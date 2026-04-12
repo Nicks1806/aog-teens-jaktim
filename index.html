@@ -1464,7 +1464,6 @@ body,nav,.hero,.srow,.sc,.wrap,.sidebar,.tbox,.t-wrap,.cpanel,.cpanel.full,.cg-c
     <span style="font-size:10px;font-family:monospace;background:#f0f0f0;padding:2px 6px;border-radius:4px;color:#666">v10</span><div class="live-badge"><div class="live-dot"></div><span class="live-txt">Live</span></div>
     <span class="nav-date">Kamis, 02 Apr 2026</span>
     <button class="theme-btn" onclick="openSheetsSettings()" title="Sambungkan Google Sheets" id="sheetsBtn" style="font-size:14px">📊</button>
-    <button class="theme-btn" onclick="toggleTheme()" id="themeBtn" title="Toggle dark/light mode">🌙</button>
   </div>
 
 <!-- SHEETS SETTINGS MODAL -->
@@ -3208,13 +3207,8 @@ function toggleTheme(){
   localStorage.setItem('aog-theme', isDark ? 'light' : 'dark');
 }
 
-// Restore saved theme
-(function(){
-  const saved = localStorage.getItem('aog-theme') || 'light';
-  document.documentElement.setAttribute('data-theme', saved);
-  const btn = document.getElementById('themeBtn');
-  if(btn) btn.textContent = saved === 'dark' ? '☀️' : '🌙';
-})();
+// Force light mode only
+(function(){ document.documentElement.setAttribute('data-theme', 'light'); localStorage.removeItem('aog-theme'); })();
 
 // ─── EVENTS SYSTEM (Supabase realtime) ───────────────
 let CUSTOM_EVENTS = []; // loaded from Supabase
