@@ -36,7 +36,7 @@ const DATA_START_ROW  = 4;   // Row 4 = mulai data nama
 const NAMA_COL        = 3;   // Kolom C = Nama
 const CG_COL          = 1;   // Kolom A = CG
 const NO_COL          = 2;   // Kolom B = No
-const DATE_START_COL  = 4;   // Kolom D = tanggal pertama
+const DATE_START_COL  = 5;   // Kolom E = tanggal pertama
 
 // Detail sheet layout
 const DETAIL_HEADER_ROW = 3;
