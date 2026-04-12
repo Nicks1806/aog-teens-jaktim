@@ -2245,8 +2245,17 @@ function setSort(mode){
   go();
 }
 
+function _statusOrder(nama){
+  const s=(getStatus(nama)||'').toLowerCase().trim();
+  if(s==='cgl'||s==='leader') return 0;
+  if(s==='sponsor') return 1;
+  if(s==='member') return 2;
+  if(s==='simpatisan') return 3;
+  if(s==='vip') return 4;
+  return 5;
+}
 function applySortToRows(rows, dates){
-  if(sortMode==='cg') return [...rows].sort((a,b)=>a.cg.localeCompare(b.cg)||a.nama.localeCompare(b.nama));
+  if(sortMode==='cg') return [...rows].sort((a,b)=>a.cg.localeCompare(b.cg)||_statusOrder(a.nama)-_statusOrder(b.nama)||a.nama.localeCompare(b.nama));
   if(sortMode==='asc')  return [...rows].sort((a,b)=>mpct(a,dates)-mpct(b,dates));
   if(sortMode==='desc') return [...rows].sort((a,b)=>mpct(b,dates)-mpct(a,dates));
   return rows;
