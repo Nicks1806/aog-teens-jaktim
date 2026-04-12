@@ -3219,7 +3219,9 @@ function getBirthdays(){
   const now = new Date(); now.setHours(0,0,0,0);
   const thisYear = now.getFullYear();
   const bdays = [];
-  getDETAIL_LIVE().forEach(member=>{
+  // Gabungkan ulang tahun dari kedua region
+  const allMembers = [...DETAIL_LIVE, ...DETAIL_LIVE2];
+  allMembers.forEach(member=>{
     if(!member.lahir) return;
     const bd = parseDate(member.lahir);
     if(!bd) return;
