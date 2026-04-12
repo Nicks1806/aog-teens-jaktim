@@ -2355,6 +2355,12 @@ function hideLoadingOverlay(){
     rebuildMonthFilter();
     rebuildCGFilter();
     await loadFromSupabase();
+    // On mobile, default to current month so only that month's dates show
+    if(window.innerWidth <= 768){
+      const now = new Date();
+      const MON_CODE_INIT = ['JAN','FEB','MAR','APR','MEI','JUN','JUL','AGS','SEP','OKT','NOV','DES'];
+      document.getElementById('moF').value = MON_CODE_INIT[now.getMonth()];
+    }
     go();
   } catch(e) {
     console.error('Init error:', e);
