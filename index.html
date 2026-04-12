@@ -3848,12 +3848,12 @@ async function syncAllToSheets(){
 
   try {
     // Apps Script fetch langsung dari Supabase — lebih reliable dari push
-    const url = SHEETS_URL + '?action=syncAll';
+    const url = SHEETS_URL + '?action=syncAll&region=' + REGION;
     const resp = await fetch(url, { mode:'no-cors' });
     showSheetsStatus('✅ Sync diminta! Data akan terupdate dalam beberapa detik.','green');
   } catch(e) {
     // Fallback JSONP
-    const payload = encodeURIComponent(JSON.stringify({ action:'syncAll' }));
+    const payload = encodeURIComponent(JSON.stringify({ action:'syncAll', region: REGION }));
     callSheetsScript(payload,
       ()=> showSheetsStatus('✅ Sync selesai!','green'),
       ()=> showSheetsStatus('❌ Gagal. Pastikan Apps Script aktif.','red')
@@ -3871,7 +3871,7 @@ async function pushAttendanceToSheets(nama, dateIdx, status){
   if(!tanggal) return;
   // Add to queue (replace duplicate for same nama+tanggal)
   _sheetsQueue = _sheetsQueue.filter(q=>!(q.nama===nama&&q.tanggal===tanggal));
-  _sheetsQueue.push({nama, tanggal, status});
+  _sheetsQueue.push({nama, tanggal, status, region: REGION});
   processSheetQueue();
 }
 
@@ -3881,7 +3881,7 @@ function processSheetQueue(){
   showSheetsSyncDot('syncing');
   const item = _sheetsQueue.shift();
   const payload = encodeURIComponent(JSON.stringify({
-    action:'update_attendance', nama:item.nama, tanggal:item.tanggal, status:item.status
+    action:'update_attendance', nama:item.nama, tanggal:item.tanggal, status:item.status, region:item.region||'jaktim1'
   }));
   callSheetsScript(payload,
     ()=>{ _sheetsRunning=false; if(_sheetsQueue.length>0) processSheetQueue(); else showSheetsSyncDot('ok'); },
