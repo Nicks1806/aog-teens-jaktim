@@ -2247,7 +2247,7 @@ function setSort(mode){
 
 function _statusOrder(nama){
   const s=(getStatus(nama)||'').toLowerCase().trim();
-  if(s==='cgl'||s==='leader') return 0;
+  if(s==='cgl'||s==='leader'||s==='cgl ') return 0;
   if(s==='sponsor') return 1;
   if(s==='member') return 2;
   if(s==='simpatisan') return 3;
