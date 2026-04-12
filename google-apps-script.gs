@@ -149,11 +149,52 @@ function syncAbsensi(region, sheetName) {
     attMap[m.nama][dateMap[a.date_id]] = a.status;
   });
 
-  // Get sheet date headers
+  // ── Auto-generate kolom tanggal baru dari Supabase ──
   var lastCol = sheet.getLastColumn();
   var dateCount = lastCol - DATE_START_COL + 1;
-  if (dateCount < 1) { Logger.log('⚠️ Tidak ada kolom tanggal'); return; }
-  var sheetDates = sheet.getRange(HEADER_DATE_ROW, DATE_START_COL, 1, dateCount).getValues()[0];
+  var sheetDates = dateCount > 0 ? sheet.getRange(HEADER_DATE_ROW, DATE_START_COL, 1, dateCount).getValues()[0] : [];
+  var sheetDateNorms = sheetDates.map(function(d){ return normDate(String(d)); });
+  var MONTH_LABEL = {JAN:'JAN',FEB:'FEB',MAR:'MAR',APR:'APR',MEI:'MEI',JUN:'JUN',JUL:'JUL',AGS:'AGS',SEP:'SEP',OKT:'OKT',NOV:'NOV',DES:'DES'};
+  var addedCols = 0;
+  dates.forEach(function(d){
+    var nd = normDate(d.label);
+    if (sheetDateNorms.indexOf(nd) < 0) {
+      // Tanggal baru — tambah kolom di akhir
+      var newCol = DATE_START_COL + sheetDates.length + addedCols;
+      // Cek apakah perlu header bulan baru di row 1
+      var mc = (d.month_code || '').toUpperCase();
+      var prevMC = '';
+      if (addedCols > 0 || sheetDates.length > 0) {
+        var prevColIdx = newCol - 1;
+        if (prevColIdx >= DATE_START_COL) {
+          var prevLabel = sheet.getRange(HEADER_DATE_ROW, prevColIdx).getValue();
+          var prevND = normDate(String(prevLabel));
+          var parts = prevND.split('-');
+          var prevMonths = {1:'JAN',2:'FEB',3:'MAR',4:'APR',5:'MEI',6:'JUN',7:'JUL',8:'AGS',9:'SEP',10:'OKT',11:'NOV',12:'DES'};
+          prevMC = prevMonths[parseInt(parts[1])] || '';
+        }
+      }
+      // Tulis header bulan di row 1 kalau bulan berubah
+      if (mc && mc !== prevMC) {
+        sheet.getRange(1, newCol).setValue(mc).setFontWeight('bold');
+        sheet.getRange(2, newCol).setValue('IBADAH').setFontWeight('bold');
+      }
+      // Tulis tanggal di row 3 (format: d-m-yy)
+      var dateLabel = d.label; // "3 Jan" format
+      var dnParts = normDate(dateLabel).split('-'); // "3-1"
+      var dateFormatted = dnParts[0] + '-' + dnParts[1] + '-26';
+      sheet.getRange(HEADER_DATE_ROW, newCol).setValue(dateFormatted).setFontWeight('bold');
+      addedCols++;
+      Logger.log('✓ Kolom baru: ' + dateFormatted + ' di kolom ' + newCol);
+    }
+  });
+  if (addedCols > 0) SpreadsheetApp.flush();
+
+  // Re-read sheet dates after adding new columns
+  lastCol = sheet.getLastColumn();
+  dateCount = lastCol - DATE_START_COL + 1;
+  if (dateCount < 1) return;
+  sheetDates = sheet.getRange(HEADER_DATE_ROW, DATE_START_COL, 1, dateCount).getValues()[0];
 
   // Get all names in sheet
   var lastRow = sheet.getLastRow();
