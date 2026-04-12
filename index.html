@@ -94,7 +94,6 @@ function showSyncing(){
 // ─── LOAD FROM SUPABASE ───────────────────
 async function loadFromSupabase(){
   try {
-    // Load everything in parallel
     const [attRes, memRes, dateRes, cgRes] = await Promise.all([
       supa.from('attendance').select('member_id, date_id, status'),
       supa.from('members').select('*'),
@@ -113,90 +112,137 @@ async function loadFromSupabase(){
     const dateRows = dateRes.data || [];
     const cgRows   = cgRes.data   || [];
 
-    // ── Rebuild DATES from Supabase (fixes hardcoded array) ──
-    if(dateRows.length > 0){
-      // Sort by sort_order to ensure correct order
-      const sorted = [...dateRows].sort((a,b)=>(a.sort_order??0)-(b.sort_order??0));
-      DATES = sorted.map(dr=>({
-        l: dr.label,
-        m: dr.month_code || dr.m || '',
-        id: dr.id,
-      }));
-      // Extend each member's a[] to match new DATES length
-      DATA.forEach(r=>{
-        while(r.a.length < DATES.length) r.a.push(null);
-      });
-      console.log('✓ DATES rebuilt from Supabase:', DATES.length, 'dates');
-      // Rebuild month filter chips now that DATES is updated
-      if(typeof rebuildMonthFilter === 'function') rebuildMonthFilter();
+    // Split by region
+    const memJ1 = memRows.filter(m => (m.region||'jaktim1') === 'jaktim1');
+    const memJ2 = memRows.filter(m => m.region === 'jaktim2');
+    const dateJ1 = dateRows.filter(d => (d.region||'jaktim1') === 'jaktim1');
+    const dateJ2 = dateRows.filter(d => d.region === 'jaktim2');
+    const cgJ1 = cgRows.filter(c => (c.region||'jaktim1') === 'jaktim1');
+    const cgJ2 = cgRows.filter(c => c.region === 'jaktim2');
+
+    // ── Rebuild DATES from Supabase ──
+    if(dateJ1.length > 0){
+      const sorted = [...dateJ1].sort((a,b)=>(a.sort_order??0)-(b.sort_order??0));
+      DATES = sorted.map(dr=>({ l: dr.label, m: dr.month_code || '', id: dr.id }));
+      DATA.forEach(r=>{ while(r.a.length < DATES.length) r.a.push(null); });
+      console.log('✓ DATES (J1) rebuilt:', DATES.length);
+    }
+    if(dateJ2.length > 0){
+      const sorted = [...dateJ2].sort((a,b)=>(a.sort_order??0)-(b.sort_order??0));
+      DATES2 = sorted.map(dr=>({ l: dr.label, m: dr.month_code || '', id: dr.id }));
+      DATA2.forEach(r=>{ while(r.a.length < DATES2.length) r.a.push(null); });
+      console.log('✓ DATES2 (J2) rebuilt:', DATES2.length);
     }
 
-    // Build date_id → DATES index map (by id first, then label fallback)
-    const dateIdxMap = {};
-    dateRows.forEach(dr => {
-      // Primary: match by id stored in DATES
-      let idx = DATES.findIndex(d => d.id === dr.id);
-      // Fallback: label match
-      if(idx < 0) idx = DATES.findIndex(d => d.l === dr.label);
-      if(idx < 0) idx = DATES.findIndex(d => d.l.trim() === dr.label?.trim());
-      if(idx >= 0) dateIdxMap[dr.id] = idx;
-    });
-    console.log('dateIdxMap:', dateIdxMap);
+    // Rebuild month filter chips now that DATES is updated
+    if(typeof rebuildMonthFilter === 'function') rebuildMonthFilter();
 
-    // Apply attendance to DATA
+    // Build date_id → index maps for both regions
+    const dateIdxMap1 = {};
+    dateJ1.forEach(dr => {
+      const idx = DATES.findIndex(d => d.id === dr.id || d.l === dr.label);
+      if(idx >= 0) dateIdxMap1[dr.id] = idx;
+    });
+    const dateIdxMap2 = {};
+    dateJ2.forEach(dr => {
+      const idx = DATES2.findIndex(d => d.id === dr.id || d.l === dr.label);
+      if(idx >= 0) dateIdxMap2[dr.id] = idx;
+    });
+
+    // Build member ID sets for region lookup
+    const j1MemberIds = new Set(memJ1.map(m => m.id));
+    const j2MemberIds = new Set(memJ2.map(m => m.id));
+
+    // Apply attendance — both regions
     if(attRows.length > 0){
-      // Reset all attendance first so DB is source of truth
       DATA.forEach(r => { r.a = new Array(DATES.length).fill(null); });
+      DATA2.forEach(r => { r.a = new Array(DATES2.length).fill(null); });
       attRows.forEach(row => {
-        const r = DATA.find(d => d.id === row.member_id);
-        if(!r) return;
-        const idx = dateIdxMap[row.date_id];
-        if(idx === undefined || idx < 0) return;
-        r.a[idx] = row.status || null;
+        if(j1MemberIds.has(row.member_id)){
+          const r = DATA.find(d => d.id === row.member_id);
+          if(!r) return;
+          const idx = dateIdxMap1[row.date_id];
+          if(idx === undefined) return;
+          r.a[idx] = row.status || null;
+        } else if(j2MemberIds.has(row.member_id)){
+          const r = DATA2.find(d => d.id === row.member_id);
+          if(!r) return;
+          const idx = dateIdxMap2[row.date_id];
+          if(idx === undefined) return;
+          r.a[idx] = row.status || null;
+        }
       });
       console.log('✓ Attendance applied:', attRows.length, 'records');
     }
 
-    // Apply member details to DETAIL_LIVE and sync IDs with DB
-    if(memRows && memRows.length > 0){
-      memRows.forEach(m => {
-        // ── Sync DATA id to match DB id (critical for realtime!) ──
+    // Sync member details — Jaktim 1
+    if(memJ1.length > 0){
+      memJ1.forEach(m => {
         const dr = DATA.find(d => d.nama.trim().toLowerCase() === m.nama?.trim().toLowerCase());
         if(dr && m.id !== undefined) dr.id = m.id;
-
         const dl = DETAIL_LIVE.find(d => d.nama.trim().toLowerCase() === m.nama?.trim().toLowerCase());
         if(dl){
-          if(m.status)     dl.status   = m.status;
-          if(m.lahir)      dl.lahir    = m.lahir;
-          if(m.wa)         dl.wa       = m.wa;
-          if(m.sekolah)    dl.sekolah  = m.sekolah;
-          if(m.kelas)      dl.kelas    = m.kelas;
-          if(m.kelurahan)  dl.kelurahan= m.kelurahan;
-          if(m.kecamatan)  dl.kecamatan= m.kecamatan;
-          if(m.notes)      dl.notes    = m.notes;
-          if(m.msj1   !== null) dl.msj1    = m.msj1;
-          if(m.msj2   !== null) dl.msj2    = m.msj2;
-          if(m.msj3   !== null) dl.msj3    = m.msj3;
-          if(m.cgt1   !== null) dl.cgt1    = m.cgt1;
-          if(m.cgt2   !== null) dl.cgt2    = m.cgt2;
-          if(m.cgt3   !== null) dl.cgt3    = m.cgt3;
+          if(m.status) dl.status = m.status;
+          if(m.lahir) dl.lahir = m.lahir;
+          if(m.wa) dl.wa = m.wa;
+          if(m.sekolah) dl.sekolah = m.sekolah;
+          if(m.kelas) dl.kelas = m.kelas;
+          if(m.kelurahan) dl.kelurahan = m.kelurahan;
+          if(m.kecamatan) dl.kecamatan = m.kecamatan;
+          if(m.notes) dl.notes = m.notes;
+          if(m.msj1 !== null) dl.msj1 = m.msj1;
+          if(m.msj2 !== null) dl.msj2 = m.msj2;
+          if(m.msj3 !== null) dl.msj3 = m.msj3;
+          if(m.cgt1 !== null) dl.cgt1 = m.cgt1;
+          if(m.cgt2 !== null) dl.cgt2 = m.cgt2;
+          if(m.cgt3 !== null) dl.cgt3 = m.cgt3;
+          if(m.baptis_air !== null) dl.baptisAir = m.baptis_air;
+          if(m.baptis_roh !== null) dl.baptisRoh = m.baptis_roh;
+        }
+      });
+    }
+    // Sync member details — Jaktim 2
+    if(memJ2.length > 0){
+      memJ2.forEach(m => {
+        const dr = DATA2.find(d => d.nama.trim().toLowerCase() === m.nama?.trim().toLowerCase());
+        if(dr && m.id !== undefined) dr.id = m.id;
+        const dl = DETAIL_LIVE2.find(d => d.nama.trim().toLowerCase() === m.nama?.trim().toLowerCase());
+        if(dl){
+          if(m.status) dl.status = m.status;
+          if(m.lahir) dl.lahir = m.lahir;
+          if(m.wa) dl.wa = m.wa;
+          if(m.sekolah) dl.sekolah = m.sekolah;
+          if(m.kelas) dl.kelas = m.kelas;
+          if(m.kelurahan) dl.kelurahan = m.kelurahan;
+          if(m.kecamatan) dl.kecamatan = m.kecamatan;
+          if(m.notes) dl.notes = m.notes;
+          if(m.msj1 !== null) dl.msj1 = m.msj1;
+          if(m.msj2 !== null) dl.msj2 = m.msj2;
+          if(m.msj3 !== null) dl.msj3 = m.msj3;
+          if(m.cgt1 !== null) dl.cgt1 = m.cgt1;
+          if(m.cgt2 !== null) dl.cgt2 = m.cgt2;
+          if(m.cgt3 !== null) dl.cgt3 = m.cgt3;
           if(m.baptis_air !== null) dl.baptisAir = m.baptis_air;
           if(m.baptis_roh !== null) dl.baptisRoh = m.baptis_roh;
         }
       });
     }
 
-    // Apply CG info
-    if(cgRows && cgRows.length > 0){
-      cgRows.forEach(cg => {
-        if(!CG_INFO[cg.cg]) CG_INFO[cg.cg] = {};
-        CG_INFO[cg.cg].leader  = cg.leader  || CG_INFO[cg.cg].leader;
-        CG_INFO[cg.cg].hariJam = cg.hari_jam|| CG_INFO[cg.cg].hariJam;
-        CG_INFO[cg.cg].lokasi  = cg.lokasi  || CG_INFO[cg.cg].lokasi;
-      });
-    }
+    // Apply CG info — both regions
+    cgJ1.forEach(cg => {
+      if(!CG_INFO[cg.cg]) CG_INFO[cg.cg] = {};
+      CG_INFO[cg.cg].leader = cg.leader || CG_INFO[cg.cg].leader;
+      CG_INFO[cg.cg].hariJam = cg.hari_jam || CG_INFO[cg.cg].hariJam;
+      CG_INFO[cg.cg].lokasi = cg.lokasi || CG_INFO[cg.cg].lokasi;
+    });
+    cgJ2.forEach(cg => {
+      if(!CG_INFO2[cg.cg]) CG_INFO2[cg.cg] = {};
+      CG_INFO2[cg.cg].leader = cg.leader || CG_INFO2[cg.cg].leader;
+      CG_INFO2[cg.cg].hariJam = cg.hari_jam || CG_INFO2[cg.cg].hariJam;
+      CG_INFO2[cg.cg].lokasi = cg.lokasi || CG_INFO2[cg.cg].lokasi;
+    });
 
-    console.log('✓ Loaded from Supabase');
+    console.log('✓ Loaded from Supabase (both regions)');
   } catch(e) {
     console.warn('Supabase load error (using local data):', e.message);
   }
@@ -208,11 +254,12 @@ async function getOrCreateDateId(label, monthCode, sortOrder){
     .from('dates')
     .select('id')
     .eq('label', label)
+    .eq('region', REGION)
     .single();
   if(data) return data.id;
   const { data: ins, error: insErr } = await supa
     .from('dates')
-    .insert({ label, month_code: monthCode, sort_order: sortOrder })
+    .insert({ label, month_code: monthCode, sort_order: sortOrder, region: REGION })
     .select('id')
     .single();
   if(insErr) throw insErr;
@@ -243,7 +290,7 @@ async function saveMemberDetail(nama, fields){
   try {
     const r = getDATA().find(d => d.nama.trim().toLowerCase() === nama.trim().toLowerCase());
     if(!r) return;
-    const payload = { id: r.id, nama: r.nama, cg: r.cg, ...fields };
+    const payload = { id: r.id, nama: r.nama, cg: r.cg, region: REGION, ...fields };
     const { error } = await supa
       .from('members')
       .upsert(payload, { onConflict: 'id' });
@@ -262,7 +309,7 @@ async function saveCGInfoToDB(cg){
     const info = getCG_INFO()[cg] || {};
     const { error } = await supa
       .from('cg_info')
-      .upsert({ cg, leader: info.leader||'', hari_jam: info.hariJam||'', lokasi: info.lokasi||'' },
+      .upsert({ cg, leader: info.leader||'', hari_jam: info.hariJam||'', lokasi: info.lokasi||'', region: REGION },
               { onConflict: 'cg' });
     if(error) throw error;
     showSaveIndicator(true);
@@ -306,10 +353,15 @@ function setRTStatus(status){
 // ─── BUILD DATE ID → INDEX MAP ────────────────
 function buildRTDateMap(){
   _rtDateMap = {};
-  supa.from('dates').select('id, label').then(({data}) => {
+  supa.from('dates').select('id, label, region').then(({data}) => {
     if(data) data.forEach(dr => {
-      const idx = DATES.findIndex(d => d.l === dr.label);
-      if(idx >= 0) _rtDateMap[dr.id] = idx;
+      if((dr.region||'jaktim1') === 'jaktim1'){
+        const idx = DATES.findIndex(d => d.l === dr.label || d.id === dr.id);
+        if(idx >= 0) _rtDateMap[dr.id] = { region: 'jaktim1', idx };
+      } else if(dr.region === 'jaktim2'){
+        const idx = DATES2.findIndex(d => d.l === dr.label || d.id === dr.id);
+        if(idx >= 0) _rtDateMap[dr.id] = { region: 'jaktim2', idx };
+      }
     });
     console.log('RT date map built:', Object.keys(_rtDateMap).length, 'entries');
   });
@@ -322,10 +374,7 @@ let _lastPollTime = 0;
 
 async function pollAttendance(){
   try {
-    // Check for new dates first
     await pollDates();
-
-    // Fetch semua attendance (tidak pakai updated_at karena mungkin tidak ada)
     const { data, error } = await supa
       .from('attendance')
       .select('member_id, date_id, status');
@@ -333,15 +382,21 @@ async function pollAttendance(){
 
     let changed = false;
     data.forEach(row => {
-      const r = DATA.find(d => d.id === row.member_id);
+      let r = DATA.find(d => d.id === row.member_id);
+      let mapEntry = _rtDateMap[row.date_id];
+      let dIdx;
+
+      if(!r) r = DATA2.find(d => d.id === row.member_id);
       if(!r) return;
-      const dIdx = _rtDateMap[row.date_id];
+
+      if(mapEntry && typeof mapEntry === 'object') dIdx = mapEntry.idx;
+      else if(typeof mapEntry === 'number') dIdx = mapEntry;
       if(dIdx === undefined) return;
+
       const newStatus = row.status || null;
-      if(r.a[dIdx] === newStatus) return; // tidak berubah
+      if(r.a[dIdx] === newStatus) return;
       r.a[dIdx] = newStatus;
       changed = true;
-      // Update DOM dot langsung
       const k = newStatus||'X';
       const label = newStatus||'–';
       const dotEl = document.querySelector(`[data-id="${row.member_id}"][data-di="${dIdx}"]`);
@@ -358,23 +413,26 @@ async function pollDates(){
   try {
     const { data, error } = await supa
       .from('dates')
-      .select('id, label, month_code, sort_order')
+      .select('id, label, month_code, sort_order, region')
       .order('sort_order');
     if(error || !data) return;
     let newDate = false;
     data.forEach(row => {
-      if(!DATES.find(d => d.l === row.label)){
-        DATES.push({ l: row.label, m: row.month_code||'', sort: row.sort_order||DATES.length });
-        DATA.forEach(r => r.a.push(null));
+      const isJ2 = row.region === 'jaktim2';
+      const targetDATES = isJ2 ? DATES2 : DATES;
+      const targetDATA = isJ2 ? DATA2 : DATA;
+      if(!targetDATES.find(d => d.l === row.label)){
+        targetDATES.push({ l: row.label, m: row.month_code||'', id: row.id, sort: row.sort_order||targetDATES.length });
+        targetDATA.forEach(r => r.a.push(null));
         newDate = true;
       }
     });
     if(newDate){
       DATES.sort((a,b)=>(a.sort||0)-(b.sort||0));
+      DATES2.sort((a,b)=>(a.sort||0)-(b.sort||0));
       buildRTDateMap();
       rebuildMonthFilter();
       go();
-      console.log('✓ Date baru ditemukan via polling');
     }
   } catch(e) {}
 }
@@ -391,29 +449,37 @@ function applyAttendanceChange(payload){
   const row = payload.new || payload.old;
   if(!row) return;
 
-  const r = DATA.find(d => d.id === row.member_id);
+  // Try both regions
+  let r = DATA.find(d => d.id === row.member_id);
+  let targetDates = DATES;
+  let mapEntry = _rtDateMap[row.date_id];
+
+  if(!r){
+    r = DATA2.find(d => d.id === row.member_id);
+    targetDates = DATES2;
+  }
   if(!r){ console.warn('RT: Member not found:', row.member_id); return; }
 
-  const dIdx = _rtDateMap[row.date_id];
-  if(dIdx === undefined){ console.warn('RT: Date not found:', row.date_id, '_rtDateMap:', _rtDateMap); return; }
+  let dIdx;
+  if(mapEntry && typeof mapEntry === 'object'){
+    dIdx = mapEntry.idx;
+  } else if(typeof mapEntry === 'number'){
+    dIdx = mapEntry; // backward compat
+  }
+  if(dIdx === undefined){ console.warn('RT: Date not found:', row.date_id); return; }
 
   const newStatus = payload.eventType === 'DELETE' ? null : (row.status || null);
   r.a[dIdx] = newStatus;
   console.log('✓ RT attendance:', r.nama, 'idx', dIdx, '→', newStatus);
 
-  // Update DOM langsung — cari dot via data attribute
   const k = newStatus||'X';
   const label = newStatus||'–';
   const dotEl = document.querySelector(`[data-id="${row.member_id}"][data-di="${dIdx}"]`);
   if(dotEl){
     dotEl.className = dotEl.className.replace(/\b(H|I|S|A|X)\b/g,'').trim() + ' ' + k;
     dotEl.textContent = label;
-    console.log('✓ DOM updated for', r.nama);
-  } else {
-    console.warn('Dot element not found for', row.member_id, dIdx, '— will re-render');
   }
 
-  // Debounce stats update (ringan)
   clearTimeout(_rtDebounce);
   _rtDebounce = setTimeout(() => {
     debouncedStats(filt, getCurrentDates());
@@ -425,14 +491,19 @@ function applyMemberChange(payload){
   const { eventType, new: nw, old: ol } = payload;
   console.log('✓ RT member:', eventType, nw || ol);
 
+  const memberRegion = (nw?.region || ol?.region || 'jaktim1');
+  const isJ2 = memberRegion === 'jaktim2';
+  // Use direct references (not getters) since we need to modify the correct array
+  const targetDATA = isJ2 ? DATA2 : DATA;
+  const targetDATES = isJ2 ? DATES2 : DATES;
+  const targetDL = isJ2 ? DETAIL_LIVE2 : DETAIL_LIVE;
+
   if(eventType === 'INSERT' && nw){
-    // Add to DATA if not already present
-    if(!DATA.find(d => d.id === nw.id)){
-      DATA.push({ id: nw.id, cg: nw.cg||'', nama: nw.nama||'', a: new Array(DATES.length).fill(null) });
+    if(!targetDATA.find(d => d.id === nw.id)){
+      targetDATA.push({ id: nw.id, cg: nw.cg||'', nama: nw.nama||'', a: new Array(targetDATES.length).fill(null) });
     }
-    // Add to DETAIL_LIVE if not already present
-    if(!DETAIL_LIVE.find(d => d.nama?.trim().toLowerCase() === nw.nama?.trim().toLowerCase())){
-      DETAIL_LIVE.push({
+    if(!targetDL.find(d => d.nama?.trim().toLowerCase() === nw.nama?.trim().toLowerCase())){
+      targetDL.push({
         nama: nw.nama||'', cg: nw.cg||'', status: nw.status||'Member',
         lahir: nw.lahir||'', wa: nw.wa||'', sekolah: nw.sekolah||'', kelas: nw.kelas||'',
         kelurahan: nw.kelurahan||'', kecamatan: nw.kecamatan||'',
@@ -444,12 +515,10 @@ function applyMemberChange(payload){
     rebuildCGFilter(); go();
 
   } else if(eventType === 'UPDATE' && nw){
-    // Update DATA cg/nama if changed
-    const dr = DATA.find(d => d.id === nw.id);
+    const dr = targetDATA.find(d => d.id === nw.id);
     if(dr){ if(nw.cg) dr.cg = nw.cg; if(nw.nama) dr.nama = nw.nama; }
-    // Update DETAIL_LIVE
-    const dl = DETAIL_LIVE.find(d => d.nama?.trim().toLowerCase() === (nw.nama||ol?.nama||'').trim().toLowerCase())
-            || DETAIL_LIVE.find(d => d.nama?.trim().toLowerCase() === (ol?.nama||'').trim().toLowerCase());
+    const dl = targetDL.find(d => d.nama?.trim().toLowerCase() === (nw.nama||ol?.nama||'').trim().toLowerCase())
+            || targetDL.find(d => d.nama?.trim().toLowerCase() === (ol?.nama||'').trim().toLowerCase());
     if(dl){
       if(nw.status)     dl.status    = nw.status;
       if(nw.lahir)      dl.lahir     = nw.lahir;
@@ -472,10 +541,11 @@ function applyMemberChange(payload){
     rebuildCGFilter(); go();
 
   } else if(eventType === 'DELETE' && ol){
-    DATA = DATA.filter(d => d.id !== ol.id);
+    const idx = targetDATA.findIndex(d => d.id === ol.id);
+    if(idx >= 0) targetDATA.splice(idx, 1);
     const olNama = ol.nama?.trim().toLowerCase();
-    const dlIdx = DETAIL_LIVE.findIndex(d => d.nama?.trim().toLowerCase() === olNama);
-    if(dlIdx >= 0) DETAIL_LIVE.splice(dlIdx, 1);
+    const dlIdx = targetDL.findIndex(d => d.nama?.trim().toLowerCase() === olNama);
+    if(dlIdx >= 0) targetDL.splice(dlIdx, 1);
     rebuildCGFilter(); go();
   }
 }
@@ -487,12 +557,13 @@ function applyCGInfoChange(payload){
 
   if((eventType === 'INSERT' || eventType === 'UPDATE') && nw){
     const cgKey = nw.cg;
+    const isJ2 = nw.region === 'jaktim2';
+    const targetCG = isJ2 ? CG_INFO2 : CG_INFO;
     if(cgKey){
-      if(!CG_INFO[cgKey]) CG_INFO[cgKey] = {};
-      if(nw.leader)   CG_INFO[cgKey].leader  = nw.leader;
-      if(nw.hari_jam) CG_INFO[cgKey].hariJam = nw.hari_jam;
-      if(nw.lokasi)   CG_INFO[cgKey].lokasi  = nw.lokasi;
-      // Refresh open CG detail panel if it belongs to this CG
+      if(!targetCG[cgKey]) targetCG[cgKey] = {};
+      if(nw.leader)   targetCG[cgKey].leader  = nw.leader;
+      if(nw.hari_jam) targetCG[cgKey].hariJam = nw.hari_jam;
+      if(nw.lokasi)   targetCG[cgKey].lokasi  = nw.lokasi;
       const openPanel = document.getElementById('cgdetail-panel');
       if(openPanel && openPanel.dataset.cg === cgKey) openPanel.dispatchEvent(new Event('refresh'));
     }
@@ -504,13 +575,13 @@ function applyDatesChange(payload){
   const { eventType, new: nw } = payload;
   console.log('✓ RT dates:', eventType, nw);
   if(eventType === 'INSERT' && nw){
-    // Check if date already exists in DATES
-    if(!DATES.find(d => d.l === nw.label)){
-      DATES.push({ l: nw.label, m: nw.month_code || nw.label.split(' ').pop() || '', sort: nw.sort_order || DATES.length });
-      DATES.sort((a,b) => (a.sort||0) - (b.sort||0));
-      // Extend attendance arrays
-      DATA.forEach(r => { r.a.push(null); });
-      // Rebuild date map
+    const isJ2 = nw.region === 'jaktim2';
+    const targetDATES = isJ2 ? DATES2 : DATES;
+    const targetDATA = isJ2 ? DATA2 : DATA;
+    if(!targetDATES.find(d => d.l === nw.label)){
+      targetDATES.push({ l: nw.label, m: nw.month_code || '', id: nw.id, sort: nw.sort_order || targetDATES.length });
+      targetDATES.sort((a,b) => (a.sort||0) - (b.sort||0));
+      targetDATA.forEach(r => { r.a.push(null); });
       buildRTDateMap();
       rebuildMonthFilter();
       go();
