@@ -149,6 +149,16 @@ async function loadFromSupabase(){
       if(idx >= 0) dateIdxMap2[dr.id] = idx;
     });
 
+    // ── Sync member IDs FIRST (before attendance) ──
+    memJ1.forEach(m => {
+      const dr = DATA.find(d => d.nama.trim().toLowerCase() === m.nama?.trim().toLowerCase());
+      if(dr && m.id !== undefined) dr.id = m.id;
+    });
+    memJ2.forEach(m => {
+      const dr = DATA2.find(d => d.nama.trim().toLowerCase() === m.nama?.trim().toLowerCase());
+      if(dr && m.id !== undefined) dr.id = m.id;
+    });
+
     // Build member ID sets for region lookup
     const j1MemberIds = new Set(memJ1.map(m => m.id));
     const j2MemberIds = new Set(memJ2.map(m => m.id));
