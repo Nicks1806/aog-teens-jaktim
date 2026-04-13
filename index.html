@@ -335,6 +335,7 @@ body{font-family:'Inter',sans-serif;background:#f8f8f5;color:#1c1c1c;min-height:
 <div class="app" id="pageD">
   <div class="app-nav"><div class="app-nav-left"><div class="app-back" onclick="goBack()">&larr;</div><span class="app-cg-badge" id="nB"></span><span class="app-cgl" id="nN"></span></div><div style="display:flex;align-items:center;gap:6px"><span class="live-dot"></span><span style="font-size:10px;color:var(--green);font-weight:600">Live</span></div></div>
   <div class="app-hero"><div class="app-hero-tag">Januari &mdash; April 2026</div><div class="app-hero-h">Rekap<br><em>CG.</em></div><div class="app-hero-meta"><span id="hC">0</span> anggota &middot; <span id="hS"></span> &middot; <span id="hL"></span></div></div>
+  <div id="regionVisiBanner" style="display:none;margin:12px 20px 0;padding:12px 16px;background:linear-gradient(135deg,#faf5ff,#f5f0ff);border-left:4px solid #6C5CE7;border-radius:10px"></div>
   <div class="app-stats">
     <div class="app-stat ct"><div class="app-stat-label">Hadir</div><div class="app-stat-num" id="sH">0</div><div class="app-stat-pct" id="sHp">0%</div></div>
     <div class="app-stat cb"><div class="app-stat-label">Izin</div><div class="app-stat-num" id="sI">0</div><div class="app-stat-pct" id="sIp">0%</div></div>
@@ -428,6 +429,25 @@ async function saveVision(cg, region, visi, misi) {
     console.error('[saveVision]', e);
     toast('\u274c Gagal simpan: ' + (e.message||'unknown'));
   }
+}
+
+// Coach region vision — disimpan di cg_vision dengan cg='__COACH_<region>__'
+async function saveCoachVisiFromUI(region) {
+  const v = document.getElementById('coachVisi_'+region)?.value || '';
+  const m = document.getElementById('coachMisi_'+region)?.value || '';
+  await saveCoachRegionVision(region, v, m);
+}
+
+async function loadCoachRegionVision(region) {
+  if (!region || region === 'all') return {visi:'', misi:''};
+  const cg = '__COACH_'+region+'__';
+  const {data} = await supa.from('cg_vision').select('*').eq('cg', cg).eq('region', region).maybeSingle();
+  return data || {visi:'', misi:''};
+}
+async function saveCoachRegionVision(region, visi, misi) {
+  if (!region || region === 'all') return;
+  const cg = '__COACH_'+region+'__';
+  await saveVision(cg, region, visi || '', misi || '');
 }
 
 async function loadDevPlans(cg, region) {
@@ -714,6 +734,19 @@ async function openCGDashboard(cg) {
   document.getElementById('hL').textContent = CUR_CG_INFO.lokasi || '';
 
   computeStats();
+
+  // Load coach region vision dan tampilkan sebagai banner (read-only)
+  loadCoachRegionVision(CUR_REGION).then(cv => {
+    const b = document.getElementById('regionVisiBanner');
+    if (!b) return;
+    if (cv && cv.visi) {
+      const regionLabel = CUR_REGION === 'jaktim1' ? 'Jaktim 1' : CUR_REGION === 'jaktim2' ? 'Jaktim 2' : '';
+      b.style.display = 'block';
+      b.innerHTML = '<div style="font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--purple);margin-bottom:4px">🎯 Visi Coach '+regionLabel+'</div><div style="font-size:12px;color:var(--g2);line-height:1.5;white-space:pre-wrap">'+esc(cv.visi)+'</div>'+(cv.misi ? '<div style="font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--purple);margin-top:8px;margin-bottom:4px">Misi</div><div style="font-size:12px;color:var(--g2);line-height:1.5;white-space:pre-wrap">'+esc(cv.misi)+'</div>' : '');
+    } else {
+      b.style.display = 'none';
+    }
+  });
 
   // Hanya render tab Absensi dulu — sisanya lazy-render saat user klik
   renderAbsensi();
@@ -1971,7 +2004,7 @@ function getCGStats(cg) {
   return { cg, leader, total, pct, atRisk, msPct, blmMsj1, info, mems };
 }
 
-function renderCoachOverview() {
+async function renderCoachOverview() {
   const el = document.getElementById('tab-c-overview');
   const region = coachRole === 'tl' ? 'all' : coachReg;
   const cgs = getCGsForRegion(region);
@@ -1994,6 +2027,21 @@ function renderCoachOverview() {
   if (coachRole !== 'tl') {
     html += '<div class="region-toggle" style="display:inline-flex;margin-bottom:16px;margin-top:4px"><button class="region-btn '+(coachReg==='jaktim1'?'active':'')+'" onclick="coachReg=\'jaktim1\';renderCoachOverview();renderCoachAbsensi();renderCoachMilestone();renderCoachVisi()" style="padding:6px 18px;font-size:12px">JAKTIM 1</button><button class="region-btn '+(coachReg==='jaktim2'?'active':'')+'" onclick="coachReg=\'jaktim2\';renderCoachOverview();renderCoachAbsensi();renderCoachMilestone();renderCoachVisi()" style="padding:6px 18px;font-size:12px">JAKTIM 2</button></div>';
   }
+
+  // Visi Coach per region (editable). Untuk TL, tampilkan dua kotak: Jaktim 1 + Jaktim 2
+  const visiRegions = coachRole === 'tl' ? ['jaktim1','jaktim2'] : [coachReg];
+  const visiData = {};
+  await Promise.all(visiRegions.map(async r => { visiData[r] = await loadCoachRegionVision(r); }));
+  visiRegions.forEach(r => {
+    const cv = visiData[r] || {visi:'',misi:''};
+    const rlbl = r === 'jaktim1' ? 'Jaktim 1' : 'Jaktim 2';
+    html += '<div style="background:linear-gradient(135deg,#faf5ff,#f5f0ff);border:1.5px solid #c4b5fd;border-radius:14px;padding:14px 16px;margin-bottom:14px">';
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><div style="font-size:10px;font-weight:700;letter-spacing:1.2px;color:var(--purple);text-transform:uppercase">🎯 Visi Coach '+rlbl+'</div><span style="font-size:9px;color:var(--g4)">auto-save saat klik di luar</span></div>';
+    html += '<textarea id="coachVisi_'+r+'" placeholder="Tulis visi untuk '+rlbl+'..." onblur="saveCoachVisiFromUI(\''+r+'\')" style="width:100%;min-height:60px;padding:10px 12px;border:1px solid var(--g5);border-radius:10px;font-family:Inter,sans-serif;font-size:12px;color:var(--g1);background:#fff;resize:vertical;line-height:1.5">'+esc(cv.visi||'')+'</textarea>';
+    html += '<div style="font-size:9px;font-weight:700;letter-spacing:1.2px;color:var(--purple);text-transform:uppercase;margin:10px 0 6px">Misi (opsional)</div>';
+    html += '<textarea id="coachMisi_'+r+'" placeholder="Tulis misi..." onblur="saveCoachVisiFromUI(\''+r+'\')" style="width:100%;min-height:50px;padding:10px 12px;border:1px solid var(--g5);border-radius:10px;font-family:Inter,sans-serif;font-size:12px;color:var(--g1);background:#fff;resize:vertical;line-height:1.5">'+esc(cv.misi||'')+'</textarea>';
+    html += '</div>';
+  });
 
   // CG Cards Grid
   html += '<div class="coach-grid">';
@@ -2235,6 +2283,16 @@ function renderCoachAbsensi() {
   html += '<button onclick="generateSabtuBulan(\''+scope+'\','+nextMonthInfo.year+','+nextMonthInfo.month+')" style="padding:8px 14px;border-radius:10px;border:1.5px solid #6C5CE7;background:linear-gradient(135deg,#f5f3ff,#ede9fe);color:#6C5CE7;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.3px;transition:all .2s;box-shadow:0 2px 6px rgba(108,92,231,.1)" onmouseover="this.style.transform=\'translateY(-1px)\';this.style.boxShadow=\'0 4px 12px rgba(108,92,231,.2)\'" onmouseout="this.style.transform=\'\';this.style.boxShadow=\'0 2px 6px rgba(108,92,231,.1)\'">+ '+genLabel+'</button>';
   html += '</div>';
   html += '</div>';
+
+  // Line chart: progress kehadiran per minggu (overall untuk region aktif / semua kalau TL)
+  const chartMems = region === 'all' ? ALL_MEMBERS : ALL_MEMBERS.filter(m => m.region === region);
+  const chartDates = region === 'all' ? ALL_DATES : ALL_DATES.filter(d => d.region === region);
+  const chartScopeLabel = region === 'all' ? 'Semua Region' : (region === 'jaktim1' ? 'Jaktim 1' : 'Jaktim 2');
+  const chartHtml = buildAttendanceLineChart(chartMems, chartDates, ALL_ATTENDANCE);
+  if (chartHtml) {
+    // Sisipkan label region di heading chart
+    html += chartHtml.replace('Progress Kehadiran per Minggu</div>', 'Progress Kehadiran '+chartScopeLabel+'</div>');
+  }
 
   // Per-CG card layout for cleaner visual separation
   cgs.sort().forEach(cg => {
