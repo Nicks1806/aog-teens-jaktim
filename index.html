@@ -1580,24 +1580,27 @@ async function renderPelayanan() {
   html += '</div>';
 
   // ── Sering Pelayanan (top 3) ──
-  html += '<div class="section" style="border-radius:14px;margin-bottom:0;background:linear-gradient(135deg,#f0fdf4,#ffffff);border:1px solid #bbf7d0">';
-  html += '<div class="section-title" style="margin-bottom:12px;color:#15803d">Sering Pelayanan</div>';
+  html += '<div class="section" style="border-radius:16px;margin-bottom:0;background:linear-gradient(135deg,#f0fdf4 0%,#fff 65%,#fff 100%);border:1px solid #bbf7d0;box-shadow:0 4px 20px rgba(22,163,74,.05)">';
+  html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><div style="width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px">\u2605</div><div><div style="font-weight:700;font-size:13px;color:#166534;letter-spacing:.2px">Top Pelayanan</div><div style="font-size:10px;color:#16a34a;opacity:.7;margin-top:1px">Member paling sering melayani</div></div></div>';
   const sorted = Object.entries(memberCounts).filter(e => e[1] > 0).sort((a,b) => b[1]-a[1]).slice(0,3);
   if (sorted.length === 0) {
-    html += '<div style="font-size:11px;color:var(--g3)">Data akan muncul setelah pelayanan disimpan.</div>';
+    html += '<div style="font-size:11px;color:var(--g3);font-style:italic;padding:8px 0">Data akan muncul setelah pelayanan disimpan.</div>';
   } else {
     const medals = ['#f59e0b','#94a3b8','#cd7f32'];
+    const medalBg = ['#fffbeb','#f1f5f9','#fef3c7'];
     const medalLabels = ['1','2','3'];
+    html += '<div style="display:flex;flex-direction:column;gap:6px">';
     sorted.forEach((entry, idx) => {
       const name = entry[0];
       const cnt = entry[1];
       const rls = (memberRoles[name] || []).join(', ');
-      html += '<div style="display:flex;align-items:center;gap:8px;padding:8px 0;'+(idx<2?'border-bottom:1px solid #e5e7eb':'')+'">';
-      html += '<div style="width:24px;height:24px;border-radius:50%;background:'+medals[idx]+';color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800">'+medalLabels[idx]+'</div>';
-      html += '<div style="flex:1"><div style="font-weight:600;font-size:11px">'+esc(name)+'</div><div style="font-size:9px;color:var(--g3)">'+esc(rls)+'</div></div>';
-      html += '<div style="font-size:14px;font-weight:800;color:#15803d">'+cnt+'x</div>';
+      html += '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#fff;border-radius:10px;border:1px solid '+medals[idx]+'33;transition:all .15s" onmouseover="this.style.transform=\'translateX(2px)\';this.style.boxShadow=\'0 2px 8px '+medals[idx]+'33\'" onmouseout="this.style.transform=\'\';this.style.boxShadow=\'none\'">';
+      html += '<div style="width:32px;height:32px;border-radius:50%;background:'+medalBg[idx]+';color:'+medals[idx]+';display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;border:2px solid '+medals[idx]+';flex-shrink:0">'+medalLabels[idx]+'</div>';
+      html += '<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:12px;color:var(--g1);line-height:1.2">'+esc(name)+'</div><div style="font-size:10px;color:var(--g4);margin-top:2px;letter-spacing:.3px">'+esc(rls || 'Belum ada role')+'</div></div>';
+      html += '<span style="background:#dcfce7;color:#15803d;padding:4px 10px;border-radius:14px;font-size:10px;font-weight:700;letter-spacing:.3px">'+cnt+'\u00d7</span>';
       html += '</div>';
     });
+    html += '</div>';
   }
   html += '</div>';
   html += '</div>'; // end stats grid
@@ -1605,16 +1608,28 @@ async function renderPelayanan() {
   // ── Belum Pernah / Jarang Pelayanan ──
   const jarang = MEMBERS.filter(m => (memberCounts[m.nama] || 0) <= 2).sort((a,b) => (memberCounts[a.nama]||0) - (memberCounts[b.nama]||0));
   if (jarang.length > 0 && weeks.length > 0) {
-    html += '<div class="section" style="border-radius:14px;background:linear-gradient(135deg,#fef2f2,#ffffff);border:1px solid #fecaca">';
-    html += '<div class="section-title" style="margin-bottom:10px;color:#dc2626">Belum Pernah / Jarang Pelayanan</div>';
+    html += '<div class="section" style="border-radius:16px;background:linear-gradient(135deg,#fef2f2 0%,#fff 65%,#fff 100%);border:1px solid #fecaca;box-shadow:0 4px 20px rgba(220,38,38,.05)">';
+    // Header dengan icon + counter
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">';
+    html += '<div style="display:flex;align-items:center;gap:10px"><div style="width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,#dc2626,#ef4444);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px">\u26A0</div>';
+    html += '<div><div style="font-weight:700;font-size:13px;color:#991b1b;letter-spacing:.2px">Belum Pernah / Jarang Pelayanan</div><div style="font-size:10px;color:#dc2626;opacity:.7;margin-top:1px">Member yang perlu di-follow up untuk pelayanan</div></div></div>';
+    html += '<span style="font-family:\'Instrument Serif\',serif;font-size:24px;color:#dc2626;line-height:1">'+jarang.length+'</span>';
+    html += '</div>';
+    // List
     html += '<div style="display:flex;flex-direction:column;gap:6px">';
     jarang.forEach(m => {
       const cnt = memberCounts[m.nama] || 0;
-      const icon = cnt === 0 ? '\uD83D\uDD34' : cnt === 1 ? '\uD83D\uDFE1' : '\uD83D\uDFE0';
-      html += '<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:#fff;border-radius:8px;border:1px solid var(--g6)">';
-      html += '<span style="font-size:14px">'+icon+'</span>';
-      html += '<div style="flex:1"><div style="font-weight:600;font-size:11px">'+esc(m.nama)+'</div><div style="font-size:9px;color:var(--g3)">'+esc(m.status || '')+'</div></div>';
-      html += '<span style="font-size:10px;color:var(--g3)">'+cnt+'x</span>';
+      const dotColor = cnt === 0 ? '#dc2626' : cnt === 1 ? '#f59e0b' : '#fb923c';
+      const dotBg = cnt === 0 ? '#fef2f2' : cnt === 1 ? '#fffbeb' : '#fff7ed';
+      const badgeBg = cnt === 0 ? '#fee2e2' : cnt === 1 ? '#fef3c7' : '#ffedd5';
+      const initial = String(m.nama||'?').trim().slice(0,1).toUpperCase();
+      html += '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#fff;border-radius:10px;border:1px solid '+dotColor+'22;transition:all .15s" onmouseover="this.style.transform=\'translateX(2px)\';this.style.boxShadow=\'0 2px 8px '+dotColor+'22\'" onmouseout="this.style.transform=\'\';this.style.boxShadow=\'none\'">';
+      // Avatar dot dengan inisial
+      html += '<div style="width:32px;height:32px;border-radius:50%;background:'+dotBg+';color:'+dotColor+';display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;border:2px solid '+dotColor+';flex-shrink:0">'+esc(initial)+'</div>';
+      // Nama + status
+      html += '<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:12px;color:var(--g1);line-height:1.2">'+esc(m.nama)+'</div><div style="font-size:10px;color:var(--g4);margin-top:2px;letter-spacing:.3px">'+esc(m.status || 'Member')+'</div></div>';
+      // Counter pill
+      html += '<span style="background:'+badgeBg+';color:'+dotColor+';padding:4px 10px;border-radius:14px;font-size:10px;font-weight:700;letter-spacing:.3px">'+cnt+'\u00d7</span>';
       html += '</div>';
     });
     html += '</div></div>';
