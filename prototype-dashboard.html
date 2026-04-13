@@ -946,11 +946,24 @@ body{font-family:'Inter',sans-serif;background:#f8f8f5;color:#1c1c1c;min-height:
     <div class="tab-content" id="tab-c-events">
       <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px">
         <select class="cgl-select" style="width:auto;min-width:140px;padding:8px 32px 8px 12px;font-size:12px;border-radius:10px">
-          <option>Semua CG</option>
-          <option>TEEN 23</option>
-          <option>TEEN 01</option>
-          <option>TEEN 09</option>
-          <option>TEEN 06</option>
+          <option>Semua CG (8)</option>
+          <optgroup label="JAKTIM 1">
+            <option>TEEN 23 — Tofanny</option>
+            <option>TEEN 01 — Stefenie</option>
+            <option>TEEN 09 — Jessica</option>
+            <option>TEEN 06 — Keizha</option>
+          </optgroup>
+          <optgroup label="JAKTIM 2">
+            <option>TEEN 12 — Wilson</option>
+            <option>TEEN 07 — Edson</option>
+            <option>TEEN 17 — Samantha</option>
+            <option>TEEN 20 — Yemima</option>
+          </optgroup>
+        </select>
+        <select class="cgl-select" style="width:auto;min-width:120px;padding:8px 32px 8px 12px;font-size:12px;border-radius:10px">
+          <option>Semua Region</option>
+          <option>JAKTIM 1</option>
+          <option>JAKTIM 2</option>
         </select>
       </div>
       <div class="filter-chips"><span class="chip on">Semua</span><span class="chip">Ibadah</span><span class="chip">CG Event</span><span class="chip">Birthday</span><span class="chip">Outreach</span></div>
@@ -979,7 +992,20 @@ body{font-family:'Inter',sans-serif;background:#f8f8f5;color:#1c1c1c;min-height:
       <div class="ev-card" style="border-left-color:#0e7490"><div class="ev-date">🎂 1 Aug 2026</div><div class="ev-name">Samantha Jane — Ulang Tahun</div><div class="ev-note">Online surprise party via Zoom.</div><span class="ev-cat" style="background:rgba(244,114,182,.08);color:#ec4899">Birthday</span><span class="ev-cat" style="background:rgba(14,116,144,.08);color:#0e7490;margin-left:4px">TEEN 17</span></div>
       <div class="ev-card" style="border-left-color:#be123c"><div class="ev-date">15 Mei 2026</div><div class="ev-name">Outreach Duren Sawit</div><div class="ev-note">Evangelism area Duren Sawit.</div><span class="ev-cat" style="background:rgba(108,92,231,.08);color:var(--purple)">Outreach</span><span class="ev-cat" style="background:rgba(190,18,60,.08);color:#be123c;margin-left:4px">TEEN 20</span></div>
 
-      <button class="btn-purple" style="margin-top:14px;width:100%">+ Tambah Event Baru (Semua CG)</button>
+      <!-- Add new event - Coach can choose target -->
+      <div style="background:linear-gradient(135deg,#faf5ff,#f5f0ff);border:2px dashed #c4b5fd;border-radius:14px;padding:16px;margin-top:16px">
+        <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--purple);margin-bottom:10px">➕ Tambah Event Baru</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+          <input type="text" placeholder="Nama event" style="padding:8px 10px;border:1px solid var(--g5);border-radius:8px;font-size:12px;font-family:'Inter',sans-serif">
+          <input type="date" style="padding:8px 10px;border:1px solid var(--g5);border-radius:8px;font-size:12px;font-family:'Inter',sans-serif">
+        </div>
+        <textarea placeholder="Catatan event..." style="width:100%;padding:8px 10px;border:1px solid var(--g5);border-radius:8px;font-size:12px;font-family:'Inter',sans-serif;resize:vertical;min-height:40px;margin-bottom:8px"></textarea>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+          <select class="cgl-select" style="padding:8px 28px 8px 10px;font-size:12px;border-radius:8px"><option>Kategori: Ibadah</option><option>Kategori: CG Event</option><option>Kategori: Birthday</option><option>Kategori: Outreach</option></select>
+          <select class="cgl-select" style="padding:8px 28px 8px 10px;font-size:12px;border-radius:8px"><option>Target: Semua CG</option><option>Target: Jaktim 1 saja</option><option>Target: Jaktim 2 saja</option><option disabled>──────────</option><option>TEEN 23</option><option>TEEN 01</option><option>TEEN 09</option><option>TEEN 06</option><option>TEEN 12</option><option>TEEN 07</option><option>TEEN 17</option><option>TEEN 20</option></select>
+        </div>
+        <button class="btn-purple" style="width:100%">💾 Simpan Event</button>
+      </div>
     </div>
 
   </div>
