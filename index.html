@@ -2963,6 +2963,8 @@ document.querySelectorAll('.modal-overlay').forEach(m => {
   if (p.get('role') === 'coach') {
     document.getElementById('pageL').style.display = 'none';
     document.getElementById('pageC').style.display = 'block';
+    // Bersihkan query string supaya refresh berikutnya ke landing (bukan coach)
+    try { history.replaceState(null, '', location.pathname); } catch(e) {}
     await loadCoachData();
   } else {
     await loadCGLDropdown();
