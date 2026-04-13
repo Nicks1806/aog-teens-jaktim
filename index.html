@@ -299,7 +299,7 @@ body{font-family:'Inter',sans-serif;background:#f8f8f5;color:#1c1c1c;min-height:
   <div class="landing-title">CG Dashboard</div>
   <div class="landing-sub">AOG Teens Jaktim 2026</div>
   <div class="region-toggle"><button class="region-btn active" onclick="selReg('jaktim1',this)">JAKTIM 1</button><button class="region-btn" onclick="selReg('jaktim2',this)">JAKTIM 2</button></div>
-  <div class="cgl-selector"><select class="cgl-select" id="cglSel" onchange="document.getElementById('enterBtn').disabled=!this.value"><option value="" disabled selected>Pilih CG Leader...</option></select></div>
+  <div class="cgl-selector"><select class="cgl-select" id="cglSel" onchange="document.getElementById('enterBtn').disabled=!this.value"><option value="" disabled selected>— Pilih CG Leader —</option></select></div>
   <button class="enter-btn" id="enterBtn" disabled onclick="enterDash()">Masuk Dashboard</button>
   <div style="margin-top:24px;padding:10px 18px;border-radius:20px;background:rgba(255,255,255,.6);backdrop-filter:blur(10px);border:1px solid rgba(108,92,231,.15);font-size:11px;color:var(--g3);letter-spacing:.3px">Coach / TL? <a href="?role=coach" style="color:var(--purple);font-weight:700;text-decoration:none;margin-left:4px">Masuk disini &rarr;</a></div>
 </div>
@@ -557,7 +557,7 @@ function selReg(r, b) {
 
 function popDD() {
   const s = document.getElementById('cglSel');
-  s.innerHTML = '<option value="" disabled selected>Pilih CG Leader...</option>';
+  s.innerHTML = '<option value="" disabled selected>— Pilih CG Leader —</option>';
   // Debug log (bisa dihapus kalau sudah jalan)
   try {
     console.log('[popDD] curReg:', JSON.stringify(curReg), 'total members:', ALL_MEMBERS.length);
@@ -575,9 +575,12 @@ function popDD() {
   cgls.forEach(m => {
     if (seen.has(m.cg)) return;
     seen.add(m.cg);
+    // Shorten name: first + last (skip middle names) for cleaner display
+    const parts = String(m.nama||'').trim().split(/\s+/);
+    const shortName = parts.length >= 2 ? parts[0] + ' ' + parts[parts.length-1] : (m.nama||'');
     const o = document.createElement('option');
     o.value = m.cg;
-    o.textContent = m.cg + ' \u2014 ' + m.nama;
+    o.textContent = m.cg + '   \u2022   ' + shortName;
     s.appendChild(o);
   });
   document.getElementById('enterBtn').disabled = true;
