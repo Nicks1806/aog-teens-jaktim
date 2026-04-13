@@ -753,7 +753,8 @@ function computeStats() {
 // ========== ABSENSI TAB ==========
 function renderAbsensi() {
   const el = document.getElementById('tab-absensi');
-  let html = '<div style="overflow-x:auto"><table class="t"><thead><tr><th>Nama</th>';
+  let html = '<div style="display:flex;justify-content:flex-end;margin-bottom:10px"><button onclick="exportCGAttendancePDF()" style="padding:8px 14px;border-radius:10px;border:1.5px solid #dc2626;background:linear-gradient(135deg,#fef2f2,#fee2e2);color:#dc2626;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.3px;box-shadow:0 2px 6px rgba(220,38,38,.1);transition:all .2s" onmouseover="this.style.transform=\'translateY(-1px)\'" onmouseout="this.style.transform=\'\'">📄 Export PDF</button></div>';
+  html += '<div style="overflow-x:auto"><table class="t"><thead><tr><th>Nama</th>';
   DATES.forEach(d => { html += '<th>' + (d.label||d.id) + '</th>'; });
   html += '<th>% Hadir</th></tr></thead><tbody>';
 
@@ -2003,6 +2004,111 @@ async function generateSabtuBulan(scope, year, month) {
   }
 }
 
+// ═══════════════════════════════════════════════════════════
+// PDF EXPORT — Attendance
+// ═══════════════════════════════════════════════════════════
+function openPrintWindow(title, bodyHtml) {
+  const w = window.open('', '_blank', 'width=1100,height=800');
+  if (!w) { alert('Izinkan popup untuk export PDF'); return; }
+  w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${title}</title>
+  <style>
+    * { box-sizing: border-box }
+    body { font-family: 'Inter', Arial, sans-serif; padding: 24px; color: #1a1a1a; font-size: 11px }
+    h1 { font-family: 'Instrument Serif', Georgia, serif; font-size: 26px; margin: 0 0 4px; font-weight: 400 }
+    .sub { color: #666; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 20px }
+    .cg-header { margin-top: 18px; padding: 10px 14px; border-left: 4px solid #6C5CE7; background: #faf5ff; border-radius: 6px; display:flex; justify-content:space-between; align-items:center }
+    .cg-name { font-weight: 700; font-size: 13px; color: #6C5CE7 }
+    .cg-meta { font-size: 10px; color: #666 }
+    .cg-pct { font-family: 'Instrument Serif', serif; font-size: 22px; color: #6C5CE7 }
+    table { width: 100%; border-collapse: collapse; margin: 8px 0 14px; font-size: 10px }
+    th { background: #f5f5f5; color: #333; padding: 6px 4px; text-align: center; border: 1px solid #ddd; font-weight: 700; font-size: 9px }
+    th:first-child { text-align: left }
+    td { padding: 5px 4px; border: 1px solid #e5e5e5; text-align: center }
+    td:first-child { text-align: left; font-weight: 500 }
+    td:last-child { font-weight: 700 }
+    .role { font-size: 8px; color: #999; margin-left: 4px; text-transform: uppercase; letter-spacing: .5px }
+    .s-H { background: #dcfce7; color: #166534 }
+    .s-I { background: #dbeafe; color: #1e40af }
+    .s-S { background: #fef3c7; color: #92400e }
+    .s-A { background: #fecaca; color: #991b1b }
+    .s-X { color: #ccc }
+    .summary { margin-top: 6px; padding: 8px; background: #fafafa; border-radius: 6px; display:flex; gap: 18px; font-size: 10px; color: #555 }
+    .summary b { color: #000 }
+    .footer { margin-top: 30px; padding-top: 14px; border-top: 1px solid #e5e5e5; color: #999; font-size: 9px; text-align: center }
+    @media print { body { padding: 0 } .page-break { page-break-before: always } }
+  </style></head><body>${bodyHtml}
+  <script>window.addEventListener('load',()=>setTimeout(()=>window.print(),300));</scr`+`ipt>
+  </body></html>`);
+  w.document.close();
+}
+
+function buildAttendanceTable(members, dates, attMap) {
+  if (!members.length) return '<div style="color:#999;padding:12px">Tidak ada member</div>';
+  let html = '<table><thead><tr><th style="min-width:140px">Nama</th>';
+  dates.forEach(d => { html += '<th>'+(d.label||'')+'</th>'; });
+  html += '<th>% Hadir</th></tr></thead><tbody>';
+  let totalH=0, totalT=0;
+  const sorted = [...members].sort((a,b) => (ROLE_ORDER[a.status]||9) - (ROLE_ORDER[b.status]||9));
+  sorted.forEach(m => {
+    let h=0, t=0;
+    html += '<tr><td>'+(m.nama||'')+'<span class="role">'+(m.status||'')+'</span></td>';
+    dates.forEach(d => {
+      const st = attMap[m.id+'_'+d.id] || '';
+      if (st) { t++; if (st==='H') h++; }
+      html += '<td class="s-'+(st||'X')+'">'+(st||'-')+'</td>';
+    });
+    const pct = t ? Math.round(h/t*100) : 0;
+    totalH += h; totalT += t;
+    html += '<td>'+pct+'%</td></tr>';
+  });
+  html += '</tbody></table>';
+  const totalPct = totalT ? Math.round(totalH/totalT*100) : 0;
+  html += '<div class="summary"><span>Total hadir: <b>'+totalH+'</b> dari <b>'+totalT+'</b></span><span>Rata-rata kehadiran: <b>'+totalPct+'%</b></span><span>Jumlah member: <b>'+members.length+'</b></span><span>Jumlah ibadah: <b>'+dates.length+'</b></span></div>';
+  return html;
+}
+
+function exportCGAttendancePDF() {
+  // Dipakai dari CGL dashboard — pakai MEMBERS, DATES, ATTENDANCE
+  const title = 'Absensi ' + CUR_CG + ' - ' + (CUR_CG_INFO.leader||'');
+  const todayStr = new Date().toLocaleDateString('id-ID', {day:'numeric',month:'long',year:'numeric'});
+  let body = '<h1>Rekap Absensi CG</h1>';
+  body += '<div class="sub">AOG Teens Jaktim · '+todayStr+'</div>';
+  body += '<div class="cg-header"><div><div class="cg-name">'+CUR_CG+'</div><div class="cg-meta">CGL: '+(CUR_CG_INFO.leader||'-')+' · '+MEMBERS.length+' member · '+(CUR_CG_INFO.hari_jam||'')+' · '+(CUR_CG_INFO.lokasi||'')+'</div></div></div>';
+  body += buildAttendanceTable(MEMBERS, DATES, ATTENDANCE);
+  body += '<div class="footer">Dicetak otomatis dari CG Dashboard · absenibadahjaktim.vercel.app</div>';
+  openPrintWindow(title, body);
+}
+
+function exportRegionAttendancePDF(scope) {
+  // scope: 'all' (TL) atau 'jaktim1' / 'jaktim2' (Coach)
+  const regionLabel = scope === 'all' ? 'Jaktim 1 & 2' : (scope === 'jaktim1' ? 'Jaktim 1' : 'Jaktim 2');
+  const title = 'Absensi '+regionLabel;
+  const todayStr = new Date().toLocaleDateString('id-ID', {day:'numeric',month:'long',year:'numeric'});
+  const cgs = scope === 'all' ? getCGsForRegion('all') : getCGsForRegion(scope);
+  const regionDates = scope === 'all' ? ALL_DATES : ALL_DATES.filter(d => d.region === scope);
+
+  let body = '<h1>Rekap Absensi '+regionLabel+'</h1>';
+  body += '<div class="sub">AOG Teens Jaktim · '+todayStr+'</div>';
+
+  cgs.sort().forEach((cg, idx) => {
+    const cgMems = ALL_MEMBERS.filter(m => m.cg === cg);
+    if (!cgMems.length) return;
+    const info = ALL_CG_INFO.find(c => c.cg === cg) || {};
+    const cgRegion = cgMems[0]?.region || '';
+    const cgDates = regionDates.filter(d => d.region === cgRegion);
+    // Compute CG avg
+    let h=0, t=0;
+    cgMems.forEach(m => cgDates.forEach(d => { const s=ALL_ATTENDANCE[m.id+'_'+d.id]; if (s){t++; if(s==='H')h++;} }));
+    const pct = t ? Math.round(h/t*100) : 0;
+    body += (idx>0 ? '<div class="page-break"></div>' : '');
+    body += '<div class="cg-header"><div><div class="cg-name">'+cg+'</div><div class="cg-meta">CGL: '+(info.leader||'-')+' · '+cgMems.length+' member · '+(info.hari_jam||'')+' · '+(info.lokasi||'')+'</div></div><div class="cg-pct">'+pct+'%</div></div>';
+    body += buildAttendanceTable(cgMems, cgDates, ALL_ATTENDANCE);
+  });
+
+  body += '<div class="footer">Dicetak otomatis dari CG Dashboard · absenibadahjaktim.vercel.app</div>';
+  openPrintWindow(title, body);
+}
+
 function renderCoachAbsensi() {
   const el = document.getElementById('tab-c-absensi');
   const region = coachRole === 'tl' ? 'all' : coachReg;
@@ -2022,7 +2128,10 @@ function renderCoachAbsensi() {
   // Generate Sabtu button (Coach + TL only — already inside Coach dashboard)
   const genLabel = 'Generate Sabtu ' + nextMonthInfo.monthName + ' ' + nextMonthInfo.year;
   const scope = coachRole === 'tl' ? 'all' : coachReg;
+  html += '<div style="display:flex;gap:8px">';
+  html += '<button onclick="exportRegionAttendancePDF(\''+scope+'\')" style="padding:8px 14px;border-radius:10px;border:1.5px solid #dc2626;background:linear-gradient(135deg,#fef2f2,#fee2e2);color:#dc2626;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.3px;box-shadow:0 2px 6px rgba(220,38,38,.1);transition:all .2s" onmouseover="this.style.transform=\'translateY(-1px)\'" onmouseout="this.style.transform=\'\'">📄 Export PDF</button>';
   html += '<button onclick="generateSabtuBulan(\''+scope+'\','+nextMonthInfo.year+','+nextMonthInfo.month+')" style="padding:8px 14px;border-radius:10px;border:1.5px solid #6C5CE7;background:linear-gradient(135deg,#f5f3ff,#ede9fe);color:#6C5CE7;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.3px;transition:all .2s;box-shadow:0 2px 6px rgba(108,92,231,.1)" onmouseover="this.style.transform=\'translateY(-1px)\';this.style.boxShadow=\'0 4px 12px rgba(108,92,231,.2)\'" onmouseout="this.style.transform=\'\';this.style.boxShadow=\'0 2px 6px rgba(108,92,231,.1)\'">+ '+genLabel+'</button>';
+  html += '</div>';
   html += '</div>';
 
   // Per-CG card layout for cleaner visual separation
