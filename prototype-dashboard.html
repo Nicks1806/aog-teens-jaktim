@@ -722,7 +722,7 @@ body{font-family:'Inter',sans-serif;background:#f8f8f5;color:#1c1c1c;min-height:
 
     <!-- COACH TAB: MILESTONE -->
     <div class="tab-content" id="tab-c-milestone">
-      <div class="region-toggle" style="display:inline-flex;margin-bottom:16px;margin-top:4px">
+      <div class="region-toggle" id="msRegionToggle" style="display:inline-flex;margin-bottom:16px;margin-top:4px">
         <button class="region-btn active" onclick="switchCoachMsReg('jaktim1',this)" style="padding:6px 18px;font-size:12px">JAKTIM 1</button>
         <button class="region-btn" onclick="switchCoachMsReg('jaktim2',this)" style="padding:6px 18px;font-size:12px">JAKTIM 2</button>
       </div>
@@ -736,7 +736,7 @@ body{font-family:'Inter',sans-serif;background:#f8f8f5;color:#1c1c1c;min-height:
       </div>
 
       <!-- Aggregated donut overview -->
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px">
+      <div id="msStatsGrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px">
         <div style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);border-radius:14px;padding:16px;text-align:center">
           <div style="position:relative;width:56px;height:56px;margin:0 auto 6px">
             <svg viewBox="0 0 36 36" style="transform:rotate(-90deg)"><circle cx="18" cy="18" r="15.5" fill="none" stroke="#e5e7eb" stroke-width="3"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="#16a34a" stroke-width="3" stroke-dasharray="72 97.4" stroke-linecap="round"/></svg>
@@ -848,9 +848,13 @@ body{font-family:'Inter',sans-serif;background:#f8f8f5;color:#1c1c1c;min-height:
     <!-- COACH TAB: VISI -->
     <div class="tab-content" id="tab-c-visi">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-        <div style="font-size:11px;color:var(--g3)">Edit visi & misi setiap CG. Tambahkan feedback sebagai Coach.</div>
-        <div class="region-toggle" style="margin:0;display:inline-flex"><button class="region-btn active" style="padding:4px 14px;font-size:11px">JAKTIM 1</button><button class="region-btn" style="padding:4px 14px;font-size:11px">JAKTIM 2</button></div>
+        <div style="font-size:11px;color:var(--g3)" id="visiSubtitle">Edit visi & misi setiap CG. Tambahkan feedback sebagai Coach.</div>
+        <div class="region-toggle" id="visiRegionToggle" style="margin:0;display:inline-flex">
+          <button class="region-btn active" onclick="switchVisiReg('jaktim1',this)" style="padding:4px 14px;font-size:11px">JAKTIM 1</button>
+          <button class="region-btn" onclick="switchVisiReg('jaktim2',this)" style="padding:4px 14px;font-size:11px">JAKTIM 2</button>
+        </div>
       </div>
+      <div id="visiCardsContainer">
 
       <!-- CG Card: TEEN 23 -->
       <div style="background:var(--white);border-radius:16px;overflow:hidden;margin-bottom:16px;box-shadow:0 2px 12px rgba(0,0,0,.04)">
@@ -950,6 +954,7 @@ body{font-family:'Inter',sans-serif;background:#f8f8f5;color:#1c1c1c;min-height:
         </div>
       </div>
 
+      </div><!-- /visiCardsContainer -->
       <button class="btn-purple" style="margin-top:4px;width:100%">💾 Simpan Semua Visi & Catatan</button>
     </div>
 
@@ -1034,11 +1039,83 @@ function goBack(){document.getElementById('pageD').style.display='none';if(fromC
 function sTab(id,b){document.querySelectorAll('#pageD .app-tab').forEach(t=>t.classList.remove('on'));b.classList.add('on');document.querySelectorAll('#pageD .tab-content').forEach(t=>t.classList.remove('active'));document.getElementById('tab-'+id).classList.add('active');}
 function sCoachTab(id,b){document.querySelectorAll('#pageC .app-tab').forEach(t=>t.classList.remove('on'));b.classList.add('on');document.querySelectorAll('#pageC .tab-content').forEach(t=>t.classList.remove('active'));document.getElementById('tab-'+id).classList.add('active');}
 function goBackCoach(){document.getElementById('pageC').style.display='none';document.getElementById('pageL').style.display='flex';window.scrollTo(0,0);}
+var ALL_CG_DATA=[
+  {cg:'TEEN 23',leader:'Tofanny Zerafim',color:'#7c3aed',pct:78,mbr:10,risk:2,ms:72,bg:'#faf5ff',init:'T23'},
+  {cg:'TEEN 01',leader:'Stefenie Nathania',color:'#1d4ed8',pct:82,mbr:7,risk:1,ms:80,bg:'#eff6ff',init:'T01'},
+  {cg:'TEEN 09',leader:'Jessica Anastasia',color:'#c2410c',pct:68,mbr:6,risk:2,ms:55,bg:'#fff7ed',init:'T09'},
+  {cg:'TEEN 06',leader:'Keizha Ananta',color:'#be185d',pct:71,mbr:8,risk:0,ms:65,bg:'#fdf2f8',init:'T06'},
+  {cg:'TEEN 12',leader:'Nathanael Wilson',color:'#0f766e',pct:74,mbr:8,risk:2,ms:60,bg:'#f0fdfa',init:'T12'},
+  {cg:'TEEN 07',leader:'Edson Matthew',color:'#b45309',pct:76,mbr:6,risk:1,ms:70,bg:'#fffbeb',init:'T07'},
+  {cg:'TEEN 17',leader:'Samantha Jane',color:'#0e7490',pct:65,mbr:4,risk:1,ms:45,bg:'#ecfeff',init:'T17'},
+  {cg:'TEEN 20',leader:'Yemima Grace',color:'#be123c',pct:58,mbr:5,risk:2,ms:38,bg:'#fff1f2',init:'T20'},
+];
+
+function buildVisiCard(c){
+  var bgGrad='linear-gradient(135deg,'+c.bg+','+c.bg+'cc)';
+  return '<div style="background:var(--white);border-radius:16px;overflow:hidden;margin-bottom:16px;box-shadow:0 2px 12px rgba(0,0,0,.04)">'+
+    '<div style="background:'+bgGrad+';padding:16px 20px;display:flex;align-items:center;justify-content:space-between">'+
+      '<div style="display:flex;align-items:center;gap:10px"><div style="width:40px;height:40px;border-radius:10px;background:'+c.color+';display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:11px">'+c.init+'</div>'+
+      '<div><div style="font-weight:700;font-size:14px">'+c.cg+'</div><div style="font-size:11px;color:var(--g3)">CGL: '+c.leader+'</div></div></div>'+
+      '<div style="text-align:right"><div style="font-family:\'Instrument Serif\',serif;font-size:22px;color:'+c.color+'">'+c.pct+'%</div><div style="font-size:9px;color:var(--g3)">Kehadiran</div></div>'+
+    '</div>'+
+    '<div style="padding:16px 20px">'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">'+
+        '<div style="background:var(--g6);border-radius:10px;padding:10px"><div style="font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--g3);margin-bottom:4px">Visi</div><textarea class="vedit" style="min-height:40px;font-size:12px">Visi CG '+c.cg+' di sini.</textarea></div>'+
+        '<div style="background:var(--g6);border-radius:10px;padding:10px"><div style="font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--g3);margin-bottom:4px">Misi</div><textarea class="vedit" style="min-height:40px;font-size:12px">Misi semester ini...</textarea></div>'+
+      '</div>'+
+      '<div style="background:#fff;border:1px solid var(--g5);border-radius:10px;padding:12px;margin-bottom:10px">'+
+        '<div style="font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--g3);margin-bottom:8px">📈 Rencana Pengembangan oleh CGL</div>'+
+        '<div style="font-size:11px;color:var(--g3);font-style:italic">Belum ada data dev plan untuk '+c.cg+'</div>'+
+      '</div>'+
+      '<div style="background:linear-gradient(135deg,'+c.bg+','+c.bg+'aa);border:1px dashed '+c.color+'80;border-radius:10px;padding:10px"><div style="font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:'+c.color+';margin-bottom:4px">💬 Catatan Coach</div><textarea class="vedit" style="min-height:36px;font-size:12px;border-color:'+c.color+'80">Catatan untuk CG ini...</textarea></div>'+
+    '</div></div>';
+}
+
+function renderVisiCards(region){
+  var container=document.getElementById('visiCardsContainer');
+  if(!container) return;
+  var cgs=region==='all'?ALL_CG_DATA:(region==='jaktim1'?ALL_CG_DATA.slice(0,4):ALL_CG_DATA.slice(4));
+  container.innerHTML=cgs.map(buildVisiCard).join('');
+}
+
+function switchVisiReg(reg,btn){
+  btn.parentElement.querySelectorAll('.region-btn').forEach(x=>x.classList.remove('active'));
+  btn.classList.add('active');
+  renderVisiCards(reg);
+}
+
+function buildMsStat(grad,stroke,color,val,total,label){
+  var dash=Math.round(val/total*97.4);
+  return '<div style="background:'+grad+';border-radius:14px;padding:16px;text-align:center"><div style="position:relative;width:56px;height:56px;margin:0 auto 6px"><svg viewBox="0 0 36 36" style="transform:rotate(-90deg)"><circle cx="18" cy="18" r="15.5" fill="none" stroke="#e5e7eb" stroke-width="3"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="'+stroke+'" stroke-width="3" stroke-dasharray="'+dash+' 97.4" stroke-linecap="round"/></svg><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:\'Instrument Serif\',serif;font-size:15px;color:'+color+'">'+val+'</div></div><div style="font-size:9px;font-weight:600;letter-spacing:1px;color:'+color+'">'+label+'</div><div style="font-size:8px;color:var(--g4)">'+val+'/'+total+'</div></div>';
+}
+
+function renderMsStats(region){
+  var grid=document.getElementById('msStatsGrid');
+  if(!grid) return;
+  var data;
+  if(region==='all'){data={total:54,msj1:42,msj2:31,cgt1:22,bair:36};}
+  else if(region==='jaktim1'){data={total:31,msj1:23,msj2:17,cgt1:13,bair:20};}
+  else{data={total:23,msj1:19,msj2:14,cgt1:9,bair:16};}
+  grid.innerHTML=
+    buildMsStat('linear-gradient(135deg,#f0fdf4,#dcfce7)','#16a34a','var(--green)',data.msj1,data.total,'MSJ 1')+
+    buildMsStat('linear-gradient(135deg,#eff6ff,#dbeafe)','#2563eb','var(--blue)',data.msj2,data.total,'MSJ 2')+
+    buildMsStat('linear-gradient(135deg,#f0fdfa,#ccfbf1)','#0f766e','#0f766e',data.cgt1,data.total,'CGT 1')+
+    buildMsStat('linear-gradient(135deg,#faf5ff,#ede9fe)','#7c3aed','#7c3aed',data.bair,data.total,'B. Air');
+}
+
+function switchCoachMsReg(reg,btn){
+  btn.parentElement.querySelectorAll('.region-btn').forEach(x=>x.classList.remove('active'));
+  btn.classList.add('active');
+  renderMsStats(reg);
+}
+
 function switchRole(role){
   var coachBtn=document.getElementById('roleCoachBtn'),tlBtn=document.getElementById('roleTLBtn'),label=document.getElementById('coachRoleLabel');
   var heroH=document.getElementById('coachHeroH'),meta=document.getElementById('coachMeta');
   // Find region toggle in overview tab
   var overviewToggle=document.querySelector('#tab-c-overview .region-toggle');
+  var msToggle=document.getElementById('msRegionToggle');
+  var visiToggle=document.getElementById('visiRegionToggle');
   var grid=document.getElementById('coachCGGrid');
   var statsLabel=document.querySelectorAll('#pageC .app-stat-pct')[0];
   if(role==='tl'){
@@ -1048,10 +1125,15 @@ function switchRole(role){
     heroH.innerHTML='Overview<br><em>Total.</em>';
     meta.textContent='8 CG aktif · 54 member · 72% kehadiran rata-rata (Jaktim 1+2)';
     if(overviewToggle) overviewToggle.style.display='none';
+    if(msToggle) msToggle.style.display='none';
+    if(visiToggle) visiToggle.style.display='none';
     document.getElementById('csTotalMbr').textContent='54';statsLabel.textContent='Total semua';
     document.getElementById('csAvgHadir').textContent='72%';
     document.getElementById('csAtRisk').textContent='11';
     document.getElementById('csBlmMsj').textContent='18';
+    // Render TL views for milestone & visi
+    renderMsStats('all');
+    renderVisiCards('all');
     // Render all 8 CGs
     var allCG=[
       {cg:'TEEN 23',leader:'Tofanny Zerafim',color:'#7c3aed',pct:78,mbr:10,risk:2,ms:72},
@@ -1077,6 +1159,8 @@ function switchRole(role){
     heroH.innerHTML='Semua<br><em>CG.</em>';
     meta.textContent='8 CG aktif · 54 member · 72% kehadiran';
     if(overviewToggle) overviewToggle.style.display='inline-flex';
+    if(msToggle) msToggle.style.display='inline-flex';
+    if(visiToggle) visiToggle.style.display='inline-flex';
     document.getElementById('csTotalMbr').textContent='31';statsLabel.textContent='Jaktim 1';
     document.getElementById('csAvgHadir').textContent='75%';
     document.getElementById('csAtRisk').textContent='5';
@@ -1084,6 +1168,8 @@ function switchRole(role){
     // Re-render Jaktim 1 cards
     var btn=document.querySelector('#tab-c-overview .region-btn.active')||document.querySelector('#tab-c-overview .region-btn');
     if(btn){btn.classList.remove('active');switchCoachReg('jaktim1',btn);}
+    renderMsStats('jaktim1');
+    renderVisiCards('jaktim1');
   }
 }
 
@@ -1110,7 +1196,7 @@ function pickRole(el,cls,label){
 document.addEventListener('click',function(e){
   if(!e.target.closest('.role-wrap')){document.querySelectorAll('.role-menu.show').forEach(m=>m.classList.remove('show'));}
 });
-(function(){const p=new URLSearchParams(location.search);if(p.get('role')==='coach'){document.getElementById('pageL').style.display='none';document.getElementById('pageC').style.display='block';}popDD();})();
+(function(){const p=new URLSearchParams(location.search);if(p.get('role')==='coach'){document.getElementById('pageL').style.display='none';document.getElementById('pageC').style.display='block';}popDD();renderVisiCards('jaktim1');})();
 </script>
 </body>
 </html>
