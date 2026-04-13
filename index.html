@@ -717,13 +717,10 @@ function popDD() {
     opt.dataset.cgInit = cgInit;
     opt.dataset.cgColor = cgColor;
     opt.dataset.cgBg = cgBg;
-    opt.style.cssText = 'display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;border-bottom:1px solid #f5f0ff;transition:background .15s';
+    opt.style.cssText = 'padding:14px 16px;cursor:pointer;border-bottom:1px solid #f5f0ff;transition:background .15s';
     opt.innerHTML =
-      '<div style="width:36px;height:36px;border-radius:10px;background:'+cgBg+';color:'+cgColor+';display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;letter-spacing:.3px;flex-shrink:0;border:1px solid '+cgColor+'30">'+esc(cgInit ? 'T'+cgInit : (m.cg||'').slice(0,3))+'</div>' +
-      '<div style="flex:1;min-width:0">' +
-        '<div style="font-weight:700;font-size:13px;color:var(--g1);line-height:1.2">'+esc(shortName)+'</div>' +
-        '<div style="font-size:10px;color:var(--g4);margin-top:2px;letter-spacing:.4px">'+esc(m.cg)+' &middot; CG Leader</div>' +
-      '</div>';
+      '<div style="font-weight:700;font-size:13px;color:var(--g1);line-height:1.2">'+esc(shortName)+'</div>' +
+      '<div style="font-size:10px;color:var(--g4);margin-top:3px;letter-spacing:.4px">'+esc(m.cg)+' &middot; CG Leader</div>';
     opt.onmouseenter = () => { opt.style.background = cgBg; };
     opt.onmouseleave = () => { opt.style.background = ''; };
     opt.onclick = (e) => { e.stopPropagation(); selectCGOption(m.cg, shortName, cgInit, cgColor, cgBg); };
