@@ -1259,11 +1259,49 @@ async function saveNewMember() {
   };
   const { error } = await supa.from('members').insert(obj);
   if (error) { alert('Error: ' + error.message); return; }
+
+  // Reset form
+  ['newNama','newWa','newLahir','newSekolah','newKelas','newKelurahan','newKecamatan'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
   closeModal('addMemberModal');
-  toast('\u2713 Member ditambahkan');
-  // Refresh ALL_MEMBERS global supaya dropdown CGL ter-update kalau member baru berstatus CGL
+
+  // Refresh MEMBERS aktif (untuk absensi & detail) tanpa full reload
+  try {
+    const { data: mems } = await supa.from('members').select('*').eq('cg', CUR_CG).order('nama');
+    MEMBERS = mems || [];
+    MEMBERS.sort((a, b) => roleRankLC(a.status) - roleRankLC(b.status));
+
+    // Re-fetch attendance untuk member baru juga (kosong di awal)
+    const memberIds = MEMBERS.map(m => m.id);
+    const dateIds = DATES.map(d => d.id);
+    if (memberIds.length && dateIds.length) {
+      const { data: att } = await supa.from('attendance').select('*').in('member_id', memberIds).in('date_id', dateIds);
+      ATTENDANCE = {};
+      (att || []).forEach(a => { ATTENDANCE[a.member_id + '_' + a.date_id] = a.status; });
+    }
+
+    // Update header counter
+    const hC = document.getElementById('hC'); if (hC) hC.textContent = MEMBERS.length;
+
+    // Reset tab rendered flags supaya semua tab re-render dgn data baru saat dibuka
+    TAB_RENDERED = {};
+    // Re-render tab yang sedang aktif
+    const activeTab = document.querySelector('#pageD .tab-content.active');
+    if (activeTab) {
+      const id = activeTab.id.replace('tab-','');
+      if (id === 'absensi') { renderAbsensi(); TAB_RENDERED.absensi = true; }
+      else { await ensureTabRendered(id); }
+    }
+    computeStats();
+  } catch(e) {
+    console.error('[saveNewMember refresh]', e);
+  }
+
+  // Refresh global ALL_MEMBERS untuk dropdown CGL kalau status = CGL/Leader
   try { await loadCGLDropdown(); } catch(e) {}
-  await openCGDashboard(CUR_CG);
+
+  toast('\u2713 ' + nama + ' ditambahkan ke absensi & detail');
 }
 
 // ========== VISI CG TAB ==========
