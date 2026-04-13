@@ -545,7 +545,7 @@ body{font-family:'Inter',sans-serif;background:#f8f8f5;color:#1c1c1c;min-height:
   <div class="app-nav">
     <div class="app-nav-left">
       <div class="app-back" onclick="goBackCoach()">←</div>
-      <span style="font-size:13px;font-weight:700" id="coachRoleLabel">👑 Coach</span>
+      <span style="font-size:13px;font-weight:700" id="coachRoleLabel">Coach</span>
       <!-- Role toggle -->
       <div style="display:inline-flex;background:#e8e8e8;border-radius:14px;padding:2px;margin-left:8px">
         <button id="roleCoachBtn" onclick="switchRole('coach')" style="padding:4px 12px;border-radius:12px;border:none;font-size:10px;font-weight:700;cursor:pointer;background:var(--purple);color:#fff;letter-spacing:.4px">COACH</button>
@@ -1121,7 +1121,7 @@ function switchRole(role){
   if(role==='tl'){
     coachBtn.style.background='transparent';coachBtn.style.color='var(--g3)';
     tlBtn.style.background='var(--purple)';tlBtn.style.color='#fff';
-    label.innerHTML='👑 Team Leader';
+    label.innerHTML='Team Leader';
     heroH.innerHTML='Overview<br><em>Total.</em>';
     meta.textContent='8 CG aktif · 54 member · 72% kehadiran rata-rata (Jaktim 1+2)';
     if(overviewToggle) overviewToggle.style.display='none';
@@ -1155,7 +1155,7 @@ function switchRole(role){
   } else {
     tlBtn.style.background='transparent';tlBtn.style.color='var(--g3)';
     coachBtn.style.background='var(--purple)';coachBtn.style.color='#fff';
-    label.innerHTML='👑 Coach';
+    label.innerHTML='Coach';
     heroH.innerHTML='Semua<br><em>CG.</em>';
     meta.textContent='8 CG aktif · 54 member · 72% kehadiran';
     if(overviewToggle) overviewToggle.style.display='inline-flex';
