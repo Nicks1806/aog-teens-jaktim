@@ -542,16 +542,389 @@ body{font-family:'Inter',sans-serif;background:#f8f8f5;color:#1c1c1c;min-height:
 
 <!-- COACH -->
 <div class="app" id="pageC">
-  <div class="app-nav"><div class="app-nav-left"><div class="app-back" onclick="goBack()">←</div><span style="font-size:13px;font-weight:700">👑 Coach / TL</span></div><div style="display:flex;align-items:center;gap:6px"><span class="live-dot"></span><span style="font-size:10px;color:var(--green);font-weight:600">Live</span></div></div>
-  <div class="app-hero"><div class="app-hero-tag">Overview</div><div class="app-hero-h">Semua<br><em>CG.</em></div><div class="app-hero-meta">8 CG aktif · 54 member · 72% kehadiran</div></div>
-  <div style="max-width:900px;margin:0 auto;padding:20px">
-    <div class="region-toggle" style="display:inline-flex;margin-bottom:16px"><button class="region-btn active" style="padding:6px 18px;font-size:12px">JAKTIM 1</button><button class="region-btn" style="padding:6px 18px;font-size:12px">JAKTIM 2</button></div>
-    <div class="coach-grid">
-      <div class="coach-card" style="border-left:4px solid #7c3aed" onclick="enterFromCoach('TEEN 23')"><div style="font-weight:800;font-size:15px">TEEN 23</div><div style="font-size:11px;color:var(--g3)">CGL: Tofanny Zerafim</div><div style="display:flex;gap:14px;margin-top:10px;font-size:11px"><div style="text-align:center"><span style="font-family:'Instrument Serif',serif;font-size:20px;color:var(--green);display:block">78%</span>Hadir</div><div style="text-align:center"><span style="font-family:'Instrument Serif',serif;font-size:20px;display:block">10</span>Member</div><div style="text-align:center"><span style="font-family:'Instrument Serif',serif;font-size:20px;color:var(--red);display:block">2</span>At Risk</div></div></div>
-      <div class="coach-card" style="border-left:4px solid #1d4ed8"><div style="font-weight:800;font-size:15px">TEEN 01</div><div style="font-size:11px;color:var(--g3)">CGL: Stefenie Nathania</div><div style="display:flex;gap:14px;margin-top:10px;font-size:11px"><div style="text-align:center"><span style="font-family:'Instrument Serif',serif;font-size:20px;color:var(--green);display:block">82%</span>Hadir</div><div style="text-align:center"><span style="font-family:'Instrument Serif',serif;font-size:20px;display:block">7</span>Member</div><div style="text-align:center"><span style="font-family:'Instrument Serif',serif;font-size:20px;color:var(--red);display:block">1</span>At Risk</div></div></div>
-      <div class="coach-card" style="border-left:4px solid #c2410c"><div style="font-weight:800;font-size:15px">TEEN 09</div><div style="font-size:11px;color:var(--g3)">CGL: Jessica Anastasia</div><div style="display:flex;gap:14px;margin-top:10px;font-size:11px"><div style="text-align:center"><span style="font-family:'Instrument Serif',serif;font-size:20px;color:var(--green);display:block">68%</span>Hadir</div><div style="text-align:center"><span style="font-family:'Instrument Serif',serif;font-size:20px;display:block">6</span>Member</div><div style="text-align:center"><span style="font-family:'Instrument Serif',serif;font-size:20px;color:var(--red);display:block">2</span>At Risk</div></div></div>
-      <div class="coach-card" style="border-left:4px solid #be185d"><div style="font-weight:800;font-size:15px">TEEN 06</div><div style="font-size:11px;color:var(--g3)">CGL: Keizha Ananta</div><div style="display:flex;gap:14px;margin-top:10px;font-size:11px"><div style="text-align:center"><span style="font-family:'Instrument Serif',serif;font-size:20px;color:var(--green);display:block">71%</span>Hadir</div><div style="text-align:center"><span style="font-family:'Instrument Serif',serif;font-size:20px;display:block">8</span>Member</div><div style="text-align:center"><span style="font-family:'Instrument Serif',serif;font-size:20px;color:var(--red);display:block">0</span>At Risk</div></div></div>
+  <div class="app-nav"><div class="app-nav-left"><div class="app-back" onclick="goBackCoach()">←</div><span style="font-size:13px;font-weight:700">👑 Coach / TL</span></div><div style="display:flex;align-items:center;gap:6px"><span class="live-dot"></span><span style="font-size:10px;color:var(--green);font-weight:600">Live</span></div></div>
+  <div class="app-hero" id="coachHero"><div class="app-hero-tag">Januari — April 2026</div><div class="app-hero-h">Semua<br><em>CG.</em></div><div class="app-hero-meta" id="coachMeta">8 CG aktif · 54 member · 72% kehadiran</div></div>
+  <div class="app-stats">
+    <div class="app-stat ct"><div class="app-stat-label">Member</div><div class="app-stat-num" id="csTotalMbr">31</div><div class="app-stat-pct">Jaktim 1</div></div>
+    <div class="app-stat cb"><div class="app-stat-label">Avg Hadir</div><div class="app-stat-num" id="csAvgHadir">75%</div><div class="app-stat-pct">rata-rata</div></div>
+    <div class="app-stat co"><div class="app-stat-label">At Risk</div><div class="app-stat-num" id="csAtRisk">5</div><div class="app-stat-pct">< 50%</div></div>
+    <div class="app-stat cr"><div class="app-stat-label">Blm MSJ1</div><div class="app-stat-num" id="csBlmMsj">8</div><div class="app-stat-pct">perlu follow</div></div>
+  </div>
+
+  <div class="app-body">
+    <div class="app-tabs" id="coachTabs">
+      <div class="app-tab on" onclick="sCoachTab('c-overview',this)">Overview</div>
+      <div class="app-tab" onclick="sCoachTab('c-absensi',this)">Absensi</div>
+      <div class="app-tab" onclick="sCoachTab('c-milestone',this)">Milestone</div>
+      <div class="app-tab" onclick="sCoachTab('c-visi',this)">Visi</div>
+      <div class="app-tab" onclick="sCoachTab('c-events',this)">Events</div>
     </div>
+
+    <!-- COACH TAB: OVERVIEW -->
+    <div class="tab-content active" id="tab-c-overview">
+      <div class="region-toggle" style="display:inline-flex;margin-bottom:16px;margin-top:4px">
+        <button class="region-btn active" onclick="switchCoachReg('jaktim1',this)" style="padding:6px 18px;font-size:12px">JAKTIM 1</button>
+        <button class="region-btn" onclick="switchCoachReg('jaktim2',this)" style="padding:6px 18px;font-size:12px">JAKTIM 2</button>
+      </div>
+
+      <!-- CG Cards Grid -->
+      <div class="coach-grid" id="coachCGGrid">
+        <!-- Jaktim 1 cards (default) -->
+        <div class="coach-card" style="border-left:4px solid #7c3aed" onclick="enterFromCoach('TEEN 23')">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+            <div style="font-weight:800;font-size:15px">TEEN 23</div>
+            <div style="position:relative;width:40px;height:40px">
+              <svg viewBox="0 0 36 36" style="transform:rotate(-90deg)"><circle cx="18" cy="18" r="15.5" fill="none" stroke="#e5e7eb" stroke-width="3"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="#7c3aed" stroke-width="3" stroke-dasharray="76 97.4" stroke-linecap="round"/></svg>
+              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700">78%</div>
+            </div>
+          </div>
+          <div style="font-size:11px;color:var(--g3);margin-bottom:8px">CGL: Tofanny Zerafim</div>
+          <div style="display:flex;gap:14px;font-size:11px;margin-bottom:8px">
+            <div style="text-align:center"><span style="font-family:'Instrument Serif',serif;font-size:18px;display:block">10</span>Member</div>
+            <div style="text-align:center"><span style="font-family:'Instrument Serif',serif;font-size:18px;color:var(--red);display:block">2</span>At Risk</div>
+          </div>
+          <div style="font-size:9px;color:var(--g3);margin-bottom:3px">Milestone Progress</div>
+          <div class="ms-bar"><div class="ms-bar-fill" style="width:72%"></div></div>
+          <div style="font-size:9px;color:var(--g4)">72% selesai</div>
+        </div>
+
+        <div class="coach-card" style="border-left:4px solid #1d4ed8" onclick="enterFromCoach('TEEN 01')">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+            <div style="font-weight:800;font-size:15px">TEEN 01</div>
+            <div style="position:relative;width:40px;height:40px">
+              <svg viewBox="0 0 36 36" style="transform:rotate(-90deg)"><circle cx="18" cy="18" r="15.5" fill="none" stroke="#e5e7eb" stroke-width="3"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="#1d4ed8" stroke-width="3" stroke-dasharray="80 97.4" stroke-linecap="round"/></svg>
+              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700">82%</div>
+            </div>
+          </div>
+          <div style="font-size:11px;color:var(--g3);margin-bottom:8px">CGL: Stefenie Nathania</div>
+          <div style="display:flex;gap:14px;font-size:11px;margin-bottom:8px">
+            <div style="text-align:center"><span style="font-family:'Instrument Serif',serif;font-size:18px;display:block">7</span>Member</div>
+            <div style="text-align:center"><span style="font-family:'Instrument Serif',serif;font-size:18px;color:var(--red);display:block">1</span>At Risk</div>
+          </div>
+          <div style="font-size:9px;color:var(--g3);margin-bottom:3px">Milestone Progress</div>
+          <div class="ms-bar"><div class="ms-bar-fill" style="width:80%"></div></div>
+          <div style="font-size:9px;color:var(--g4)">80% selesai</div>
+        </div>
+
+        <div class="coach-card" style="border-left:4px solid #c2410c" onclick="enterFromCoach('TEEN 09')">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+            <div style="font-weight:800;font-size:15px">TEEN 09</div>
+            <div style="position:relative;width:40px;height:40px">
+              <svg viewBox="0 0 36 36" style="transform:rotate(-90deg)"><circle cx="18" cy="18" r="15.5" fill="none" stroke="#e5e7eb" stroke-width="3"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="#c2410c" stroke-width="3" stroke-dasharray="66 97.4" stroke-linecap="round"/></svg>
+              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700">68%</div>
+            </div>
+          </div>
+          <div style="font-size:11px;color:var(--g3);margin-bottom:8px">CGL: Jessica Anastasia</div>
+          <div style="display:flex;gap:14px;font-size:11px;margin-bottom:8px">
+            <div style="text-align:center"><span style="font-family:'Instrument Serif',serif;font-size:18px;display:block">6</span>Member</div>
+            <div style="text-align:center"><span style="font-family:'Instrument Serif',serif;font-size:18px;color:var(--red);display:block">2</span>At Risk</div>
+          </div>
+          <div style="font-size:9px;color:var(--g3);margin-bottom:3px">Milestone Progress</div>
+          <div class="ms-bar"><div class="ms-bar-fill" style="width:55%"></div></div>
+          <div style="font-size:9px;color:var(--g4)">55% selesai</div>
+        </div>
+
+        <div class="coach-card" style="border-left:4px solid #be185d" onclick="enterFromCoach('TEEN 06')">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+            <div style="font-weight:800;font-size:15px">TEEN 06</div>
+            <div style="position:relative;width:40px;height:40px">
+              <svg viewBox="0 0 36 36" style="transform:rotate(-90deg)"><circle cx="18" cy="18" r="15.5" fill="none" stroke="#e5e7eb" stroke-width="3"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="#be185d" stroke-width="3" stroke-dasharray="69 97.4" stroke-linecap="round"/></svg>
+              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700">71%</div>
+            </div>
+          </div>
+          <div style="font-size:11px;color:var(--g3);margin-bottom:8px">CGL: Keizha Ananta</div>
+          <div style="display:flex;gap:14px;font-size:11px;margin-bottom:8px">
+            <div style="text-align:center"><span style="font-family:'Instrument Serif',serif;font-size:18px;display:block">8</span>Member</div>
+            <div style="text-align:center"><span style="font-family:'Instrument Serif',serif;font-size:18px;color:var(--red);display:block">0</span>At Risk</div>
+          </div>
+          <div style="font-size:9px;color:var(--g3);margin-bottom:3px">Milestone Progress</div>
+          <div class="ms-bar"><div class="ms-bar-fill" style="width:65%"></div></div>
+          <div style="font-size:9px;color:var(--g4)">65% selesai</div>
+        </div>
+      </div>
+
+      <!-- Perbandingan Antar CG -->
+      <div class="section" style="margin-top:20px" id="coachCompare">
+        <div class="section-title">📊 Perbandingan Antar CG</div>
+        <div id="coachBarChart">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+            <div style="width:70px;font-size:11px;font-weight:600;text-align:right">TEEN 01</div>
+            <div style="flex:1;height:22px;background:var(--g6);border-radius:6px;overflow:hidden"><div style="width:82%;height:100%;background:#1d4ed8;border-radius:6px;display:flex;align-items:center;padding-left:8px"><span style="font-size:9px;color:#fff;font-weight:700">82%</span></div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+            <div style="width:70px;font-size:11px;font-weight:600;text-align:right">TEEN 23</div>
+            <div style="flex:1;height:22px;background:var(--g6);border-radius:6px;overflow:hidden"><div style="width:78%;height:100%;background:#7c3aed;border-radius:6px;display:flex;align-items:center;padding-left:8px"><span style="font-size:9px;color:#fff;font-weight:700">78%</span></div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+            <div style="width:70px;font-size:11px;font-weight:600;text-align:right">TEEN 06</div>
+            <div style="flex:1;height:22px;background:var(--g6);border-radius:6px;overflow:hidden"><div style="width:71%;height:100%;background:#be185d;border-radius:6px;display:flex;align-items:center;padding-left:8px"><span style="font-size:9px;color:#fff;font-weight:700">71%</span></div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+            <div style="width:70px;font-size:11px;font-weight:600;text-align:right">TEEN 09</div>
+            <div style="flex:1;height:22px;background:var(--g6);border-radius:6px;overflow:hidden"><div style="width:68%;height:100%;background:#c2410c;border-radius:6px;display:flex;align-items:center;padding-left:8px"><span style="font-size:9px;color:#fff;font-weight:700">68%</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COACH TAB: ABSENSI -->
+    <div class="tab-content" id="tab-c-absensi">
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px">
+        <select class="cgl-select" style="width:auto;min-width:160px;padding:8px 32px 8px 12px;font-size:12px;border-radius:10px" id="coachCGFilter" onchange="filterCoachAbsensi()">
+          <option value="all">Semua CG</option>
+          <option value="TEEN 23">TEEN 23</option>
+          <option value="TEEN 01">TEEN 01</option>
+          <option value="TEEN 09">TEEN 09</option>
+          <option value="TEEN 06">TEEN 06</option>
+        </select>
+      </div>
+      <div class="filter-chips"><span class="chip on">Semua</span><span class="chip">Jan</span><span class="chip">Feb</span><span class="chip">Mar</span><span class="chip">Apr</span></div>
+      <div style="overflow-x:auto">
+        <table class="t" id="coachAbsensiTable">
+          <thead><tr><th>Nama</th><th>CG</th><th>3 Jan</th><th>10 Jan</th><th>17 Jan</th><th>24 Jan</th><th>7 Feb</th><th>14 Feb</th><th>21 Feb</th><th>7 Mar</th><th>14 Mar</th><th>21 Mar</th><th>% Hadir</th></tr></thead>
+          <tbody>
+            <!-- TEEN 23 -->
+            <tr style="background:#faf5ff"><td colspan="12" style="font-weight:700;font-size:11px;letter-spacing:1px;color:#7c3aed;text-align:left;padding:8px 10px;border-left:3px solid #7c3aed">TEEN 23 — Tofanny Zerafim</td><td></td></tr>
+            <tr><td class="name-cell">Tofanny Zerafim<span class="role-tag">CGL</span></td><td style="font-size:9px;color:var(--g4)">T23</td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><div class="pbar"><div class="pbar-track"><div class="pbar-fill" style="width:100%;background:var(--green)"></div></div><span class="pbar-val" style="color:var(--green)">100%</span></div></td></tr>
+            <tr><td class="name-cell">Valerie Alea D.<span class="role-tag">Sponsor</span></td><td style="font-size:9px;color:var(--g4)">T23</td><td><span class="dot I">I</span></td><td><span class="dot S">S</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot S">S</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot I">I</span></td><td><div class="pbar"><div class="pbar-track"><div class="pbar-fill" style="width:70%;background:var(--orange)"></div></div><span class="pbar-val" style="color:var(--orange)">70%</span></div></td></tr>
+            <tr style="border-left:3px solid var(--red)"><td class="name-cell" style="color:var(--red)">Florencia Arumi<span class="role-tag">Simpatisan</span></td><td style="font-size:9px;color:var(--g4)">T23</td><td><span class="dot A">A</span></td><td><span class="dot A">A</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot A">A</span></td><td><span class="dot A">A</span></td><td><span class="dot H">H</span></td><td><span class="dot A">A</span></td><td><span class="dot H">H</span></td><td><span class="dot A">A</span></td><td><div class="pbar"><div class="pbar-track"><div class="pbar-fill" style="width:40%;background:var(--red)"></div></div><span class="pbar-val" style="color:var(--red)">40%</span></div></td></tr>
+
+            <!-- TEEN 01 -->
+            <tr style="background:#eff6ff"><td colspan="12" style="font-weight:700;font-size:11px;letter-spacing:1px;color:#1d4ed8;text-align:left;padding:8px 10px;border-left:3px solid #1d4ed8">TEEN 01 — Stefenie Nathania</td><td></td></tr>
+            <tr><td class="name-cell">Stefenie Nathania<span class="role-tag">CGL</span></td><td style="font-size:9px;color:var(--g4)">T01</td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot I">I</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><div class="pbar"><div class="pbar-track"><div class="pbar-fill" style="width:90%;background:var(--green)"></div></div><span class="pbar-val" style="color:var(--green)">90%</span></div></td></tr>
+            <tr><td class="name-cell">Daniel Prasetyo<span class="role-tag">Member</span></td><td style="font-size:9px;color:var(--g4)">T01</td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot I">I</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot S">S</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><div class="pbar"><div class="pbar-track"><div class="pbar-fill" style="width:80%;background:var(--green)"></div></div><span class="pbar-val" style="color:var(--green)">80%</span></div></td></tr>
+
+            <!-- TEEN 09 -->
+            <tr style="background:#fff7ed"><td colspan="12" style="font-weight:700;font-size:11px;letter-spacing:1px;color:#c2410c;text-align:left;padding:8px 10px;border-left:3px solid #c2410c">TEEN 09 — Jessica Anastasia</td><td></td></tr>
+            <tr><td class="name-cell">Jessica Anastasia<span class="role-tag">CGL</span></td><td style="font-size:9px;color:var(--g4)">T09</td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot I">I</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot A">A</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><div class="pbar"><div class="pbar-track"><div class="pbar-fill" style="width:80%;background:var(--green)"></div></div><span class="pbar-val" style="color:var(--green)">80%</span></div></td></tr>
+            <tr style="border-left:3px solid var(--red)"><td class="name-cell" style="color:var(--red)">Michael Tanujaya<span class="role-tag">Simpatisan</span></td><td style="font-size:9px;color:var(--g4)">T09</td><td><span class="dot A">A</span></td><td><span class="dot H">H</span></td><td><span class="dot A">A</span></td><td><span class="dot A">A</span></td><td><span class="dot H">H</span></td><td><span class="dot A">A</span></td><td><span class="dot A">A</span></td><td><span class="dot H">H</span></td><td><span class="dot A">A</span></td><td><span class="dot H">H</span></td><td><div class="pbar"><div class="pbar-track"><div class="pbar-fill" style="width:40%;background:var(--red)"></div></div><span class="pbar-val" style="color:var(--red)">40%</span></div></td></tr>
+
+            <!-- TEEN 06 -->
+            <tr style="background:#fdf2f8"><td colspan="12" style="font-weight:700;font-size:11px;letter-spacing:1px;color:#be185d;text-align:left;padding:8px 10px;border-left:3px solid #be185d">TEEN 06 — Keizha Ananta</td><td></td></tr>
+            <tr><td class="name-cell">Keizha Ananta<span class="role-tag">CGL</span></td><td style="font-size:9px;color:var(--g4)">T06</td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot I">I</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot I">I</span></td><td><div class="pbar"><div class="pbar-track"><div class="pbar-fill" style="width:80%;background:var(--green)"></div></div><span class="pbar-val" style="color:var(--green)">80%</span></div></td></tr>
+            <tr><td class="name-cell">Raphael Jonathan<span class="role-tag">Member</span></td><td style="font-size:9px;color:var(--g4)">T06</td><td><span class="dot H">H</span></td><td><span class="dot S">S</span></td><td><span class="dot H">H</span></td><td><span class="dot I">I</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot S">S</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><div class="pbar"><div class="pbar-track"><div class="pbar-fill" style="width:70%;background:var(--orange)"></div></div><span class="pbar-val" style="color:var(--orange)">70%</span></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="font-size:10px;color:var(--g4);margin-top:10px;text-align:right">Menampilkan semua CG Jaktim 1</div>
+    </div>
+
+    <!-- COACH TAB: MILESTONE -->
+    <div class="tab-content" id="tab-c-milestone">
+      <div class="region-toggle" style="display:inline-flex;margin-bottom:16px;margin-top:4px">
+        <button class="region-btn active" onclick="switchCoachMsReg('jaktim1',this)" style="padding:6px 18px;font-size:12px">JAKTIM 1</button>
+        <button class="region-btn" onclick="switchCoachMsReg('jaktim2',this)" style="padding:6px 18px;font-size:12px">JAKTIM 2</button>
+      </div>
+
+      <div class="filter-chips" style="margin-bottom:16px">
+        <span class="chip on">Semua</span>
+        <span class="chip">MSJ</span>
+        <span class="chip">CGT</span>
+        <span class="chip">Baptis</span>
+        <span class="chip red">Belum MSJ 1</span>
+      </div>
+
+      <!-- Aggregated donut overview -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px">
+        <div style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);border-radius:14px;padding:16px;text-align:center">
+          <div style="position:relative;width:56px;height:56px;margin:0 auto 6px">
+            <svg viewBox="0 0 36 36" style="transform:rotate(-90deg)"><circle cx="18" cy="18" r="15.5" fill="none" stroke="#e5e7eb" stroke-width="3"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="#16a34a" stroke-width="3" stroke-dasharray="72 97.4" stroke-linecap="round"/></svg>
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Instrument Serif',serif;font-size:15px;color:var(--green)">23</div>
+          </div>
+          <div style="font-size:9px;font-weight:600;letter-spacing:1px;color:var(--green)">MSJ 1</div>
+          <div style="font-size:8px;color:var(--g4)">23/31</div>
+        </div>
+        <div style="background:linear-gradient(135deg,#eff6ff,#dbeafe);border-radius:14px;padding:16px;text-align:center">
+          <div style="position:relative;width:56px;height:56px;margin:0 auto 6px">
+            <svg viewBox="0 0 36 36" style="transform:rotate(-90deg)"><circle cx="18" cy="18" r="15.5" fill="none" stroke="#e5e7eb" stroke-width="3"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="#2563eb" stroke-width="3" stroke-dasharray="55 97.4" stroke-linecap="round"/></svg>
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Instrument Serif',serif;font-size:15px;color:var(--blue)">17</div>
+          </div>
+          <div style="font-size:9px;font-weight:600;letter-spacing:1px;color:var(--blue)">MSJ 2</div>
+          <div style="font-size:8px;color:var(--g4)">17/31</div>
+        </div>
+        <div style="background:linear-gradient(135deg,#f0fdfa,#ccfbf1);border-radius:14px;padding:16px;text-align:center">
+          <div style="position:relative;width:56px;height:56px;margin:0 auto 6px">
+            <svg viewBox="0 0 36 36" style="transform:rotate(-90deg)"><circle cx="18" cy="18" r="15.5" fill="none" stroke="#e5e7eb" stroke-width="3"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="#0f766e" stroke-width="3" stroke-dasharray="42 97.4" stroke-linecap="round"/></svg>
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Instrument Serif',serif;font-size:15px;color:#0f766e">13</div>
+          </div>
+          <div style="font-size:9px;font-weight:600;letter-spacing:1px;color:#0f766e">CGT 1</div>
+          <div style="font-size:8px;color:var(--g4)">13/31</div>
+        </div>
+        <div style="background:linear-gradient(135deg,#faf5ff,#ede9fe);border-radius:14px;padding:16px;text-align:center">
+          <div style="position:relative;width:56px;height:56px;margin:0 auto 6px">
+            <svg viewBox="0 0 36 36" style="transform:rotate(-90deg)"><circle cx="18" cy="18" r="15.5" fill="none" stroke="#e5e7eb" stroke-width="3"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="#7c3aed" stroke-width="3" stroke-dasharray="63 97.4" stroke-linecap="round"/></svg>
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Instrument Serif',serif;font-size:15px;color:#7c3aed">20</div>
+          </div>
+          <div style="font-size:9px;font-weight:600;letter-spacing:1px;color:#7c3aed">B. Air</div>
+          <div style="font-size:8px;color:var(--g4)">20/31</div>
+        </div>
+      </div>
+
+      <!-- Per-CG Accordion -->
+      <div class="section" id="coachMsAccordion">
+        <div class="section-title">📋 Breakdown per CG</div>
+
+        <!-- TEEN 23 -->
+        <div style="border:1px solid var(--g5);border-radius:10px;margin-bottom:10px;overflow:hidden">
+          <div style="padding:12px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;background:#faf5ff;border-left:3px solid #7c3aed" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none';this.querySelector('.acc-arrow').textContent=this.nextElementSibling.style.display==='none'?'+':'-'">
+            <div><span style="font-weight:700;font-size:13px">TEEN 23</span> <span style="font-size:10px;color:var(--g3)">· 10 member</span></div>
+            <div style="display:flex;align-items:center;gap:10px"><span style="font-size:11px;font-weight:600;color:#7c3aed">72% milestone</span><span class="acc-arrow" style="font-size:14px;color:var(--g3)">+</span></div>
+          </div>
+          <div style="display:none;padding:14px;background:var(--white)">
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+              <div style="flex:1;min-width:60px;background:var(--g6);border-radius:8px;padding:8px;text-align:center"><span style="font-family:'Instrument Serif',serif;font-size:16px;color:var(--green)">6</span><div style="font-size:8px;color:var(--g3)">MSJ 1</div></div>
+              <div style="flex:1;min-width:60px;background:var(--g6);border-radius:8px;padding:8px;text-align:center"><span style="font-family:'Instrument Serif',serif;font-size:16px;color:var(--blue)">4</span><div style="font-size:8px;color:var(--g3)">MSJ 2</div></div>
+              <div style="flex:1;min-width:60px;background:var(--g6);border-radius:8px;padding:8px;text-align:center"><span style="font-family:'Instrument Serif',serif;font-size:16px;color:#0f766e">3</span><div style="font-size:8px;color:var(--g3)">CGT 1</div></div>
+              <div style="flex:1;min-width:60px;background:var(--g6);border-radius:8px;padding:8px;text-align:center"><span style="font-family:'Instrument Serif',serif;font-size:16px;color:#7c3aed">7</span><div style="font-size:8px;color:var(--g3)">B.Air</div></div>
+            </div>
+            <div style="font-size:10px;color:var(--red);font-weight:600">Belum MSJ 1: Florencia Arumi, Kefas, Samuel V., Clara F.</div>
+          </div>
+        </div>
+
+        <!-- TEEN 01 -->
+        <div style="border:1px solid var(--g5);border-radius:10px;margin-bottom:10px;overflow:hidden">
+          <div style="padding:12px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;background:#eff6ff;border-left:3px solid #1d4ed8" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none';this.querySelector('.acc-arrow').textContent=this.nextElementSibling.style.display==='none'?'+':'-'">
+            <div><span style="font-weight:700;font-size:13px">TEEN 01</span> <span style="font-size:10px;color:var(--g3)">· 7 member</span></div>
+            <div style="display:flex;align-items:center;gap:10px"><span style="font-size:11px;font-weight:600;color:#1d4ed8">80% milestone</span><span class="acc-arrow" style="font-size:14px;color:var(--g3)">+</span></div>
+          </div>
+          <div style="display:none;padding:14px;background:var(--white)">
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+              <div style="flex:1;min-width:60px;background:var(--g6);border-radius:8px;padding:8px;text-align:center"><span style="font-family:'Instrument Serif',serif;font-size:16px;color:var(--green)">6</span><div style="font-size:8px;color:var(--g3)">MSJ 1</div></div>
+              <div style="flex:1;min-width:60px;background:var(--g6);border-radius:8px;padding:8px;text-align:center"><span style="font-family:'Instrument Serif',serif;font-size:16px;color:var(--blue)">5</span><div style="font-size:8px;color:var(--g3)">MSJ 2</div></div>
+              <div style="flex:1;min-width:60px;background:var(--g6);border-radius:8px;padding:8px;text-align:center"><span style="font-family:'Instrument Serif',serif;font-size:16px;color:#0f766e">4</span><div style="font-size:8px;color:var(--g3)">CGT 1</div></div>
+              <div style="flex:1;min-width:60px;background:var(--g6);border-radius:8px;padding:8px;text-align:center"><span style="font-family:'Instrument Serif',serif;font-size:16px;color:#7c3aed">5</span><div style="font-size:8px;color:var(--g3)">B.Air</div></div>
+            </div>
+            <div style="font-size:10px;color:var(--red);font-weight:600">Belum MSJ 1: Daniel Prasetyo</div>
+          </div>
+        </div>
+
+        <!-- TEEN 09 -->
+        <div style="border:1px solid var(--g5);border-radius:10px;margin-bottom:10px;overflow:hidden">
+          <div style="padding:12px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;background:#fff7ed;border-left:3px solid #c2410c" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none';this.querySelector('.acc-arrow').textContent=this.nextElementSibling.style.display==='none'?'+':'-'">
+            <div><span style="font-weight:700;font-size:13px">TEEN 09</span> <span style="font-size:10px;color:var(--g3)">· 6 member</span></div>
+            <div style="display:flex;align-items:center;gap:10px"><span style="font-size:11px;font-weight:600;color:#c2410c">55% milestone</span><span class="acc-arrow" style="font-size:14px;color:var(--g3)">+</span></div>
+          </div>
+          <div style="display:none;padding:14px;background:var(--white)">
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+              <div style="flex:1;min-width:60px;background:var(--g6);border-radius:8px;padding:8px;text-align:center"><span style="font-family:'Instrument Serif',serif;font-size:16px;color:var(--green)">4</span><div style="font-size:8px;color:var(--g3)">MSJ 1</div></div>
+              <div style="flex:1;min-width:60px;background:var(--g6);border-radius:8px;padding:8px;text-align:center"><span style="font-family:'Instrument Serif',serif;font-size:16px;color:var(--blue)">3</span><div style="font-size:8px;color:var(--g3)">MSJ 2</div></div>
+              <div style="flex:1;min-width:60px;background:var(--g6);border-radius:8px;padding:8px;text-align:center"><span style="font-family:'Instrument Serif',serif;font-size:16px;color:#0f766e">2</span><div style="font-size:8px;color:var(--g3)">CGT 1</div></div>
+              <div style="flex:1;min-width:60px;background:var(--g6);border-radius:8px;padding:8px;text-align:center"><span style="font-family:'Instrument Serif',serif;font-size:16px;color:#7c3aed">3</span><div style="font-size:8px;color:var(--g3)">B.Air</div></div>
+            </div>
+            <div style="font-size:10px;color:var(--red);font-weight:600">Belum MSJ 1: Michael Tanujaya, Priscilla Ong</div>
+          </div>
+        </div>
+
+        <!-- TEEN 06 -->
+        <div style="border:1px solid var(--g5);border-radius:10px;margin-bottom:10px;overflow:hidden">
+          <div style="padding:12px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;background:#fdf2f8;border-left:3px solid #be185d" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none';this.querySelector('.acc-arrow').textContent=this.nextElementSibling.style.display==='none'?'+':'-'">
+            <div><span style="font-weight:700;font-size:13px">TEEN 06</span> <span style="font-size:10px;color:var(--g3)">· 8 member</span></div>
+            <div style="display:flex;align-items:center;gap:10px"><span style="font-size:11px;font-weight:600;color:#be185d">65% milestone</span><span class="acc-arrow" style="font-size:14px;color:var(--g3)">+</span></div>
+          </div>
+          <div style="display:none;padding:14px;background:var(--white)">
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+              <div style="flex:1;min-width:60px;background:var(--g6);border-radius:8px;padding:8px;text-align:center"><span style="font-family:'Instrument Serif',serif;font-size:16px;color:var(--green)">7</span><div style="font-size:8px;color:var(--g3)">MSJ 1</div></div>
+              <div style="flex:1;min-width:60px;background:var(--g6);border-radius:8px;padding:8px;text-align:center"><span style="font-family:'Instrument Serif',serif;font-size:16px;color:var(--blue)">5</span><div style="font-size:8px;color:var(--g3)">MSJ 2</div></div>
+              <div style="flex:1;min-width:60px;background:var(--g6);border-radius:8px;padding:8px;text-align:center"><span style="font-family:'Instrument Serif',serif;font-size:16px;color:#0f766e">4</span><div style="font-size:8px;color:var(--g3)">CGT 1</div></div>
+              <div style="flex:1;min-width:60px;background:var(--g6);border-radius:8px;padding:8px;text-align:center"><span style="font-family:'Instrument Serif',serif;font-size:16px;color:#7c3aed">5</span><div style="font-size:8px;color:var(--g3)">B.Air</div></div>
+            </div>
+            <div style="font-size:10px;color:var(--red);font-weight:600">Belum MSJ 1: Raphael Jonathan</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COACH TAB: VISI -->
+    <div class="tab-content" id="tab-c-visi">
+      <div style="font-size:11px;color:var(--g3);margin-bottom:16px">Edit visi & misi setiap CG. Tambahkan catatan atau feedback sebagai Coach.</div>
+
+      <!-- TEEN 23 -->
+      <div class="section" style="border-left:4px solid #7c3aed">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+          <span style="background:#faf5ff;color:#7c3aed;padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:.8px;border:1px solid #7c3aed40">TEEN 23</span>
+          <span style="font-size:12px;font-weight:600">Tofanny Zerafim</span>
+        </div>
+        <div class="vcard"><div class="vlabel">Visi CG</div><textarea class="vedit">Semua member CG aktif dan bertumbuh dalam iman, menjadi generasi yang berdampak.</textarea></div>
+        <div class="vcard"><div class="vlabel">Misi Semester Ini</div><textarea class="vedit">1. Semua member selesai MSJ 1 sebelum Juni 2026
+2. Minimal 80% kehadiran per bulan
+3. Follow-up member baru setiap minggu</textarea></div>
+        <div class="vcard"><div class="vlabel">Catatan Coach</div><textarea class="vedit" placeholder="Tulis feedback atau catatan untuk CG ini..." style="border-color:var(--purple)">CG ini cukup aktif. Perlu perhatian khusus ke Florencia yang sering absent. Milestone progress bagus.</textarea></div>
+      </div>
+
+      <!-- TEEN 01 -->
+      <div class="section" style="border-left:4px solid #1d4ed8">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+          <span style="background:#eff6ff;color:#1d4ed8;padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:.8px;border:1px solid #1d4ed840">TEEN 01</span>
+          <span style="font-size:12px;font-weight:600">Stefenie Nathania</span>
+        </div>
+        <div class="vcard"><div class="vlabel">Visi CG</div><textarea class="vedit">Membawa setiap member untuk mengenal Tuhan secara pribadi dan bertumbuh bersama.</textarea></div>
+        <div class="vcard"><div class="vlabel">Misi Semester Ini</div><textarea class="vedit">1. Setiap member punya accountability partner
+2. 1 orang baru setiap bulan
+3. Semua member ikut retreat Juni</textarea></div>
+        <div class="vcard"><div class="vlabel">Catatan Coach</div><textarea class="vedit" placeholder="Tulis feedback atau catatan untuk CG ini..." style="border-color:var(--purple)">Kehadiran paling tinggi di Jaktim 1. Pertahankan momentum ini.</textarea></div>
+      </div>
+
+      <!-- TEEN 09 -->
+      <div class="section" style="border-left:4px solid #c2410c">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+          <span style="background:#fff7ed;color:#c2410c;padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:.8px;border:1px solid #c2410c40">TEEN 09</span>
+          <span style="font-size:12px;font-weight:600">Jessica Anastasia</span>
+        </div>
+        <div class="vcard"><div class="vlabel">Visi CG</div><textarea class="vedit">Menjadi CG yang saling menguatkan dan berbuah bagi lingkungan sekitar.</textarea></div>
+        <div class="vcard"><div class="vlabel">Misi Semester Ini</div><textarea class="vedit">1. Outreach ke tetangga member sebulan sekali
+2. Setiap member melayani minimal 1x per bulan
+3. MSJ 1 untuk semua member baru</textarea></div>
+        <div class="vcard"><div class="vlabel">Catatan Coach</div><textarea class="vedit" placeholder="Tulis feedback atau catatan untuk CG ini..." style="border-color:var(--purple)">Kehadiran perlu ditingkatkan. 2 member at risk. Bantu Jessica untuk follow-up.</textarea></div>
+      </div>
+
+      <!-- TEEN 06 -->
+      <div class="section" style="border-left:4px solid #be185d">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+          <span style="background:#fdf2f8;color:#be185d;padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:.8px;border:1px solid #be185d40">TEEN 06</span>
+          <span style="font-size:12px;font-weight:600">Keizha Ananta</span>
+        </div>
+        <div class="vcard"><div class="vlabel">Visi CG</div><textarea class="vedit">Generasi muda yang on-fire untuk Tuhan dan berdampak di sekolah.</textarea></div>
+        <div class="vcard"><div class="vlabel">Misi Semester Ini</div><textarea class="vedit">1. Setiap member bawa 1 teman baru per semester
+2. CG games night sebulan sekali
+3. Baptis air untuk 2 member</textarea></div>
+        <div class="vcard"><div class="vlabel">Catatan Coach</div><textarea class="vedit" placeholder="Tulis feedback atau catatan untuk CG ini..." style="border-color:var(--purple)">Tidak ada member at risk, bagus. Dorong milestone completion.</textarea></div>
+      </div>
+
+      <button class="btn-purple" style="margin-top:12px;width:100%">Simpan Semua Visi & Catatan</button>
+    </div>
+
+    <!-- COACH TAB: EVENTS -->
+    <div class="tab-content" id="tab-c-events">
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px">
+        <select class="cgl-select" style="width:auto;min-width:140px;padding:8px 32px 8px 12px;font-size:12px;border-radius:10px">
+          <option>Semua CG</option>
+          <option>TEEN 23</option>
+          <option>TEEN 01</option>
+          <option>TEEN 09</option>
+          <option>TEEN 06</option>
+        </select>
+      </div>
+      <div class="filter-chips"><span class="chip on">Semua</span><span class="chip">Ibadah</span><span class="chip">CG Event</span><span class="chip">Birthday</span><span class="chip">Outreach</span></div>
+
+      <!-- Shared events -->
+      <div style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--g3);margin-bottom:10px;margin-top:4px">Event Semua CG</div>
+      <div class="ev-card" style="border-left-color:var(--green)"><div class="ev-date">18 Apr 2026</div><div class="ev-name">Good Friday Service</div><div class="ev-note">Ibadah Jumat Agung. Semua member wajib hadir.</div><span class="ev-cat" style="background:rgba(22,163,74,.08);color:var(--green)">Ibadah</span><span class="ev-cat" style="background:rgba(108,92,231,.06);color:var(--purple);margin-left:4px">Semua CG</span></div>
+      <div class="ev-card" style="border-left-color:var(--orange)"><div class="ev-date">20 Apr 2026</div><div class="ev-name">Easter Sunday</div><div class="ev-note">Ibadah Paskah. Ada drama dari teens.</div><span class="ev-cat" style="background:rgba(22,163,74,.08);color:var(--green)">Ibadah</span><span class="ev-cat" style="background:rgba(108,92,231,.06);color:var(--purple);margin-left:4px">Semua CG</span></div>
+      <div class="ev-card" style="border-left-color:var(--purple)"><div class="ev-date">7 Jun 2026</div><div class="ev-name">Youth Outreach — Cakung</div><div class="ev-note">Evangelism dan games di area Cakung.</div><span class="ev-cat" style="background:rgba(108,92,231,.08);color:var(--purple)">Outreach</span><span class="ev-cat" style="background:rgba(108,92,231,.06);color:var(--purple);margin-left:4px">Semua CG</span></div>
+      <div class="ev-card" style="border-left-color:var(--blue)"><div class="ev-date">28 Jun 2026</div><div class="ev-name">Youth Retreat — Puncak</div><div class="ev-note">Retreat 2 hari 1 malam di Puncak. Wajib semua CG.</div><span class="ev-cat" style="background:rgba(37,99,235,.08);color:var(--blue)">CG Event</span><span class="ev-cat" style="background:rgba(108,92,231,.06);color:var(--purple);margin-left:4px">Semua CG</span></div>
+
+      <!-- Per-CG events -->
+      <div style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--g3);margin:20px 0 10px">Event per CG</div>
+
+      <div class="ev-card" style="border-left-color:#7c3aed"><div class="ev-date">3 Mei 2026</div><div class="ev-name">CG Outing — Taman Mini</div><div class="ev-note">Jalan-jalan CG TEEN 23. Budget 50rb/orang.</div><span class="ev-cat" style="background:rgba(37,99,235,.08);color:var(--blue)">CG Event</span><span class="ev-cat" style="background:rgba(124,58,237,.08);color:#7c3aed;margin-left:4px">TEEN 23</span></div>
+      <div class="ev-card" style="border-left-color:#7c3aed"><div class="ev-date">22 Mei 2026</div><div class="ev-name">Tofanny Zerafim — Ulang Tahun</div><div class="ev-note">Surprise party setelah CG session.</div><span class="ev-cat" style="background:rgba(244,114,182,.08);color:#ec4899">Birthday</span><span class="ev-cat" style="background:rgba(124,58,237,.08);color:#7c3aed;margin-left:4px">TEEN 23</span></div>
+      <div class="ev-card" style="border-left-color:#1d4ed8"><div class="ev-date">10 Mei 2026</div><div class="ev-name">CG Movie Night</div><div class="ev-note">Nonton bareng di rumah Stefi.</div><span class="ev-cat" style="background:rgba(37,99,235,.08);color:var(--blue)">CG Event</span><span class="ev-cat" style="background:rgba(29,78,216,.08);color:#1d4ed8;margin-left:4px">TEEN 01</span></div>
+      <div class="ev-card" style="border-left-color:#c2410c"><div class="ev-date">17 Mei 2026</div><div class="ev-name">Outreach Cakung Barat</div><div class="ev-note">Evangelism ke RT sekitar rumah Jessica.</div><span class="ev-cat" style="background:rgba(108,92,231,.08);color:var(--purple)">Outreach</span><span class="ev-cat" style="background:rgba(194,65,12,.08);color:#c2410c;margin-left:4px">TEEN 09</span></div>
+      <div class="ev-card" style="border-left-color:#be185d"><div class="ev-date">24 Mei 2026</div><div class="ev-name">CG Games Day</div><div class="ev-note">Games seharian di taman. Ajak teman baru.</div><span class="ev-cat" style="background:rgba(37,99,235,.08);color:var(--blue)">CG Event</span><span class="ev-cat" style="background:rgba(190,24,93,.08);color:#be185d;margin-left:4px">TEEN 06</span></div>
+
+      <button class="btn-purple" style="margin-top:14px;width:100%">+ Tambah Event Baru (Semua CG)</button>
+    </div>
+
   </div>
 </div>
 
@@ -564,7 +937,22 @@ function enterDash(){fromCoach=false;openD(CG[curReg][document.getElementById('c
 function enterFromCoach(n){fromCoach=true;openD([...CG.jaktim1,...CG.jaktim2].find(x=>x.cg===n));}
 function openD(c){['pageL','pageC'].forEach(x=>document.getElementById(x).style.display='none');document.getElementById('pageD').style.display='block';document.getElementById('nB').textContent=c.cg;document.getElementById('nB').style.cssText='padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:.8px;background:'+c.bg+';color:'+c.color+';border:1px solid '+c.color+'40';document.getElementById('nN').textContent=c.leader;document.getElementById('hC').textContent=c.count;document.getElementById('hS').textContent=c.schedule;document.getElementById('hL').textContent=c.loc;window.scrollTo(0,0);}
 function goBack(){document.getElementById('pageD').style.display='none';if(fromCoach)document.getElementById('pageC').style.display='block';else document.getElementById('pageL').style.display='flex';window.scrollTo(0,0);}
-function sTab(id,b){document.querySelectorAll('.app-tab').forEach(t=>t.classList.remove('on'));b.classList.add('on');document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));document.getElementById('tab-'+id).classList.add('active');}
+function sTab(id,b){document.querySelectorAll('#pageD .app-tab').forEach(t=>t.classList.remove('on'));b.classList.add('on');document.querySelectorAll('#pageD .tab-content').forEach(t=>t.classList.remove('active'));document.getElementById('tab-'+id).classList.add('active');}
+function sCoachTab(id,b){document.querySelectorAll('#pageC .app-tab').forEach(t=>t.classList.remove('on'));b.classList.add('on');document.querySelectorAll('#pageC .tab-content').forEach(t=>t.classList.remove('active'));document.getElementById('tab-'+id).classList.add('active');}
+function goBackCoach(){document.getElementById('pageC').style.display='none';document.getElementById('pageL').style.display='flex';window.scrollTo(0,0);}
+function switchCoachReg(reg,btn){
+  btn.parentElement.querySelectorAll('.region-btn').forEach(x=>x.classList.remove('active'));btn.classList.add('active');
+  var d=CG[reg],grid=document.getElementById('coachCGGrid'),chart=document.getElementById('coachBarChart');
+  var stats={jaktim1:{mbr:31,avg:'75%',risk:5,msj:8},jaktim2:{mbr:23,avg:'68%',risk:6,msj:10}};
+  var s=stats[reg];document.getElementById('csTotalMbr').textContent=s.mbr;document.getElementById('csAvgHadir').textContent=s.avg;document.getElementById('csAtRisk').textContent=s.risk;document.getElementById('csBlmMsj').textContent=s.msj;
+  var cgData={jaktim1:[{cg:'TEEN 23',pct:78,mbr:10,risk:2,ms:72},{cg:'TEEN 01',pct:82,mbr:7,risk:1,ms:80},{cg:'TEEN 09',pct:68,mbr:6,risk:2,ms:55},{cg:'TEEN 06',pct:71,mbr:8,risk:0,ms:65}],jaktim2:[{cg:'TEEN 12',pct:74,mbr:8,risk:2,ms:60},{cg:'TEEN 07',pct:76,mbr:6,risk:1,ms:70},{cg:'TEEN 17',pct:65,mbr:4,risk:1,ms:45},{cg:'TEEN 20',pct:58,mbr:5,risk:2,ms:38}]};
+  var cards=cgData[reg];var colors={};d.forEach(function(x){colors[x.cg]=x.color;});
+  grid.innerHTML=cards.map(function(c){var col=colors[c.cg]||'#7c3aed';var dash=Math.round(c.pct*97.4/100);return '<div class="coach-card" style="border-left:4px solid '+col+'" onclick="enterFromCoach(\''+c.cg+'\')"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><div style="font-weight:800;font-size:15px">'+c.cg+'</div><div style="position:relative;width:40px;height:40px"><svg viewBox="0 0 36 36" style="transform:rotate(-90deg)"><circle cx="18" cy="18" r="15.5" fill="none" stroke="#e5e7eb" stroke-width="3"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="'+col+'" stroke-width="3" stroke-dasharray="'+dash+' 97.4" stroke-linecap="round"/></svg><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700">'+c.pct+'%</div></div></div><div style="font-size:11px;color:var(--g3);margin-bottom:8px">CGL: '+d.find(function(x){return x.cg===c.cg;}).leader+'</div><div style="display:flex;gap:14px;font-size:11px;margin-bottom:8px"><div style="text-align:center"><span style="font-family:\'Instrument Serif\',serif;font-size:18px;display:block">'+c.mbr+'</span>Member</div><div style="text-align:center"><span style="font-family:\'Instrument Serif\',serif;font-size:18px;color:var(--red);display:block">'+c.risk+'</span>At Risk</div></div><div style="font-size:9px;color:var(--g3);margin-bottom:3px">Milestone Progress</div><div class="ms-bar"><div class="ms-bar-fill" style="width:'+c.ms+'%"></div></div><div style="font-size:9px;color:var(--g4)">'+c.ms+'% selesai</div></div>';}).join('');
+  var sorted=cards.slice().sort(function(a,b){return b.pct-a.pct;});
+  chart.innerHTML=sorted.map(function(c){var col=colors[c.cg]||'#7c3aed';return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><div style="width:70px;font-size:11px;font-weight:600;text-align:right">'+c.cg+'</div><div style="flex:1;height:22px;background:var(--g6);border-radius:6px;overflow:hidden"><div style="width:'+c.pct+'%;height:100%;background:'+col+';border-radius:6px;display:flex;align-items:center;padding-left:8px"><span style="font-size:9px;color:#fff;font-weight:700">'+c.pct+'%</span></div></div></div>';}).join('');
+}
+function switchCoachMsReg(reg,btn){btn.parentElement.querySelectorAll('.region-btn').forEach(x=>x.classList.remove('active'));btn.classList.add('active');}
+function filterCoachAbsensi(){}
 function pickRole(el,cls,label){
   const wrap=el.closest('.role-wrap');
   const btn=wrap.querySelector('.role-btn');
