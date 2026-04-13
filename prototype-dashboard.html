@@ -415,6 +415,42 @@ body{font-family:'Inter',sans-serif;background:#f8f8f5;color:#1c1c1c;min-height:
         <button class="pel-add" style="margin-top:10px;width:100%;padding:8px;border-radius:10px;font-size:11px">+ Tambah Role Custom</button>
       </div>
 
+      <!-- Stats Charts -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+        <!-- Distribusi Jenis Pelayanan -->
+        <div class="section" style="border-radius:14px;margin-bottom:0">
+          <div class="section-title" style="margin-bottom:12px">🎯 Distribusi Jenis</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px"><span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:var(--green);display:inline-block"></span>Firman CG</span><span style="font-weight:700">3x</span></div><div style="height:6px;background:var(--g6);border-radius:6px;overflow:hidden"><div style="width:60%;height:100%;background:linear-gradient(90deg,#16a34a,#34d399);border-radius:6px"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px"><span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:var(--orange);display:inline-block"></span>PAW</span><span style="font-weight:700">3x</span></div><div style="height:6px;background:var(--g6);border-radius:6px;overflow:hidden"><div style="width:60%;height:100%;background:linear-gradient(90deg,#d97706,#fbbf24);border-radius:6px"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px"><span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:var(--blue);display:inline-block"></span>Game</span><span style="font-weight:700">2x</span></div><div style="height:6px;background:var(--g6);border-radius:6px;overflow:hidden"><div style="width:40%;height:100%;background:linear-gradient(90deg,#2563eb,#60a5fa);border-radius:6px"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px"><span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:var(--red);display:inline-block"></span>Sharing</span><span style="font-weight:700">2x</span></div><div style="height:6px;background:var(--g6);border-radius:6px;overflow:hidden"><div style="width:40%;height:100%;background:linear-gradient(90deg,#dc2626,#f87171);border-radius:6px"></div></div></div>
+          </div>
+          <div style="margin-top:12px;padding-top:10px;border-top:1px dashed var(--g5);font-size:10px;color:var(--g3);text-align:center">Total: 10 slot pelayanan bulan ini</div>
+        </div>
+
+        <!-- Top Pelayan -->
+        <div class="section" style="border-radius:14px;margin-bottom:0;background:linear-gradient(135deg,#f0fdf4,#ffffff);border:1px solid #bbf7d0">
+          <div class="section-title" style="margin-bottom:12px;color:#15803d">🏆 Sering Pelayanan</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--white);border-radius:10px"><div style="width:24px;height:24px;border-radius:6px;background:#fbbf24;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800">1</div><div style="flex:1"><div style="font-size:12px;font-weight:600">Tofanny Zerafim</div><div style="font-size:9px;color:var(--g3)">CGL · Firman, Sharing</div></div><div style="font-family:'Instrument Serif',serif;font-size:18px;color:var(--green)">3x</div></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--white);border-radius:10px"><div style="width:24px;height:24px;border-radius:6px;background:#9ca3af;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800">2</div><div style="flex:1"><div style="font-size:12px;font-weight:600">Valerie Alea D.</div><div style="font-size:9px;color:var(--g3)">Sponsor · PAW, Sharing</div></div><div style="font-family:'Instrument Serif',serif;font-size:18px;color:var(--green)">3x</div></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--white);border-radius:10px"><div style="width:24px;height:24px;border-radius:6px;background:#cd7f32;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800">3</div><div style="flex:1"><div style="font-size:12px;font-weight:600">Fitzgerrald O.</div><div style="font-size:9px;color:var(--g3)">Member · Game</div></div><div style="font-family:'Instrument Serif',serif;font-size:18px;color:var(--blue)">1x</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Belum pernah pelayanan -->
+      <div class="section" style="border-radius:14px;background:linear-gradient(135deg,#fef2f2,#ffffff);border:1px solid #fecaca">
+        <div class="section-title" style="margin-bottom:10px;color:#b91c1c">⚠️ Belum Pernah / Jarang Pelayanan</div>
+        <div style="font-size:11px;color:var(--g3);margin-bottom:10px">Member yang perlu di-encourage untuk mulai pelayanan</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--white);border:1px solid var(--Abr);border-radius:10px"><div style="font-size:18px">🔴</div><div style="flex:1"><div style="font-size:12px;font-weight:600;color:var(--red)">Florencia Arumi Koo</div><div style="font-size:10px;color:var(--g3)">Simpatisan · 0x pelayanan bulan ini · Kehadiran 38%</div></div><button style="padding:4px 10px;border-radius:8px;border:1px solid var(--purple);background:transparent;color:var(--purple);font-size:10px;font-weight:600;cursor:pointer">Ajak</button></div>
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--white);border:1px solid var(--Abr);border-radius:10px"><div style="font-size:18px">🟡</div><div style="flex:1"><div style="font-size:12px;font-weight:600">Ivy Yolanda W.</div><div style="font-size:10px;color:var(--g3)">Simpatisan · 0x pelayanan · Belum MSJ 1</div></div><button style="padding:4px 10px;border-radius:8px;border:1px solid var(--purple);background:transparent;color:var(--purple);font-size:10px;font-weight:600;cursor:pointer">Ajak</button></div>
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--white);border:1px solid var(--Sbr);border-radius:10px"><div style="font-size:18px">🟠</div><div style="flex:1"><div style="font-size:12px;font-weight:600">Callista Lorraine W.</div><div style="font-size:10px;color:var(--g3)">VIP · 0x pelayanan · Sering izin</div></div><button style="padding:4px 10px;border-radius:8px;border:1px solid var(--purple);background:transparent;color:var(--purple);font-size:10px;font-weight:600;cursor:pointer">Ajak</button></div>
+        </div>
+      </div>
+
       <!-- Rekap bulanan -->
       <div class="section" style="border-radius:14px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
