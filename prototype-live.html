@@ -736,25 +736,37 @@ function renderPelayanan() {
   // Schedule section
   html += '<div class="section" style="border-radius:14px;background:linear-gradient(135deg,#faf5ff,#ffffff);border:1px solid #e9e3ff">';
   html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">';
-  html += '<div class="section-title" style="margin-bottom:0">\ud83d\udcc5 Jadwal Pelayanan</div>';
+  html += '<div class="section-title" style="margin-bottom:0">Jadwal Pelayanan</div>';
   html += '<div style="display:flex;align-items:center;gap:6px">';
   html += '<input type="date" id="pelNewDate" style="padding:6px 10px;border:1px solid var(--g5);border-radius:8px;font-size:11px;font-family:\'Inter\',sans-serif">';
   html += '<button class="pel-add" onclick="addPelWeek()" style="padding:6px 10px;font-size:11px">+ Minggu</button></div></div>';
 
-  // Week pills
-  html += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">';
+  // Week pills with edit
+  html += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;align-items:center">';
+  if(weeks.length===0){
+    html += '<span style="font-size:11px;color:var(--g4);font-style:italic">Belum ada minggu — tambahkan dengan tombol "+ Minggu"</span>';
+  }
   weeks.forEach((w, i) => {
     const active = i === 0;
-    html += '<span style="font-size:10px;padding:5px 12px;border-radius:14px;' + (active ? 'background:var(--purple);color:#fff;font-weight:600' : 'background:#fff;border:1px solid var(--g5);color:var(--g3);font-weight:500') + ';cursor:pointer">' + esc(w) + '</span>';
+    html += '<div style="display:inline-flex;align-items:center;gap:4px;padding:4px 6px 4px 12px;border-radius:14px;'+(active?'background:var(--purple);color:#fff;font-weight:600':'background:#fff;border:1px solid var(--g5);color:var(--g3);font-weight:500')+';font-size:10px">';
+    html += '<span style="cursor:pointer">'+esc(w)+'</span>';
+    html += '<button onclick="editPelWeek(\''+esc(w)+'\')" style="background:none;border:none;cursor:pointer;color:'+(active?'#fff':'var(--g4)')+';padding:2px;font-size:10px;line-height:1" title="Edit tanggal">✎</button>';
+    html += '<button onclick="deletePelWeek(\''+esc(w)+'\')" style="background:none;border:none;cursor:pointer;color:'+(active?'#fff':'var(--g4)')+';padding:2px;font-size:11px;line-height:1" title="Hapus">×</button>';
+    html += '</div>';
   });
   html += '</div>';
 
-  // Role assignments
-  const roles = [{icon:'\ud83d\udcd6',name:'Firman CG',bg:'#f0fdf4'},{icon:'\ud83d\ude4f',name:'PAW',bg:'#fff7ed'},{icon:'\ud83c\udfae',name:'Game',bg:'#eff6ff'},{icon:'\ud83d\udcac',name:'Sharing',bg:'#fef2f2'}];
+  // Role assignments (no emoji - letter badges)
+  const roles = [
+    {abbr:'FC',name:'Firman CG',bg:'#f0fdf4',color:'#16a34a'},
+    {abbr:'PW',name:'PAW',bg:'#fff7ed',color:'#d97706'},
+    {abbr:'GM',name:'Game',bg:'#eff6ff',color:'#2563eb'},
+    {abbr:'SH',name:'Sharing',bg:'#fef2f2',color:'#dc2626'}
+  ];
   html += '<div style="display:flex;flex-direction:column;gap:8px">';
   roles.forEach(r => {
     html += '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--white);border-radius:10px;border:1px solid var(--g6)">';
-    html += '<div style="width:32px;height:32px;border-radius:8px;background:'+r.bg+';display:flex;align-items:center;justify-content:center;font-size:14px">'+r.icon+'</div>';
+    html += '<div style="width:32px;height:32px;border-radius:8px;background:'+r.bg+';display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:'+r.color+';letter-spacing:.5px">'+r.abbr+'</div>';
     html += '<div style="flex:1"><div style="font-weight:600;font-size:12px">'+r.name+'</div></div>';
     html += '<select class="pel-select" style="min-width:140px;padding:6px 24px 6px 10px;font-size:11px"><option value="">Pilih...</option>';
     MEMBERS.forEach(m => { html += '<option>'+esc(m.nama)+'</option>'; });
@@ -766,8 +778,8 @@ function renderPelayanan() {
 
   // Stats placeholders
   html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;margin-top:14px">';
-  html += '<div class="section" style="border-radius:14px;margin-bottom:0"><div class="section-title" style="margin-bottom:12px">\ud83c\udfaf Distribusi Jenis</div><div style="font-size:11px;color:var(--g3)">Data akan muncul setelah pelayanan disimpan.</div></div>';
-  html += '<div class="section" style="border-radius:14px;margin-bottom:0;background:linear-gradient(135deg,#f0fdf4,#ffffff);border:1px solid #bbf7d0"><div class="section-title" style="margin-bottom:12px;color:#15803d">\ud83c\udfc6 Sering Pelayanan</div><div style="font-size:11px;color:var(--g3)">Data akan muncul setelah pelayanan disimpan.</div></div>';
+  html += '<div class="section" style="border-radius:14px;margin-bottom:0"><div class="section-title" style="margin-bottom:12px">Distribusi Jenis</div><div style="font-size:11px;color:var(--g3)">Data akan muncul setelah pelayanan disimpan.</div></div>';
+  html += '<div class="section" style="border-radius:14px;margin-bottom:0;background:linear-gradient(135deg,#f0fdf4,#ffffff);border:1px solid #bbf7d0"><div class="section-title" style="margin-bottom:12px;color:#15803d">Sering Pelayanan</div><div style="font-size:11px;color:var(--g3)">Data akan muncul setelah pelayanan disimpan.</div></div>';
   html += '</div>';
 
   el.innerHTML = html;
@@ -795,6 +807,30 @@ function addPelWeek() {
   localStorage.setItem(lsKey, JSON.stringify(data));
   renderPelayanan();
   toast('\u2713 Disimpan lokal');
+}
+
+function editPelWeek(oldDate) {
+  const newDate = prompt('Edit tanggal (format YYYY-MM-DD)', oldDate);
+  if (!newDate || newDate === oldDate) return;
+  const lsKey = 'cg_pelayanan_' + CUR_CG;
+  const data = JSON.parse(localStorage.getItem(lsKey) || '{}');
+  const month = document.getElementById('pelMonth').value || Object.keys(data)[0];
+  if (!data[month] || !data[month][oldDate]) return;
+  data[month][newDate] = data[month][oldDate];
+  delete data[month][oldDate];
+  localStorage.setItem(lsKey, JSON.stringify(data));
+  renderPelayanan();
+  toast('\u2713 Tanggal diubah');
+}
+
+function deletePelWeek(date) {
+  if (!confirm('Hapus minggu ' + date + '?')) return;
+  const lsKey = 'cg_pelayanan_' + CUR_CG;
+  const data = JSON.parse(localStorage.getItem(lsKey) || '{}');
+  const month = document.getElementById('pelMonth').value || Object.keys(data)[0];
+  if (data[month]) { delete data[month][date]; localStorage.setItem(lsKey, JSON.stringify(data)); }
+  renderPelayanan();
+  toast('\u2713 Minggu dihapus');
 }
 
 // ========== MILESTONE TAB ==========
