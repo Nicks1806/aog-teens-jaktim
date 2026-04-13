@@ -104,6 +104,28 @@ body{font-family:'Inter',sans-serif;background:#f8f8f5;color:#1c1c1c;min-height:
 .rbadge.member{background:#faf5ff;color:#7c3aed;border:1px solid #c4b5fd}
 .rbadge.simpatisan{background:#fff7ed;color:var(--orange);border:1px solid #fdba74}
 .rbadge.vip{background:#fef2f2;color:var(--red);border:1px solid #fecaca}
+
+/* Role selector custom */
+.role-wrap{position:relative;display:inline-block}
+.role-btn{font-size:10px;padding:4px 12px;border-radius:20px;font-weight:700;cursor:pointer;border:none;letter-spacing:.3px;display:inline-flex;align-items:center;gap:4px;transition:all .15s}
+.role-btn:hover{opacity:.85;transform:scale(1.03)}
+.role-btn::after{content:'';width:0;height:0;border-left:3.5px solid transparent;border-right:3.5px solid transparent;border-top:4px solid currentColor;opacity:.5}
+.role-btn.cgl{background:#dcfce7;color:#15803d}
+.role-btn.sponsor{background:#dbeafe;color:#1d4ed8}
+.role-btn.member{background:#ede9fe;color:#6d28d9}
+.role-btn.simpatisan{background:#ffedd5;color:#c2410c}
+.role-btn.vip{background:#ffe4e6;color:#be123c}
+.role-menu{display:none;position:absolute;right:0;top:calc(100% + 6px);background:var(--white);border:1px solid var(--g5);border-radius:12px;padding:6px;box-shadow:0 8px 30px rgba(0,0,0,.12);z-index:50;min-width:140px}
+.role-menu.show{display:block;animation:fadeIn .15s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.role-opt{padding:7px 12px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background .1s}
+.role-opt:hover{background:var(--g6)}
+.role-opt .rdot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.role-opt.cgl .rdot{background:#16a34a}
+.role-opt.sponsor .rdot{background:#2563eb}
+.role-opt.member .rdot{background:#7c3aed}
+.role-opt.simpatisan .rdot{background:#d97706}
+.role-opt.vip .rdot{background:#dc2626}
 .dgrid{display:grid;grid-template-columns:1fr 1fr;gap:5px;font-size:11px;color:var(--g2);margin-bottom:8px}
 .dgrid span{display:flex;align-items:center;gap:4px}
 
@@ -212,9 +234,10 @@ body{font-family:'Inter',sans-serif;background:#f8f8f5;color:#1c1c1c;min-height:
       <div class="dcard">
         <div class="dcard-top">
           <div class="dcard-name">Tofanny Zerafim Alexandra</div>
-          <select class="pel-select" style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;background:#f0fdf4;color:var(--green);border:1px solid #bbf7d0">
-            <option selected>CGL</option><option>Sponsor</option><option>Member</option><option>Simpatisan</option><option>VIP</option>
-          </select>
+          <div class="role-wrap">
+            <button class="role-btn cgl" onclick="this.nextElementSibling.classList.toggle('show')">CGL</button>
+            <div class="role-menu"><div class="role-opt cgl" onclick="pickRole(this,'cgl','CGL')"><span class="rdot"></span>CGL</div><div class="role-opt sponsor" onclick="pickRole(this,'sponsor','Sponsor')"><span class="rdot"></span>Sponsor</div><div class="role-opt member" onclick="pickRole(this,'member','Member')"><span class="rdot"></span>Member</div><div class="role-opt simpatisan" onclick="pickRole(this,'simpatisan','Simpatisan')"><span class="rdot"></span>Simpatisan</div><div class="role-opt vip" onclick="pickRole(this,'vip','VIP')"><span class="rdot"></span>VIP</div></div>
+          </div>
         </div>
         <div class="dgrid"><span>📱 0889-7317-7676</span><span>🎂 22 Mei 2010</span><span>🏫 SMAN 31 · Kelas 10</span><span>📍 Rawamangun, Pulo Gadung</span></div>
         <div style="font-size:10px;color:var(--g3);margin:8px 0 4px">Milestone <span style="font-size:9px;color:var(--g4)">(klik untuk ubah)</span></div>
@@ -235,9 +258,10 @@ body{font-family:'Inter',sans-serif;background:#f8f8f5;color:#1c1c1c;min-height:
       <div class="dcard">
         <div class="dcard-top">
           <div class="dcard-name">Valerie Alea Darmawan</div>
-          <select class="pel-select" style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;background:#eff6ff;color:var(--blue);border:1px solid #bfdbfe">
-            <option>CGL</option><option selected>Sponsor</option><option>Member</option><option>Simpatisan</option><option>VIP</option>
-          </select>
+          <div class="role-wrap">
+            <button class="role-btn sponsor" onclick="this.nextElementSibling.classList.toggle('show')">Sponsor</button>
+            <div class="role-menu"><div class="role-opt cgl" onclick="pickRole(this,'cgl','CGL')"><span class="rdot"></span>CGL</div><div class="role-opt sponsor" onclick="pickRole(this,'sponsor','Sponsor')"><span class="rdot"></span>Sponsor</div><div class="role-opt member" onclick="pickRole(this,'member','Member')"><span class="rdot"></span>Member</div><div class="role-opt simpatisan" onclick="pickRole(this,'simpatisan','Simpatisan')"><span class="rdot"></span>Simpatisan</div><div class="role-opt vip" onclick="pickRole(this,'vip','VIP')"><span class="rdot"></span>VIP</div></div>
+          </div>
         </div>
         <div class="dgrid"><span>📱 0813-1888-3186</span><span>🎂 12 Okt 2008</span><span>🏫 SMA Fons Vitae 1 · Kelas 11</span><span>📍 Cipinang Cempedak, Jatinegara</span></div>
         <div style="font-size:10px;color:var(--g3);margin:8px 0 4px">Milestone <span style="font-size:9px;color:var(--g4)">(klik untuk ubah)</span></div>
@@ -258,9 +282,10 @@ body{font-family:'Inter',sans-serif;background:#f8f8f5;color:#1c1c1c;min-height:
       <div class="dcard" style="border-left:3px solid var(--red)">
         <div class="dcard-top">
           <div class="dcard-name">Florencia Arumi Koo</div>
-          <select class="pel-select" style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;background:#fff7ed;color:var(--orange);border:1px solid #fdba74">
-            <option>CGL</option><option>Sponsor</option><option>Member</option><option selected>Simpatisan</option><option>VIP</option>
-          </select>
+          <div class="role-wrap">
+            <button class="role-btn simpatisan" onclick="this.nextElementSibling.classList.toggle('show')">Simpatisan</button>
+            <div class="role-menu"><div class="role-opt cgl" onclick="pickRole(this,'cgl','CGL')"><span class="rdot"></span>CGL</div><div class="role-opt sponsor" onclick="pickRole(this,'sponsor','Sponsor')"><span class="rdot"></span>Sponsor</div><div class="role-opt member" onclick="pickRole(this,'member','Member')"><span class="rdot"></span>Member</div><div class="role-opt simpatisan" onclick="pickRole(this,'simpatisan','Simpatisan')"><span class="rdot"></span>Simpatisan</div><div class="role-opt vip" onclick="pickRole(this,'vip','VIP')"><span class="rdot"></span>VIP</div></div>
+          </div>
         </div>
         <div class="dgrid"><span>📱 0857-2410-7837</span><span>🎂 30 Jul 2010</span><span>🏫 Don Bosco 2 · Kelas 10</span><span>📍 -</span></div>
         <div style="font-size:11px;color:var(--red);font-weight:600;margin-bottom:6px">⚠️ Kehadiran 38% · Perlu follow-up</div>
@@ -427,6 +452,16 @@ function enterFromCoach(n){fromCoach=true;openD([...CG.jaktim1,...CG.jaktim2].fi
 function openD(c){['pageL','pageC'].forEach(x=>document.getElementById(x).style.display='none');document.getElementById('pageD').style.display='block';document.getElementById('nB').textContent=c.cg;document.getElementById('nB').style.cssText='padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:.8px;background:'+c.bg+';color:'+c.color+';border:1px solid '+c.color+'40';document.getElementById('nN').textContent=c.leader;document.getElementById('hC').textContent=c.count;document.getElementById('hS').textContent=c.schedule;document.getElementById('hL').textContent=c.loc;window.scrollTo(0,0);}
 function goBack(){document.getElementById('pageD').style.display='none';if(fromCoach)document.getElementById('pageC').style.display='block';else document.getElementById('pageL').style.display='flex';window.scrollTo(0,0);}
 function sTab(id,b){document.querySelectorAll('.app-tab').forEach(t=>t.classList.remove('on'));b.classList.add('on');document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));document.getElementById('tab-'+id).classList.add('active');}
+function pickRole(el,cls,label){
+  const wrap=el.closest('.role-wrap');
+  const btn=wrap.querySelector('.role-btn');
+  btn.className='role-btn '+cls;
+  btn.childNodes[0].textContent=label;
+  wrap.querySelector('.role-menu').classList.remove('show');
+}
+document.addEventListener('click',function(e){
+  if(!e.target.closest('.role-wrap')){document.querySelectorAll('.role-menu.show').forEach(m=>m.classList.remove('show'));}
+});
 (function(){const p=new URLSearchParams(location.search);if(p.get('role')==='coach'){document.getElementById('pageL').style.display='none';document.getElementById('pageC').style.display='block';}popDD();})();
 </script>
 </body>
