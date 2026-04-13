@@ -888,13 +888,18 @@ function computeStats() {
 function buildAttendanceLineChart(members, dates, attMap) {
   if (!dates.length || !members.length) return '';
   // Hitung % hadir untuk tiap tanggal
+  // Denominator = total member CG (bukan cuma yg ter-record). Member yang belum di-input
+  // dianggap tidak hadir supaya tidak salah tampil 100% padahal ada yg absen/belum diisi.
+  // Kalau tidak ada record sama sekali di tanggal itu (ibadah belum jalan) → pct=null.
   const points = dates.map(d => {
-    let h = 0, t = 0;
+    let h = 0, anyRecord = false;
     members.forEach(m => {
       const st = attMap[m.id+'_'+d.id];
-      if (st) { t++; if (st==='H') h++; }
+      if (st) anyRecord = true;
+      if (st === 'H') h++;
     });
-    const pct = t ? Math.round(h/t*100) : null;
+    const t = members.length;
+    const pct = anyRecord ? Math.round(h/t*100) : null;
     return { label: d.label||'', pct, hadir: h, total: t };
   });
   // Kalau semua null, jangan tampilin
