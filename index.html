@@ -543,7 +543,10 @@ function selReg(r, b) {
 function popDD() {
   const s = document.getElementById('cglSel');
   s.innerHTML = '<option value="" disabled selected>Pilih CG Leader...</option>';
-  const cgls = ALL_MEMBERS.filter(m => m.status === 'CGL' && m.region === curReg);
+  const cgls = ALL_MEMBERS.filter(m => {
+    var s = String(m.status||'').toLowerCase().trim();
+    return (s === 'cgl' || s === 'leader') && m.region === curReg;
+  });
   const seen = new Set();
   cgls.forEach(m => {
     if (seen.has(m.cg)) return;
