@@ -203,7 +203,7 @@ body{font-family:'Inter',sans-serif;background:#f8f8f5;color:#1c1c1c;min-height:
 .coach-card:hover{border-color:var(--purple);box-shadow:0 4px 16px rgba(0,0,0,.06);transform:translateY(-2px)}
 
 /* Toast */
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:#1c1c1c;color:#fff;padding:10px 20px;border-radius:10px;font-size:12px;font-weight:600;z-index:9999;transition:transform .3s ease;pointer-events:none}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:#1c1c1c;color:#fff;padding:10px 20px;border-radius:10px;font-size:12px;font-weight:600;z-index:9999;transition:transform .3s ease;pointer-events:none;max-width:90vw;white-space:pre-wrap;word-break:break-word;text-align:center}
 .toast.show{transform:translateX(-50%) translateY(0)}
 
 /* Loading */
@@ -597,8 +597,9 @@ async function cleanupPastEvents() {
 // Badge countdown "X hari lagi" untuk event
 function eventCountdownBadge(dateStart) {
   if (!dateStart) return '';
-  const d = new Date(dateStart); d.setHours(0,0,0,0);
-  if (isNaN(d.getTime())) return '';
+  const d = parseLocalDate(dateStart);
+  if (!d) return '';
+  d.setHours(0,0,0,0);
   const today = new Date(); today.setHours(0,0,0,0);
   const diff = Math.round((d - today) / 86400000);
   let txt, bg, col;
@@ -1260,6 +1261,8 @@ async function saveNewMember() {
   if (error) { alert('Error: ' + error.message); return; }
   closeModal('addMemberModal');
   toast('\u2713 Member ditambahkan');
+  // Refresh ALL_MEMBERS global supaya dropdown CGL ter-update kalau member baru berstatus CGL
+  try { await loadCGLDropdown(); } catch(e) {}
   await openCGDashboard(CUR_CG);
 }
 
@@ -1453,7 +1456,7 @@ async function renderPelayanan() {
       const saved = weekAssignments[r.name] || '';
       const assignees = saved ? String(saved).split(',').map(s => s.trim()).filter(Boolean) : [];
       const assignedSet = new Set(assignees);
-      const roleKey = esc(r.name).replace(/'/g,"\\'");
+      const roleKey = esc(r.name);
       html += '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--white);border-radius:10px;border:1px solid var(--g6);flex-wrap:wrap">';
       // Avatar
       html += '<div style="width:28px;height:28px;border-radius:7px;background:'+r.bg+';display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:'+r.color+';letter-spacing:.3px;flex-shrink:0">'+esc(r.abbr)+'</div>';
@@ -1462,7 +1465,7 @@ async function renderPelayanan() {
       // Assignees container (grows to fill)
       html += '<div style="flex:1;display:flex;flex-wrap:wrap;gap:4px;align-items:center;justify-content:flex-end;min-width:180px">';
       assignees.forEach(name => {
-        html += '<span style="display:inline-flex;align-items:center;gap:2px;padding:3px 3px 3px 9px;background:'+r.bg+';color:'+r.color+';border-radius:12px;font-size:10.5px;font-weight:600;line-height:1.2">'+esc(name)+'<button onclick="removePelAssignee(\''+roleKey+'\',\''+esc(name).replace(/'/g,"\\'")+'\')" style="background:none;border:0;cursor:pointer;color:'+r.color+';opacity:.65;font-size:13px;line-height:1;padding:0 4px 0 2px;border-radius:50%" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.65" title="Hapus">&times;</button></span>';
+        html += '<span style="display:inline-flex;align-items:center;gap:2px;padding:3px 3px 3px 9px;background:'+r.bg+';color:'+r.color+';border-radius:12px;font-size:10.5px;font-weight:600;line-height:1.2">'+esc(name)+'<button onclick="removePelAssignee(\''+roleKey+'\',\''+esc(name)+'\')" style="background:none;border:0;cursor:pointer;color:'+r.color+';opacity:.65;font-size:13px;line-height:1;padding:0 4px 0 2px;border-radius:50%" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.65" title="Hapus">&times;</button></span>';
       });
       // "+" add button (styled wrapper with hidden select overlay)
       html += '<span style="position:relative;display:inline-flex">';
@@ -1494,7 +1497,7 @@ async function renderPelayanan() {
       const raw = wa[role];
       if (!raw) return;
       // Multi-assignee: split comma-separated names
-      const persons = String(raw).split(',').map(s => s.trim()).filter(Boolean);
+      const persons = [...new Set(String(raw).split(',').map(s => s.trim()).filter(Boolean))];
       if (persons.length === 0) return;
       roleCounts[role] = (roleCounts[role] || 0) + 1; // role tetap dihitung 1 per week
       persons.forEach(person => {
@@ -1661,17 +1664,6 @@ async function deletePelWeek(date) {
   if (CUR_PEL_WEEK === date) CUR_PEL_WEEK = null;
   await renderPelayanan();
   toast('\u2713 Minggu dihapus');
-}
-
-async function savePelAssignment(roleName, memberName) {
-  if (!CUR_PEL_WEEK) return;
-  if (memberName) {
-    await savePelayananCell(CUR_CG, CUR_REGION, CUR_PEL_MONTH, CUR_PEL_WEEK, roleName, memberName);
-  } else {
-    await supa.from('cg_pelayanan').delete().eq('cg', CUR_CG).eq('region', CUR_REGION).eq('week_date', CUR_PEL_WEEK).eq('role_name', roleName);
-    toast('\u2713 Disimpan');
-  }
-  await renderPelayanan();
 }
 
 // Multi-assignee helpers: baca nilai current → modifikasi list → save gabungan comma-separated
@@ -2370,17 +2362,19 @@ async function generateSabtuBulan(scope, year, month) {
   try {
     let totalInserted = 0;
     let totalSkipped = 0;
+    // Normalize label (strip leading zero pada day) untuk detect duplikat robust
+    const normLbl = (s) => String(s||'').trim().toLowerCase().replace(/^0+(\d)/,'$1');
     for (const reg of regions) {
       // Ambil existing sort_order max + labels utk skip duplikat
       const { data: existing } = await supa.from('dates').select('label,sort_order').eq('region', reg);
-      const existingLabels = new Set((existing||[]).map(d => String(d.label||'').trim().toLowerCase()));
+      const existingLabels = new Set((existing||[]).map(d => normLbl(d.label)));
       let maxSort = 0;
       (existing||[]).forEach(d => { if (d.sort_order > maxSort) maxSort = d.sort_order; });
 
       const toInsert = [];
       sabtuList.forEach(d => {
         const lbl = d+' '+monthName+' '+String(year).slice(-2);
-        if (existingLabels.has(lbl.toLowerCase())) { totalSkipped++; return; }
+        if (existingLabels.has(normLbl(lbl))) { totalSkipped++; return; }
         maxSort++;
         toInsert.push({ label: lbl, month_code: monthCode, sort_order: maxSort, region: reg });
       });
@@ -2943,7 +2937,18 @@ async function switchRole(role) {
 }
 
 // ========== UTILITY ==========
-function esc(s) { if (!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function esc(s) { if (!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
+// Parse date string safely as LOCAL time (not UTC) to avoid timezone off-by-one
+function parseLocalDate(s) {
+  if (s instanceof Date) return s;
+  const str = String(s||'').trim();
+  if (!str) return null;
+  const m = str.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if (m) return new Date(+m[1], +m[2]-1, +m[3]);
+  const d = new Date(str);
+  return isNaN(d.getTime()) ? null : d;
+}
 
 // Close role menus on outside click
 document.addEventListener('click', function(e) {
@@ -2971,15 +2976,19 @@ document.querySelectorAll('.modal-overlay').forEach(m => {
   }
 })();
 
-// Auto re-render absensi tab saat ganti antara mobile/desktop
+// Auto re-render absensi tab saat ganti antara mobile/desktop (debounced 150ms)
 let __wasMobile = isMobileScreen();
+let __resizeTimer = null;
 window.addEventListener('resize', () => {
-  const now = isMobileScreen();
-  if (now !== __wasMobile) {
-    __wasMobile = now;
-    if (document.getElementById('tab-absensi')?.classList.contains('active')) renderAbsensi();
-    if (document.getElementById('tab-c-absensi')?.classList.contains('active')) renderCoachAbsensi();
-  }
+  clearTimeout(__resizeTimer);
+  __resizeTimer = setTimeout(() => {
+    const now = isMobileScreen();
+    if (now !== __wasMobile) {
+      __wasMobile = now;
+      if (document.getElementById('tab-absensi')?.classList.contains('active')) renderAbsensi();
+      if (document.getElementById('tab-c-absensi')?.classList.contains('active')) renderCoachAbsensi();
+    }
+  }, 150);
 });
 </script>
 </body>
