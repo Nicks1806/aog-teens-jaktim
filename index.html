@@ -320,11 +320,11 @@ body{font-family:'Inter',sans-serif;background:#f8f8f5;color:#1c1c1c;min-height:
 
 <!-- LANDING -->
 <div class="landing" id="pageL">
-  <div style="font-size:10px;letter-spacing:2px;color:var(--g3);text-transform:uppercase;margin-bottom:4px">THE YEAR OF</div>
-  <div style="font-family:'Inter',sans-serif;font-weight:900;font-size:26px;letter-spacing:-1.5px">UNITY</div>
-  <div style="font-family:'Inter',sans-serif;font-weight:800;font-size:15px;margin-bottom:20px">& OPEN HEAVENS</div>
-  <div class="landing-title">CG Dashboard</div>
-  <div class="landing-sub">AOG Teens Jaktim 2026</div>
+  <div style="font-size:13px;letter-spacing:3px;color:var(--g3);text-transform:uppercase;margin-bottom:6px;font-weight:600">THE YEAR OF</div>
+  <div style="font-family:'Inter',sans-serif;font-weight:900;font-size:44px;letter-spacing:-2px;line-height:1">UNITY</div>
+  <div style="font-family:'Inter',sans-serif;font-weight:800;font-size:22px;margin-bottom:28px;letter-spacing:-.5px">& OPEN HEAVENS</div>
+  <div class="landing-title" style="font-size:44px;line-height:1.1">Absensi Dashboard</div>
+  <div class="landing-sub" style="font-size:13px;letter-spacing:1.5px">AOG Teens Jaktim 2026</div>
   <div class="region-toggle"><button class="region-btn active" onclick="selReg('jaktim1',this)">JAKTIM 1</button><button class="region-btn" onclick="selReg('jaktim2',this)">JAKTIM 2</button></div>
   <div class="cgl-selector"><select class="cgl-select" id="cglSel" onchange="document.getElementById('enterBtn').disabled=!this.value"><option value="" disabled selected>— Pilih CG Leader —</option></select></div>
   <button class="enter-btn" id="enterBtn" disabled onclick="enterDash()">Masuk Dashboard</button>
@@ -335,7 +335,7 @@ body{font-family:'Inter',sans-serif;background:#f8f8f5;color:#1c1c1c;min-height:
 <div class="app" id="pageD">
   <div class="app-nav"><div class="app-nav-left"><div class="app-back" onclick="goBack()">&larr;</div><span class="app-cg-badge" id="nB"></span><span class="app-cgl" id="nN"></span></div><div style="display:flex;align-items:center;gap:6px"><span class="live-dot"></span><span style="font-size:10px;color:var(--green);font-weight:600">Live</span></div></div>
   <div class="app-hero"><div class="app-hero-tag">Januari &mdash; April 2026</div><div class="app-hero-h">Rekap<br><em>CG.</em></div><div class="app-hero-meta"><span id="hC">0</span> anggota &middot; <span id="hS"></span> &middot; <span id="hL"></span></div></div>
-  <div id="regionVisiBanner" style="display:none;margin:16px 20px 0;padding:18px 22px;background:linear-gradient(135deg,#faf5ff 0%,#fdfaff 60%,#fff 100%);border:1px solid #e4dcff;border-radius:16px;box-shadow:0 4px 20px rgba(108,92,231,.08)"></div>
+  <div id="regionVisiBanner" style="display:none;margin:0 20px 8px;padding:0"></div>
   <div class="app-stats">
     <div class="app-stat ct"><div class="app-stat-label">Hadir</div><div class="app-stat-num" id="sH">0</div><div class="app-stat-pct" id="sHp">0%</div></div>
     <div class="app-stat cb"><div class="app-stat-label">Izin</div><div class="app-stat-num" id="sI">0</div><div class="app-stat-pct" id="sIp">0%</div></div>
@@ -741,12 +741,11 @@ async function openCGDashboard(cg) {
     if (!b) return;
     if (cv && cv.visi) {
       b.style.display = 'block';
-      let inner = '<div style="display:flex;align-items:flex-start;gap:12px">';
-      inner += '<div style="flex-shrink:0;width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#6C5CE7,#a855f7);display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px">✦</div>';
-      inner += '<div style="flex:1">';
-      inner += '<div style="font-family:\'Instrument Serif\',serif;font-size:18px;color:var(--g1);line-height:1.35;font-style:italic;white-space:pre-wrap">&ldquo;'+esc(cv.visi)+'&rdquo;</div>';
-      if (cv.misi) inner += '<div style="font-size:11px;color:var(--g3);line-height:1.5;margin-top:8px;padding-top:8px;border-top:1px dashed #d8d4ff;white-space:pre-wrap">'+esc(cv.misi)+'</div>';
-      inner += '</div></div>';
+      let inner = '<div style="text-align:center;padding:10px 0 6px">';
+      inner += '<div style="font-size:10px;letter-spacing:2.5px;color:var(--g3);text-transform:uppercase;margin-bottom:6px;font-weight:600">The Year Of</div>';
+      inner += '<div style="font-family:\'Instrument Serif\',serif;font-size:44px;line-height:1.05;color:var(--g1);white-space:pre-wrap;font-style:italic">'+esc(cv.visi)+'</div>';
+      if (cv.misi) inner += '<div style="font-size:11px;color:var(--g3);line-height:1.5;margin-top:10px;letter-spacing:.5px;white-space:pre-wrap">'+esc(cv.misi)+'</div>';
+      inner += '</div>';
       b.innerHTML = inner;
     } else {
       b.style.display = 'none';
