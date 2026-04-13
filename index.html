@@ -405,9 +405,23 @@ async function loadVision(cg, region) {
   return data || {visi:'', misi:''};
 }
 async function saveVision(cg, region, visi, misi) {
-  const {error} = await supa.from('cg_vision').upsert({cg, region, visi, misi, updated_at: new Date().toISOString()}, {onConflict: 'cg,region'});
-  if (error) { toast('\u274c Gagal simpan'); console.error(error); return; }
-  toast('\u2713 Disimpan');
+  try {
+    const payload = { cg, region, visi, misi, updated_at: new Date().toISOString() };
+    // Cek apakah row sudah ada
+    const { data: existing, error: selErr } = await supa.from('cg_vision').select('id').eq('cg', cg).eq('region', region).maybeSingle();
+    if (selErr) throw selErr;
+    if (existing && existing.id) {
+      const { error: upErr } = await supa.from('cg_vision').update(payload).eq('id', existing.id);
+      if (upErr) throw upErr;
+    } else {
+      const { error: insErr } = await supa.from('cg_vision').insert(payload);
+      if (insErr) throw insErr;
+    }
+    toast('\u2713 Disimpan');
+  } catch(e) {
+    console.error('[saveVision]', e);
+    toast('\u274c Gagal simpan: ' + (e.message||'unknown'));
+  }
 }
 
 async function loadDevPlans(cg, region) {
