@@ -1748,16 +1748,34 @@ function renderCoachAbsensi() {
   }
   html += '</div>';
 
-  html += '<div style="overflow-x:auto"><table class="t"><thead><tr><th>Nama</th><th>CG</th>';
-  dates.forEach(d => { html += '<th>' + esc(d.label||d.id) + '</th>'; });
-  html += '<th>% Hadir</th></tr></thead><tbody>';
-
+  // Per-CG card layout for cleaner visual separation
   cgs.sort().forEach(cg => {
     const mems = ALL_MEMBERS.filter(m => m.cg === cg);
+    if (mems.length === 0) return;
     const color = CG_COLORS[cg] || '#7c3aed';
     const bg = CG_BG[cg] || '#faf5ff';
     const info = ALL_CG_INFO.find(c => c.cg === cg) || {};
-    html += '<tr style="background:'+bg+'"><td colspan="'+(dates.length+2)+'" style="font-weight:700;font-size:11px;letter-spacing:1px;color:'+color+';text-align:left;padding:8px 10px;border-left:3px solid '+color+'">'+esc(cg)+' \u2014 '+esc(info.leader||'')+'</td></tr>';
+
+    // Compute CG average %
+    let cgH=0, cgT=0;
+    mems.forEach(m => { dates.forEach(d => { const s=ALL_ATTENDANCE[m.id+'_'+d.id]; if(s){cgT++;if(s==='H')cgH++;} }); });
+    const cgPct = cgT ? Math.round(cgH/cgT*100) : 0;
+
+    html += '<div style="background:#fff;border:1px solid var(--g5);border-radius:14px;overflow:hidden;margin-bottom:18px;box-shadow:0 1px 4px rgba(0,0,0,.03)">';
+    // CG header
+    html += '<div style="background:linear-gradient(135deg,'+bg+','+bg+'cc);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid '+color+'33">';
+    html += '<div style="display:flex;align-items:center;gap:10px">';
+    html += '<div style="width:34px;height:34px;border-radius:8px;background:'+color+';color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:10px;letter-spacing:.3px">'+esc(CG_INIT[cg]||cg)+'</div>';
+    html += '<div><div style="font-weight:700;font-size:13px;color:'+color+'">'+esc(cg)+'</div><div style="font-size:10px;color:var(--g3)">CGL: '+esc(info.leader||'-')+' · '+mems.length+' member</div></div>';
+    html += '</div>';
+    html += '<div style="text-align:right"><div style="font-family:\'Instrument Serif\',serif;font-size:20px;color:'+color+';line-height:1">'+cgPct+'%</div><div style="font-size:9px;color:var(--g4);letter-spacing:.5px">avg hadir</div></div>';
+    html += '</div>';
+
+    // Attendance table inside card
+    html += '<div style="overflow-x:auto"><table class="t" style="border-collapse:collapse;width:100%">';
+    html += '<thead><tr><th style="background:#fafafa;text-align:left">Nama</th>';
+    dates.forEach(d => { html += '<th style="background:#fafafa">' + esc(d.label||d.id) + '</th>'; });
+    html += '<th style="background:#fafafa">% Hadir</th></tr></thead><tbody>';
 
     mems.sort((a,b) => (ROLE_ORDER[a.status]||9) - (ROLE_ORDER[b.status]||9)).forEach(m => {
       let hCount=0, tCount=0;
@@ -1766,9 +1784,8 @@ function renderCoachAbsensi() {
       const pctColor = pct>=75?'var(--green)':pct>=50?'var(--orange)':'var(--red)';
       const atRisk = tCount>1 && pct<50;
 
-      html += '<tr'+(atRisk?' style="border-left:3px solid var(--red)"':'')+'>';
+      html += '<tr'+(atRisk?' style="background:#fef2f2"':'')+'>';
       html += '<td class="name-cell"'+(atRisk?' style="color:var(--red)"':'')+'>'+esc(m.nama)+'<span class="role-tag">'+esc(m.status)+'</span></td>';
-      html += '<td style="font-size:9px;color:var(--g4)">'+esc(CG_INIT[cg]||cg)+'</td>';
       dates.forEach(d => {
         const st = ALL_ATTENDANCE[m.id+'_'+d.id] || null;
         const cls = st || 'X';
@@ -1776,9 +1793,9 @@ function renderCoachAbsensi() {
       });
       html += '<td><div class="pbar"><div class="pbar-track"><div class="pbar-fill" style="width:'+pct+'%;background:'+pctColor+'"></div></div><span class="pbar-val" style="color:'+pctColor+'">'+pct+'%</span></div></td></tr>';
     });
-  });
 
-  html += '</tbody></table></div>';
+    html += '</tbody></table></div></div>';
+  });
   el.innerHTML = html;
 }
 
