@@ -261,7 +261,10 @@ body{font-family:'Inter',sans-serif;background:#f8f8f5;color:#1c1c1c;min-height:
   <div class="modal-box" style="max-width:480px">
     <div class="modal-title">+ Tambah Event CG</div>
     <input class="modal-input" id="evName" placeholder="Nama event">
-    <input class="modal-input" id="evDate" type="date">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div><label style="display:block;font-size:11px;color:var(--g3);margin-bottom:4px;font-weight:600">Tanggal mulai</label><input class="modal-input" id="evDate" type="date" style="margin:0"></div>
+      <div><label style="display:block;font-size:11px;color:var(--g3);margin-bottom:4px;font-weight:600">Tanggal selesai (opsional)</label><input class="modal-input" id="evDateEnd" type="date" style="margin:0"></div>
+    </div>
     <select class="modal-input" id="evCat">
       <option value="msj">📖 MSJ</option>
       <option value="cgt">👥 CGT</option>
@@ -612,6 +615,12 @@ const CG_INIT = {
 };
 
 const ROLE_ORDER = {CGL:0,Sponsor:1,Member:2,Simpatisan:3,VIP:4};
+// Helper case-insensitive sort untuk role: CGL=0, Leader=0, Sponsor=1, Member=2, Simpatisan=3, VIP=4
+function roleRankLC(status) {
+  const s = String(status||'member').toLowerCase().trim();
+  const map = {cgl:0, leader:0, sponsor:1, member:2, simpatisan:3, vip:4};
+  return map[s] !== undefined ? map[s] : 9;
+}
 const STATUS_CYCLE = ['H','I','S','A',null];
 const MS_FIELDS = ['msj1','msj2','msj3','cgt1','cgt2','cgt3','baptis_air','baptis_roh'];
 const MS_LABELS = ['MSJ 1','MSJ 2','MSJ 3','CGT 1','CGT 2','CGT 3','B.Air','B.Roh'];
@@ -1712,7 +1721,8 @@ async function renderEvents() {
     const img = ev.image || '';
     let cardHtml = '<div class="ev-card" style="border-left-color:'+cColor+';padding:14px;margin-bottom:12px" id="ev_'+evId+'">';
     cardHtml += '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px">';
-    cardHtml += '<div style="flex:1"><div style="display:flex;align-items:center;flex-wrap:wrap"><span class="ev-date">'+esc(ev.date_start||'')+'</span>'+eventCountdownBadge(ev.date_start)+'</div><div class="ev-name">'+esc(ev.name||'')+'</div></div>';
+    const dateRange = ev.date_end && ev.date_end !== ev.date_start ? esc(ev.date_start||'')+' → '+esc(ev.date_end) : esc(ev.date_start||'');
+    cardHtml += '<div style="flex:1"><div style="display:flex;align-items:center;flex-wrap:wrap"><span class="ev-date">'+dateRange+'</span>'+eventCountdownBadge(ev.date_start)+'</div><div class="ev-name">'+esc(ev.name||'')+'</div></div>';
     cardHtml += '<div style="display:flex;gap:4px">';
     cardHtml += '<button onclick="copyEventText(\''+evId+'\')" title="Copy text" class="ev-btn ev-btn-copy"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>';
     cardHtml += '<button onclick="broadcastEvent(\''+evId+'\')" title="Broadcast WhatsApp" class="ev-btn ev-btn-wa"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413"/></svg></button>';
@@ -1808,6 +1818,7 @@ function openEditEvent(evId) {
   window.__editingEventId = evId;
   document.getElementById('evName').value = ev.name || '';
   document.getElementById('evDate').value = ev.date_start || '';
+  document.getElementById('evDateEnd').value = ev.date_end || '';
   document.getElementById('evCat').value = (ev.cat || 'event').toLowerCase();
   document.getElementById('evNote').value = ev.note || '';
   document.getElementById('evImageUrl').value = ev.image && ev.image.startsWith('http') ? ev.image : '';
@@ -1831,6 +1842,7 @@ async function saveCGEvent() {
   const evData = {
     name,
     date_start: document.getElementById('evDate').value,
+    date_end: document.getElementById('evDateEnd').value || null,
     cat: document.getElementById('evCat').value,
     note: document.getElementById('evNote').value,
     image
@@ -1868,6 +1880,7 @@ async function saveCGEvent() {
   document.querySelector('#addCGEventModal .modal-title').textContent = '+ Tambah Event CG';
   document.getElementById('evName').value = '';
   document.getElementById('evDate').value = '';
+  document.getElementById('evDateEnd').value = '';
   document.getElementById('evNote').value = '';
   document.getElementById('evImageUrl').value = '';
   document.getElementById('evImagePreview').innerHTML = '';
@@ -1884,6 +1897,7 @@ function openAddEventModal() {
   document.querySelector('#addCGEventModal .modal-title').textContent = '+ Tambah Event CG';
   document.getElementById('evName').value = '';
   document.getElementById('evDate').value = '';
+  document.getElementById('evDateEnd').value = '';
   document.getElementById('evNote').value = '';
   document.getElementById('evImageUrl').value = '';
   document.getElementById('evImagePreview').innerHTML = '';
@@ -1899,6 +1913,7 @@ function openCoachAddEvent() {
   document.querySelector('#addCGEventModal .modal-title').textContent = '+ Tambah Event';
   document.getElementById('evName').value = '';
   document.getElementById('evDate').value = '';
+  document.getElementById('evDateEnd').value = '';
   document.getElementById('evNote').value = '';
   document.getElementById('evImageUrl').value = '';
   document.getElementById('evImagePreview').innerHTML = '';
@@ -2359,7 +2374,7 @@ function renderCoachAbsensi() {
     cgDates.forEach(d => { html += '<th style="background:#fafafa">' + esc(d.label||d.id) + '</th>'; });
     html += '<th style="background:#fafafa">% Hadir</th></tr></thead><tbody>';
 
-    mems.sort((a,b) => (ROLE_ORDER[a.status]||9) - (ROLE_ORDER[b.status]||9)).forEach(m => {
+    mems.sort((a,b) => roleRankLC(a.status) - roleRankLC(b.status)).forEach(m => {
       let hCount=0, tCount=0;
       cgDates.forEach(d => { const s=ALL_ATTENDANCE[m.id+'_'+d.id]; if(s){tCount++;if(s==='H')hCount++;} });
       const pct = tCount ? Math.round(hCount/tCount*100) : 0;
@@ -2608,7 +2623,8 @@ async function renderCoachEvents() {
     const img = ev.image || '';
     let h = '<div class="ev-card" style="border-left-color:'+(leftColor||cColor)+';padding:14px;margin-bottom:12px">';
     h += '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px">';
-    h += '<div style="flex:1"><div style="display:flex;align-items:center;flex-wrap:wrap"><span class="ev-date">'+esc(ev.date_start||'')+'</span>'+eventCountdownBadge(ev.date_start)+'</div><div class="ev-name">'+esc(ev.name||'')+'</div></div>';
+    const dateRange = ev.date_end && ev.date_end !== ev.date_start ? esc(ev.date_start||'')+' → '+esc(ev.date_end) : esc(ev.date_start||'');
+    h += '<div style="flex:1"><div style="display:flex;align-items:center;flex-wrap:wrap"><span class="ev-date">'+dateRange+'</span>'+eventCountdownBadge(ev.date_start)+'</div><div class="ev-name">'+esc(ev.name||'')+'</div></div>';
     h += '<div style="display:flex;gap:4px">';
     h += '<button onclick="copyEventText(\''+evId+'\')" title="Copy text" class="ev-btn ev-btn-copy"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>';
     h += '<button onclick="broadcastEvent(\''+evId+'\')" title="Broadcast WhatsApp" class="ev-btn ev-btn-wa"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413"/></svg></button>';
