@@ -273,6 +273,12 @@ body{font-family:'Inter',sans-serif;background:#f8f8f5;color:#1c1c1c;min-height:
     </select>
     <textarea class="modal-input" id="evNote" placeholder="Catatan / deskripsi event..." style="min-height:90px;resize:vertical"></textarea>
 
+    <!-- Target (hanya muncul di Coach/TL context) -->
+    <div id="evTargetWrap" style="display:none;margin-top:8px">
+      <label style="display:block;font-size:11px;color:var(--g3);margin-bottom:6px">🎯 Target</label>
+      <select class="modal-input" id="evTarget"><option value="all">Semua CG (shared)</option></select>
+    </div>
+
     <!-- Image upload/URL -->
     <div style="margin-top:8px">
       <label style="display:block;font-size:11px;color:var(--g3);margin-bottom:6px">📷 Gambar (opsional)</label>
@@ -633,33 +639,45 @@ async function enterFromCoach(cg) {
 }
 
 // ========== OPEN CGL DASHBOARD ==========
+let TAB_RENDERED = {};
+
 async function openCGDashboard(cg) {
   CUR_CG = cg;
   ['pageL','pageC'].forEach(x => document.getElementById(x).style.display = 'none');
   document.getElementById('pageD').style.display = 'block';
   window.scrollTo(0, 0);
 
-  // Set default tab ke Absensi SEKARANG (sebelum async load) supaya user click tab
-  // selama loading tidak ter-override di akhir
+  // Set default tab ke Absensi SEKARANG (sebelum async load)
   document.querySelectorAll('#pageD .app-tab').forEach((t,i) => t.classList.toggle('on', i===0));
   document.querySelectorAll('#pageD .tab-content').forEach((t,i) => t.classList.toggle('active', i===0));
 
-  // Load cg_info
-  const { data: cgInfoArr } = await supa.from('cg_info').select('*').eq('cg', cg);
-  CUR_CG_INFO = cgInfoArr && cgInfoArr[0] ? cgInfoArr[0] : {};
+  // Reset tab render flags — hanya Absensi yang akan di-render di awal
+  TAB_RENDERED = {};
 
-  // Load members
-  const { data: mems } = await supa.from('members').select('*').eq('cg', cg).order('nama');
-  MEMBERS = mems || [];
-  MEMBERS.sort((a, b) => (ROLE_ORDER[a.status]||9) - (ROLE_ORDER[b.status]||9));
+  // Show loading placeholder on all tabs
+  ['absensi','detail','visi','pelayanan','milestone','events'].forEach(id => {
+    const el = document.getElementById('tab-'+id);
+    if (el) el.innerHTML = '<div class="loading-msg">Memuat...</div>';
+  });
 
-  // Load dates for this region
-  const region = MEMBERS[0] ? MEMBERS[0].region : curReg;
+  // Determine region from any member record (single quick query)
+  const { data: firstMem } = await supa.from('members').select('region').eq('cg', cg).limit(1).maybeSingle();
+  const region = (firstMem && firstMem.region) || curReg;
   CUR_REGION = region;
-  const { data: dates } = await supa.from('dates').select('*').eq('region', region).order('sort_order');
-  DATES = dates || [];
 
-  // Load attendance
+  // Parallel load semua data utama
+  const [cgInfoRes, memsRes, datesRes] = await Promise.all([
+    supa.from('cg_info').select('*').eq('cg', cg),
+    supa.from('members').select('*').eq('cg', cg).order('nama'),
+    supa.from('dates').select('*').eq('region', region).order('sort_order')
+  ]);
+
+  CUR_CG_INFO = cgInfoRes.data && cgInfoRes.data[0] ? cgInfoRes.data[0] : {};
+  MEMBERS = memsRes.data || [];
+  MEMBERS.sort((a, b) => (ROLE_ORDER[a.status]||9) - (ROLE_ORDER[b.status]||9));
+  DATES = datesRes.data || [];
+
+  // Load attendance (butuh ids dari hasil di atas)
   const memberIds = MEMBERS.map(m => m.id);
   const dateIds = DATES.map(d => d.id);
   ATTENDANCE = {};
@@ -678,18 +696,27 @@ async function openCGDashboard(cg) {
   document.getElementById('hS').textContent = CUR_CG_INFO.hari_jam || '';
   document.getElementById('hL').textContent = CUR_CG_INFO.lokasi || '';
 
-  // Stats
   computeStats();
 
-  // Render tabs
+  // Hanya render tab Absensi dulu — sisanya lazy-render saat user klik
   renderAbsensi();
-  await renderDetail();
-  await renderVisiCG();
-  await renderPelayanan();
-  renderMilestone();
-  await renderEvents();
-  // (Default tab sudah di-set di awal — tidak override di sini supaya user click tab
-  //  selama loading tetap terhormati)
+  TAB_RENDERED.absensi = true;
+}
+
+// Lazy render untuk tab yang dipilih
+async function ensureTabRendered(id) {
+  if (TAB_RENDERED[id]) return;
+  TAB_RENDERED[id] = true;
+  try {
+    if (id === 'detail') await renderDetail();
+    else if (id === 'visi') await renderVisiCG();
+    else if (id === 'pelayanan') await renderPelayanan();
+    else if (id === 'milestone') renderMilestone();
+    else if (id === 'events') await renderEvents();
+  } catch(e) {
+    TAB_RENDERED[id] = false; // allow retry
+    console.error('[tab '+id+' render error]', e);
+  }
 }
 
 function computeStats() {
@@ -1639,9 +1666,21 @@ async function saveCGEvent() {
     }
     toast('✓ Event diupdate');
   } else {
-    // ADD mode (new CG event)
-    await addCGEvent({ cg: CUR_CG, region: CUR_REGION, is_shared: false, ...evData });
+    // ADD mode
+    if (window.__coachEventCtx) {
+      // Coach/TL context — pakai target dropdown
+      const target = document.getElementById('evTarget').value;
+      if (target === 'all') {
+        await addCGEvent({ cg: 'ALL', region: 'all', is_shared: true, ...evData });
+      } else {
+        const cgRegion = (ALL_MEMBERS.find(m => m.cg === target) || {}).region || coachReg || 'jaktim1';
+        await addCGEvent({ cg: target, region: cgRegion, is_shared: false, ...evData });
+      }
+    } else {
+      await addCGEvent({ cg: CUR_CG, region: CUR_REGION, is_shared: false, ...evData });
+    }
   }
+  window.__coachEventCtx = false;
 
   // Reset form & state
   window.__editingEventId = null;
@@ -1667,7 +1706,28 @@ function openAddEventModal() {
   document.getElementById('evNote').value = '';
   document.getElementById('evImageUrl').value = '';
   document.getElementById('evImagePreview').innerHTML = '';
+  document.getElementById('evTargetWrap').style.display = 'none';
   window.__evImageDataUrl = '';
+  window.__coachEventCtx = false;
+  openModal('addCGEventModal');
+}
+
+function openCoachAddEvent() {
+  window.__editingEventId = null;
+  window.__coachEventCtx = true;
+  document.querySelector('#addCGEventModal .modal-title').textContent = '+ Tambah Event';
+  document.getElementById('evName').value = '';
+  document.getElementById('evDate').value = '';
+  document.getElementById('evNote').value = '';
+  document.getElementById('evImageUrl').value = '';
+  document.getElementById('evImagePreview').innerHTML = '';
+  window.__evImageDataUrl = '';
+  // Populate target dropdown with all CGs (scope sesuai role)
+  const sel = document.getElementById('evTarget');
+  sel.innerHTML = '<option value="all">Semua CG (shared)</option>';
+  const cgs = coachRole === 'tl' ? getCGsForRegion('all') : getCGsForRegion(coachReg);
+  cgs.forEach(cg => { const o=document.createElement('option'); o.value=cg; o.textContent=cg; sel.appendChild(o); });
+  document.getElementById('evTargetWrap').style.display = 'block';
   openModal('addCGEventModal');
 }
 
@@ -1697,6 +1757,8 @@ function sTab(id, b) {
   b.classList.add('on');
   document.querySelectorAll('#pageD .tab-content').forEach(t => t.classList.remove('active'));
   document.getElementById('tab-' + id).classList.add('active');
+  // Lazy render tab kalau belum pernah di-render
+  ensureTabRendered(id);
 }
 
 function goBackCoach() {
@@ -1710,6 +1772,7 @@ function sCoachTab(id, b) {
   b.classList.add('on');
   document.querySelectorAll('#pageC .tab-content').forEach(t => t.classList.remove('active'));
   document.getElementById('tab-' + id).classList.add('active');
+  ensureCoachTabRendered(id);
 }
 
 // ========== COACH DASHBOARD ==========
@@ -1729,11 +1792,30 @@ async function loadCoachData() {
   ALL_ATTENDANCE = {};
   (attendanceRes.data || []).forEach(a => { ALL_ATTENDANCE[a.member_id + '_' + a.date_id] = a.status; });
 
+  // Lazy render Coach tabs — hanya overview yang di-render di awal
+  COACH_TAB_RENDERED = {};
+  ['c-overview','c-absensi','c-milestone','c-visi','c-events'].forEach(id => {
+    const el = document.getElementById('tab-'+id);
+    if (el) el.innerHTML = '<div class="loading-msg">Memuat...</div>';
+  });
   renderCoachOverview();
-  renderCoachAbsensi();
-  renderCoachMilestone();
-  await renderCoachVisi();
-  await renderCoachEvents();
+  COACH_TAB_RENDERED['c-overview'] = true;
+}
+
+let COACH_TAB_RENDERED = {};
+async function ensureCoachTabRendered(id) {
+  if (COACH_TAB_RENDERED[id]) return;
+  COACH_TAB_RENDERED[id] = true;
+  try {
+    if (id === 'c-overview') renderCoachOverview();
+    else if (id === 'c-absensi') renderCoachAbsensi();
+    else if (id === 'c-milestone') renderCoachMilestone();
+    else if (id === 'c-visi') await renderCoachVisi();
+    else if (id === 'c-events') await renderCoachEvents();
+  } catch(e) {
+    COACH_TAB_RENDERED[id] = false;
+    console.error('[coach tab '+id+' error]', e);
+  }
 }
 
 function getCGsForRegion(reg) {
@@ -2189,10 +2271,13 @@ async function renderCoachEvents() {
     {key:'birthday',label:'Birthday'},
     {key:'outreach',label:'Outreach'}
   ];
-  let html = '<div class="filter-chips">';
+  // Header: filter chips + tombol Tambah Event
+  let html = '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:8px"><div class="filter-chips" style="margin:0">';
   filters.forEach(f => {
     html += '<span class="chip '+(COACH_EV_FILTER===f.key?'on':'')+'" onclick="setCoachEventFilter(\''+f.key+'\')">'+f.label+'</span>';
   });
+  html += '</div>';
+  html += '<button onclick="openCoachAddEvent()" style="padding:8px 14px;border-radius:10px;border:1.5px solid #6C5CE7;background:linear-gradient(135deg,#6C5CE7,#8B5CF6);color:#fff;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.3px;box-shadow:0 4px 12px rgba(108,92,231,.25);transition:all .2s" onmouseover="this.style.transform=\'translateY(-1px)\'" onmouseout="this.style.transform=\'\'">+ Tambah Event</button>';
   html += '</div>';
 
   const passFilter = (ev) => COACH_EV_FILTER==='all' ? true : (String(ev.cat||'').toLowerCase() === COACH_EV_FILTER);
