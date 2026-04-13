@@ -681,6 +681,10 @@ body{font-family:'Inter',sans-serif;background:#f8f8f5;color:#1c1c1c;min-height:
     <!-- COACH TAB: ABSENSI -->
     <div class="tab-content" id="tab-c-absensi">
       <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px">
+        <div class="region-toggle" id="absRegionToggle" style="display:inline-flex;margin:0">
+          <button class="region-btn active" onclick="switchAbsReg('jaktim1',this)" style="padding:6px 16px;font-size:11px">JAKTIM 1</button>
+          <button class="region-btn" onclick="switchAbsReg('jaktim2',this)" style="padding:6px 16px;font-size:11px">JAKTIM 2</button>
+        </div>
         <select class="cgl-select" style="width:auto;min-width:160px;padding:8px 32px 8px 12px;font-size:12px;border-radius:10px" id="coachCGFilter" onchange="filterCoachAbsensi()">
           <option value="all">Semua CG</option>
           <option value="TEEN 23">TEEN 23</option>
@@ -688,6 +692,7 @@ body{font-family:'Inter',sans-serif;background:#f8f8f5;color:#1c1c1c;min-height:
           <option value="TEEN 09">TEEN 09</option>
           <option value="TEEN 06">TEEN 06</option>
         </select>
+        <div id="absStatusInfo" style="font-size:10px;color:var(--g4);margin-left:auto">Menampilkan Jaktim 1</div>
       </div>
       <div class="filter-chips"><span class="chip on">Semua</span><span class="chip">Jan</span><span class="chip">Feb</span><span class="chip">Mar</span><span class="chip">Apr</span></div>
       <div style="overflow-x:auto">
@@ -1103,6 +1108,18 @@ function renderMsStats(region){
     buildMsStat('linear-gradient(135deg,#faf5ff,#ede9fe)','#7c3aed','#7c3aed',data.bair,data.total,'B. Air');
 }
 
+function switchAbsReg(reg,btn){
+  btn.parentElement.querySelectorAll('.region-btn').forEach(x=>x.classList.remove('active'));
+  btn.classList.add('active');
+  var info=document.getElementById('absStatusInfo');
+  if(info) info.textContent='Menampilkan '+(reg==='jaktim1'?'Jaktim 1':'Jaktim 2');
+  var sel=document.getElementById('coachCGFilter');
+  if(sel){
+    var cgs=reg==='jaktim1'?['TEEN 23','TEEN 01','TEEN 09','TEEN 06']:['TEEN 12','TEEN 07','TEEN 17','TEEN 20'];
+    sel.innerHTML='<option value="all">Semua CG</option>'+cgs.map(c=>'<option value="'+c+'">'+c+'</option>').join('');
+  }
+}
+
 function switchCoachMsReg(reg,btn){
   btn.parentElement.querySelectorAll('.region-btn').forEach(x=>x.classList.remove('active'));
   btn.classList.add('active');
@@ -1116,6 +1133,8 @@ function switchRole(role){
   var overviewToggle=document.querySelector('#tab-c-overview .region-toggle');
   var msToggle=document.getElementById('msRegionToggle');
   var visiToggle=document.getElementById('visiRegionToggle');
+  var absToggle=document.getElementById('absRegionToggle');
+  var absInfo=document.getElementById('absStatusInfo');
   var grid=document.getElementById('coachCGGrid');
   var statsLabel=document.querySelectorAll('#pageC .app-stat-pct')[0];
   if(role==='tl'){
@@ -1127,6 +1146,10 @@ function switchRole(role){
     if(overviewToggle) overviewToggle.style.display='none';
     if(msToggle) msToggle.style.display='none';
     if(visiToggle) visiToggle.style.display='none';
+    if(absToggle) absToggle.style.display='none';
+    if(absInfo) absInfo.textContent='Menampilkan semua CG (Jaktim 1+2)';
+    var absSel=document.getElementById('coachCGFilter');
+    if(absSel){absSel.innerHTML='<option value="all">Semua CG (8)</option>'+['TEEN 23','TEEN 01','TEEN 09','TEEN 06','TEEN 12','TEEN 07','TEEN 17','TEEN 20'].map(c=>'<option value="'+c+'">'+c+'</option>').join('');}
     document.getElementById('csTotalMbr').textContent='54';statsLabel.textContent='Total semua';
     document.getElementById('csAvgHadir').textContent='72%';
     document.getElementById('csAtRisk').textContent='11';
@@ -1161,6 +1184,10 @@ function switchRole(role){
     if(overviewToggle) overviewToggle.style.display='inline-flex';
     if(msToggle) msToggle.style.display='inline-flex';
     if(visiToggle) visiToggle.style.display='inline-flex';
+    if(absToggle) absToggle.style.display='inline-flex';
+    if(absInfo) absInfo.textContent='Menampilkan Jaktim 1';
+    var absSel2=document.getElementById('coachCGFilter');
+    if(absSel2){absSel2.innerHTML='<option value="all">Semua CG</option>'+['TEEN 23','TEEN 01','TEEN 09','TEEN 06'].map(c=>'<option value="'+c+'">'+c+'</option>').join('');}
     document.getElementById('csTotalMbr').textContent='31';statsLabel.textContent='Jaktim 1';
     document.getElementById('csAvgHadir').textContent='75%';
     document.getElementById('csAtRisk').textContent='5';
