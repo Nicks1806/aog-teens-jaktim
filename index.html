@@ -1979,10 +1979,17 @@ function sTab(id, b) {
   ensureTabRendered(id);
 }
 
-function goBackCoach() {
+async function goBackCoach() {
   document.getElementById('pageC').style.display = 'none';
   document.getElementById('pageL').style.display = 'flex';
   window.scrollTo(0, 0);
+  // Pastikan dropdown CGL ke-populate (kalau user landing dari ?role=coach,
+  // loadCGLDropdown belum pernah dipanggil). ALL_MEMBERS sudah ada dari loadCoachData.
+  if (typeof ALL_MEMBERS !== 'undefined' && ALL_MEMBERS.length) {
+    popDD();
+  } else {
+    await loadCGLDropdown();
+  }
 }
 
 function sCoachTab(id, b) {
