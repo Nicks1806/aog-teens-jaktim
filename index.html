@@ -291,6 +291,27 @@ body{font-family:'Inter',sans-serif;background:#f8f8f5;color:#1c1c1c;min-height:
   </div>
 </div>
 
+<!-- Dev Plan Modal -->
+<div class="modal-overlay" id="devPlanModal">
+  <div class="modal-box" style="max-width:480px">
+    <div class="modal-title">📈 Tambah Rencana Pengembangan</div>
+    <div style="font-size:11px;color:var(--g3);margin-bottom:10px">Pilih member yang akan dikembangkan:</div>
+    <div id="devPlanMemberGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;max-height:280px;overflow-y:auto;margin-bottom:14px;padding:4px"></div>
+    <div style="font-size:11px;color:var(--g3);margin-bottom:6px;margin-top:4px">Target posisi:</div>
+    <select class="modal-input" id="devPlanTarget" style="margin-bottom:10px">
+      <option value="CGL">🧡 CGL</option>
+      <option value="Sponsor" selected>💙 Sponsor</option>
+      <option value="Member">⚪ Member</option>
+    </select>
+    <div style="font-size:11px;color:var(--g3);margin-bottom:6px">Deadline (opsional):</div>
+    <input type="date" class="modal-input" id="devPlanDeadline" style="margin-bottom:12px">
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button class="btn-purple" style="flex:1" onclick="confirmDevPlan()">💾 Simpan</button>
+      <button class="pel-add" style="flex:1;padding:10px" onclick="closeModal('devPlanModal')">Batal</button>
+    </div>
+  </div>
+</div>
+
 <!-- LANDING -->
 <div class="landing" id="pageL">
   <div style="font-size:10px;letter-spacing:2px;color:var(--g3);text-transform:uppercase;margin-bottom:4px">THE YEAR OF</div>
@@ -902,13 +923,55 @@ function buildDevRow(d, i) {
     '</div>';
 }
 
-async function addDevPlanRow() {
-  const names = MEMBERS.map(m => m.nama);
-  const name = prompt('Pilih nama member:\n' + names.join('\n'));
-  if (!name) return;
-  const m = MEMBERS.find(x => x.nama.toLowerCase().includes(name.toLowerCase()));
-  if (!m) { alert('Member tidak ditemukan'); return; }
-  await addDevPlan(CUR_CG, CUR_REGION, m.nama, m.status, 'Sponsor', '');
+let __SELECTED_DEV_MEMBER = null;
+
+function addDevPlanRow() {
+  // Buka modal + populate grid member
+  __SELECTED_DEV_MEMBER = null;
+  const grid = document.getElementById('devPlanMemberGrid');
+  const roleColor = (st) => {
+    const s = (st||'member').toLowerCase();
+    if (s==='cgl'||s==='leader') return {bg:'#fff3e0', border:'#fb923c', color:'#c2410c'};
+    if (s==='sponsor') return {bg:'#e8eaf6', border:'#6366f1', color:'#3730a3'};
+    if (s==='simpatisan') return {bg:'#fce4ec', border:'#ec4899', color:'#9f1239'};
+    if (s==='vip') return {bg:'#f3e5f5', border:'#a855f7', color:'#6b21a8'};
+    return {bg:'#f4f4f5', border:'#a1a1aa', color:'#3f3f46'};
+  };
+  grid.innerHTML = '';
+  MEMBERS.forEach(m => {
+    const c = roleColor(m.status);
+    const card = document.createElement('div');
+    card.style.cssText = 'padding:10px 12px;border:2px solid '+c.border+'33;background:'+c.bg+';border-radius:10px;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;gap:4px';
+    card.innerHTML = '<div style="font-weight:600;font-size:12px;color:'+c.color+';line-height:1.2">'+esc(m.nama)+'</div><span style="font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:'+c.color+';align-self:flex-start;padding:2px 8px;border-radius:10px;background:#fff">'+esc(m.status||'Member')+'</span>';
+    card.onmouseover = () => { card.style.transform='translateY(-2px)'; card.style.boxShadow='0 4px 12px rgba(0,0,0,.1)'; };
+    card.onmouseout = () => { if (__SELECTED_DEV_MEMBER?.id !== m.id) { card.style.transform=''; card.style.boxShadow=''; card.style.borderColor=c.border+'33'; } };
+    card.onclick = () => {
+      __SELECTED_DEV_MEMBER = m;
+      // Reset others
+      Array.from(grid.children).forEach((c2,i) => {
+        const m2 = MEMBERS[i]; const cc = roleColor(m2.status);
+        c2.style.borderColor = cc.border+'33';
+        c2.style.boxShadow = '';
+        c2.style.transform = '';
+      });
+      card.style.borderColor = c.border;
+      card.style.boxShadow = '0 4px 14px '+c.border+'55';
+      card.style.transform = 'translateY(-2px)';
+    };
+    grid.appendChild(card);
+  });
+  document.getElementById('devPlanTarget').value = 'Sponsor';
+  document.getElementById('devPlanDeadline').value = '';
+  openModal('devPlanModal');
+}
+
+async function confirmDevPlan() {
+  if (!__SELECTED_DEV_MEMBER) { alert('Pilih member dulu'); return; }
+  const target = document.getElementById('devPlanTarget').value;
+  const deadline = document.getElementById('devPlanDeadline').value;
+  closeModal('devPlanModal');
+  await addDevPlan(CUR_CG, CUR_REGION, __SELECTED_DEV_MEMBER.nama, __SELECTED_DEV_MEMBER.status, target, deadline);
+  __SELECTED_DEV_MEMBER = null;
   await renderVisiCG();
 }
 
