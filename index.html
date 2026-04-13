@@ -1654,7 +1654,13 @@ async function renderPelayanan() {
       weeks.forEach(w => {
         const wa = monthData[w] || {};
         const assigned = [];
-        Object.keys(wa).forEach(role => { if (wa[role] === m.nama) assigned.push(role); });
+        // Multi-assignee: wa[role] bisa berupa comma-separated names
+        Object.keys(wa).forEach(role => {
+          const raw = wa[role];
+          if (!raw) return;
+          const names = String(raw).split(',').map(s => s.trim()).filter(Boolean);
+          if (names.includes(m.nama)) assigned.push(role);
+        });
         total += assigned.length;
         if (assigned.length) {
           const abbrs = assigned.map(rn => { const found = roles.find(r => r.name === rn); return found ? found.abbr : rn.substring(0,2).toUpperCase(); });
