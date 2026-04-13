@@ -14,17 +14,29 @@ body{font-family:'Inter',sans-serif;background:#f8f8f5;color:#1c1c1c;min-height:
 --H:#16a34a;--Hb:#f0fdf4;--Hbr:#bbf7d0;--I:#2563eb;--Ib:#eff6ff;--Ibr:#bfdbfe;--S:#d97706;--Sb:#fffbeb;--Sbr:#fde68a;--A:#dc2626;--Ab:#fef2f2;--Abr:#fecaca}
 
 /* Landing */
-.landing{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.landing{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:20px;background:radial-gradient(ellipse at top,#faf5ff,#f8f8f5 60%)}
 .landing-title{font-family:'Instrument Serif',serif;font-size:32px;margin-bottom:2px}
 .landing-sub{font-size:11px;color:var(--g3);letter-spacing:2px;text-transform:uppercase;margin-bottom:36px}
-.region-toggle{display:flex;background:#e8e8e8;border-radius:24px;padding:3px;margin-bottom:28px}
-.region-btn{padding:10px 32px;border-radius:22px;border:none;font-size:14px;font-weight:700;cursor:pointer;transition:all .25s;background:transparent;color:var(--g3)}
-.region-btn.active{background:var(--purple);color:#fff;box-shadow:0 2px 10px rgba(108,92,231,.3)}
-.cgl-selector{width:100%;max-width:400px;margin-bottom:20px}
-.cgl-select{width:100%;padding:14px 18px;border:2px solid var(--g5);border-radius:14px;font-size:14px;font-family:'Inter',sans-serif;font-weight:500;appearance:none;background:var(--white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 16px center;cursor:pointer}
-.cgl-select:focus{outline:none;border-color:var(--purple)}
-.enter-btn{width:100%;max-width:400px;padding:14px;border:none;border-radius:14px;background:var(--purple);color:#fff;font-size:15px;font-weight:700;cursor:pointer}
-.enter-btn:disabled{background:var(--g5);color:var(--g4);cursor:not-allowed}
+.region-toggle{display:flex;background:rgba(232,232,232,.6);backdrop-filter:blur(10px);border-radius:24px;padding:3px;margin-bottom:28px;box-shadow:inset 0 1px 2px rgba(0,0,0,.04)}
+.region-btn{padding:10px 32px;border-radius:22px;border:none;font-size:14px;font-weight:700;cursor:pointer;transition:all .3s cubic-bezier(.4,0,.2,1);background:transparent;color:var(--g3);letter-spacing:.5px}
+.region-btn.active{background:linear-gradient(135deg,#6C5CE7,#8B5CF6);color:#fff;box-shadow:0 4px 14px rgba(108,92,231,.4),0 0 0 2px rgba(108,92,231,.1)}
+.region-btn:hover:not(.active){color:var(--g1);background:rgba(255,255,255,.5)}
+
+/* Custom dropdown */
+.cgl-selector{width:100%;max-width:420px;margin-bottom:16px;position:relative}
+.cgl-select{width:100%;padding:16px 48px 16px 20px;border:2px solid #e4e4e7;border-radius:16px;font-size:14px;font-family:'Inter',sans-serif;font-weight:500;color:var(--g1);appearance:none;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%236C5CE7' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 18px center;cursor:pointer;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.04);letter-spacing:.2px}
+.cgl-select:hover{border-color:#c4b5fd;box-shadow:0 4px 14px rgba(108,92,231,.1)}
+.cgl-select:focus{outline:none;border-color:var(--purple);box-shadow:0 0 0 4px rgba(108,92,231,.15),0 4px 14px rgba(108,92,231,.15)}
+.cgl-select option{padding:12px;font-weight:500;background:#fff;color:var(--g1)}
+.cgl-select option:disabled{color:var(--g4)}
+
+/* Enter button */
+.enter-btn{width:100%;max-width:420px;padding:16px;border:none;border-radius:16px;background:linear-gradient(135deg,#6C5CE7,#8B5CF6);color:#fff;font-size:15px;font-weight:700;letter-spacing:.5px;cursor:pointer;transition:all .25s cubic-bezier(.4,0,.2,1);box-shadow:0 6px 20px rgba(108,92,231,.35);position:relative;overflow:hidden}
+.enter-btn:not(:disabled):hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(108,92,231,.45)}
+.enter-btn:not(:disabled):active{transform:translateY(0);box-shadow:0 4px 12px rgba(108,92,231,.35)}
+.enter-btn:disabled{background:#e5e5e5;color:#a1a1aa;cursor:not-allowed;box-shadow:none}
+.enter-btn::after{content:'→';margin-left:8px;display:inline-block;transition:transform .2s}
+.enter-btn:not(:disabled):hover::after{transform:translateX(4px)}
 
 /* App shell */
 .app{display:none}
@@ -286,7 +298,7 @@ body{font-family:'Inter',sans-serif;background:#f8f8f5;color:#1c1c1c;min-height:
   <div class="region-toggle"><button class="region-btn active" onclick="selReg('jaktim1',this)">JAKTIM 1</button><button class="region-btn" onclick="selReg('jaktim2',this)">JAKTIM 2</button></div>
   <div class="cgl-selector"><select class="cgl-select" id="cglSel" onchange="document.getElementById('enterBtn').disabled=!this.value"><option value="" disabled selected>Pilih CG Leader...</option></select></div>
   <button class="enter-btn" id="enterBtn" disabled onclick="enterDash()">Masuk Dashboard</button>
-  <div style="margin-top:20px;font-size:11px;color:var(--g4)">Coach / TL? <a href="?role=coach" style="color:var(--purple);font-weight:600;text-decoration:none">Masuk disini &rarr;</a></div>
+  <div style="margin-top:24px;padding:10px 18px;border-radius:20px;background:rgba(255,255,255,.6);backdrop-filter:blur(10px);border:1px solid rgba(108,92,231,.15);font-size:11px;color:var(--g3);letter-spacing:.3px">👑 Coach / TL? <a href="?role=coach" style="color:var(--purple);font-weight:700;text-decoration:none;margin-left:4px">Masuk disini &rarr;</a></div>
 </div>
 
 <!-- CGL DASHBOARD -->
