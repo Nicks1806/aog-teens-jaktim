@@ -208,26 +208,73 @@ body{font-family:'Inter',sans-serif;background:#f8f8f5;color:#1c1c1c;min-height:
 
     <!-- TAB: DETAIL CG -->
     <div class="tab-content" id="tab-detail">
+      <!-- Member 1: Tofanny -->
       <div class="dcard">
-        <div class="dcard-top"><div class="dcard-name">Tofanny Zerafim Alexandra</div><span class="rbadge cgl">CGL</span></div>
+        <div class="dcard-top">
+          <div class="dcard-name">Tofanny Zerafim Alexandra</div>
+          <select class="pel-select" style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;background:#f0fdf4;color:var(--green);border:1px solid #bbf7d0">
+            <option selected>CGL</option><option>Sponsor</option><option>Member</option><option>Simpatisan</option><option>VIP</option>
+          </select>
+        </div>
         <div class="dgrid"><span>📱 0889-7317-7676</span><span>🎂 22 Mei 2010</span><span>🏫 SMAN 31 · Kelas 10</span><span>📍 Rawamangun, Pulo Gadung</span></div>
-        <div style="font-size:10px;color:var(--g3);margin-bottom:4px">Milestone</div>
-        <div class="ms-chips"><span class="msc done">MSJ 1 ✓</span><span class="msc done">MSJ 2 ✓</span><span class="msc pending">MSJ 3</span><span class="msc done">CGT 1 ✓</span><span class="msc done">CGT 2 ✓</span><span class="msc pending">CGT 3</span><span class="msc done">B.Air ✓</span><span class="msc done">B.Roh ✓</span></div>
+        <div style="font-size:10px;color:var(--g3);margin:8px 0 4px">Milestone <span style="font-size:9px;color:var(--g4)">(klik untuk ubah)</span></div>
+        <div class="ms-chips">
+          <span class="msc done" onclick="this.classList.toggle('done');this.classList.toggle('pending');this.textContent=this.classList.contains('done')?'MSJ 1 ✓':'MSJ 1'" style="cursor:pointer">MSJ 1 ✓</span>
+          <span class="msc done" onclick="this.classList.toggle('done');this.classList.toggle('pending');this.textContent=this.classList.contains('done')?'MSJ 2 ✓':'MSJ 2'" style="cursor:pointer">MSJ 2 ✓</span>
+          <span class="msc pending" onclick="this.classList.toggle('done');this.classList.toggle('pending');this.textContent=this.classList.contains('done')?'MSJ 3 ✓':'MSJ 3'" style="cursor:pointer">MSJ 3</span>
+          <span class="msc done" onclick="this.classList.toggle('done');this.classList.toggle('pending');this.textContent=this.classList.contains('done')?'CGT 1 ✓':'CGT 1'" style="cursor:pointer">CGT 1 ✓</span>
+          <span class="msc done" onclick="this.classList.toggle('done');this.classList.toggle('pending');this.textContent=this.classList.contains('done')?'CGT 2 ✓':'CGT 2'" style="cursor:pointer">CGT 2 ✓</span>
+          <span class="msc pending" onclick="this.classList.toggle('done');this.classList.toggle('pending');this.textContent=this.classList.contains('done')?'CGT 3 ✓':'CGT 3'" style="cursor:pointer">CGT 3</span>
+          <span class="msc done" onclick="this.classList.toggle('done');this.classList.toggle('pending');this.textContent=this.classList.contains('done')?'B.Air ✓':'B.Air'" style="cursor:pointer">B.Air ✓</span>
+          <span class="msc done" onclick="this.classList.toggle('done');this.classList.toggle('pending');this.textContent=this.classList.contains('done')?'B.Roh ✓':'B.Roh'" style="cursor:pointer">B.Roh ✓</span>
+        </div>
         <textarea class="note" placeholder="Catatan CGL...">Aktif dan setia hadir. Sedang proses MSJ 3.</textarea>
       </div>
+
+      <!-- Member 2: Valerie -->
       <div class="dcard">
-        <div class="dcard-top"><div class="dcard-name">Valerie Alea Darmawan</div><span class="rbadge sponsor">Sponsor</span></div>
+        <div class="dcard-top">
+          <div class="dcard-name">Valerie Alea Darmawan</div>
+          <select class="pel-select" style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;background:#eff6ff;color:var(--blue);border:1px solid #bfdbfe">
+            <option>CGL</option><option selected>Sponsor</option><option>Member</option><option>Simpatisan</option><option>VIP</option>
+          </select>
+        </div>
         <div class="dgrid"><span>📱 0813-1888-3186</span><span>🎂 12 Okt 2008</span><span>🏫 SMA Fons Vitae 1 · Kelas 11</span><span>📍 Cipinang Cempedak, Jatinegara</span></div>
-        <div style="font-size:10px;color:var(--g3);margin-bottom:4px">Milestone</div>
-        <div class="ms-chips"><span class="msc done">MSJ 1 ✓</span><span class="msc done">MSJ 2 ✓</span><span class="msc done">MSJ 3 ✓</span><span class="msc done">CGT 1 ✓</span><span class="msc done">CGT 2 ✓</span><span class="msc done">CGT 3 ✓</span><span class="msc done">B.Air ✓</span><span class="msc done">B.Roh ✓</span></div>
+        <div style="font-size:10px;color:var(--g3);margin:8px 0 4px">Milestone <span style="font-size:9px;color:var(--g4)">(klik untuk ubah)</span></div>
+        <div class="ms-chips">
+          <span class="msc done" onclick="this.classList.toggle('done');this.classList.toggle('pending');this.textContent=this.classList.contains('done')?'MSJ 1 ✓':'MSJ 1'" style="cursor:pointer">MSJ 1 ✓</span>
+          <span class="msc done" onclick="this.classList.toggle('done');this.classList.toggle('pending');this.textContent=this.classList.contains('done')?'MSJ 2 ✓':'MSJ 2'" style="cursor:pointer">MSJ 2 ✓</span>
+          <span class="msc done" onclick="this.classList.toggle('done');this.classList.toggle('pending');this.textContent=this.classList.contains('done')?'MSJ 3 ✓':'MSJ 3'" style="cursor:pointer">MSJ 3 ✓</span>
+          <span class="msc done" onclick="this.classList.toggle('done');this.classList.toggle('pending');this.textContent=this.classList.contains('done')?'CGT 1 ✓':'CGT 1'" style="cursor:pointer">CGT 1 ✓</span>
+          <span class="msc done" onclick="this.classList.toggle('done');this.classList.toggle('pending');this.textContent=this.classList.contains('done')?'CGT 2 ✓':'CGT 2'" style="cursor:pointer">CGT 2 ✓</span>
+          <span class="msc done" onclick="this.classList.toggle('done');this.classList.toggle('pending');this.textContent=this.classList.contains('done')?'CGT 3 ✓':'CGT 3'" style="cursor:pointer">CGT 3 ✓</span>
+          <span class="msc done" onclick="this.classList.toggle('done');this.classList.toggle('pending');this.textContent=this.classList.contains('done')?'B.Air ✓':'B.Air'" style="cursor:pointer">B.Air ✓</span>
+          <span class="msc done" onclick="this.classList.toggle('done');this.classList.toggle('pending');this.textContent=this.classList.contains('done')?'B.Roh ✓':'B.Roh'" style="cursor:pointer">B.Roh ✓</span>
+        </div>
         <textarea class="note" placeholder="Catatan CGL...">Milestone lengkap. Siap jadi CGL.</textarea>
       </div>
+
+      <!-- Member 3: Florencia (at risk) -->
       <div class="dcard" style="border-left:3px solid var(--red)">
-        <div class="dcard-top"><div class="dcard-name">Florencia Arumi Koo</div><span class="rbadge simpatisan">Simpatisan</span></div>
+        <div class="dcard-top">
+          <div class="dcard-name">Florencia Arumi Koo</div>
+          <select class="pel-select" style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;background:#fff7ed;color:var(--orange);border:1px solid #fdba74">
+            <option>CGL</option><option>Sponsor</option><option>Member</option><option selected>Simpatisan</option><option>VIP</option>
+          </select>
+        </div>
         <div class="dgrid"><span>📱 0857-2410-7837</span><span>🎂 30 Jul 2010</span><span>🏫 Don Bosco 2 · Kelas 10</span><span>📍 -</span></div>
         <div style="font-size:11px;color:var(--red);font-weight:600;margin-bottom:6px">⚠️ Kehadiran 38% · Perlu follow-up</div>
-        <div style="font-size:10px;color:var(--g3);margin-bottom:4px">Milestone</div>
-        <div class="ms-chips"><span class="msc pending">MSJ 1</span><span class="msc pending">MSJ 2</span><span class="msc pending">MSJ 3</span><span class="msc pending">CGT 1</span><span class="msc pending">CGT 2</span><span class="msc pending">CGT 3</span><span class="msc pending">B.Air</span><span class="msc pending">B.Roh</span></div>
+        <div style="font-size:10px;color:var(--g3);margin:8px 0 4px">Milestone <span style="font-size:9px;color:var(--g4)">(klik untuk ubah)</span></div>
+        <div class="ms-chips">
+          <span class="msc pending" onclick="this.classList.toggle('done');this.classList.toggle('pending');this.textContent=this.classList.contains('done')?'MSJ 1 ✓':'MSJ 1'" style="cursor:pointer">MSJ 1</span>
+          <span class="msc pending" onclick="this.classList.toggle('done');this.classList.toggle('pending');this.textContent=this.classList.contains('done')?'MSJ 2 ✓':'MSJ 2'" style="cursor:pointer">MSJ 2</span>
+          <span class="msc pending" onclick="this.classList.toggle('done');this.classList.toggle('pending');this.textContent=this.classList.contains('done')?'MSJ 3 ✓':'MSJ 3'" style="cursor:pointer">MSJ 3</span>
+          <span class="msc pending" onclick="this.classList.toggle('done');this.classList.toggle('pending');this.textContent=this.classList.contains('done')?'CGT 1 ✓':'CGT 1'" style="cursor:pointer">CGT 1</span>
+          <span class="msc pending" onclick="this.classList.toggle('done');this.classList.toggle('pending');this.textContent=this.classList.contains('done')?'CGT 2 ✓':'CGT 2'" style="cursor:pointer">CGT 2</span>
+          <span class="msc pending" onclick="this.classList.toggle('done');this.classList.toggle('pending');this.textContent=this.classList.contains('done')?'CGT 3 ✓':'CGT 3'" style="cursor:pointer">CGT 3</span>
+          <span class="msc pending" onclick="this.classList.toggle('done');this.classList.toggle('pending');this.textContent=this.classList.contains('done')?'B.Air ✓':'B.Air'" style="cursor:pointer">B.Air</span>
+          <span class="msc pending" onclick="this.classList.toggle('done');this.classList.toggle('pending');this.textContent=this.classList.contains('done')?'B.Roh ✓':'B.Roh'" style="cursor:pointer">B.Roh</span>
+        </div>
         <textarea class="note" placeholder="Catatan CGL...">4x tidak hadir. Perlu dijemput dan WA personal.</textarea>
       </div>
     </div>
