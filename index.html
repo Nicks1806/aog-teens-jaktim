@@ -571,6 +571,25 @@ const CAT_COLOR = {msj:'#7c3aed',cgt:'#0f766e',ct:'#b45309',ibadah:'#16a34a',out
 function catColor(cat){ return CAT_COLOR[(cat||'').toLowerCase()] || '#2563eb'; }
 function catLabel(cat){ const k=(cat||'').toLowerCase(); return (CAT_ICON[k]||'')+' '+(CAT_LABEL[k]||cat||'Event'); }
 
+// Auto-cleanup: hapus event yang sudah lewat (end date < hari ini)
+async function cleanupPastEvents() {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const todayStr = today.toISOString().slice(0,10);
+  try {
+    // events table: hapus yang date_end < today (atau kalau date_end null, date_start < today)
+    // Pakai 2 query supaya jelas:
+    // 1. Yang punya date_end → cek date_end < today
+    await supa.from('events').delete().lt('date_end', todayStr).not('date_end','is',null);
+    // 2. Yang date_end null → cek date_start < today
+    await supa.from('events').delete().lt('date_start', todayStr).is('date_end', null);
+    // Sama untuk cg_events
+    await supa.from('cg_events').delete().lt('date_end', todayStr).not('date_end','is',null);
+    await supa.from('cg_events').delete().lt('date_start', todayStr).is('date_end', null);
+  } catch(e) {
+    console.warn('[cleanupPastEvents] skip:', e.message);
+  }
+}
+
 // Badge countdown "X hari lagi" untuk event
 function eventCountdownBadge(dateStart) {
   if (!dateStart) return '';
@@ -701,6 +720,9 @@ async function openCGDashboard(cg) {
   ['pageL','pageC'].forEach(x => document.getElementById(x).style.display = 'none');
   document.getElementById('pageD').style.display = 'block';
   window.scrollTo(0, 0);
+
+  // Auto-cleanup event yang sudah lewat (background, jangan blocking)
+  cleanupPastEvents();
 
   // Set default tab ke Absensi SEKARANG (sebelum async load)
   document.querySelectorAll('#pageD .app-tab').forEach((t,i) => t.classList.toggle('on', i===0));
@@ -1973,6 +1995,8 @@ function sCoachTab(id, b) {
 
 // ========== COACH DASHBOARD ==========
 async function loadCoachData() {
+  // Auto-cleanup event yang sudah lewat (sebelum fetch supaya hasilnya bersih)
+  await cleanupPastEvents();
   const [membersRes, cgInfoRes, datesRes, attendanceRes, eventsRes] = await Promise.all([
     supa.from('members').select('*').order('cg,nama'),
     supa.from('cg_info').select('*'),
