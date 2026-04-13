@@ -751,9 +751,111 @@ function computeStats() {
 }
 
 // ========== ABSENSI TAB ==========
+// SVG line chart untuk % hadir per minggu/tanggal
+function buildAttendanceLineChart(members, dates, attMap) {
+  if (!dates.length || !members.length) return '';
+  // Hitung % hadir untuk tiap tanggal
+  const points = dates.map(d => {
+    let h = 0, t = 0;
+    members.forEach(m => {
+      const st = attMap[m.id+'_'+d.id];
+      if (st) { t++; if (st==='H') h++; }
+    });
+    const pct = t ? Math.round(h/t*100) : null;
+    return { label: d.label||'', pct, hadir: h, total: t };
+  });
+  // Kalau semua null, jangan tampilin
+  if (!points.some(p => p.pct !== null)) return '';
+
+  const W = Math.max(560, dates.length * 56);
+  const H = 180;
+  const padL = 32, padR = 14, padT = 16, padB = 34;
+  const innerW = W - padL - padR;
+  const innerH = H - padT - padB;
+  const stepX = dates.length > 1 ? innerW / (dates.length - 1) : 0;
+  const yFor = (pct) => padT + innerH - (pct/100) * innerH;
+
+  // Gridlines horizontal
+  let grid = '';
+  [0,25,50,75,100].forEach(v => {
+    const y = yFor(v);
+    grid += `<line x1="${padL}" y1="${y}" x2="${W-padR}" y2="${y}" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="${v===0?0:'3 3'}"/>`;
+    grid += `<text x="${padL-6}" y="${y+3}" text-anchor="end" font-size="9" fill="#9ca3af" font-family="Inter">${v}%</text>`;
+  });
+
+  // Line path (skip null)
+  let path = '';
+  points.forEach((p, i) => {
+    if (p.pct === null) return;
+    const x = padL + i * stepX;
+    const y = yFor(p.pct);
+    path += (path ? ' L ' : 'M ') + x + ' ' + y;
+  });
+
+  // Area under line (gradient fill)
+  let areaPath = '';
+  const nonNull = points.map((p,i) => ({...p, i})).filter(p => p.pct !== null);
+  if (nonNull.length > 1) {
+    nonNull.forEach((p, idx) => {
+      const x = padL + p.i * stepX;
+      const y = yFor(p.pct);
+      areaPath += (idx===0 ? 'M ' + x + ' ' + (padT+innerH) + ' L ' : ' L ') + x + ' ' + y;
+    });
+    areaPath += ' L ' + (padL + nonNull[nonNull.length-1].i * stepX) + ' ' + (padT+innerH) + ' Z';
+  }
+
+  // Points
+  let dots = '';
+  points.forEach((p, i) => {
+    if (p.pct === null) return;
+    const x = padL + i * stepX;
+    const y = yFor(p.pct);
+    const color = p.pct >= 75 ? '#16a34a' : p.pct >= 50 ? '#d97706' : '#dc2626';
+    dots += `<circle cx="${x}" cy="${y}" r="4.5" fill="#fff" stroke="${color}" stroke-width="2.5"/>`;
+    dots += `<text x="${x}" y="${y-10}" text-anchor="middle" font-size="9" font-weight="700" fill="${color}" font-family="Inter">${p.pct}%</text>`;
+  });
+
+  // X-axis labels
+  let xLabels = '';
+  points.forEach((p, i) => {
+    const x = padL + i * stepX;
+    const lbl = String(p.label).split(/\s+/).slice(0,2).join(' '); // shorten: "3 Jan" style
+    xLabels += `<text x="${x}" y="${H-14}" text-anchor="middle" font-size="9" fill="#6b7280" font-family="Inter">${lbl}</text>`;
+  });
+
+  // Rata-rata
+  const validPts = points.filter(p => p.pct !== null);
+  const avgPct = validPts.length ? Math.round(validPts.reduce((s,p)=>s+p.pct,0)/validPts.length) : 0;
+  const avgColor = avgPct >= 75 ? '#16a34a' : avgPct >= 50 ? '#d97706' : '#dc2626';
+
+  return `<div style="background:linear-gradient(135deg,#faf5ff 0%,#ffffff 100%);border:1px solid var(--g5);border-radius:14px;padding:14px 16px;margin-bottom:16px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+      <div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:1.2px;color:var(--g3);text-transform:uppercase">📈 Progress Kehadiran per Minggu</div>
+        <div style="font-size:10px;color:var(--g4);margin-top:2px">Persentase member yang hadir tiap ibadah</div>
+      </div>
+      <div style="text-align:right"><div style="font-family:'Instrument Serif',serif;font-size:24px;color:${avgColor};line-height:1">${avgPct}%</div><div style="font-size:9px;color:var(--g4);letter-spacing:.5px">RATA-RATA</div></div>
+    </div>
+    <div style="overflow-x:auto;margin:0 -4px">
+      <svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="display:block">
+        <defs><linearGradient id="attFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#6C5CE7" stop-opacity=".25"/><stop offset="100%" stop-color="#6C5CE7" stop-opacity="0"/></linearGradient></defs>
+        ${grid}
+        ${areaPath ? '<path d="'+areaPath+'" fill="url(#attFill)"/>' : ''}
+        ${path ? '<path d="'+path+'" fill="none" stroke="#6C5CE7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>' : ''}
+        ${dots}
+        ${xLabels}
+      </svg>
+    </div>
+  </div>`;
+}
+
 function renderAbsensi() {
   const el = document.getElementById('tab-absensi');
   let html = '<div style="display:flex;justify-content:flex-end;margin-bottom:10px"><button onclick="exportCGAttendancePDF()" style="padding:8px 14px;border-radius:10px;border:1.5px solid #dc2626;background:linear-gradient(135deg,#fef2f2,#fee2e2);color:#dc2626;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.3px;box-shadow:0 2px 6px rgba(220,38,38,.1);transition:all .2s" onmouseover="this.style.transform=\'translateY(-1px)\'" onmouseout="this.style.transform=\'\'">📄 Export PDF</button></div>';
+
+  // Line chart: % hadir per minggu
+  html += buildAttendanceLineChart(MEMBERS, DATES, ATTENDANCE);
+
   html += '<div style="overflow-x:auto"><table class="t"><thead><tr><th>Nama</th>';
   DATES.forEach(d => { html += '<th>' + (d.label||d.id) + '</th>'; });
   html += '<th>% Hadir</th></tr></thead><tbody>';
