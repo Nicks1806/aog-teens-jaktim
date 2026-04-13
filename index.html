@@ -208,6 +208,10 @@ body{font-family:'Inter',sans-serif;background:#f8f8f5;color:#1c1c1c;min-height:
 
 /* Loading */
 .loading-msg{text-align:center;padding:40px;color:var(--g3);font-size:13px}
+@keyframes skel-pulse{0%,100%{opacity:.55}50%{opacity:.95}}
+.skel{background:linear-gradient(90deg,#f3f4f6 0%,#fafafa 50%,#f3f4f6 100%);background-size:200% 100%;border-radius:6px;animation:skel-pulse 1.4s ease-in-out infinite;display:block}
+.skel-row{height:14px;margin-bottom:8px}
+.skel-card{padding:14px;background:#fff;border:1px solid var(--g6);border-radius:10px;margin-bottom:10px}
 
 /* Modal */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;align-items:center;justify-content:center}
@@ -791,10 +795,10 @@ async function openCGDashboard(cg) {
   // Reset tab render flags — hanya Absensi yang akan di-render di awal
   TAB_RENDERED = {};
 
-  // Show loading placeholder on all tabs
+  // Show skeleton loader on all tabs
   ['absensi','detail','visi','pelayanan','milestone','events'].forEach(id => {
     const el = document.getElementById('tab-'+id);
-    if (el) el.innerHTML = '<div class="loading-msg">Memuat...</div>';
+    if (el) el.innerHTML = tabSkeleton(4);
   });
 
   // Determine region from any member record (single quick query)
@@ -849,20 +853,21 @@ async function openCGDashboard(cg) {
     }
   });
 
-  // Render tab Absensi dulu (instant), sisanya prefetch di background
+  // Render tab Absensi dulu (sync, instant)
   renderAbsensi();
   TAB_RENDERED.absensi = true;
 
-  // Prefetch tab lain di background dengan delay kecil supaya tidak block
-  // tab aktif. Setiap tab di-render saat browser idle.
-  const prefetchTabs = ['milestone','detail','events','visi','pelayanan'];
-  const idleQueue = (cb, delay) => {
-    if (typeof requestIdleCallback === 'function') requestIdleCallback(cb, {timeout: 2000});
-    else setTimeout(cb, delay || 100);
-  };
-  prefetchTabs.forEach((id, idx) => {
-    idleQueue(() => { ensureTabRendered(id); }, 80 * (idx + 1));
-  });
+  // Render Milestone juga langsung (sync, tidak butuh fetch)
+  try { renderMilestone(); TAB_RENDERED.milestone = true; } catch(e) {}
+
+  // Kick off semua fetch async tab lain SECARA PARALEL (tidak nunggu idle)
+  // Pakai Promise.all supaya semua mulai bersamaan, bukan sequential
+  Promise.all([
+    ensureTabRendered('detail'),
+    ensureTabRendered('visi'),
+    ensureTabRendered('pelayanan'),
+    ensureTabRendered('events')
+  ]).catch(e => console.warn('[prefetch tabs]', e));
 }
 
 // Lazy render untuk tab yang dipilih
@@ -2238,24 +2243,24 @@ async function loadCoachData() {
   ALL_ATTENDANCE = {};
   (attendanceRes.data || []).forEach(a => { ALL_ATTENDANCE[a.member_id + '_' + a.date_id] = a.status; });
 
-  // Lazy render Coach tabs — hanya overview yang di-render di awal
+  // Show skeleton loader, then render Coach tabs
   COACH_TAB_RENDERED = {};
   ['c-overview','c-absensi','c-milestone','c-visi','c-events'].forEach(id => {
     const el = document.getElementById('tab-'+id);
-    if (el) el.innerHTML = '<div class="loading-msg">Memuat...</div>';
+    if (el) el.innerHTML = tabSkeleton(4);
   });
   renderCoachOverview();
   COACH_TAB_RENDERED['c-overview'] = true;
 
-  // Prefetch sisa tab Coach di background (idle callback) — biar klik tab instant
-  const coachPrefetch = ['c-absensi','c-milestone','c-events','c-visi'];
-  const idleQ = (cb, delay) => {
-    if (typeof requestIdleCallback === 'function') requestIdleCallback(cb, {timeout: 2000});
-    else setTimeout(cb, delay || 100);
-  };
-  coachPrefetch.forEach((id, idx) => {
-    idleQ(() => { ensureCoachTabRendered(id); }, 80 * (idx + 1));
-  });
+  // Render tab sync (Absensi & Milestone) langsung
+  try { renderCoachAbsensi(); COACH_TAB_RENDERED['c-absensi'] = true; } catch(e) {}
+  try { renderCoachMilestone(); COACH_TAB_RENDERED['c-milestone'] = true; } catch(e) {}
+
+  // Kick off async tab fetches secara paralel
+  Promise.all([
+    ensureCoachTabRendered('c-visi'),
+    ensureCoachTabRendered('c-events')
+  ]).catch(e => console.warn('[coach prefetch]', e));
 }
 
 let COACH_TAB_RENDERED = {};
@@ -3007,6 +3012,17 @@ async function switchRole(role) {
 
 // ========== UTILITY ==========
 function esc(s) { if (!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
+// Shimmer skeleton loader untuk tab yang lagi loading data
+function tabSkeleton(rows = 4) {
+  let h = '<div style="padding:14px 4px">';
+  for (let i = 0; i < rows; i++) {
+    const w1 = 55 + Math.floor(Math.random()*30);
+    const w2 = 35 + Math.floor(Math.random()*40);
+    h += '<div class="skel-card"><div class="skel skel-row" style="width:'+w1+'%"></div><div class="skel skel-row" style="width:'+w2+'%;height:10px"></div></div>';
+  }
+  return h + '</div>';
+}
 
 // Parse date string safely as LOCAL time (not UTC) to avoid timezone off-by-one
 function parseLocalDate(s) {
