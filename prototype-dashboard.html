@@ -542,8 +542,19 @@ body{font-family:'Inter',sans-serif;background:#f8f8f5;color:#1c1c1c;min-height:
 
 <!-- COACH -->
 <div class="app" id="pageC">
-  <div class="app-nav"><div class="app-nav-left"><div class="app-back" onclick="goBackCoach()">←</div><span style="font-size:13px;font-weight:700">👑 Coach / TL</span></div><div style="display:flex;align-items:center;gap:6px"><span class="live-dot"></span><span style="font-size:10px;color:var(--green);font-weight:600">Live</span></div></div>
-  <div class="app-hero" id="coachHero"><div class="app-hero-tag">Januari — April 2026</div><div class="app-hero-h">Semua<br><em>CG.</em></div><div class="app-hero-meta" id="coachMeta">8 CG aktif · 54 member · 72% kehadiran</div></div>
+  <div class="app-nav">
+    <div class="app-nav-left">
+      <div class="app-back" onclick="goBackCoach()">←</div>
+      <span style="font-size:13px;font-weight:700" id="coachRoleLabel">👑 Coach</span>
+      <!-- Role toggle -->
+      <div style="display:inline-flex;background:#e8e8e8;border-radius:14px;padding:2px;margin-left:8px">
+        <button id="roleCoachBtn" onclick="switchRole('coach')" style="padding:4px 12px;border-radius:12px;border:none;font-size:10px;font-weight:700;cursor:pointer;background:var(--purple);color:#fff;letter-spacing:.4px">COACH</button>
+        <button id="roleTLBtn" onclick="switchRole('tl')" style="padding:4px 12px;border-radius:12px;border:none;font-size:10px;font-weight:700;cursor:pointer;background:transparent;color:var(--g3);letter-spacing:.4px">TL</button>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px"><span class="live-dot"></span><span style="font-size:10px;color:var(--green);font-weight:600">Live</span></div>
+  </div>
+  <div class="app-hero" id="coachHero"><div class="app-hero-tag">Januari — April 2026</div><div class="app-hero-h" id="coachHeroH">Semua<br><em>CG.</em></div><div class="app-hero-meta" id="coachMeta">8 CG aktif · 54 member · 72% kehadiran</div></div>
   <div class="app-stats">
     <div class="app-stat ct"><div class="app-stat-label">Member</div><div class="app-stat-num" id="csTotalMbr">31</div><div class="app-stat-pct">Jaktim 1</div></div>
     <div class="app-stat cb"><div class="app-stat-label">Avg Hadir</div><div class="app-stat-num" id="csAvgHadir">75%</div><div class="app-stat-pct">rata-rata</div></div>
@@ -1023,6 +1034,59 @@ function goBack(){document.getElementById('pageD').style.display='none';if(fromC
 function sTab(id,b){document.querySelectorAll('#pageD .app-tab').forEach(t=>t.classList.remove('on'));b.classList.add('on');document.querySelectorAll('#pageD .tab-content').forEach(t=>t.classList.remove('active'));document.getElementById('tab-'+id).classList.add('active');}
 function sCoachTab(id,b){document.querySelectorAll('#pageC .app-tab').forEach(t=>t.classList.remove('on'));b.classList.add('on');document.querySelectorAll('#pageC .tab-content').forEach(t=>t.classList.remove('active'));document.getElementById('tab-'+id).classList.add('active');}
 function goBackCoach(){document.getElementById('pageC').style.display='none';document.getElementById('pageL').style.display='flex';window.scrollTo(0,0);}
+function switchRole(role){
+  var coachBtn=document.getElementById('roleCoachBtn'),tlBtn=document.getElementById('roleTLBtn'),label=document.getElementById('coachRoleLabel');
+  var heroH=document.getElementById('coachHeroH'),meta=document.getElementById('coachMeta');
+  // Find region toggle in overview tab
+  var overviewToggle=document.querySelector('#tab-c-overview .region-toggle');
+  var grid=document.getElementById('coachCGGrid');
+  var statsLabel=document.querySelectorAll('#pageC .app-stat-pct')[0];
+  if(role==='tl'){
+    coachBtn.style.background='transparent';coachBtn.style.color='var(--g3)';
+    tlBtn.style.background='var(--purple)';tlBtn.style.color='#fff';
+    label.innerHTML='👑 Team Leader';
+    heroH.innerHTML='Overview<br><em>Total.</em>';
+    meta.textContent='8 CG aktif · 54 member · 72% kehadiran rata-rata (Jaktim 1+2)';
+    if(overviewToggle) overviewToggle.style.display='none';
+    document.getElementById('csTotalMbr').textContent='54';statsLabel.textContent='Total semua';
+    document.getElementById('csAvgHadir').textContent='72%';
+    document.getElementById('csAtRisk').textContent='11';
+    document.getElementById('csBlmMsj').textContent='18';
+    // Render all 8 CGs
+    var allCG=[
+      {cg:'TEEN 23',leader:'Tofanny Zerafim',color:'#7c3aed',pct:78,mbr:10,risk:2,ms:72},
+      {cg:'TEEN 01',leader:'Stefenie Nathania',color:'#1d4ed8',pct:82,mbr:7,risk:1,ms:80},
+      {cg:'TEEN 09',leader:'Jessica Anastasia',color:'#c2410c',pct:68,mbr:6,risk:2,ms:55},
+      {cg:'TEEN 06',leader:'Keizha Ananta',color:'#be185d',pct:71,mbr:8,risk:0,ms:65},
+      {cg:'TEEN 12',leader:'Nathanael Wilson',color:'#0f766e',pct:74,mbr:8,risk:2,ms:60},
+      {cg:'TEEN 07',leader:'Edson Matthew',color:'#b45309',pct:76,mbr:6,risk:1,ms:70},
+      {cg:'TEEN 17',leader:'Samantha Jane',color:'#0e7490',pct:65,mbr:4,risk:1,ms:45},
+      {cg:'TEEN 20',leader:'Yemima Grace',color:'#be123c',pct:58,mbr:5,risk:2,ms:38},
+    ];
+    grid.innerHTML=allCG.map(function(c){
+      var dash=Math.round(c.pct*97.4/100);
+      return '<div class="coach-card" style="border-left:4px solid '+c.color+'" onclick="enterFromCoach(\''+c.cg+'\')"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><div style="font-weight:800;font-size:15px">'+c.cg+'</div><div style="position:relative;width:40px;height:40px"><svg viewBox="0 0 36 36" style="transform:rotate(-90deg)"><circle cx="18" cy="18" r="15.5" fill="none" stroke="#e5e7eb" stroke-width="3"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="'+c.color+'" stroke-width="3" stroke-dasharray="'+dash+' 97.4" stroke-linecap="round"/></svg><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700">'+c.pct+'%</div></div></div><div style="font-size:11px;color:var(--g3);margin-bottom:8px">CGL: '+c.leader+'</div><div style="display:flex;gap:14px;font-size:11px;margin-bottom:8px"><div style="text-align:center"><span style="font-family:\'Instrument Serif\',serif;font-size:18px;display:block">'+c.mbr+'</span>Member</div><div style="text-align:center"><span style="font-family:\'Instrument Serif\',serif;font-size:18px;color:var(--red);display:block">'+c.risk+'</span>At Risk</div></div><div style="font-size:9px;color:var(--g3);margin-bottom:3px">Milestone Progress</div><div class="ms-bar"><div class="ms-bar-fill" style="width:'+c.ms+'%"></div></div><div style="font-size:9px;color:var(--g4)">'+c.ms+'% selesai</div></div>';
+    }).join('');
+    // Update bar chart
+    var chart=document.getElementById('coachBarChart');
+    if(chart){var sorted=allCG.slice().sort(function(a,b){return b.pct-a.pct;});chart.innerHTML=sorted.map(function(c){return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><div style="width:70px;font-size:11px;font-weight:600;text-align:right">'+c.cg+'</div><div style="flex:1;height:22px;background:var(--g6);border-radius:6px;overflow:hidden"><div style="width:'+c.pct+'%;height:100%;background:'+c.color+';border-radius:6px;display:flex;align-items:center;padding-left:8px"><span style="font-size:9px;color:#fff;font-weight:700">'+c.pct+'%</span></div></div></div>';}).join('');}
+  } else {
+    tlBtn.style.background='transparent';tlBtn.style.color='var(--g3)';
+    coachBtn.style.background='var(--purple)';coachBtn.style.color='#fff';
+    label.innerHTML='👑 Coach';
+    heroH.innerHTML='Semua<br><em>CG.</em>';
+    meta.textContent='8 CG aktif · 54 member · 72% kehadiran';
+    if(overviewToggle) overviewToggle.style.display='inline-flex';
+    document.getElementById('csTotalMbr').textContent='31';statsLabel.textContent='Jaktim 1';
+    document.getElementById('csAvgHadir').textContent='75%';
+    document.getElementById('csAtRisk').textContent='5';
+    document.getElementById('csBlmMsj').textContent='8';
+    // Re-render Jaktim 1 cards
+    var btn=document.querySelector('#tab-c-overview .region-btn.active')||document.querySelector('#tab-c-overview .region-btn');
+    if(btn){btn.classList.remove('active');switchCoachReg('jaktim1',btn);}
+  }
+}
+
 function switchCoachReg(reg,btn){
   btn.parentElement.querySelectorAll('.region-btn').forEach(x=>x.classList.remove('active'));btn.classList.add('active');
   var d=CG[reg],grid=document.getElementById('coachCGGrid'),chart=document.getElementById('coachBarChart');
