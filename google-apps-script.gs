@@ -308,35 +308,94 @@ function syncAbsensi(region, sheetName, dateStartCol) {
   });
 
   if (newDates.length > 0) {
-    // Append at end (sorted by sort_order dari Supabase)
+    // Smart insert: sisipkan di posisi yang benar berdasarkan sort_order Supabase
     newDates.sort(function(a,b){return a.sort_order-b.sort_order;});
-    var startCol = dateStartCol + sheetDates.length;
-    var prevMonth = '';
-    // Cek month terakhir di sheet
-    if (sheetDates.length > 0) {
-      var lastDateStr = sheetDates[sheetDates.length-1];
-      var ldn = normDate(lastDateStr);
-      if (ldn) {
-        var parts = ldn.split('-');
-        prevMonth = MONTHS_ID[parseInt(parts[1])] || '';
-      }
-    }
-    newDates.forEach(function(nd, i) {
+
+    // Build map: normalized date label → sort_order dari Supabase (source of truth urutan)
+    var supaSortMap = {};
+    dates.forEach(function(d){ supaSortMap[normDate(d.label)] = d.sort_order; });
+
+    // Limit max insert per run untuk hindari timeout
+    var MAX_INSERTS = 10;
+    var toInsert = newDates.slice(0, MAX_INSERTS);
+    var inserted = 0;
+
+    toInsert.forEach(function(nd) {
+      var newSort = nd.sort_order;
       var ndn = normDate(nd.label);
       var parts = ndn.split('-');
-      var monthNum = parseInt(parts[1]);
-      var monthCode = MONTHS_ID[monthNum] || '';
-      var col = startCol + i;
-      if (monthCode !== prevMonth) {
-        sheet.getRange(1, col).setValue(monthCode).setFontWeight('bold').setHorizontalAlignment('center');
-        sheet.getRange(2, col).setValue('IBADAH').setFontWeight('bold').setHorizontalAlignment('center').setFontStyle('italic');
+      var monthCode = MONTHS_ID[parseInt(parts[1])] || '';
+      var dateStr = parts[0]+'-'+parts[1]+'-26';
+
+      // Re-read current date columns setiap iteration (karena posisi shift setelah insert)
+      var lc = sheet.getLastColumn();
+      var dc = lc - dateStartCol + 1;
+      var curDates = dc > 0 ? sheet.getRange(HEADER_DATE_ROW, dateStartCol, 1, dc).getValues()[0] : [];
+
+      // Find insert position: kolom pertama yang sort_order-nya > newSort
+      var insertCol = -1;
+      for (var i = 0; i < curDates.length; i++) {
+        var curNorm = normDate(curDates[i]);
+        if (!curNorm) continue;
+        var curSort = supaSortMap[curNorm];
+        if (curSort !== undefined && curSort > newSort) {
+          insertCol = dateStartCol + i;
+          break;
+        }
       }
-      sheet.getRange(3, col).setValue(parts[0]+'-'+parts[1]+'-26').setFontWeight('bold').setHorizontalAlignment('center').setNumberFormat('@');
-      sheet.setColumnWidth(col, 80);
-      prevMonth = monthCode;
+      // Kalau tidak ada yang lebih besar, append di akhir
+      if (insertCol < 0) insertCol = dateStartCol + curDates.length;
+
+      // Insert column (shift existing kanan) kalau bukan append
+      if (insertCol < dateStartCol + curDates.length) {
+        sheet.insertColumnBefore(insertCol);
+      }
+
+      // Determine prevMonth (kolom sebelum insertCol)
+      var prevMonth = '';
+      if (insertCol > dateStartCol) {
+        var prevLabel = sheet.getRange(HEADER_DATE_ROW, insertCol - 1).getValue();
+        var prevNorm = normDate(prevLabel);
+        if (prevNorm) {
+          var pParts = prevNorm.split('-');
+          prevMonth = MONTHS_ID[parseInt(pParts[1])] || '';
+        }
+      }
+
+      // Write month label hanya kalau bulan beda dari kolom sebelumnya
+      if (monthCode && monthCode !== prevMonth) {
+        sheet.getRange(1, insertCol).setValue(monthCode).setFontWeight('bold').setHorizontalAlignment('center');
+        sheet.getRange(2, insertCol).setValue('IBADAH').setFontWeight('bold').setHorizontalAlignment('center').setFontStyle('italic');
+      }
+
+      // Write date di row 3
+      sheet.getRange(HEADER_DATE_ROW, insertCol).setValue(dateStr).setFontWeight('bold').setHorizontalAlignment('center').setNumberFormat('@');
+      sheet.setColumnWidth(insertCol, 80);
+
+      // Cek kolom SETELAH insert — kalau bulannya sama dengan inserted date tapi dia punya month label, hapus labelnya (karena sekarang bukan awal bulan lagi)
+      var nextCol = insertCol + 1;
+      var nextLabel = sheet.getRange(HEADER_DATE_ROW, nextCol).getValue();
+      if (nextLabel) {
+        var nextNorm = normDate(nextLabel);
+        if (nextNorm) {
+          var nParts = nextNorm.split('-');
+          var nextMonthCode = MONTHS_ID[parseInt(nParts[1])] || '';
+          if (nextMonthCode === monthCode) {
+            // Clear month/ibadah di nextCol (duplikat karena kita sisipin sebelumnya)
+            var nextMonthVal = sheet.getRange(1, nextCol).getValue();
+            if (String(nextMonthVal).toUpperCase() === monthCode) {
+              sheet.getRange(1, nextCol).setValue('');
+              sheet.getRange(2, nextCol).setValue('');
+            }
+          }
+        }
+      }
+
+      inserted++;
     });
+
     SpreadsheetApp.flush();
-    Logger.log('+'+newDates.length+' date columns di '+sheetName);
+    Logger.log('+'+inserted+' date columns di '+sheetName+' (smart insert)');
     lastCol = sheet.getLastColumn();
     dateCount = lastCol - dateStartCol + 1;
     sheetDates = sheet.getRange(HEADER_DATE_ROW, dateStartCol, 1, dateCount).getValues()[0];
