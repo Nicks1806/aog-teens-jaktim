@@ -1495,24 +1495,20 @@ async function renderEvents() {
     return { ...m, _bd: bd, _next: next, _daysLeft: daysLeft, _turnAge: turnAge, _dateLabel: dateLabel };
   }).filter(Boolean).sort((a,b) => a._daysLeft - b._daysLeft);
 
-  // Filter chips with all categories
+  // Filter chips — disederhanakan supaya match Coach/TL Events
   const evCats = [
-    {key:'all', label:'Semua'},
-    {key:'msj', label:'📖 MSJ'},
-    {key:'cgt', label:'👥 CGT'},
-    {key:'ct', label:'🏕️ CT'},
-    {key:'ibadah', label:'⛪ Ibadah'},
-    {key:'outreach', label:'🌏 Outreach'},
-    {key:'retreat', label:'🏕️ Retreat'},
-    {key:'event', label:'📌 Event'},
-    {key:'birthday', label:'🎂 Ultah'},
-    {key:'reminder', label:'🔔 Pengingat'},
-    {key:'other', label:'📌 Lainnya'}
+    {key:'all',     label:'Semua'},
+    {key:'ibadah',  label:'Ibadah'},
+    {key:'cg event',label:'CG Event'},
+    {key:'birthday',label:'Birthday'},
+    {key:'outreach',label:'Outreach'}
   ];
-  let html = '<div class="filter-chips" style="flex-wrap:wrap">';
+  let html = '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:8px"><div class="filter-chips" style="margin:0;flex-wrap:wrap">';
   evCats.forEach(c => {
     html += '<span class="chip '+(EV_FILTER===c.key?'on':'')+'" onclick="setEventFilter(\''+c.key+'\')">'+c.label+'</span>';
   });
+  html += '</div>';
+  html += '<button onclick="openAddEventModal()" style="padding:8px 14px;border-radius:10px;border:1.5px solid #6C5CE7;background:linear-gradient(135deg,#6C5CE7,#8B5CF6);color:#fff;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.3px;box-shadow:0 4px 12px rgba(108,92,231,.25);transition:all .2s" onmouseover="this.style.transform=\'translateY(-1px)\'" onmouseout="this.style.transform=\'\'">+ Tambah Event</button>';
   html += '</div>';
 
   // Filter helper
@@ -1582,7 +1578,6 @@ async function renderEvents() {
     });
   }
 
-  html += '<button class="pel-add" style="margin-top:10px;width:100%;padding:10px;text-align:center" onclick="openAddEventModal()">+ Tambah Event CG</button>';
   el.innerHTML = html;
 }
 
