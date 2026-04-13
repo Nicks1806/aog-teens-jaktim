@@ -331,10 +331,116 @@ const SUPABASE_URL = 'https://gqppviugodokncxezdwd.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxcHB2aXVnb2Rva25jeGV6ZHdkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4NjIwOTcsImV4cCI6MjA5MDQzODA5N30.w2oUJYWk4yr_tJQuhk0UyxJKwgH1C3FkmJB6CXclSpk';
 const supa = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+// ========== SUPABASE HELPERS (new tables) ==========
+async function loadVision(cg, region) {
+  const {data} = await supa.from('cg_vision').select('*').eq('cg', cg).eq('region', region).maybeSingle();
+  return data || {visi:'', misi:''};
+}
+async function saveVision(cg, region, visi, misi) {
+  const {error} = await supa.from('cg_vision').upsert({cg, region, visi, misi, updated_at: new Date().toISOString()}, {onConflict: 'cg,region'});
+  if (error) { toast('\u274c Gagal simpan'); console.error(error); return; }
+  toast('\u2713 Disimpan');
+}
+
+async function loadDevPlans(cg, region) {
+  const {data} = await supa.from('cg_dev_plans').select('*').eq('cg', cg).eq('region', region).order('created_at');
+  return data || [];
+}
+async function addDevPlan(cg, region, member_name, current_status, target_status, deadline) {
+  const {data, error} = await supa.from('cg_dev_plans').insert({cg, region, member_name, current_status, target_status, deadline}).select().single();
+  if (error) { toast('\u274c Gagal simpan'); console.error(error); return null; }
+  toast('\u2713 Disimpan');
+  return data;
+}
+async function deleteDevPlan(id) {
+  const {error} = await supa.from('cg_dev_plans').delete().eq('id', id);
+  if (error) { toast('\u274c Gagal hapus'); console.error(error); return; }
+  toast('\u2713 Dihapus');
+}
+
+async function loadMemberNote(memberId) {
+  const {data} = await supa.from('member_notes').select('cgl_note').eq('member_id', memberId).maybeSingle();
+  return data?.cgl_note || '';
+}
+async function saveMemberNote(memberId, note) {
+  const {error} = await supa.from('member_notes').upsert({member_id: memberId, cgl_note: note, updated_at: new Date().toISOString()}, {onConflict: 'member_id'});
+  if (error) { toast('\u274c Gagal simpan'); console.error(error); return; }
+  toast('\u2713 Disimpan');
+}
+
+async function loadCoachNote(cg, region) {
+  const {data} = await supa.from('coach_notes').select('note').eq('cg', cg).eq('region', region).maybeSingle();
+  return data?.note || '';
+}
+async function saveCoachNoteDB(cg, region, note) {
+  const {error} = await supa.from('coach_notes').upsert({cg, region, note, updated_at: new Date().toISOString()}, {onConflict: 'cg,region'});
+  if (error) { toast('\u274c Gagal simpan'); console.error(error); return; }
+  toast('\u2713 Disimpan');
+}
+
+async function loadPelayanan(cg, region) {
+  const {data} = await supa.from('cg_pelayanan').select('*').eq('cg', cg).eq('region', region);
+  return data || [];
+}
+async function savePelayananCell(cg, region, month, week_date, role_name, member_name) {
+  const {error} = await supa.from('cg_pelayanan').upsert({cg, region, month, week_date, role_name, member_name}, {onConflict: 'cg,week_date,role_name'});
+  if (error) { toast('\u274c Gagal simpan'); console.error(error); return; }
+  toast('\u2713 Disimpan');
+}
+async function deletePelWeekDB(cg, region, week_date) {
+  const {error} = await supa.from('cg_pelayanan').delete().eq('cg', cg).eq('region', region).eq('week_date', week_date);
+  if (error) { toast('\u274c Gagal hapus'); console.error(error); }
+}
+
+async function loadCustomRoles(cg, region) {
+  const {data} = await supa.from('cg_custom_roles').select('*').eq('cg', cg).eq('region', region);
+  return data || [];
+}
+async function addCustomRole(cg, region, role_name, abbr, color, bg) {
+  const {error} = await supa.from('cg_custom_roles').insert({cg, region, role_name, abbr, color, bg});
+  if (error) { toast('\u274c Gagal simpan'); console.error(error); return; }
+  toast('\u2713 Role ditambahkan');
+}
+
+async function loadCGEvents(cg, region) {
+  const {data} = await supa.from('cg_events').select('*').or('and(cg.eq.'+cg+',region.eq.'+region+',is_shared.eq.false),is_shared.eq.true').order('date_start');
+  return data || [];
+}
+async function loadCGEventsForCG(cg, region) {
+  const {data} = await supa.from('cg_events').select('*').eq('cg', cg).eq('region', region).eq('is_shared', false).order('date_start');
+  return data || [];
+}
+async function loadAllCGEvents() {
+  const {data} = await supa.from('cg_events').select('*').order('date_start');
+  return data || [];
+}
+async function addCGEvent(eventData) {
+  const {data, error} = await supa.from('cg_events').insert(eventData).select().single();
+  if (error) { toast('\u274c Gagal simpan'); console.error(error); return null; }
+  toast('\u2713 Disimpan');
+  return data;
+}
+async function deleteCGEvent(id) {
+  const {error} = await supa.from('cg_events').delete().eq('id', id);
+  if (error) { toast('\u274c Gagal hapus'); console.error(error); }
+}
+
+// Helper: convert flat pelayanan rows to nested { month: { week_date: { role: member } } }
+function pelRowsToNested(rows) {
+  const obj = {};
+  rows.forEach(r => {
+    if (!obj[r.month]) obj[r.month] = {};
+    if (!obj[r.month][r.week_date]) obj[r.month][r.week_date] = {};
+    obj[r.month][r.week_date][r.role_name] = r.member_name;
+  });
+  return obj;
+}
+
 // ========== GLOBAL STATE ==========
 let curReg = 'jaktim1';
 let fromCoach = false;
 let CUR_CG = null; // current CG name
+let CUR_REGION = null; // current region
 let CUR_CG_INFO = null;
 let MEMBERS = [];
 let DATES = [];
@@ -413,9 +519,9 @@ async function enterDash() {
   await openCGDashboard(cg);
 }
 
-function enterFromCoach(cg) {
+async function enterFromCoach(cg) {
   fromCoach = true;
-  openCGDashboard(cg);
+  await openCGDashboard(cg);
 }
 
 // ========== OPEN CGL DASHBOARD ==========
@@ -436,6 +542,7 @@ async function openCGDashboard(cg) {
 
   // Load dates for this region
   const region = MEMBERS[0] ? MEMBERS[0].region : curReg;
+  CUR_REGION = region;
   const { data: dates } = await supa.from('dates').select('*').eq('region', region).order('sort_order');
   DATES = dates || [];
 
@@ -463,11 +570,11 @@ async function openCGDashboard(cg) {
 
   // Render tabs
   renderAbsensi();
-  renderDetail();
-  renderVisiCG();
-  renderPelayanan();
+  await renderDetail();
+  await renderVisiCG();
+  await renderPelayanan();
   renderMilestone();
-  renderEvents();
+  await renderEvents();
 
   // Reset to absensi tab
   document.querySelectorAll('#pageD .app-tab').forEach((t,i) => t.classList.toggle('on', i===0));
@@ -548,8 +655,14 @@ async function cycleDot(dotEl, memberId, dateId) {
 }
 
 // ========== DETAIL CG TAB ==========
-function renderDetail() {
+async function renderDetail() {
   const el = document.getElementById('tab-detail');
+  // Load all member notes in parallel
+  const notePromises = MEMBERS.map(m => loadMemberNote(m.id));
+  const notes = await Promise.all(notePromises);
+  const memberNotes = {};
+  MEMBERS.forEach((m, idx) => { memberNotes[m.id] = notes[idx]; });
+
   let html = '';
 
   MEMBERS.forEach(m => {
@@ -586,7 +699,7 @@ function renderDetail() {
     });
     html += '</div>';
 
-    html += '<textarea class="note" placeholder="Catatan CGL..." data-mid="'+m.id+'" onblur="saveMemberNotes(this)">' + esc(m.notes||'') + '</textarea>';
+    html += '<textarea class="note" placeholder="Catatan CGL..." data-mid="'+m.id+'" onblur="saveMemberNotes(this)">' + esc(memberNotes[m.id]||'') + '</textarea>';
     html += '</div>';
   });
 
@@ -604,8 +717,7 @@ async function saveMemberField(input) {
 
 async function saveMemberNotes(textarea) {
   const mid = parseInt(textarea.dataset.mid);
-  const { error } = await supa.from('members').update({ notes: textarea.value }).eq('id', mid);
-  if (!error) toast('\u2713 Disimpan');
+  await saveMemberNote(mid, textarea.value);
 }
 
 async function toggleMilestone(chip, memberId, field, wasDone) {
@@ -662,56 +774,63 @@ async function saveNewMember() {
 }
 
 // ========== VISI CG TAB ==========
-function renderVisiCG() {
+async function renderVisiCG() {
   const el = document.getElementById('tab-visi');
-  const lsKeyV = 'cg_vision_' + CUR_CG;
-  const lsKeyM = 'cg_mission_' + CUR_CG;
-  const vision = localStorage.getItem(lsKeyV) || '';
-  const mission = localStorage.getItem(lsKeyM) || '';
+  const visionData = await loadVision(CUR_CG, CUR_REGION);
+  const vision = visionData.visi || '';
+  const mission = visionData.misi || '';
 
-  let html = '<div class="vcard"><div class="vlabel">Visi CG</div><textarea class="vedit" id="visiText">' + esc(vision) + '</textarea></div>';
-  html += '<div class="vcard"><div class="vlabel">Misi Semester Ini</div><textarea class="vedit" id="misiText">' + esc(mission) + '</textarea></div>';
+  let html = '<div class="vcard"><div class="vlabel">Visi CG</div><textarea class="vedit" id="visiText" onblur="saveVisiCG()">' + esc(vision) + '</textarea></div>';
+  html += '<div class="vcard"><div class="vlabel">Misi Semester Ini</div><textarea class="vedit" id="misiText" onblur="saveVisiCG()">' + esc(mission) + '</textarea></div>';
 
   // Dev plan
   html += '<div class="section" style="margin-top:16px"><div class="section-title">\ud83d\udcc8 Rencana Pengembangan Member</div>';
   html += '<div style="font-size:11px;color:var(--g3);margin-bottom:12px">Pilih member yang akan dikembangkan ke posisi baru dan tentukan deadline</div>';
   html += '<div id="devPlanRows">';
-  const devPlan = JSON.parse(localStorage.getItem('cg_devplan_' + CUR_CG) || '[]');
+  const devPlan = await loadDevPlans(CUR_CG, CUR_REGION);
   devPlan.forEach((d, i) => {
     html += buildDevRow(d, i);
   });
   html += '</div>';
   html += '<button class="pel-add" style="margin-top:10px" onclick="addDevPlanRow()">+ Tambah member</button></div>';
-  html += '<button class="btn-purple" style="margin-top:12px" onclick="saveVisiCG()">\ud83d\udcbe Simpan Visi & Rencana</button>';
   el.innerHTML = html;
 }
 
 function buildDevRow(d, i) {
-  const roleCls = (d.currentRole||'member').toLowerCase();
-  return '<div class="dev-row"><div class="dev-name">' + esc(d.name||'') + '</div>' +
-    '<span class="dev-current rbadge ' + roleCls + '">' + esc(d.currentRole||'Member') + '</span>' +
+  const roleCls = (d.current_status||d.currentRole||'member').toLowerCase();
+  const memberName = d.member_name || d.name || '';
+  const currentRole = d.current_status || d.currentRole || 'Member';
+  const targetRole = d.target_status || d.target || 'Sponsor';
+  const rowId = d.id || '';
+  return '<div class="dev-row"><div class="dev-name">' + esc(memberName) + '</div>' +
+    '<span class="dev-current rbadge ' + roleCls + '">' + esc(currentRole) + '</span>' +
     '<span style="font-size:11px;color:var(--g3)">\u2192</span>' +
-    '<select class="dev-select" data-idx="'+i+'"><option>Target: CGL</option><option>Target: Sponsor</option><option>Target: Member</option></select>' +
-    '<input type="date" class="dev-date" value="' + (d.deadline||'') + '" data-idx="'+i+'"></div>';
+    '<select class="dev-select" data-idx="'+i+'"><option'+(targetRole==='CGL'?' selected':'')+'>Target: CGL</option><option'+(targetRole==='Sponsor'?' selected':'')+'>Target: Sponsor</option><option'+(targetRole==='Member'?' selected':'')+'>Target: Member</option></select>' +
+    '<input type="date" class="dev-date" value="' + (d.deadline||'') + '" data-idx="'+i+'">' +
+    (rowId ? '<button onclick="removeDevPlan('+rowId+')" style="background:none;border:none;cursor:pointer;color:var(--red);font-size:14px;padding:2px 6px" title="Hapus">&times;</button>' : '') +
+    '</div>';
 }
 
-function addDevPlanRow() {
+async function addDevPlanRow() {
   const names = MEMBERS.map(m => m.nama);
   const name = prompt('Pilih nama member:\n' + names.join('\n'));
   if (!name) return;
   const m = MEMBERS.find(x => x.nama.toLowerCase().includes(name.toLowerCase()));
   if (!m) { alert('Member tidak ditemukan'); return; }
-  const devPlan = JSON.parse(localStorage.getItem('cg_devplan_' + CUR_CG) || '[]');
-  devPlan.push({ name: m.nama, currentRole: m.status, target: 'Sponsor', deadline: '' });
-  localStorage.setItem('cg_devplan_' + CUR_CG, JSON.stringify(devPlan));
-  renderVisiCG();
-  toast('\u2713 Disimpan lokal');
+  await addDevPlan(CUR_CG, CUR_REGION, m.nama, m.status, 'Sponsor', '');
+  await renderVisiCG();
 }
 
-function saveVisiCG() {
-  localStorage.setItem('cg_vision_' + CUR_CG, document.getElementById('visiText').value);
-  localStorage.setItem('cg_mission_' + CUR_CG, document.getElementById('misiText').value);
-  toast('\u2713 Disimpan lokal');
+async function removeDevPlan(id) {
+  await deleteDevPlan(id);
+  await renderVisiCG();
+}
+
+async function saveVisiCG() {
+  const visiEl = document.getElementById('visiText');
+  const misiEl = document.getElementById('misiText');
+  if (!visiEl || !misiEl) return;
+  await saveVision(CUR_CG, CUR_REGION, visiEl.value, misiEl.value);
 }
 
 // ========== PELAYANAN TAB ==========
@@ -725,18 +844,13 @@ const DEFAULT_PEL_ROLES = [
   {name:'Sharing', abbr:'SH', color:'#dc2626', bg:'#fef2f2'}
 ];
 
-function getPelData() {
-  return JSON.parse(localStorage.getItem('cg_pelayanan_' + CUR_CG) || '{}');
-}
-function savePelData(data) {
-  localStorage.setItem('cg_pelayanan_' + CUR_CG, JSON.stringify(data));
-}
-function getPelRoles() {
-  const custom = JSON.parse(localStorage.getItem('cg_pel_roles_' + CUR_CG) || '[]');
-  return DEFAULT_PEL_ROLES.concat(custom);
-}
-function savePelRoles(roles) {
-  localStorage.setItem('cg_pel_roles_' + CUR_CG, JSON.stringify(roles));
+// getPelData and savePelData are now async and load from Supabase
+// They are replaced by loadPelayanan() + pelRowsToNested() and savePelayananCell()
+// getPelRoles is now async and loads from Supabase
+async function getPelRolesAsync() {
+  const custom = await loadCustomRoles(CUR_CG, CUR_REGION);
+  const mapped = custom.map(r => ({name: r.role_name, abbr: r.abbr, color: r.color, bg: r.bg}));
+  return DEFAULT_PEL_ROLES.concat(mapped);
 }
 
 function fmtWeekLabel(dateStr) {
@@ -745,13 +859,11 @@ function fmtWeekLabel(dateStr) {
   return d.getDate() + ' ' + months[d.getMonth()];
 }
 
-function renderPelayanan() {
+async function renderPelayanan() {
   const el = document.getElementById('tab-pelayanan');
-  const allData = getPelData();
+  const pelRows = await loadPelayanan(CUR_CG, CUR_REGION);
+  const allData = pelRowsToNested(pelRows);
   const months = Object.keys(allData).length ? Object.keys(allData) : ['April 2026'];
-
-  // Ensure default month exists in data
-  if (!Object.keys(allData).length) { allData['April 2026'] = {}; savePelData(allData); }
 
   // Set current month
   if (!CUR_PEL_MONTH || !allData[CUR_PEL_MONTH]) CUR_PEL_MONTH = months[0];
@@ -761,7 +873,7 @@ function renderPelayanan() {
   // Set current week
   if (!CUR_PEL_WEEK || !monthData[CUR_PEL_WEEK]) CUR_PEL_WEEK = weeks.length ? weeks[0] : null;
 
-  const roles = getPelRoles();
+  const roles = await getPelRolesAsync();
   const weekAssignments = CUR_PEL_WEEK ? (monthData[CUR_PEL_WEEK] || {}) : {};
 
   let html = '';
@@ -941,94 +1053,89 @@ function renderPelayanan() {
   el.innerHTML = html;
 }
 
-function switchPelMonth(month) {
+async function switchPelMonth(month) {
   CUR_PEL_MONTH = month;
   CUR_PEL_WEEK = null;
-  renderPelayanan();
+  await renderPelayanan();
 }
 
-function switchPelWeek(date) {
+async function switchPelWeek(date) {
   CUR_PEL_WEEK = date;
-  renderPelayanan();
+  await renderPelayanan();
 }
 
-function addPelMonth() {
+async function addPelMonth() {
   const name = prompt('Nama bulan (contoh: Mei 2026)');
   if (!name) return;
-  const data = getPelData();
-  if (data[name]) { toast('Bulan sudah ada'); return; }
-  data[name] = {};
-  savePelData(data);
+  // Save a placeholder row so the month appears in Supabase
+  await savePelayananCell(CUR_CG, CUR_REGION, name, '__placeholder__', '__placeholder__', '');
+  // Delete the placeholder immediately (month will persist in real rows when weeks are added)
+  await supa.from('cg_pelayanan').delete().eq('cg', CUR_CG).eq('region', CUR_REGION).eq('week_date', '__placeholder__');
   CUR_PEL_MONTH = name;
   CUR_PEL_WEEK = null;
-  renderPelayanan();
+  await renderPelayanan();
   toast('\u2713 Bulan ditambahkan');
 }
 
-function addPelWeek() {
+async function addPelWeek() {
   const dateInput = document.getElementById('pelNewDate');
   if (!dateInput || !dateInput.value) { alert('Pilih tanggal dulu'); return; }
-  const data = getPelData();
-  if (!data[CUR_PEL_MONTH]) data[CUR_PEL_MONTH] = {};
-  if (data[CUR_PEL_MONTH][dateInput.value]) { toast('Minggu sudah ada'); return; }
-  data[CUR_PEL_MONTH][dateInput.value] = {};
-  savePelData(data);
+  // Save a placeholder role to create the week in DB
+  const roles = await getPelRolesAsync();
+  if (roles.length) {
+    await savePelayananCell(CUR_CG, CUR_REGION, CUR_PEL_MONTH, dateInput.value, roles[0].name, '');
+  }
   CUR_PEL_WEEK = dateInput.value;
-  renderPelayanan();
+  await renderPelayanan();
   toast('\u2713 Minggu ditambahkan');
 }
 
-function editPelWeek(oldDate) {
+async function editPelWeek(oldDate) {
   const newDate = prompt('Edit tanggal (format YYYY-MM-DD)', oldDate);
   if (!newDate || newDate === oldDate) return;
-  const data = getPelData();
-  if (!data[CUR_PEL_MONTH] || !data[CUR_PEL_MONTH][oldDate]) return;
-  data[CUR_PEL_MONTH][newDate] = data[CUR_PEL_MONTH][oldDate];
-  delete data[CUR_PEL_MONTH][oldDate];
-  savePelData(data);
+  // Get all rows for old date and re-insert with new date
+  const {data: rows} = await supa.from('cg_pelayanan').select('*').eq('cg', CUR_CG).eq('region', CUR_REGION).eq('week_date', oldDate);
+  if (rows && rows.length) {
+    for (const r of rows) {
+      await savePelayananCell(CUR_CG, CUR_REGION, r.month, newDate, r.role_name, r.member_name);
+    }
+    await supa.from('cg_pelayanan').delete().eq('cg', CUR_CG).eq('region', CUR_REGION).eq('week_date', oldDate);
+  }
   if (CUR_PEL_WEEK === oldDate) CUR_PEL_WEEK = newDate;
-  renderPelayanan();
+  await renderPelayanan();
   toast('\u2713 Tanggal diubah');
 }
 
-function deletePelWeek(date) {
+async function deletePelWeek(date) {
   if (!confirm('Hapus minggu ' + fmtWeekLabel(date) + '?')) return;
-  const data = getPelData();
-  if (data[CUR_PEL_MONTH]) { delete data[CUR_PEL_MONTH][date]; savePelData(data); }
+  await deletePelWeekDB(CUR_CG, CUR_REGION, date);
   if (CUR_PEL_WEEK === date) CUR_PEL_WEEK = null;
-  renderPelayanan();
+  await renderPelayanan();
   toast('\u2713 Minggu dihapus');
 }
 
-function savePelAssignment(roleName, memberName) {
+async function savePelAssignment(roleName, memberName) {
   if (!CUR_PEL_WEEK) return;
-  const data = getPelData();
-  if (!data[CUR_PEL_MONTH]) data[CUR_PEL_MONTH] = {};
-  if (!data[CUR_PEL_MONTH][CUR_PEL_WEEK]) data[CUR_PEL_MONTH][CUR_PEL_WEEK] = {};
   if (memberName) {
-    data[CUR_PEL_MONTH][CUR_PEL_WEEK][roleName] = memberName;
+    await savePelayananCell(CUR_CG, CUR_REGION, CUR_PEL_MONTH, CUR_PEL_WEEK, roleName, memberName);
   } else {
-    delete data[CUR_PEL_MONTH][CUR_PEL_WEEK][roleName];
+    await supa.from('cg_pelayanan').delete().eq('cg', CUR_CG).eq('region', CUR_REGION).eq('week_date', CUR_PEL_WEEK).eq('role_name', roleName);
+    toast('\u2713 Disimpan');
   }
-  savePelData(data);
-  // Re-render to update stats
-  renderPelayanan();
-  toast('\u2713 Disimpan');
+  await renderPelayanan();
 }
 
-function addPelRole() {
+async function addPelRole() {
   const name = prompt('Nama role custom (contoh: Worship Leader)');
   if (!name) return;
   const abbr = prompt('Singkatan (2-3 huruf, contoh: WL)', name.substring(0,2).toUpperCase());
   if (!abbr) return;
   const colors = ['#7c3aed','#0891b2','#be185d','#4f46e5','#059669','#ca8a04'];
   const bgs = ['#f5f3ff','#ecfeff','#fdf2f8','#eef2ff','#ecfdf5','#fefce8'];
-  const idx = getPelRoles().length % colors.length;
-  const custom = JSON.parse(localStorage.getItem('cg_pel_roles_' + CUR_CG) || '[]');
-  custom.push({name: name, abbr: abbr.toUpperCase(), color: colors[idx], bg: bgs[idx]});
-  savePelRoles(custom);
-  renderPelayanan();
-  toast('\u2713 Role ditambahkan');
+  const currentRoles = await getPelRolesAsync();
+  const idx = currentRoles.length % colors.length;
+  await addCustomRole(CUR_CG, CUR_REGION, name, abbr.toUpperCase(), colors[idx], bgs[idx]);
+  await renderPelayanan();
 }
 
 function ajakMember(name) {
@@ -1139,8 +1246,8 @@ async function renderEvents() {
   const { data: events } = await supa.from('events').select('*').order('date_start');
   ALL_EVENTS = events || [];
 
-  // Load CG-specific events from localStorage
-  const cgEvents = JSON.parse(localStorage.getItem('cg_events_' + CUR_CG) || '[]');
+  // Load CG-specific events from Supabase
+  const cgEvents = await loadCGEventsForCG(CUR_CG, CUR_REGION);
 
   // Birthdays from members
   const birthdays = MEMBERS.filter(m => m.lahir).map(m => ({
@@ -1163,7 +1270,7 @@ async function renderEvents() {
   html += '<div style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--g3);margin:20px 0 10px">\ud83d\udccb Event CG Ini</div>';
   cgEvents.forEach(ev => {
     const catColor = ev.cat === 'Ibadah' ? 'var(--green)' : ev.cat === 'Outreach' ? 'var(--purple)' : ev.cat === 'Birthday' ? '#ec4899' : 'var(--blue)';
-    html += '<div class="ev-card" style="border-left-color:'+catColor+'"><div class="ev-date">'+esc(ev.date||'')+'</div><div class="ev-name">'+esc(ev.name||'')+'</div><div class="ev-note">'+esc(ev.note||'')+'</div><span class="ev-cat" style="background:rgba(0,0,0,.05);color:'+catColor+'">'+esc(ev.cat||'')+'</span></div>';
+    html += '<div class="ev-card" style="border-left-color:'+catColor+'"><div class="ev-date">'+esc(ev.date_start||ev.date||'')+'</div><div class="ev-name">'+esc(ev.name||'')+'</div><div class="ev-note">'+esc(ev.note||'')+'</div><span class="ev-cat" style="background:rgba(0,0,0,.05);color:'+catColor+'">'+esc(ev.cat||'')+'</span></div>';
   });
 
   // Birthdays
@@ -1175,21 +1282,21 @@ async function renderEvents() {
   el.innerHTML = html;
 }
 
-function saveCGEvent() {
+async function saveCGEvent() {
   const name = document.getElementById('evName').value.trim();
   if (!name) { alert('Nama event harus diisi'); return; }
   const ev = {
+    cg: CUR_CG,
+    region: CUR_REGION,
+    is_shared: false,
     name,
-    date: document.getElementById('evDate').value,
+    date_start: document.getElementById('evDate').value,
     cat: document.getElementById('evCat').value,
     note: document.getElementById('evNote').value
   };
-  const cgEvents = JSON.parse(localStorage.getItem('cg_events_' + CUR_CG) || '[]');
-  cgEvents.push(ev);
-  localStorage.setItem('cg_events_' + CUR_CG, JSON.stringify(cgEvents));
+  await addCGEvent(ev);
   closeModal('addCGEventModal');
-  renderEvents();
-  toast('\u2713 Disimpan lokal');
+  await renderEvents();
 }
 
 // ========== NAVIGATION ==========
@@ -1240,8 +1347,8 @@ async function loadCoachData() {
   renderCoachOverview();
   renderCoachAbsensi();
   renderCoachMilestone();
-  renderCoachVisi();
-  renderCoachEvents();
+  await renderCoachVisi();
+  await renderCoachEvents();
 }
 
 function getCGsForRegion(reg) {
@@ -1441,10 +1548,24 @@ function renderCoachMilestone() {
   el.innerHTML = html;
 }
 
-function renderCoachVisi() {
+async function renderCoachVisi() {
   const el = document.getElementById('tab-c-visi');
   const region = coachRole === 'tl' ? 'all' : coachReg;
   const cgs = getCGsForRegion(region);
+
+  // Load all vision, coach notes, and dev plans in parallel for all CGs
+  const cgDataPromises = cgs.map(async cg => {
+    const cgRegion = (ALL_MEMBERS.find(m => m.cg === cg) || {}).region || 'jaktim1';
+    const [visionData, coachNote, devPlan] = await Promise.all([
+      loadVision(cg, cgRegion),
+      loadCoachNote(cg, cgRegion),
+      loadDevPlans(cg, cgRegion)
+    ]);
+    return { cg, region: cgRegion, vision: visionData.visi || '', mission: visionData.misi || '', coachNotes: coachNote, devPlan };
+  });
+  const cgDataArr = await Promise.all(cgDataPromises);
+  const cgDataMap = {};
+  cgDataArr.forEach(d => { cgDataMap[d.cg] = d; });
 
   let html = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">';
   html += '<div style="font-size:11px;color:var(--g3)">Edit visi & misi setiap CG. Tambahkan feedback.</div>';
@@ -1458,10 +1579,12 @@ function renderCoachVisi() {
     const color = CG_COLORS[cg] || '#7c3aed';
     const bg = CG_BG[cg] || '#faf5ff';
     const init = CG_INIT[cg] || cg.replace('TEEN ','T');
-    const vision = localStorage.getItem('cg_vision_'+cg) || '';
-    const mission = localStorage.getItem('cg_mission_'+cg) || '';
-    const coachNotes = localStorage.getItem('coach_notes_'+cg) || '';
-    const devPlan = JSON.parse(localStorage.getItem('cg_devplan_'+cg) || '[]');
+    const cd = cgDataMap[cg] || {};
+    const vision = cd.vision || '';
+    const mission = cd.mission || '';
+    const coachNotes = cd.coachNotes || '';
+    const devPlan = cd.devPlan || [];
+    const cgRegion = cd.region || 'jaktim1';
 
     html += '<div style="background:var(--white);border-radius:16px;overflow:hidden;margin-bottom:16px;box-shadow:0 2px 12px rgba(0,0,0,.04)">';
     html += '<div style="background:linear-gradient(135deg,'+bg+','+bg+'cc);padding:16px 20px;display:flex;align-items:center;justify-content:space-between">';
@@ -1471,8 +1594,8 @@ function renderCoachVisi() {
 
     html += '<div style="padding:16px 20px">';
     html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">';
-    html += '<div style="background:var(--g6);border-radius:10px;padding:10px"><div style="font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--g3);margin-bottom:4px">Visi</div><textarea class="vedit" style="min-height:40px;font-size:12px" data-cg="'+cg+'" data-type="vision" onblur="saveCoachVisi(this)">'+esc(vision)+'</textarea></div>';
-    html += '<div style="background:var(--g6);border-radius:10px;padding:10px"><div style="font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--g3);margin-bottom:4px">Misi</div><textarea class="vedit" style="min-height:40px;font-size:12px" data-cg="'+cg+'" data-type="mission" onblur="saveCoachVisi(this)">'+esc(mission)+'</textarea></div>';
+    html += '<div style="background:var(--g6);border-radius:10px;padding:10px"><div style="font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--g3);margin-bottom:4px">Visi</div><textarea class="vedit" style="min-height:40px;font-size:12px" data-cg="'+cg+'" data-region="'+cgRegion+'" data-type="vision" onblur="saveCoachVisiField(this)">'+esc(vision)+'</textarea></div>';
+    html += '<div style="background:var(--g6);border-radius:10px;padding:10px"><div style="font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--g3);margin-bottom:4px">Misi</div><textarea class="vedit" style="min-height:40px;font-size:12px" data-cg="'+cg+'" data-region="'+cgRegion+'" data-type="mission" onblur="saveCoachVisiField(this)">'+esc(mission)+'</textarea></div>';
     html += '</div>';
 
     // Dev plan
@@ -1480,9 +1603,11 @@ function renderCoachVisi() {
     html += '<div style="font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--g3);margin-bottom:8px">\ud83d\udcc8 Rencana Pengembangan oleh CGL</div>';
     if (devPlan.length) {
       devPlan.forEach(d => {
-        const roleCls = (d.currentRole||'member').toLowerCase();
-        const targetCls = (d.target||'sponsor').toLowerCase().replace('target: ','');
-        html += '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--g6);font-size:12px"><span style="font-weight:500;flex:1">'+esc(d.name)+'</span><span class="role-btn '+roleCls+'" style="cursor:default;font-size:9px;padding:2px 8px">'+esc(d.currentRole)+'</span><span style="color:var(--g4)">\u2192</span><span class="role-btn sponsor" style="cursor:default;font-size:9px;padding:2px 8px">'+esc(d.target||'Sponsor')+'</span><span style="font-size:10px;color:var(--g3);min-width:65px;text-align:right">'+esc(d.deadline||'')+'</span></div>';
+        const roleCls = (d.current_status||d.currentRole||'member').toLowerCase();
+        const memberName = d.member_name || d.name || '';
+        const currentRole = d.current_status || d.currentRole || 'Member';
+        const targetRole = d.target_status || d.target || 'Sponsor';
+        html += '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--g6);font-size:12px"><span style="font-weight:500;flex:1">'+esc(memberName)+'</span><span class="role-btn '+roleCls+'" style="cursor:default;font-size:9px;padding:2px 8px">'+esc(currentRole)+'</span><span style="color:var(--g4)">\u2192</span><span class="role-btn sponsor" style="cursor:default;font-size:9px;padding:2px 8px">'+esc(targetRole)+'</span><span style="font-size:10px;color:var(--g3);min-width:65px;text-align:right">'+esc(d.deadline||'')+'</span></div>';
       });
     } else {
       html += '<div style="font-size:11px;color:var(--g3);font-style:italic">Belum ada data dev plan</div>';
@@ -1490,31 +1615,51 @@ function renderCoachVisi() {
     html += '</div>';
 
     // Coach notes
-    html += '<div style="background:linear-gradient(135deg,'+bg+','+bg+'aa);border:1px dashed '+color+'80;border-radius:10px;padding:10px"><div style="font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:'+color+';margin-bottom:4px">\ud83d\udcac Catatan Coach</div><textarea class="vedit" style="min-height:36px;font-size:12px;border-color:'+color+'80" data-cg="'+cg+'" data-type="coach_notes" onblur="saveCoachVisi(this)">'+esc(coachNotes)+'</textarea></div>';
+    html += '<div style="background:linear-gradient(135deg,'+bg+','+bg+'aa);border:1px dashed '+color+'80;border-radius:10px;padding:10px"><div style="font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:'+color+';margin-bottom:4px">\ud83d\udcac Catatan Coach</div><textarea class="vedit" style="min-height:36px;font-size:12px;border-color:'+color+'80" data-cg="'+cg+'" data-region="'+cgRegion+'" data-type="coach_notes" onblur="saveCoachVisiField(this)">'+esc(coachNotes)+'</textarea></div>';
     html += '</div></div>';
   });
 
-  html += '<button class="btn-purple" style="margin-top:4px;width:100%" onclick="toast(\'\u2713 Disimpan lokal\')">\ud83d\udcbe Simpan Semua Visi & Catatan</button>';
   el.innerHTML = html;
 }
 
-function saveCoachVisi(textarea) {
+async function saveCoachVisiField(textarea) {
   const cg = textarea.dataset.cg;
+  const cgRegion = textarea.dataset.region;
   const type = textarea.dataset.type;
-  const key = type === 'vision' ? 'cg_vision_'+cg : type === 'mission' ? 'cg_mission_'+cg : 'coach_notes_'+cg;
-  localStorage.setItem(key, textarea.value);
-  toast('\u2713 Disimpan lokal');
+  if (type === 'coach_notes') {
+    await saveCoachNoteDB(cg, cgRegion, textarea.value);
+  } else {
+    // Need to load existing vision data to preserve the other field
+    const existing = await loadVision(cg, cgRegion);
+    const visi = type === 'vision' ? textarea.value : (existing.visi || '');
+    const misi = type === 'mission' ? textarea.value : (existing.misi || '');
+    await saveVision(cg, cgRegion, visi, misi);
+  }
 }
 
-function renderCoachEvents() {
+async function renderCoachEvents() {
   const el = document.getElementById('tab-c-events');
   const cgs = coachRole === 'tl' ? getCGsForRegion('all') : getCGsForRegion(coachReg);
 
+  // Load all CG events from Supabase
+  const allCGEventsData = await loadAllCGEvents();
+  const sharedEvents = allCGEventsData.filter(e => e.is_shared);
+  const perCGEvents = {};
+  allCGEventsData.filter(e => !e.is_shared).forEach(e => {
+    if (!perCGEvents[e.cg]) perCGEvents[e.cg] = [];
+    perCGEvents[e.cg].push(e);
+  });
+
   let html = '<div class="filter-chips"><span class="chip on">Semua</span><span class="chip">Ibadah</span><span class="chip">CG Event</span><span class="chip">Birthday</span><span class="chip">Outreach</span></div>';
 
-  // Shared events
+  // Shared events from events table (global)
   html += '<div style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--g3);margin-bottom:10px;margin-top:4px">Event Semua CG</div>';
   ALL_EVENTS.forEach(ev => {
+    const catColor = ev.cat === 'Ibadah' ? 'var(--green)' : ev.cat === 'Outreach' ? 'var(--purple)' : ev.cat === 'Birthday' ? '#ec4899' : 'var(--blue)';
+    html += '<div class="ev-card" style="border-left-color:'+catColor+'"><div class="ev-date">'+esc(ev.date_start||'')+'</div><div class="ev-name">'+esc(ev.name||'')+'</div><div class="ev-note">'+esc(ev.note||'')+'</div><span class="ev-cat" style="background:rgba(0,0,0,.05);color:'+catColor+'">'+esc(ev.cat||'')+'</span><span class="ev-cat" style="background:rgba(108,92,231,.06);color:var(--purple);margin-left:4px">Semua CG</span></div>';
+  });
+  // Shared CG events
+  sharedEvents.forEach(ev => {
     const catColor = ev.cat === 'Ibadah' ? 'var(--green)' : ev.cat === 'Outreach' ? 'var(--purple)' : ev.cat === 'Birthday' ? '#ec4899' : 'var(--blue)';
     html += '<div class="ev-card" style="border-left-color:'+catColor+'"><div class="ev-date">'+esc(ev.date_start||'')+'</div><div class="ev-name">'+esc(ev.name||'')+'</div><div class="ev-note">'+esc(ev.note||'')+'</div><span class="ev-cat" style="background:rgba(0,0,0,.05);color:'+catColor+'">'+esc(ev.cat||'')+'</span><span class="ev-cat" style="background:rgba(108,92,231,.06);color:var(--purple);margin-left:4px">Semua CG</span></div>';
   });
@@ -1522,11 +1667,11 @@ function renderCoachEvents() {
   // Per-CG events
   html += '<div style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--g3);margin:20px 0 10px">Event per CG</div>';
   cgs.forEach(cg => {
-    const cgEvents = JSON.parse(localStorage.getItem('cg_events_'+cg) || '[]');
+    const cgEvents = perCGEvents[cg] || [];
     const color = CG_COLORS[cg] || '#7c3aed';
     cgEvents.forEach(ev => {
       const catColor = ev.cat === 'Ibadah' ? 'var(--green)' : ev.cat === 'Outreach' ? 'var(--purple)' : ev.cat === 'Birthday' ? '#ec4899' : 'var(--blue)';
-      html += '<div class="ev-card" style="border-left-color:'+color+'"><div class="ev-date">'+esc(ev.date||'')+'</div><div class="ev-name">'+esc(ev.name||'')+'</div><div class="ev-note">'+esc(ev.note||'')+'</div><span class="ev-cat" style="background:rgba(0,0,0,.05);color:'+catColor+'">'+esc(ev.cat||'')+'</span><span class="ev-cat" style="background:rgba(0,0,0,.05);color:'+color+';margin-left:4px">'+esc(cg)+'</span></div>';
+      html += '<div class="ev-card" style="border-left-color:'+color+'"><div class="ev-date">'+esc(ev.date_start||'')+'</div><div class="ev-name">'+esc(ev.name||'')+'</div><div class="ev-note">'+esc(ev.note||'')+'</div><span class="ev-cat" style="background:rgba(0,0,0,.05);color:'+catColor+'">'+esc(ev.cat||'')+'</span><span class="ev-cat" style="background:rgba(0,0,0,.05);color:'+color+';margin-left:4px">'+esc(cg)+'</span></div>';
     });
 
     // Birthdays
@@ -1545,7 +1690,7 @@ function renderCoachEvents() {
   html += '<textarea id="coachEvNote" placeholder="Catatan event..." style="width:100%;padding:8px 10px;border:1px solid var(--g5);border-radius:8px;font-size:12px;font-family:\'Inter\',sans-serif;resize:vertical;min-height:40px;margin-bottom:8px"></textarea>';
   html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">';
   html += '<select class="cgl-select" id="coachEvCat" style="padding:8px 28px 8px 10px;font-size:12px;border-radius:8px"><option value="Ibadah">Ibadah</option><option value="CG Event">CG Event</option><option value="Birthday">Birthday</option><option value="Outreach">Outreach</option></select>';
-  html += '<select class="cgl-select" id="coachEvTarget" style="padding:8px 28px 8px 10px;font-size:12px;border-radius:8px"><option value="all">Semua CG</option>';
+  html += '<select class="cgl-select" id="coachEvTarget" style="padding:8px 28px 8px 10px;font-size:12px;border-radius:8px"><option value="all">Semua CG (shared)</option>';
   getCGsForRegion('all').forEach(cg => { html += '<option value="'+cg+'">'+cg+'</option>'; });
   html += '</select></div>';
   html += '<button class="btn-purple" style="width:100%" onclick="saveCoachEvent()">\ud83d\udcbe Simpan Event</button></div>';
@@ -1553,34 +1698,31 @@ function renderCoachEvents() {
   el.innerHTML = html;
 }
 
-function saveCoachEvent() {
+async function saveCoachEvent() {
   const name = document.getElementById('coachEvName').value.trim();
   if (!name) { alert('Nama event harus diisi'); return; }
   const target = document.getElementById('coachEvTarget').value;
-  const ev = {
-    name,
-    date: document.getElementById('coachEvDate').value,
-    cat: document.getElementById('coachEvCat').value,
-    note: document.getElementById('coachEvNote').value
-  };
+  const dateVal = document.getElementById('coachEvDate').value;
+  const cat = document.getElementById('coachEvCat').value;
+  const note = document.getElementById('coachEvNote').value;
 
   if (target === 'all') {
-    // Save to all CGs
-    getCGsForRegion('all').forEach(cg => {
-      const arr = JSON.parse(localStorage.getItem('cg_events_'+cg) || '[]');
-      arr.push(ev);
-      localStorage.setItem('cg_events_'+cg, JSON.stringify(arr));
+    // Save as shared event
+    await addCGEvent({
+      cg: 'ALL', region: 'all', is_shared: true,
+      name, date_start: dateVal, cat, note
     });
   } else {
-    const arr = JSON.parse(localStorage.getItem('cg_events_'+target) || '[]');
-    arr.push(ev);
-    localStorage.setItem('cg_events_'+target, JSON.stringify(arr));
+    const cgRegion = (ALL_MEMBERS.find(m => m.cg === target) || {}).region || 'jaktim1';
+    await addCGEvent({
+      cg: target, region: cgRegion, is_shared: false,
+      name, date_start: dateVal, cat, note
+    });
   }
-  renderCoachEvents();
-  toast('\u2713 Disimpan lokal');
+  await renderCoachEvents();
 }
 
-function switchRole(role) {
+async function switchRole(role) {
   coachRole = role;
   const coachBtn = document.getElementById('roleCoachBtn');
   const tlBtn = document.getElementById('roleTLBtn');
@@ -1601,8 +1743,8 @@ function switchRole(role) {
   renderCoachOverview();
   renderCoachAbsensi();
   renderCoachMilestone();
-  renderCoachVisi();
-  renderCoachEvents();
+  await renderCoachVisi();
+  await renderCoachEvents();
 }
 
 // ========== UTILITY ==========
