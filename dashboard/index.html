@@ -1,0 +1,1636 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AOG Teens — CG Dashboard (Live)</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#f8f8f5;color:#1c1c1c;min-height:100vh}
+:root{--purple:#6C5CE7;--green:#16a34a;--blue:#2563eb;--orange:#d97706;--red:#dc2626;--g1:#1c1c1c;--g2:#555;--g3:#888;--g4:#bbb;--g5:#ddd;--g6:#f0f0ed;--white:#fff;
+--H:#16a34a;--Hb:#f0fdf4;--Hbr:#bbf7d0;--I:#2563eb;--Ib:#eff6ff;--Ibr:#bfdbfe;--S:#d97706;--Sb:#fffbeb;--Sbr:#fde68a;--A:#dc2626;--Ab:#fef2f2;--Abr:#fecaca}
+
+/* Landing */
+.landing{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.landing-title{font-family:'Instrument Serif',serif;font-size:32px;margin-bottom:2px}
+.landing-sub{font-size:11px;color:var(--g3);letter-spacing:2px;text-transform:uppercase;margin-bottom:36px}
+.region-toggle{display:flex;background:#e8e8e8;border-radius:24px;padding:3px;margin-bottom:28px}
+.region-btn{padding:10px 32px;border-radius:22px;border:none;font-size:14px;font-weight:700;cursor:pointer;transition:all .25s;background:transparent;color:var(--g3)}
+.region-btn.active{background:var(--purple);color:#fff;box-shadow:0 2px 10px rgba(108,92,231,.3)}
+.cgl-selector{width:100%;max-width:400px;margin-bottom:20px}
+.cgl-select{width:100%;padding:14px 18px;border:2px solid var(--g5);border-radius:14px;font-size:14px;font-family:'Inter',sans-serif;font-weight:500;appearance:none;background:var(--white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 16px center;cursor:pointer}
+.cgl-select:focus{outline:none;border-color:var(--purple)}
+.enter-btn{width:100%;max-width:400px;padding:14px;border:none;border-radius:14px;background:var(--purple);color:#fff;font-size:15px;font-weight:700;cursor:pointer}
+.enter-btn:disabled{background:var(--g5);color:var(--g4);cursor:not-allowed}
+
+/* App shell */
+.app{display:none}
+.app-nav{background:var(--white);border-bottom:1px solid var(--g5);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.app-nav-left{display:flex;align-items:center;gap:10px}
+.app-back{font-size:18px;cursor:pointer;color:var(--g3)}
+.app-back:hover{color:var(--g1)}
+.app-cg-badge{padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:.8px}
+.app-cgl{font-size:13px;font-weight:600}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+.app-hero{padding:24px 20px 20px;border-bottom:1px solid var(--g5);background:var(--white)}
+.app-hero-tag{font-size:10px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:var(--g4);margin-bottom:6px}
+.app-hero-h{font-family:'Instrument Serif',serif;font-size:clamp(26px,5vw,42px);line-height:1.05;color:var(--g1)}
+.app-hero-h em{font-style:italic;color:var(--g3)}
+.app-hero-meta{font-size:12px;color:var(--g3);margin-top:6px}
+
+.app-stats{display:grid;grid-template-columns:repeat(4,1fr);background:var(--white);border-bottom:1px solid var(--g5)}
+.app-stat{padding:14px 12px;text-align:center;border-right:1px solid var(--g5)}
+.app-stat:last-child{border-right:none}
+.app-stat-label{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--g3)}
+.app-stat-num{font-family:'Instrument Serif',serif;font-size:24px;margin-top:2px}
+.app-stat-pct{font-size:10px;color:var(--g3)}
+.ct .app-stat-num{color:var(--green)}.cb .app-stat-num{color:var(--blue)}.co .app-stat-num{color:var(--orange)}.cr .app-stat-num{color:var(--red)}
+
+.app-body{max-width:900px;margin:0 auto;padding:0 16px}
+.app-tabs{display:flex;gap:0;padding:12px 0 0;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--g5);background:var(--white);margin:0 -16px;padding-left:16px;position:sticky;top:49px;z-index:99}
+.app-tabs::-webkit-scrollbar{display:none}
+.app-tab{padding:8px 14px;font-size:12px;font-weight:600;color:var(--g3);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .2s}
+.app-tab:hover{color:var(--g1)}
+.app-tab.on{color:var(--g1);border-bottom-color:var(--purple)}
+
+.tab-content{display:none;padding:20px 0}
+.tab-content.active{display:block}
+
+/* Shared */
+.section{background:var(--white);border:1px solid var(--g5);border-radius:12px;padding:16px;margin-bottom:14px}
+.section-title{font-size:13px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.filter-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.chip{font-size:10px;padding:4px 10px;border-radius:12px;border:1px solid var(--g5);color:var(--g3);cursor:pointer;transition:all .15s}
+.chip:hover{border-color:var(--purple);color:var(--purple)}
+.chip.on{background:var(--g1);color:#fff;border-color:var(--g1)}
+.chip.green{background:var(--Hb);color:var(--green);border-color:var(--Hbr)}
+.chip.red{background:var(--Ab);color:var(--red);border-color:var(--Abr)}
+
+/* Dots */
+.dot{width:28px;height:28px;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;cursor:pointer;transition:all .15s}
+.dot:hover{transform:scale(1.15)}
+.dot.H{background:var(--Hb);color:var(--H);border:1px solid var(--Hbr)}
+.dot.I{background:var(--Ib);color:var(--I);border:1px solid var(--Ibr)}
+.dot.S{background:var(--Sb);color:var(--S);border:1px solid var(--Sbr)}
+.dot.A{background:var(--Ab);color:var(--A);border:1px solid var(--Abr)}
+.dot.X{color:var(--g4);background:var(--g6);border:1px solid var(--g5)}
+
+/* Tables */
+.t{width:100%;border-collapse:collapse}
+.t th{padding:8px 10px;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--g3);font-weight:500;border-bottom:1px solid var(--g5);text-align:center}
+.t th:first-child{text-align:left}
+.t td{padding:10px;border-bottom:1px solid var(--g6);text-align:center;font-size:12px}
+.t td:first-child{text-align:left}
+.name-cell{font-weight:500;min-width:130px}
+.role-tag{font-size:9px;color:var(--g4);display:block}
+
+/* Pct bar */
+.pbar{display:flex;align-items:center;gap:6px}
+.pbar-track{flex:1;height:3px;background:var(--g5);border-radius:3px;overflow:hidden;min-width:30px}
+.pbar-fill{height:100%;border-radius:3px}
+.pbar-val{font-family:'Instrument Serif',serif;font-size:15px;min-width:36px;text-align:right}
+
+/* Detail cards */
+.dcard{border:1px solid var(--g5);border-radius:12px;padding:14px;margin-bottom:12px}
+.dcard:hover{border-color:var(--purple)}
+.dcard-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.dcard-name{font-weight:600;font-size:14px}
+.rbadge{font-size:10px;padding:2px 8px;border-radius:4px;font-weight:600}
+.rbadge.cgl{background:#f0fdf4;color:var(--green);border:1px solid #bbf7d0}
+.rbadge.sponsor{background:#eff6ff;color:var(--blue);border:1px solid #bfdbfe}
+.rbadge.member{background:#faf5ff;color:#7c3aed;border:1px solid #c4b5fd}
+.rbadge.simpatisan{background:#fff7ed;color:var(--orange);border:1px solid #fdba74}
+.rbadge.vip{background:#fef2f2;color:var(--red);border:1px solid #fecaca}
+
+/* Role selector custom */
+.role-wrap{position:relative;display:inline-block}
+.role-btn{font-size:10px;padding:4px 12px;border-radius:20px;font-weight:700;cursor:pointer;border:none;letter-spacing:.3px;display:inline-flex;align-items:center;gap:4px;transition:all .15s}
+.role-btn:hover{opacity:.85;transform:scale(1.03)}
+.role-btn::after{content:'';width:0;height:0;border-left:3.5px solid transparent;border-right:3.5px solid transparent;border-top:4px solid currentColor;opacity:.5}
+.role-btn.cgl{background:#dcfce7;color:#15803d}
+.role-btn.sponsor{background:#dbeafe;color:#1d4ed8}
+.role-btn.member{background:#ede9fe;color:#6d28d9}
+.role-btn.simpatisan{background:#ffedd5;color:#c2410c}
+.role-btn.vip{background:#ffe4e6;color:#be123c}
+.role-menu{display:none;position:absolute;right:0;top:calc(100% + 6px);background:var(--white);border:1px solid var(--g5);border-radius:12px;padding:6px;box-shadow:0 8px 30px rgba(0,0,0,.12);z-index:50;min-width:140px}
+.role-menu.show{display:block;animation:fadeIn .15s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.role-opt{padding:7px 12px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background .1s}
+.role-opt:hover{background:var(--g6)}
+.role-opt .rdot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.role-opt.cgl .rdot{background:#16a34a}
+.role-opt.sponsor .rdot{background:#2563eb}
+.role-opt.member .rdot{background:#7c3aed}
+.role-opt.simpatisan .rdot{background:#d97706}
+.role-opt.vip .rdot{background:#dc2626}
+.dgrid{display:grid;grid-template-columns:1fr 1fr;gap:5px;font-size:11px;color:var(--g2);margin-bottom:8px}
+.dgrid span{display:flex;align-items:center;gap:4px}
+
+/* Milestone chips */
+.ms-chips{display:flex;gap:5px;flex-wrap:wrap}
+.msc{padding:2px 7px;border-radius:5px;font-size:9px;font-weight:600;cursor:pointer}
+.msc.done{background:#f0fdf4;color:var(--green);border:1px solid #bbf7d0}
+.msc.pending{background:#f5f5f4;color:var(--g4);border:1px solid var(--g5)}
+.ms-bar{height:4px;background:var(--g5);border-radius:4px;overflow:hidden;margin-bottom:6px}
+.ms-bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--green),#34d399)}
+
+/* Notes */
+.note{width:100%;border:1px solid var(--g5);border-radius:8px;padding:8px 10px;font-size:11px;font-family:'Inter',sans-serif;resize:vertical;min-height:40px;outline:none;margin-top:6px}
+.note:focus{border-color:var(--purple)}
+.note-h{font-size:9px;color:var(--g4);margin-top:2px}
+
+/* Vision */
+.vcard{background:var(--g6);border-radius:10px;padding:14px;margin-bottom:10px}
+.vlabel{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--g3);margin-bottom:4px}
+.vedit{width:100%;border:1px dashed var(--g5);border-radius:8px;padding:10px 12px;font-size:13px;font-family:'Inter',sans-serif;line-height:1.6;min-height:50px;background:var(--white);resize:vertical;outline:none}
+.vedit:focus{border-color:var(--purple)}
+.btn-purple{padding:8px 20px;border:none;border-radius:8px;background:var(--purple);color:#fff;font-size:12px;font-weight:600;cursor:pointer}
+
+/* Pelayanan table */
+.pel-select{padding:4px 8px;border:1px solid var(--g5);border-radius:6px;font-size:11px;font-family:'Inter',sans-serif;outline:none;min-width:100px}
+.pel-select:focus{border-color:var(--purple)}
+.pel-add{padding:4px 10px;border:1px dashed var(--g5);border-radius:6px;font-size:11px;color:var(--g3);cursor:pointer;background:none}
+.pel-add:hover{border-color:var(--purple);color:var(--purple)}
+
+/* Event cards */
+.ev-card{background:var(--white);border:1px solid var(--g5);border-radius:12px;padding:14px;margin-bottom:10px;border-left:4px solid var(--purple)}
+.ev-date{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--purple);margin-bottom:3px}
+.ev-name{font-weight:700;font-size:14px;margin-bottom:3px}
+.ev-note{font-size:12px;color:var(--g3);line-height:1.4}
+.ev-cat{display:inline-block;padding:2px 8px;border-radius:4px;font-size:9px;font-weight:600;margin-top:6px}
+
+/* Dev plan */
+.dev-row{display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--g6);flex-wrap:wrap}
+.dev-name{font-weight:500;font-size:13px;min-width:140px}
+.dev-select{padding:6px 10px;border:1px solid var(--g5);border-radius:8px;font-size:12px;font-family:'Inter',sans-serif;outline:none}
+.dev-select:focus{border-color:var(--purple)}
+.dev-date{padding:6px 10px;border:1px solid var(--g5);border-radius:8px;font-size:12px;font-family:'Inter',sans-serif;outline:none}
+.dev-current{font-size:10px;padding:2px 8px;border-radius:4px;font-weight:600}
+
+/* Coach */
+.coach-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-top:16px}
+.coach-card{background:var(--white);border:1px solid var(--g5);border-radius:14px;padding:18px;cursor:pointer;transition:all .2s}
+.coach-card:hover{border-color:var(--purple);box-shadow:0 4px 16px rgba(0,0,0,.06);transform:translateY(-2px)}
+
+/* Toast */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:#1c1c1c;color:#fff;padding:10px 20px;border-radius:10px;font-size:12px;font-weight:600;z-index:9999;transition:transform .3s ease;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* Loading */
+.loading-msg{text-align:center;padding:40px;color:var(--g3);font-size:13px}
+
+/* Modal */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;align-items:center;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal-box{background:var(--white);border-radius:16px;padding:24px;max-width:420px;width:90%;max-height:80vh;overflow-y:auto}
+.modal-title{font-size:15px;font-weight:700;margin-bottom:14px}
+.modal-input{width:100%;padding:10px 12px;border:1px solid var(--g5);border-radius:8px;font-size:13px;font-family:'Inter',sans-serif;margin-bottom:8px;outline:none}
+.modal-input:focus{border-color:var(--purple)}
+
+@media(max-width:640px){
+  .app-stats{grid-template-columns:repeat(2,1fr)}
+  .app-stat{border-bottom:1px solid var(--g5)}
+  .dgrid{grid-template-columns:1fr}
+  .region-btn{padding:8px 24px;font-size:13px}
+  .dev-row{flex-direction:column;align-items:flex-start;gap:6px}
+  #visiCardsContainer > div[style*="grid-template-columns:repeat(2"]{grid-template-columns:1fr !important}
+}
+</style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ADD MEMBER MODAL -->
+<div class="modal-overlay" id="addMemberModal">
+  <div class="modal-box">
+    <div class="modal-title">+ Tambah Member Baru</div>
+    <input class="modal-input" id="newNama" placeholder="Nama lengkap">
+    <select class="modal-input" id="newStatus">
+      <option value="Member">Member</option><option value="Sponsor">Sponsor</option><option value="Simpatisan">Simpatisan</option><option value="VIP">VIP</option><option value="CGL">CGL</option>
+    </select>
+    <input class="modal-input" id="newWa" placeholder="No. WA (08xxx)">
+    <input class="modal-input" id="newLahir" type="date" placeholder="Tanggal lahir">
+    <input class="modal-input" id="newSekolah" placeholder="Sekolah">
+    <input class="modal-input" id="newKelas" placeholder="Kelas">
+    <input class="modal-input" id="newKelurahan" placeholder="Kelurahan">
+    <input class="modal-input" id="newKecamatan" placeholder="Kecamatan">
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="btn-purple" style="flex:1" onclick="saveNewMember()">Simpan</button>
+      <button class="pel-add" style="flex:1;padding:10px" onclick="closeModal('addMemberModal')">Batal</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD CG EVENT MODAL -->
+<div class="modal-overlay" id="addCGEventModal">
+  <div class="modal-box">
+    <div class="modal-title">+ Tambah Event CG</div>
+    <input class="modal-input" id="evName" placeholder="Nama event">
+    <input class="modal-input" id="evDate" type="date">
+    <select class="modal-input" id="evCat">
+      <option value="CG Event">CG Event</option><option value="Outreach">Outreach</option><option value="Birthday">Birthday</option><option value="Ibadah">Ibadah</option>
+    </select>
+    <textarea class="modal-input" id="evNote" placeholder="Catatan..." style="min-height:60px;resize:vertical"></textarea>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="btn-purple" style="flex:1" onclick="saveCGEvent()">Simpan</button>
+      <button class="pel-add" style="flex:1;padding:10px" onclick="closeModal('addCGEventModal')">Batal</button>
+    </div>
+  </div>
+</div>
+
+<!-- LANDING -->
+<div class="landing" id="pageL">
+  <div style="font-size:10px;letter-spacing:2px;color:var(--g3);text-transform:uppercase;margin-bottom:4px">THE YEAR OF</div>
+  <div style="font-family:'Inter',sans-serif;font-weight:900;font-size:26px;letter-spacing:-1.5px">UNITY</div>
+  <div style="font-family:'Inter',sans-serif;font-weight:800;font-size:15px;margin-bottom:20px">& OPEN HEAVENS</div>
+  <div class="landing-title">CG Dashboard</div>
+  <div class="landing-sub">AOG Teens Jaktim 2026</div>
+  <div class="region-toggle"><button class="region-btn active" onclick="selReg('jaktim1',this)">JAKTIM 1</button><button class="region-btn" onclick="selReg('jaktim2',this)">JAKTIM 2</button></div>
+  <div class="cgl-selector"><select class="cgl-select" id="cglSel" onchange="document.getElementById('enterBtn').disabled=!this.value"><option value="" disabled selected>Pilih CG Leader...</option></select></div>
+  <button class="enter-btn" id="enterBtn" disabled onclick="enterDash()">Masuk Dashboard</button>
+  <div style="margin-top:20px;font-size:11px;color:var(--g4)">Coach / TL? <a href="?role=coach" style="color:var(--purple);font-weight:600;text-decoration:none">Masuk disini &rarr;</a></div>
+</div>
+
+<!-- CGL DASHBOARD -->
+<div class="app" id="pageD">
+  <div class="app-nav"><div class="app-nav-left"><div class="app-back" onclick="goBack()">&larr;</div><span class="app-cg-badge" id="nB"></span><span class="app-cgl" id="nN"></span></div><div style="display:flex;align-items:center;gap:6px"><span class="live-dot"></span><span style="font-size:10px;color:var(--green);font-weight:600">Live</span></div></div>
+  <div class="app-hero"><div class="app-hero-tag">Januari &mdash; April 2026</div><div class="app-hero-h">Rekap<br><em>CG.</em></div><div class="app-hero-meta"><span id="hC">0</span> anggota &middot; <span id="hS"></span> &middot; <span id="hL"></span></div></div>
+  <div class="app-stats">
+    <div class="app-stat ct"><div class="app-stat-label">Hadir</div><div class="app-stat-num" id="sH">0</div><div class="app-stat-pct" id="sHp">0%</div></div>
+    <div class="app-stat cb"><div class="app-stat-label">Izin</div><div class="app-stat-num" id="sI">0</div><div class="app-stat-pct" id="sIp">0%</div></div>
+    <div class="app-stat co"><div class="app-stat-label">Sakit</div><div class="app-stat-num" id="sS">0</div><div class="app-stat-pct" id="sSp">0%</div></div>
+    <div class="app-stat cr"><div class="app-stat-label">Alpa</div><div class="app-stat-num" id="sA">0</div><div class="app-stat-pct" id="sAp">0%</div></div>
+  </div>
+
+  <div class="app-body">
+    <div class="app-tabs">
+      <div class="app-tab on" onclick="sTab('absensi',this)">Absensi</div>
+      <div class="app-tab" onclick="sTab('detail',this)">Detail CG</div>
+      <div class="app-tab" onclick="sTab('visi',this)">Visi CG</div>
+      <div class="app-tab" onclick="sTab('pelayanan',this)">Pelayanan</div>
+      <div class="app-tab" onclick="sTab('milestone',this)">Milestone</div>
+      <div class="app-tab" onclick="sTab('events',this)">Events</div>
+    </div>
+
+    <div class="tab-content active" id="tab-absensi"><div class="loading-msg">Memuat...</div></div>
+    <div class="tab-content" id="tab-detail"><div class="loading-msg">Memuat...</div></div>
+    <div class="tab-content" id="tab-visi"><div class="loading-msg">Memuat...</div></div>
+    <div class="tab-content" id="tab-pelayanan"><div class="loading-msg">Memuat...</div></div>
+    <div class="tab-content" id="tab-milestone"><div class="loading-msg">Memuat...</div></div>
+    <div class="tab-content" id="tab-events"><div class="loading-msg">Memuat...</div></div>
+  </div>
+</div>
+
+<!-- COACH -->
+<div class="app" id="pageC">
+  <div class="app-nav">
+    <div class="app-nav-left">
+      <div class="app-back" onclick="goBackCoach()">&larr;</div>
+      <span style="font-size:13px;font-weight:700" id="coachRoleLabel">Coach</span>
+      <div style="display:inline-flex;background:#e8e8e8;border-radius:14px;padding:2px;margin-left:8px">
+        <button id="roleCoachBtn" onclick="switchRole('coach')" style="padding:4px 12px;border-radius:12px;border:none;font-size:10px;font-weight:700;cursor:pointer;background:var(--purple);color:#fff;letter-spacing:.4px">COACH</button>
+        <button id="roleTLBtn" onclick="switchRole('tl')" style="padding:4px 12px;border-radius:12px;border:none;font-size:10px;font-weight:700;cursor:pointer;background:transparent;color:var(--g3);letter-spacing:.4px">TL</button>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px"><span class="live-dot"></span><span style="font-size:10px;color:var(--green);font-weight:600">Live</span></div>
+  </div>
+  <div class="app-hero" id="coachHero"><div class="app-hero-tag">Januari &mdash; April 2026</div><div class="app-hero-h" id="coachHeroH">Semua<br><em>CG.</em></div><div class="app-hero-meta" id="coachMeta">Memuat...</div></div>
+  <div class="app-stats">
+    <div class="app-stat ct"><div class="app-stat-label">Member</div><div class="app-stat-num" id="csTotalMbr">0</div><div class="app-stat-pct" id="csRegLabel">-</div></div>
+    <div class="app-stat cb"><div class="app-stat-label">Avg Hadir</div><div class="app-stat-num" id="csAvgHadir">-</div><div class="app-stat-pct">rata-rata</div></div>
+    <div class="app-stat co"><div class="app-stat-label">At Risk</div><div class="app-stat-num" id="csAtRisk">0</div><div class="app-stat-pct">&lt; 50%</div></div>
+    <div class="app-stat cr"><div class="app-stat-label">Blm MSJ1</div><div class="app-stat-num" id="csBlmMsj">0</div><div class="app-stat-pct">perlu follow</div></div>
+  </div>
+
+  <div class="app-body">
+    <div class="app-tabs" id="coachTabs">
+      <div class="app-tab on" onclick="sCoachTab('c-overview',this)">Overview</div>
+      <div class="app-tab" onclick="sCoachTab('c-absensi',this)">Absensi</div>
+      <div class="app-tab" onclick="sCoachTab('c-milestone',this)">Milestone</div>
+      <div class="app-tab" onclick="sCoachTab('c-visi',this)">Visi</div>
+      <div class="app-tab" onclick="sCoachTab('c-events',this)">Events</div>
+    </div>
+
+    <div class="tab-content active" id="tab-c-overview"><div class="loading-msg">Memuat...</div></div>
+    <div class="tab-content" id="tab-c-absensi"><div class="loading-msg">Memuat...</div></div>
+    <div class="tab-content" id="tab-c-milestone"><div class="loading-msg">Memuat...</div></div>
+    <div class="tab-content" id="tab-c-visi"><div class="loading-msg">Memuat...</div></div>
+    <div class="tab-content" id="tab-c-events"><div class="loading-msg">Memuat...</div></div>
+  </div>
+</div>
+
+<script>
+// ========== SUPABASE INIT ==========
+const SUPABASE_URL = 'https://gqppviugodokncxezdwd.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxcHB2aXVnb2Rva25jeGV6ZHdkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4NjIwOTcsImV4cCI6MjA5MDQzODA5N30.w2oUJYWk4yr_tJQuhk0UyxJKwgH1C3FkmJB6CXclSpk';
+const supa = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ========== GLOBAL STATE ==========
+let curReg = 'jaktim1';
+let fromCoach = false;
+let CUR_CG = null; // current CG name
+let CUR_CG_INFO = null;
+let MEMBERS = [];
+let DATES = [];
+let ATTENDANCE = {};  // { `${member_id}_${date_id}`: 'H'|'I'|'S'|'A' }
+let ALL_MEMBERS = [];
+let ALL_CG_INFO = [];
+let ALL_DATES = [];
+let ALL_ATTENDANCE = {};
+let ALL_EVENTS = [];
+let coachRole = 'coach';
+let coachReg = 'jaktim1';
+
+const CG_COLORS = {
+  'TEEN 23':'#7c3aed','TEEN 01':'#1d4ed8','TEEN 09':'#c2410c','TEEN 06':'#be185d',
+  'TEEN 12':'#0f766e','TEEN 07':'#b45309','TEEN 17':'#0e7490','TEEN 20':'#be123c'
+};
+const CG_BG = {
+  'TEEN 23':'#faf5ff','TEEN 01':'#eff6ff','TEEN 09':'#fff7ed','TEEN 06':'#fdf2f8',
+  'TEEN 12':'#f0fdfa','TEEN 07':'#fffbeb','TEEN 17':'#ecfeff','TEEN 20':'#fff1f2'
+};
+const CG_INIT = {
+  'TEEN 23':'T23','TEEN 01':'T01','TEEN 09':'T09','TEEN 06':'T06',
+  'TEEN 12':'T12','TEEN 07':'T07','TEEN 17':'T17','TEEN 20':'T20'
+};
+
+const ROLE_ORDER = {CGL:0,Sponsor:1,Member:2,Simpatisan:3,VIP:4};
+const STATUS_CYCLE = ['H','I','S','A',null];
+const MS_FIELDS = ['msj1','msj2','msj3','cgt1','cgt2','cgt3','baptis_air','baptis_roh'];
+const MS_LABELS = ['MSJ 1','MSJ 2','MSJ 3','CGT 1','CGT 2','CGT 3','B.Air','B.Roh'];
+
+// ========== TOAST ==========
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+function openModal(id) { document.getElementById(id).classList.add('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+// ========== LANDING ==========
+async function loadCGLDropdown() {
+  const { data: members } = await supa.from('members').select('id,nama,cg,status,region').order('cg');
+  if (!members) return;
+  ALL_MEMBERS = members;
+  popDD();
+}
+
+function selReg(r, b) {
+  curReg = r;
+  document.querySelectorAll('#pageL .region-btn').forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+  popDD();
+}
+
+function popDD() {
+  const s = document.getElementById('cglSel');
+  s.innerHTML = '<option value="" disabled selected>Pilih CG Leader...</option>';
+  const cgls = ALL_MEMBERS.filter(m => m.status === 'CGL' && m.region === curReg);
+  const seen = new Set();
+  cgls.forEach(m => {
+    if (seen.has(m.cg)) return;
+    seen.add(m.cg);
+    const o = document.createElement('option');
+    o.value = m.cg;
+    o.textContent = m.cg + ' \u2014 ' + m.nama;
+    s.appendChild(o);
+  });
+  document.getElementById('enterBtn').disabled = true;
+}
+
+async function enterDash() {
+  fromCoach = false;
+  const cg = document.getElementById('cglSel').value;
+  await openCGDashboard(cg);
+}
+
+function enterFromCoach(cg) {
+  fromCoach = true;
+  openCGDashboard(cg);
+}
+
+// ========== OPEN CGL DASHBOARD ==========
+async function openCGDashboard(cg) {
+  CUR_CG = cg;
+  ['pageL','pageC'].forEach(x => document.getElementById(x).style.display = 'none');
+  document.getElementById('pageD').style.display = 'block';
+  window.scrollTo(0, 0);
+
+  // Load cg_info
+  const { data: cgInfoArr } = await supa.from('cg_info').select('*').eq('cg', cg);
+  CUR_CG_INFO = cgInfoArr && cgInfoArr[0] ? cgInfoArr[0] : {};
+
+  // Load members
+  const { data: mems } = await supa.from('members').select('*').eq('cg', cg).order('nama');
+  MEMBERS = mems || [];
+  MEMBERS.sort((a, b) => (ROLE_ORDER[a.status]||9) - (ROLE_ORDER[b.status]||9));
+
+  // Load dates for this region
+  const region = MEMBERS[0] ? MEMBERS[0].region : curReg;
+  const { data: dates } = await supa.from('dates').select('*').eq('region', region).order('sort_order');
+  DATES = dates || [];
+
+  // Load attendance
+  const memberIds = MEMBERS.map(m => m.id);
+  const dateIds = DATES.map(d => d.id);
+  ATTENDANCE = {};
+  if (memberIds.length && dateIds.length) {
+    const { data: att } = await supa.from('attendance').select('*').in('member_id', memberIds).in('date_id', dateIds);
+    (att || []).forEach(a => { ATTENDANCE[a.member_id + '_' + a.date_id] = a.status; });
+  }
+
+  // Update nav
+  const color = CG_COLORS[cg] || '#7c3aed';
+  const bg = CG_BG[cg] || '#faf5ff';
+  document.getElementById('nB').textContent = cg;
+  document.getElementById('nB').style.cssText = 'padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:.8px;background:'+bg+';color:'+color+';border:1px solid '+color+'40';
+  document.getElementById('nN').textContent = CUR_CG_INFO.leader || '';
+  document.getElementById('hC').textContent = MEMBERS.length;
+  document.getElementById('hS').textContent = CUR_CG_INFO.hari_jam || '';
+  document.getElementById('hL').textContent = CUR_CG_INFO.lokasi || '';
+
+  // Stats
+  computeStats();
+
+  // Render tabs
+  renderAbsensi();
+  renderDetail();
+  renderVisiCG();
+  renderPelayanan();
+  renderMilestone();
+  renderEvents();
+
+  // Reset to absensi tab
+  document.querySelectorAll('#pageD .app-tab').forEach((t,i) => t.classList.toggle('on', i===0));
+  document.querySelectorAll('#pageD .tab-content').forEach((t,i) => t.classList.toggle('active', i===0));
+}
+
+function computeStats() {
+  let h=0,i=0,s=0,a=0;
+  Object.values(ATTENDANCE).forEach(v => { if(v==='H')h++; else if(v==='I')i++; else if(v==='S')s++; else if(v==='A')a++; });
+  const tot = h+i+s+a || 1;
+  document.getElementById('sH').textContent = h;
+  document.getElementById('sI').textContent = i;
+  document.getElementById('sS').textContent = s;
+  document.getElementById('sA').textContent = a;
+  document.getElementById('sHp').textContent = Math.round(h/tot*100)+'%';
+  document.getElementById('sIp').textContent = Math.round(i/tot*100)+'%';
+  document.getElementById('sSp').textContent = Math.round(s/tot*100)+'%';
+  document.getElementById('sAp').textContent = Math.round(a/tot*100)+'%';
+}
+
+// ========== ABSENSI TAB ==========
+function renderAbsensi() {
+  const el = document.getElementById('tab-absensi');
+  let html = '<div style="overflow-x:auto"><table class="t"><thead><tr><th>Nama</th>';
+  DATES.forEach(d => { html += '<th>' + (d.label||d.id) + '</th>'; });
+  html += '<th>% Hadir</th></tr></thead><tbody>';
+
+  MEMBERS.forEach(m => {
+    const hadirCount = DATES.filter(d => ATTENDANCE[m.id+'_'+d.id]==='H').length;
+    const totalDates = DATES.filter(d => ATTENDANCE[m.id+'_'+d.id]).length || 1;
+    const pct = Math.round(hadirCount / totalDates * 100);
+    const pctColor = pct >= 75 ? 'var(--green)' : pct >= 50 ? 'var(--orange)' : 'var(--red)';
+    const atRisk = pct < 50 && totalDates > 1;
+
+    html += '<tr' + (atRisk ? ' style="border-left:3px solid var(--red)"' : '') + '>';
+    html += '<td class="name-cell"' + (atRisk ? ' style="color:var(--red)"' : '') + '>' + esc(m.nama) + '<span class="role-tag">' + esc(m.status) + '</span></td>';
+
+    DATES.forEach(d => {
+      const st = ATTENDANCE[m.id+'_'+d.id] || null;
+      const cls = st || 'X';
+      const label = st || '-';
+      html += '<td><span class="dot ' + cls + '" onclick="cycleDot(this,' + m.id + ',\'' + d.id + '\')">' + label + '</span></td>';
+    });
+
+    html += '<td><div class="pbar"><div class="pbar-track"><div class="pbar-fill" style="width:'+pct+'%;background:'+pctColor+'"></div></div><span class="pbar-val" style="color:'+pctColor+'">'+pct+'%</span></div></td>';
+    html += '</tr>';
+  });
+
+  html += '</tbody></table></div>';
+  html += '<div style="font-size:10px;color:var(--g4);margin-top:10px;text-align:right">klik status untuk edit</div>';
+  el.innerHTML = html;
+}
+
+async function cycleDot(dotEl, memberId, dateId) {
+  const key = memberId + '_' + dateId;
+  const cur = ATTENDANCE[key] || null;
+  const idx = STATUS_CYCLE.indexOf(cur);
+  const next = STATUS_CYCLE[(idx + 1) % STATUS_CYCLE.length];
+
+  if (next === null) {
+    // Delete
+    ATTENDANCE[key] = null;
+    delete ATTENDANCE[key];
+    await supa.from('attendance').delete().eq('member_id', memberId).eq('date_id', dateId);
+  } else {
+    ATTENDANCE[key] = next;
+    await supa.from('attendance').upsert({ member_id: memberId, date_id: dateId, status: next }, { onConflict: 'member_id,date_id' });
+  }
+
+  // Update dot
+  const cls = next || 'X';
+  const label = next || '-';
+  dotEl.className = 'dot ' + cls;
+  dotEl.textContent = label;
+
+  computeStats();
+  toast('\u2713 Disimpan');
+}
+
+// ========== DETAIL CG TAB ==========
+function renderDetail() {
+  const el = document.getElementById('tab-detail');
+  let html = '';
+
+  MEMBERS.forEach(m => {
+    const hadirCount = DATES.filter(d => ATTENDANCE[m.id+'_'+d.id]==='H').length;
+    const totalDates = DATES.filter(d => ATTENDANCE[m.id+'_'+d.id]).length || 1;
+    const pct = Math.round(hadirCount / totalDates * 100);
+    const atRisk = pct < 50 && totalDates > 1;
+    const roleCls = (m.status||'member').toLowerCase();
+
+    html += '<div class="dcard"' + (atRisk ? ' style="border-left:3px solid var(--red)"' : '') + '>';
+    html += '<div class="dcard-top">';
+    html += '<input type="text" value="' + esc(m.nama) + '" class="dcard-name" data-mid="'+m.id+'" data-field="nama" style="border:none;background:transparent;outline:none;font-weight:600;font-size:14px;flex:1;min-width:0;border-bottom:1px dashed transparent" onfocus="this.style.borderBottomColor=\'var(--purple)\'" onblur="this.style.borderBottomColor=\'transparent\';saveMemberField(this)">';
+    html += '<div class="role-wrap"><button class="role-btn '+roleCls+'" onclick="this.nextElementSibling.classList.toggle(\'show\')">'+esc(m.status)+'</button>';
+    html += '<div class="role-menu">';
+    ['CGL','Sponsor','Member','Simpatisan','VIP'].forEach(r => {
+      html += '<div class="role-opt '+r.toLowerCase()+'" onclick="pickRole(this,\''+r.toLowerCase()+'\',\''+r+'\','+m.id+')"><span class="rdot"></span>'+r+'</div>';
+    });
+    html += '</div></div></div>';
+
+    html += '<div class="dgrid">';
+    html += '<span>\ud83d\udcf1 <input type="text" value="' + esc(m.wa||'') + '" data-mid="'+m.id+'" data-field="wa" style="border:none;background:transparent;font-size:11px;color:var(--g2);outline:none;border-bottom:1px dashed transparent;width:120px" onfocus="this.style.borderBottomColor=\'var(--purple)\'" onblur="this.style.borderBottomColor=\'transparent\';saveMemberField(this)"></span>';
+    html += '<span>\ud83c\udf82 <input type="text" value="' + esc(m.lahir||'') + '" data-mid="'+m.id+'" data-field="lahir" style="border:none;background:transparent;font-size:11px;color:var(--g2);outline:none;border-bottom:1px dashed transparent;width:90px" onfocus="this.style.borderBottomColor=\'var(--purple)\'" onblur="this.style.borderBottomColor=\'transparent\';saveMemberField(this)"></span>';
+    html += '<span>\ud83c\udfeb <input type="text" value="' + esc((m.sekolah||'') + (m.kelas ? ' \u00b7 Kelas '+m.kelas : '')) + '" data-mid="'+m.id+'" data-field="sekolah" style="border:none;background:transparent;font-size:11px;color:var(--g2);outline:none;border-bottom:1px dashed transparent;flex:1;min-width:140px" onfocus="this.style.borderBottomColor=\'var(--purple)\'" onblur="this.style.borderBottomColor=\'transparent\';saveMemberField(this)"></span>';
+    html += '<span>\ud83d\udccd <input type="text" value="' + esc((m.kelurahan||'') + (m.kecamatan ? ', '+m.kecamatan : '')) + '" data-mid="'+m.id+'" data-field="kelurahan" style="border:none;background:transparent;font-size:11px;color:var(--g2);outline:none;border-bottom:1px dashed transparent;flex:1;min-width:140px" onfocus="this.style.borderBottomColor=\'var(--purple)\'" onblur="this.style.borderBottomColor=\'transparent\';saveMemberField(this)"></span>';
+    html += '</div>';
+
+    if (atRisk) html += '<div style="font-size:11px;color:var(--red);font-weight:600;margin-bottom:6px">\u26a0\ufe0f Kehadiran '+pct+'% \u00b7 Perlu follow-up</div>';
+
+    html += '<div style="font-size:10px;color:var(--g3);margin:8px 0 4px">Milestone <span style="font-size:9px;color:var(--g4)">(klik untuk ubah)</span></div>';
+    html += '<div class="ms-chips">';
+    MS_FIELDS.forEach((f, i) => {
+      const done = m[f] ? true : false;
+      html += '<span class="msc ' + (done?'done':'pending') + '" style="cursor:pointer" onclick="toggleMilestone(this,'+m.id+',\''+f+'\',' + (done?'true':'false') + ')">' + MS_LABELS[i] + (done?' \u2713':'') + '</span>';
+    });
+    html += '</div>';
+
+    html += '<textarea class="note" placeholder="Catatan CGL..." data-mid="'+m.id+'" onblur="saveMemberNotes(this)">' + esc(m.notes||'') + '</textarea>';
+    html += '</div>';
+  });
+
+  html += '<button class="pel-add" style="width:100%;padding:14px;text-align:center;border:2px dashed var(--g5);border-radius:12px;font-size:13px;font-weight:600;color:var(--purple)" onclick="openModal(\'addMemberModal\')">+ Tambah Member Baru</button>';
+  el.innerHTML = html;
+}
+
+async function saveMemberField(input) {
+  const mid = parseInt(input.dataset.mid);
+  const field = input.dataset.field;
+  const val = input.value.trim();
+  const { error } = await supa.from('members').update({ [field]: val }).eq('id', mid);
+  if (!error) toast('\u2713 Disimpan');
+}
+
+async function saveMemberNotes(textarea) {
+  const mid = parseInt(textarea.dataset.mid);
+  const { error } = await supa.from('members').update({ notes: textarea.value }).eq('id', mid);
+  if (!error) toast('\u2713 Disimpan');
+}
+
+async function toggleMilestone(chip, memberId, field, wasDone) {
+  const newVal = wasDone ? null : true;
+  await supa.from('members').update({ [field]: newVal }).eq('id', memberId);
+
+  // Update local
+  const m = MEMBERS.find(x => x.id === memberId);
+  if (m) m[field] = newVal;
+
+  // Toggle visual
+  if (wasDone) {
+    chip.classList.remove('done');
+    chip.classList.add('pending');
+    chip.textContent = chip.textContent.replace(' \u2713','');
+    chip.setAttribute('onclick', "toggleMilestone(this,"+memberId+",'"+field+"',false)");
+  } else {
+    chip.classList.remove('pending');
+    chip.classList.add('done');
+    chip.textContent = chip.textContent + ' \u2713';
+    chip.setAttribute('onclick', "toggleMilestone(this,"+memberId+",'"+field+"',true)");
+  }
+  toast('\u2713 Disimpan');
+}
+
+async function pickRole(el, cls, label, memberId) {
+  const wrap = el.closest('.role-wrap');
+  const btn = wrap.querySelector('.role-btn');
+  btn.className = 'role-btn ' + cls;
+  btn.childNodes[0].textContent = label;
+  wrap.querySelector('.role-menu').classList.remove('show');
+  await supa.from('members').update({ status: label }).eq('id', memberId);
+  const m = MEMBERS.find(x => x.id === memberId);
+  if (m) m.status = label;
+  toast('\u2713 Disimpan');
+}
+
+async function saveNewMember() {
+  const nama = document.getElementById('newNama').value.trim();
+  if (!nama) return alert('Nama harus diisi');
+  const region = MEMBERS[0] ? MEMBERS[0].region : curReg;
+  const obj = {
+    nama, cg: CUR_CG, status: document.getElementById('newStatus').value,
+    wa: document.getElementById('newWa').value, lahir: document.getElementById('newLahir').value || null,
+    sekolah: document.getElementById('newSekolah').value, kelas: document.getElementById('newKelas').value,
+    kelurahan: document.getElementById('newKelurahan').value, kecamatan: document.getElementById('newKecamatan').value,
+    region
+  };
+  const { error } = await supa.from('members').insert(obj);
+  if (error) { alert('Error: ' + error.message); return; }
+  closeModal('addMemberModal');
+  toast('\u2713 Member ditambahkan');
+  await openCGDashboard(CUR_CG);
+}
+
+// ========== VISI CG TAB ==========
+function renderVisiCG() {
+  const el = document.getElementById('tab-visi');
+  const lsKeyV = 'cg_vision_' + CUR_CG;
+  const lsKeyM = 'cg_mission_' + CUR_CG;
+  const vision = localStorage.getItem(lsKeyV) || '';
+  const mission = localStorage.getItem(lsKeyM) || '';
+
+  let html = '<div class="vcard"><div class="vlabel">Visi CG</div><textarea class="vedit" id="visiText">' + esc(vision) + '</textarea></div>';
+  html += '<div class="vcard"><div class="vlabel">Misi Semester Ini</div><textarea class="vedit" id="misiText">' + esc(mission) + '</textarea></div>';
+
+  // Dev plan
+  html += '<div class="section" style="margin-top:16px"><div class="section-title">\ud83d\udcc8 Rencana Pengembangan Member</div>';
+  html += '<div style="font-size:11px;color:var(--g3);margin-bottom:12px">Pilih member yang akan dikembangkan ke posisi baru dan tentukan deadline</div>';
+  html += '<div id="devPlanRows">';
+  const devPlan = JSON.parse(localStorage.getItem('cg_devplan_' + CUR_CG) || '[]');
+  devPlan.forEach((d, i) => {
+    html += buildDevRow(d, i);
+  });
+  html += '</div>';
+  html += '<button class="pel-add" style="margin-top:10px" onclick="addDevPlanRow()">+ Tambah member</button></div>';
+  html += '<button class="btn-purple" style="margin-top:12px" onclick="saveVisiCG()">\ud83d\udcbe Simpan Visi & Rencana</button>';
+  el.innerHTML = html;
+}
+
+function buildDevRow(d, i) {
+  const roleCls = (d.currentRole||'member').toLowerCase();
+  return '<div class="dev-row"><div class="dev-name">' + esc(d.name||'') + '</div>' +
+    '<span class="dev-current rbadge ' + roleCls + '">' + esc(d.currentRole||'Member') + '</span>' +
+    '<span style="font-size:11px;color:var(--g3)">\u2192</span>' +
+    '<select class="dev-select" data-idx="'+i+'"><option>Target: CGL</option><option>Target: Sponsor</option><option>Target: Member</option></select>' +
+    '<input type="date" class="dev-date" value="' + (d.deadline||'') + '" data-idx="'+i+'"></div>';
+}
+
+function addDevPlanRow() {
+  const names = MEMBERS.map(m => m.nama);
+  const name = prompt('Pilih nama member:\n' + names.join('\n'));
+  if (!name) return;
+  const m = MEMBERS.find(x => x.nama.toLowerCase().includes(name.toLowerCase()));
+  if (!m) { alert('Member tidak ditemukan'); return; }
+  const devPlan = JSON.parse(localStorage.getItem('cg_devplan_' + CUR_CG) || '[]');
+  devPlan.push({ name: m.nama, currentRole: m.status, target: 'Sponsor', deadline: '' });
+  localStorage.setItem('cg_devplan_' + CUR_CG, JSON.stringify(devPlan));
+  renderVisiCG();
+  toast('\u2713 Disimpan lokal');
+}
+
+function saveVisiCG() {
+  localStorage.setItem('cg_vision_' + CUR_CG, document.getElementById('visiText').value);
+  localStorage.setItem('cg_mission_' + CUR_CG, document.getElementById('misiText').value);
+  toast('\u2713 Disimpan lokal');
+}
+
+// ========== PELAYANAN TAB ==========
+let CUR_PEL_MONTH = null;
+let CUR_PEL_WEEK = null;
+
+const DEFAULT_PEL_ROLES = [
+  {name:'Firman CG', abbr:'FC', color:'#16a34a', bg:'#f0fdf4'},
+  {name:'PAW', abbr:'PW', color:'#d97706', bg:'#fff7ed'},
+  {name:'Game', abbr:'GM', color:'#2563eb', bg:'#eff6ff'},
+  {name:'Sharing', abbr:'SH', color:'#dc2626', bg:'#fef2f2'}
+];
+
+function getPelData() {
+  return JSON.parse(localStorage.getItem('cg_pelayanan_' + CUR_CG) || '{}');
+}
+function savePelData(data) {
+  localStorage.setItem('cg_pelayanan_' + CUR_CG, JSON.stringify(data));
+}
+function getPelRoles() {
+  const custom = JSON.parse(localStorage.getItem('cg_pel_roles_' + CUR_CG) || '[]');
+  return DEFAULT_PEL_ROLES.concat(custom);
+}
+function savePelRoles(roles) {
+  localStorage.setItem('cg_pel_roles_' + CUR_CG, JSON.stringify(roles));
+}
+
+function fmtWeekLabel(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+  return d.getDate() + ' ' + months[d.getMonth()];
+}
+
+function renderPelayanan() {
+  const el = document.getElementById('tab-pelayanan');
+  const allData = getPelData();
+  const months = Object.keys(allData).length ? Object.keys(allData) : ['April 2026'];
+
+  // Ensure default month exists in data
+  if (!Object.keys(allData).length) { allData['April 2026'] = {}; savePelData(allData); }
+
+  // Set current month
+  if (!CUR_PEL_MONTH || !allData[CUR_PEL_MONTH]) CUR_PEL_MONTH = months[0];
+  const monthData = allData[CUR_PEL_MONTH] || {};
+  const weeks = Object.keys(monthData).sort();
+
+  // Set current week
+  if (!CUR_PEL_WEEK || !monthData[CUR_PEL_WEEK]) CUR_PEL_WEEK = weeks.length ? weeks[0] : null;
+
+  const roles = getPelRoles();
+  const weekAssignments = CUR_PEL_WEEK ? (monthData[CUR_PEL_WEEK] || {}) : {};
+
+  let html = '';
+
+  // ── Month selector row ──
+  html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px">';
+  html += '<div style="display:flex;align-items:center;gap:8px">';
+  html += '<span style="font-size:11px;font-weight:600;letter-spacing:1px;color:var(--g3);text-transform:uppercase">Bulan:</span>';
+  html += '<select class="pel-select" id="pelMonth" onchange="switchPelMonth(this.value)" style="min-width:140px;padding:8px 28px 8px 12px;font-size:12px;border-radius:10px;font-weight:600">';
+  months.forEach(m => { html += '<option value="'+esc(m)+'"'+(m===CUR_PEL_MONTH?' selected':'')+'>'+esc(m)+'</option>'; });
+  html += '</select>';
+  html += '<button class="pel-add" onclick="addPelMonth()" style="padding:8px 12px;font-size:11px">+ Bulan</button>';
+  html += '</div></div>';
+
+  // ── Schedule section ──
+  html += '<div class="section" style="border-radius:14px;background:linear-gradient(135deg,#faf5ff,#ffffff);border:1px solid #e9e3ff">';
+  html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">';
+  html += '<div class="section-title" style="margin-bottom:0">Jadwal Pelayanan</div>';
+  html += '<div style="display:flex;align-items:center;gap:6px">';
+  html += '<input type="date" id="pelNewDate" style="padding:6px 10px;border:1px solid var(--g5);border-radius:8px;font-size:11px;font-family:\'Inter\',sans-serif">';
+  html += '<button class="pel-add" onclick="addPelWeek()" style="padding:6px 10px;font-size:11px">+ Minggu</button></div></div>';
+
+  // Week pills
+  html += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;align-items:center">';
+  if (weeks.length === 0) {
+    html += '<span style="font-size:11px;color:var(--g4);font-style:italic">Belum ada minggu — tambahkan dengan tombol "+ Minggu"</span>';
+  }
+  weeks.forEach(w => {
+    const active = w === CUR_PEL_WEEK;
+    const label = fmtWeekLabel(w);
+    html += '<div style="display:inline-flex;align-items:center;gap:4px;padding:4px 6px 4px 12px;border-radius:14px;'
+      + (active ? 'background:var(--purple);color:#fff;font-weight:600' : 'background:#fff;border:1px solid var(--g5);color:var(--g3);font-weight:500')
+      + ';font-size:10px">';
+    html += '<span style="cursor:pointer" onclick="switchPelWeek(\''+esc(w)+'\')">'+esc(label)+'</span>';
+    html += '<button onclick="editPelWeek(\''+esc(w)+'\')" style="background:none;border:none;cursor:pointer;color:'+(active?'#fff':'var(--g4)')+';padding:2px;font-size:10px;line-height:1" title="Edit tanggal">&#9998;</button>';
+    html += '<button onclick="deletePelWeek(\''+esc(w)+'\')" style="background:none;border:none;cursor:pointer;color:'+(active?'#fff':'var(--g4)')+';padding:2px;font-size:11px;line-height:1" title="Hapus">&times;</button>';
+    html += '</div>';
+  });
+  html += '</div>';
+
+  // ── Role assignments for active week ──
+  if (CUR_PEL_WEEK) {
+    html += '<div style="display:flex;flex-direction:column;gap:8px">';
+    roles.forEach(r => {
+      const saved = weekAssignments[r.name] || '';
+      html += '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--white);border-radius:10px;border:1px solid var(--g6)">';
+      html += '<div style="width:32px;height:32px;border-radius:8px;background:'+r.bg+';display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:'+r.color+';letter-spacing:.5px">'+esc(r.abbr)+'</div>';
+      html += '<div style="flex:1"><div style="font-weight:600;font-size:12px">'+esc(r.name)+'</div></div>';
+      html += '<select class="pel-select" onchange="savePelAssignment(\''+esc(r.name)+'\',this.value)" style="min-width:140px;padding:6px 24px 6px 10px;font-size:11px">';
+      html += '<option value="">Pilih...</option>';
+      MEMBERS.forEach(m => {
+        html += '<option value="'+esc(m.nama)+'"'+(saved===m.nama?' selected':'')+'>'+esc(m.nama)+'</option>';
+      });
+      html += '</select></div>';
+    });
+    html += '</div>';
+    html += '<button class="pel-add" style="margin-top:10px;width:100%;padding:8px;border-radius:10px;font-size:11px" onclick="addPelRole()">+ Tambah Role Custom</button>';
+  } else {
+    html += '<div style="font-size:11px;color:var(--g4);font-style:italic;text-align:center;padding:16px 0">Tambahkan minggu untuk mulai assign pelayanan</div>';
+  }
+  html += '</div>'; // end schedule section
+
+  // ── Statistics ──
+  // Compute stats across current month
+  const roleCounts = {};
+  const memberCounts = {};
+  const memberRoles = {};
+  roles.forEach(r => { roleCounts[r.name] = 0; });
+  MEMBERS.forEach(m => { memberCounts[m.nama] = 0; memberRoles[m.nama] = []; });
+
+  weeks.forEach(w => {
+    const wa = monthData[w] || {};
+    Object.keys(wa).forEach(role => {
+      const person = wa[role];
+      if (!person) return;
+      roleCounts[role] = (roleCounts[role] || 0) + 1;
+      memberCounts[person] = (memberCounts[person] || 0) + 1;
+      if (memberRoles[person] && !memberRoles[person].includes(role)) memberRoles[person].push(role);
+    });
+  });
+
+  const maxRoleCount = Math.max(1, ...Object.values(roleCounts));
+
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;margin-top:14px">';
+
+  // ── Distribusi Jenis (bar chart) ──
+  html += '<div class="section" style="border-radius:14px;margin-bottom:0">';
+  html += '<div class="section-title" style="margin-bottom:12px">Distribusi Jenis</div>';
+  if (weeks.length === 0) {
+    html += '<div style="font-size:11px;color:var(--g3)">Data akan muncul setelah pelayanan disimpan.</div>';
+  } else {
+    html += '<div style="display:flex;flex-direction:column;gap:8px">';
+    roles.forEach(r => {
+      const cnt = roleCounts[r.name] || 0;
+      const pct = Math.round(cnt / maxRoleCount * 100);
+      html += '<div>';
+      html += '<div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:3px"><span style="font-weight:600;color:'+r.color+'">'+esc(r.name)+'</span><span style="color:var(--g3)">'+cnt+'x</span></div>';
+      html += '<div style="height:6px;background:var(--g6);border-radius:3px;overflow:hidden"><div style="width:'+pct+'%;height:100%;background:'+r.color+';border-radius:3px;transition:width .3s"></div></div>';
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+  html += '</div>';
+
+  // ── Sering Pelayanan (top 3) ──
+  html += '<div class="section" style="border-radius:14px;margin-bottom:0;background:linear-gradient(135deg,#f0fdf4,#ffffff);border:1px solid #bbf7d0">';
+  html += '<div class="section-title" style="margin-bottom:12px;color:#15803d">Sering Pelayanan</div>';
+  const sorted = Object.entries(memberCounts).filter(e => e[1] > 0).sort((a,b) => b[1]-a[1]).slice(0,3);
+  if (sorted.length === 0) {
+    html += '<div style="font-size:11px;color:var(--g3)">Data akan muncul setelah pelayanan disimpan.</div>';
+  } else {
+    const medals = ['#f59e0b','#94a3b8','#cd7f32'];
+    const medalLabels = ['1','2','3'];
+    sorted.forEach((entry, idx) => {
+      const name = entry[0];
+      const cnt = entry[1];
+      const rls = (memberRoles[name] || []).join(', ');
+      html += '<div style="display:flex;align-items:center;gap:8px;padding:8px 0;'+(idx<2?'border-bottom:1px solid #e5e7eb':'')+'">';
+      html += '<div style="width:24px;height:24px;border-radius:50%;background:'+medals[idx]+';color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800">'+medalLabels[idx]+'</div>';
+      html += '<div style="flex:1"><div style="font-weight:600;font-size:11px">'+esc(name)+'</div><div style="font-size:9px;color:var(--g3)">'+esc(rls)+'</div></div>';
+      html += '<div style="font-size:14px;font-weight:800;color:#15803d">'+cnt+'x</div>';
+      html += '</div>';
+    });
+  }
+  html += '</div>';
+  html += '</div>'; // end stats grid
+
+  // ── Belum Pernah / Jarang Pelayanan ──
+  const jarang = MEMBERS.filter(m => (memberCounts[m.nama] || 0) <= 2).sort((a,b) => (memberCounts[a.nama]||0) - (memberCounts[b.nama]||0));
+  if (jarang.length > 0 && weeks.length > 0) {
+    html += '<div class="section" style="border-radius:14px;background:linear-gradient(135deg,#fef2f2,#ffffff);border:1px solid #fecaca">';
+    html += '<div class="section-title" style="margin-bottom:10px;color:#dc2626">Belum Pernah / Jarang Pelayanan</div>';
+    html += '<div style="display:flex;flex-direction:column;gap:6px">';
+    jarang.forEach(m => {
+      const cnt = memberCounts[m.nama] || 0;
+      const icon = cnt === 0 ? '\uD83D\uDD34' : cnt === 1 ? '\uD83D\uDFE1' : '\uD83D\uDFE0';
+      html += '<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:#fff;border-radius:8px;border:1px solid var(--g6)">';
+      html += '<span style="font-size:14px">'+icon+'</span>';
+      html += '<div style="flex:1"><div style="font-weight:600;font-size:11px">'+esc(m.nama)+'</div><div style="font-size:9px;color:var(--g3)">'+esc(m.status || '')+'</div></div>';
+      html += '<span style="font-size:10px;color:var(--g3);margin-right:6px">'+cnt+'x</span>';
+      html += '<button onclick="ajakMember(\''+esc(m.nama)+'\')" style="padding:4px 10px;border-radius:8px;border:1px solid #fecaca;background:#fef2f2;color:#dc2626;font-size:10px;font-weight:600;cursor:pointer">Ajak</button>';
+      html += '</div>';
+    });
+    html += '</div></div>';
+  }
+
+  // ── Monthly recap table ──
+  if (weeks.length > 0) {
+    html += '<div class="section" style="border-radius:14px">';
+    html += '<div class="section-title" style="margin-bottom:10px">Rekap Bulanan — '+esc(CUR_PEL_MONTH)+'</div>';
+    html += '<div style="overflow-x:auto">';
+    html += '<table class="t"><thead><tr><th style="text-align:left">Nama</th>';
+    weeks.forEach(w => { html += '<th>'+esc(fmtWeekLabel(w))+'</th>'; });
+    html += '<th>Total</th></tr></thead><tbody>';
+    MEMBERS.forEach(m => {
+      let total = 0;
+      html += '<tr><td class="name-cell">'+esc(m.nama)+'</td>';
+      weeks.forEach(w => {
+        const wa = monthData[w] || {};
+        const assigned = [];
+        Object.keys(wa).forEach(role => { if (wa[role] === m.nama) assigned.push(role); });
+        total += assigned.length;
+        if (assigned.length) {
+          const abbrs = assigned.map(rn => { const found = roles.find(r => r.name === rn); return found ? found.abbr : rn.substring(0,2).toUpperCase(); });
+          html += '<td style="font-size:10px;font-weight:600;color:var(--purple)">'+abbrs.join(', ')+'</td>';
+        } else {
+          html += '<td style="font-size:10px;color:var(--g4)">&ndash;</td>';
+        }
+      });
+      const tColor = total >= 3 ? '#16a34a' : total >= 1 ? '#2563eb' : '#dc2626';
+      html += '<td style="font-weight:700;color:'+tColor+'">'+total+'</td>';
+      html += '</tr>';
+    });
+    html += '</tbody></table></div></div>';
+  }
+
+  el.innerHTML = html;
+}
+
+function switchPelMonth(month) {
+  CUR_PEL_MONTH = month;
+  CUR_PEL_WEEK = null;
+  renderPelayanan();
+}
+
+function switchPelWeek(date) {
+  CUR_PEL_WEEK = date;
+  renderPelayanan();
+}
+
+function addPelMonth() {
+  const name = prompt('Nama bulan (contoh: Mei 2026)');
+  if (!name) return;
+  const data = getPelData();
+  if (data[name]) { toast('Bulan sudah ada'); return; }
+  data[name] = {};
+  savePelData(data);
+  CUR_PEL_MONTH = name;
+  CUR_PEL_WEEK = null;
+  renderPelayanan();
+  toast('\u2713 Bulan ditambahkan');
+}
+
+function addPelWeek() {
+  const dateInput = document.getElementById('pelNewDate');
+  if (!dateInput || !dateInput.value) { alert('Pilih tanggal dulu'); return; }
+  const data = getPelData();
+  if (!data[CUR_PEL_MONTH]) data[CUR_PEL_MONTH] = {};
+  if (data[CUR_PEL_MONTH][dateInput.value]) { toast('Minggu sudah ada'); return; }
+  data[CUR_PEL_MONTH][dateInput.value] = {};
+  savePelData(data);
+  CUR_PEL_WEEK = dateInput.value;
+  renderPelayanan();
+  toast('\u2713 Minggu ditambahkan');
+}
+
+function editPelWeek(oldDate) {
+  const newDate = prompt('Edit tanggal (format YYYY-MM-DD)', oldDate);
+  if (!newDate || newDate === oldDate) return;
+  const data = getPelData();
+  if (!data[CUR_PEL_MONTH] || !data[CUR_PEL_MONTH][oldDate]) return;
+  data[CUR_PEL_MONTH][newDate] = data[CUR_PEL_MONTH][oldDate];
+  delete data[CUR_PEL_MONTH][oldDate];
+  savePelData(data);
+  if (CUR_PEL_WEEK === oldDate) CUR_PEL_WEEK = newDate;
+  renderPelayanan();
+  toast('\u2713 Tanggal diubah');
+}
+
+function deletePelWeek(date) {
+  if (!confirm('Hapus minggu ' + fmtWeekLabel(date) + '?')) return;
+  const data = getPelData();
+  if (data[CUR_PEL_MONTH]) { delete data[CUR_PEL_MONTH][date]; savePelData(data); }
+  if (CUR_PEL_WEEK === date) CUR_PEL_WEEK = null;
+  renderPelayanan();
+  toast('\u2713 Minggu dihapus');
+}
+
+function savePelAssignment(roleName, memberName) {
+  if (!CUR_PEL_WEEK) return;
+  const data = getPelData();
+  if (!data[CUR_PEL_MONTH]) data[CUR_PEL_MONTH] = {};
+  if (!data[CUR_PEL_MONTH][CUR_PEL_WEEK]) data[CUR_PEL_MONTH][CUR_PEL_WEEK] = {};
+  if (memberName) {
+    data[CUR_PEL_MONTH][CUR_PEL_WEEK][roleName] = memberName;
+  } else {
+    delete data[CUR_PEL_MONTH][CUR_PEL_WEEK][roleName];
+  }
+  savePelData(data);
+  // Re-render to update stats
+  renderPelayanan();
+  toast('\u2713 Disimpan');
+}
+
+function addPelRole() {
+  const name = prompt('Nama role custom (contoh: Worship Leader)');
+  if (!name) return;
+  const abbr = prompt('Singkatan (2-3 huruf, contoh: WL)', name.substring(0,2).toUpperCase());
+  if (!abbr) return;
+  const colors = ['#7c3aed','#0891b2','#be185d','#4f46e5','#059669','#ca8a04'];
+  const bgs = ['#f5f3ff','#ecfeff','#fdf2f8','#eef2ff','#ecfdf5','#fefce8'];
+  const idx = getPelRoles().length % colors.length;
+  const custom = JSON.parse(localStorage.getItem('cg_pel_roles_' + CUR_CG) || '[]');
+  custom.push({name: name, abbr: abbr.toUpperCase(), color: colors[idx], bg: bgs[idx]});
+  savePelRoles(custom);
+  renderPelayanan();
+  toast('\u2713 Role ditambahkan');
+}
+
+function ajakMember(name) {
+  toast('Reminder dikirim ke ' + name);
+}
+
+// ========== MILESTONE TAB ==========
+function renderMilestone() {
+  const el = document.getElementById('tab-milestone');
+  const total = MEMBERS.length || 1;
+
+  // Compute stats
+  const counts = {};
+  MS_FIELDS.forEach(f => { counts[f] = MEMBERS.filter(m => m[f]).length; });
+  const totalMs = MS_FIELDS.reduce((s, f) => s + counts[f], 0);
+  const avgPct = Math.round(totalMs / (total * 8) * 100);
+  const avgPer = (totalMs / total).toFixed(1);
+
+  let html = '';
+
+  // Filter chips
+  html += '<div class="filter-chips" style="margin-bottom:16px"><span class="chip on">Semua</span><span class="chip">MSJ</span><span class="chip">CGT</span><span class="chip">Baptis</span><span class="chip red">Belum MSJ 1</span></div>';
+
+  // Hero
+  const heroDash = Math.round(avgPct / 100 * 97.4);
+  html += '<div style="background:linear-gradient(135deg,#6C5CE7,#a855f7);border-radius:18px;padding:18px 20px;margin-bottom:14px;color:#fff;box-shadow:0 8px 24px rgba(108,92,231,.25);display:flex;align-items:center;justify-content:space-between">';
+  html += '<div><div style="font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;opacity:.85">Rata-rata Milestone</div>';
+  html += '<div style="font-family:\'Instrument Serif\',serif;font-size:38px;line-height:1">'+avgPct+'%</div>';
+  html += '<div style="font-size:11px;opacity:.85;margin-top:2px">'+total+' member \u00b7 '+avgPer+'/8 milestone rata-rata</div></div>';
+  html += '<div style="position:relative;width:64px;height:64px"><svg viewBox="0 0 36 36" style="transform:rotate(-90deg)"><circle cx="18" cy="18" r="15.5" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="3"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="#fff" stroke-width="3" stroke-dasharray="'+heroDash+' 97.4" stroke-linecap="round"/></svg></div></div>';
+
+  // Donut stats
+  const donutItems = [
+    {field:'msj1',label:'MSJ 1',color:'var(--green)',stroke:'#16a34a',grad:'linear-gradient(135deg,#f0fdf4,#dcfce7)',border:'#bbf7d0'},
+    {field:'msj2',label:'MSJ 2',color:'var(--blue)',stroke:'#2563eb',grad:'linear-gradient(135deg,#eff6ff,#dbeafe)',border:'#bfdbfe'},
+    {field:'cgt1',label:'CGT 1',color:'#0f766e',stroke:'#0f766e',grad:'linear-gradient(135deg,#f0fdfa,#ccfbf1)',border:'#99f6e4'},
+    {field:'baptis_air',label:'B. Air',color:'#7c3aed',stroke:'#7c3aed',grad:'linear-gradient(135deg,#faf5ff,#ede9fe)',border:'#ddd6fe'}
+  ];
+
+  html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px">';
+  donutItems.forEach(d => {
+    const cnt = counts[d.field];
+    const pct = Math.round(cnt/total*100);
+    const dash = Math.round(pct/100*97.4);
+    html += '<div style="background:'+d.grad+';border-radius:14px;padding:14px 10px;text-align:center;border:1px solid '+d.border+';transition:transform .15s;cursor:pointer" onmouseover="this.style.transform=\'translateY(-2px)\'" onmouseout="this.style.transform=\'\'">';
+    html += '<div style="position:relative;width:56px;height:56px;margin:0 auto 6px"><svg viewBox="0 0 36 36" style="transform:rotate(-90deg)"><circle cx="18" cy="18" r="15.5" fill="none" stroke="rgba(0,0,0,.08)" stroke-width="3"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="'+d.stroke+'" stroke-width="3" stroke-dasharray="'+dash+' 97.4" stroke-linecap="round"/></svg>';
+    html += '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:\'Instrument Serif\',serif;font-size:18px;color:'+d.color+'">'+cnt+'</div></div>';
+    html += '<div style="font-size:10px;font-weight:700;letter-spacing:1px;color:'+d.color+'">'+d.label+'</div>';
+    html += '<div style="font-size:9px;color:var(--g4);margin-top:2px">'+pct+'% selesai</div></div>';
+  });
+  html += '</div>';
+
+  // Secondary bars
+  const barItems = [
+    {field:'msj3',label:'MSJ 3',color:'var(--purple)',grad:'linear-gradient(90deg,#7c3aed,#a78bfa)'},
+    {field:'cgt2',label:'CGT 2',color:'var(--blue)',grad:'linear-gradient(90deg,#2563eb,#60a5fa)'},
+    {field:'cgt3',label:'CGT 3',color:'var(--orange)',grad:'linear-gradient(90deg,#d97706,#fbbf24)'},
+    {field:'baptis_roh',label:'B. Roh',color:'var(--green)',grad:'linear-gradient(90deg,#16a34a,#34d399)'}
+  ];
+  html += '<div style="background:var(--white);border:1px solid var(--g5);border-radius:14px;padding:14px;margin-bottom:20px">';
+  html += '<div style="font-size:9px;font-weight:700;letter-spacing:1.2px;color:var(--g3);margin-bottom:10px;text-transform:uppercase">Progress Lainnya (dari '+total+' member)</div>';
+  html += '<div style="display:flex;flex-direction:column;gap:8px">';
+  barItems.forEach(b => {
+    const cnt = counts[b.field];
+    const w = Math.round(cnt/total*100);
+    html += '<div style="display:flex;align-items:center;gap:10px"><span style="font-size:10px;font-weight:600;color:'+b.color+';min-width:48px">'+b.label+'</span><div style="flex:1;height:10px;background:var(--g6);border-radius:10px;overflow:hidden"><div style="width:'+w+'%;height:100%;background:'+b.grad+';border-radius:10px"></div></div><span style="font-size:11px;font-weight:700;color:'+b.color+';min-width:32px;text-align:right">'+cnt+'/'+total+'</span></div>';
+  });
+  html += '</div></div>';
+
+  // Per-member cards
+  html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><div style="font-size:11px;font-weight:700;letter-spacing:1.2px;color:var(--g3);text-transform:uppercase">\ud83d\udc65 Progress per Member</div><span style="font-size:10px;color:var(--g4)">Sorted by progress</span></div>';
+
+  const memberProgress = MEMBERS.map(m => {
+    const done = MS_FIELDS.filter(f => m[f]).length;
+    return { ...m, msDone: done, msPct: Math.round(done/8*100) };
+  }).sort((a, b) => b.msPct - a.msPct);
+
+  memberProgress.forEach(m => {
+    const pct = m.msPct;
+    const pctColor = pct >= 75 ? 'var(--green)' : pct >= 50 ? 'var(--blue)' : pct >= 25 ? 'var(--orange)' : 'var(--red)';
+    const gradColor = pct >= 75 ? 'linear-gradient(90deg,#16a34a,#34d399)' : pct >= 50 ? 'linear-gradient(90deg,#2563eb,#60a5fa)' : pct >= 25 ? 'linear-gradient(90deg,#d97706,#fbbf24)' : 'var(--red)';
+    const bgPill = pct >= 75 ? 'linear-gradient(135deg,#f0fdf4,#dcfce7)' : pct >= 50 ? 'linear-gradient(135deg,#eff6ff,#dbeafe)' : pct >= 25 ? 'linear-gradient(135deg,#fffbeb,#fef3c7)' : 'linear-gradient(135deg,#fef2f2,#ffe4e6)';
+    const atRisk = pct === 0;
+
+    html += '<div style="background:var(--white);border:1px solid '+(atRisk?'#fecaca':'var(--g5)')+';border-radius:14px;padding:16px;margin-bottom:12px;overflow:hidden;position:relative'+(atRisk?';border-left:4px solid var(--red)':'')+'">';
+    if (pct > 0) html += '<div style="position:absolute;top:0;left:0;width:'+pct+'%;height:3px;background:'+gradColor+'"></div>';
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px"><div>';
+    html += '<div style="font-weight:600;font-size:14px'+(atRisk?';color:var(--red)':'')+'">'+esc(m.nama)+'</div>';
+    html += '<div style="font-size:10px;color:'+(atRisk?'var(--red)':'var(--g4)')+'">'+esc(m.status)+(atRisk?' \u00b7 \u26a0\ufe0f Perlu follow-up':'')+'</div></div>';
+    html += '<div style="background:'+bgPill+';padding:6px 14px;border-radius:20px"><span style="font-family:\'Instrument Serif\',serif;font-size:20px;color:'+pctColor+'">'+pct+'%</span></div></div>';
+    html += '<div style="height:6px;background:var(--g6);border-radius:6px;overflow:hidden;margin-bottom:10px"><div style="width:'+pct+'%;height:100%;background:'+gradColor+';border-radius:6px"></div></div>';
+    html += '<div class="ms-chips">';
+    MS_FIELDS.forEach((f, i) => {
+      const done = m[f] ? true : false;
+      html += '<span class="msc '+(done?'done':'pending')+'" style="padding:4px 10px;border-radius:8px;cursor:pointer" onclick="toggleMilestone(this,'+m.id+',\''+f+'\','+(done?'true':'false')+')">'+MS_LABELS[i]+(done?' \u2713':'')+'</span>';
+    });
+    html += '</div></div>';
+  });
+
+  el.innerHTML = html;
+}
+
+// ========== EVENTS TAB ==========
+async function renderEvents() {
+  const el = document.getElementById('tab-events');
+
+  // Load from Supabase events table
+  const { data: events } = await supa.from('events').select('*').order('date_start');
+  ALL_EVENTS = events || [];
+
+  // Load CG-specific events from localStorage
+  const cgEvents = JSON.parse(localStorage.getItem('cg_events_' + CUR_CG) || '[]');
+
+  // Birthdays from members
+  const birthdays = MEMBERS.filter(m => m.lahir).map(m => ({
+    name: '\ud83c\udf82 ' + m.nama + ' \u2014 Ulang Tahun',
+    date_start: m.lahir,
+    cat: 'Birthday',
+    note: 'Ulang tahun member CG'
+  }));
+
+  let html = '<div class="filter-chips"><span class="chip on">Semua</span><span class="chip">Ibadah</span><span class="chip">CG Event</span><span class="chip">Birthday</span><span class="chip">Outreach</span></div>';
+
+  // Shared events
+  html += '<div style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--g3);margin-bottom:10px;margin-top:4px">\ud83d\udce2 Event Semua CG</div>';
+  ALL_EVENTS.forEach(ev => {
+    const catColor = ev.cat === 'Ibadah' ? 'var(--green)' : ev.cat === 'Outreach' ? 'var(--purple)' : ev.cat === 'Birthday' ? '#ec4899' : 'var(--blue)';
+    html += '<div class="ev-card" style="border-left-color:'+catColor+'"><div class="ev-date">'+esc(ev.date_start||'')+'</div><div class="ev-name">'+esc(ev.name||'')+'</div><div class="ev-note">'+esc(ev.note||'')+'</div><span class="ev-cat" style="background:rgba(0,0,0,.05);color:'+catColor+'">'+esc(ev.cat||'')+'</span><span class="ev-cat" style="background:rgba(108,92,231,.06);color:var(--purple);margin-left:4px">Semua CG</span></div>';
+  });
+
+  // CG events
+  html += '<div style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--g3);margin:20px 0 10px">\ud83d\udccb Event CG Ini</div>';
+  cgEvents.forEach(ev => {
+    const catColor = ev.cat === 'Ibadah' ? 'var(--green)' : ev.cat === 'Outreach' ? 'var(--purple)' : ev.cat === 'Birthday' ? '#ec4899' : 'var(--blue)';
+    html += '<div class="ev-card" style="border-left-color:'+catColor+'"><div class="ev-date">'+esc(ev.date||'')+'</div><div class="ev-name">'+esc(ev.name||'')+'</div><div class="ev-note">'+esc(ev.note||'')+'</div><span class="ev-cat" style="background:rgba(0,0,0,.05);color:'+catColor+'">'+esc(ev.cat||'')+'</span></div>';
+  });
+
+  // Birthdays
+  birthdays.forEach(ev => {
+    html += '<div class="ev-card" style="border-left-color:#f472b6"><div class="ev-date">'+esc(ev.date_start||'')+'</div><div class="ev-name">'+esc(ev.name)+'</div><div class="ev-note">'+esc(ev.note)+'</div><span class="ev-cat" style="background:rgba(244,114,182,.08);color:#ec4899">Birthday</span></div>';
+  });
+
+  html += '<button class="pel-add" style="margin-top:10px;width:100%;padding:10px;text-align:center" onclick="openModal(\'addCGEventModal\')">+ Tambah Event CG</button>';
+  el.innerHTML = html;
+}
+
+function saveCGEvent() {
+  const name = document.getElementById('evName').value.trim();
+  if (!name) { alert('Nama event harus diisi'); return; }
+  const ev = {
+    name,
+    date: document.getElementById('evDate').value,
+    cat: document.getElementById('evCat').value,
+    note: document.getElementById('evNote').value
+  };
+  const cgEvents = JSON.parse(localStorage.getItem('cg_events_' + CUR_CG) || '[]');
+  cgEvents.push(ev);
+  localStorage.setItem('cg_events_' + CUR_CG, JSON.stringify(cgEvents));
+  closeModal('addCGEventModal');
+  renderEvents();
+  toast('\u2713 Disimpan lokal');
+}
+
+// ========== NAVIGATION ==========
+function goBack() {
+  document.getElementById('pageD').style.display = 'none';
+  if (fromCoach) document.getElementById('pageC').style.display = 'block';
+  else document.getElementById('pageL').style.display = 'flex';
+  window.scrollTo(0, 0);
+}
+
+function sTab(id, b) {
+  document.querySelectorAll('#pageD .app-tab').forEach(t => t.classList.remove('on'));
+  b.classList.add('on');
+  document.querySelectorAll('#pageD .tab-content').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+}
+
+function goBackCoach() {
+  document.getElementById('pageC').style.display = 'none';
+  document.getElementById('pageL').style.display = 'flex';
+  window.scrollTo(0, 0);
+}
+
+function sCoachTab(id, b) {
+  document.querySelectorAll('#pageC .app-tab').forEach(t => t.classList.remove('on'));
+  b.classList.add('on');
+  document.querySelectorAll('#pageC .tab-content').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+}
+
+// ========== COACH DASHBOARD ==========
+async function loadCoachData() {
+  const [membersRes, cgInfoRes, datesRes, attendanceRes, eventsRes] = await Promise.all([
+    supa.from('members').select('*').order('cg,nama'),
+    supa.from('cg_info').select('*'),
+    supa.from('dates').select('*').order('sort_order'),
+    supa.from('attendance').select('*'),
+    supa.from('events').select('*').order('date_start')
+  ]);
+
+  ALL_MEMBERS = membersRes.data || [];
+  ALL_CG_INFO = cgInfoRes.data || [];
+  ALL_DATES = datesRes.data || [];
+  ALL_EVENTS = eventsRes.data || [];
+  ALL_ATTENDANCE = {};
+  (attendanceRes.data || []).forEach(a => { ALL_ATTENDANCE[a.member_id + '_' + a.date_id] = a.status; });
+
+  renderCoachOverview();
+  renderCoachAbsensi();
+  renderCoachMilestone();
+  renderCoachVisi();
+  renderCoachEvents();
+}
+
+function getCGsForRegion(reg) {
+  if (reg === 'all') return [...new Set(ALL_MEMBERS.map(m => m.cg))];
+  return [...new Set(ALL_MEMBERS.filter(m => m.region === reg).map(m => m.cg))];
+}
+
+function getCGStats(cg) {
+  const mems = ALL_MEMBERS.filter(m => m.cg === cg);
+  const total = mems.length;
+  const info = ALL_CG_INFO.find(c => c.cg === cg) || {};
+  const leader = info.leader || mems.find(m => m.status === 'CGL')?.nama || '';
+
+  // Attendance pct
+  let hCount = 0, totalAtt = 0;
+  mems.forEach(m => {
+    ALL_DATES.forEach(d => {
+      const st = ALL_ATTENDANCE[m.id + '_' + d.id];
+      if (st) { totalAtt++; if (st === 'H') hCount++; }
+    });
+  });
+  const pct = totalAtt ? Math.round(hCount / totalAtt * 100) : 0;
+
+  // At risk
+  const atRisk = mems.filter(m => {
+    let h=0, t=0;
+    ALL_DATES.forEach(d => { const s=ALL_ATTENDANCE[m.id+'_'+d.id]; if(s){t++;if(s==='H')h++;} });
+    return t > 1 && h/t < 0.5;
+  }).length;
+
+  // Milestone
+  let msDone = 0;
+  mems.forEach(m => { MS_FIELDS.forEach(f => { if (m[f]) msDone++; }); });
+  const msPct = total ? Math.round(msDone / (total * 8) * 100) : 0;
+
+  const blmMsj1 = mems.filter(m => !m.msj1).length;
+
+  return { cg, leader, total, pct, atRisk, msPct, blmMsj1, info, mems };
+}
+
+function renderCoachOverview() {
+  const el = document.getElementById('tab-c-overview');
+  const region = coachRole === 'tl' ? 'all' : coachReg;
+  const cgs = getCGsForRegion(region);
+  const allStats = cgs.map(getCGStats);
+
+  // Totals
+  const totalMbr = allStats.reduce((s, c) => s + c.total, 0);
+  const avgHadir = allStats.length ? Math.round(allStats.reduce((s, c) => s + c.pct, 0) / allStats.length) : 0;
+  const totalRisk = allStats.reduce((s, c) => s + c.atRisk, 0);
+  const totalBlm = allStats.reduce((s, c) => s + c.blmMsj1, 0);
+
+  document.getElementById('csTotalMbr').textContent = totalMbr;
+  document.getElementById('csAvgHadir').textContent = avgHadir + '%';
+  document.getElementById('csAtRisk').textContent = totalRisk;
+  document.getElementById('csBlmMsj').textContent = totalBlm;
+  document.getElementById('csRegLabel').textContent = coachRole === 'tl' ? 'Total semua' : (coachReg === 'jaktim1' ? 'Jaktim 1' : 'Jaktim 2');
+  document.getElementById('coachMeta').textContent = cgs.length + ' CG aktif \u00b7 ' + totalMbr + ' member \u00b7 ' + avgHadir + '% kehadiran';
+
+  let html = '';
+  if (coachRole !== 'tl') {
+    html += '<div class="region-toggle" style="display:inline-flex;margin-bottom:16px;margin-top:4px"><button class="region-btn '+(coachReg==='jaktim1'?'active':'')+'" onclick="coachReg=\'jaktim1\';renderCoachOverview();renderCoachAbsensi();renderCoachMilestone();renderCoachVisi()" style="padding:6px 18px;font-size:12px">JAKTIM 1</button><button class="region-btn '+(coachReg==='jaktim2'?'active':'')+'" onclick="coachReg=\'jaktim2\';renderCoachOverview();renderCoachAbsensi();renderCoachMilestone();renderCoachVisi()" style="padding:6px 18px;font-size:12px">JAKTIM 2</button></div>';
+  }
+
+  // CG Cards Grid
+  html += '<div class="coach-grid">';
+  allStats.sort((a, b) => b.pct - a.pct);
+  allStats.forEach(c => {
+    const color = CG_COLORS[c.cg] || '#7c3aed';
+    const dash = Math.round(c.pct * 97.4 / 100);
+    html += '<div class="coach-card" style="border-left:4px solid '+color+'" onclick="enterFromCoach(\''+c.cg+'\')">';
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><div style="font-weight:800;font-size:15px">'+esc(c.cg)+'</div>';
+    html += '<div style="position:relative;width:40px;height:40px"><svg viewBox="0 0 36 36" style="transform:rotate(-90deg)"><circle cx="18" cy="18" r="15.5" fill="none" stroke="#e5e7eb" stroke-width="3"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="'+color+'" stroke-width="3" stroke-dasharray="'+dash+' 97.4" stroke-linecap="round"/></svg><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700">'+c.pct+'%</div></div></div>';
+    html += '<div style="font-size:11px;color:var(--g3);margin-bottom:8px">CGL: '+esc(c.leader)+'</div>';
+    html += '<div style="display:flex;gap:14px;font-size:11px;margin-bottom:8px"><div style="text-align:center"><span style="font-family:\'Instrument Serif\',serif;font-size:18px;display:block">'+c.total+'</span>Member</div><div style="text-align:center"><span style="font-family:\'Instrument Serif\',serif;font-size:18px;color:var(--red);display:block">'+c.atRisk+'</span>At Risk</div></div>';
+    html += '<div style="font-size:9px;color:var(--g3);margin-bottom:3px">Milestone Progress</div><div class="ms-bar"><div class="ms-bar-fill" style="width:'+c.msPct+'%"></div></div><div style="font-size:9px;color:var(--g4)">'+c.msPct+'% selesai</div></div>';
+  });
+  html += '</div>';
+
+  // Bar chart comparison
+  html += '<div class="section" style="margin-top:20px"><div class="section-title">\ud83d\udcca Perbandingan Antar CG</div>';
+  allStats.forEach(c => {
+    const color = CG_COLORS[c.cg] || '#7c3aed';
+    html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><div style="width:70px;font-size:11px;font-weight:600;text-align:right">'+esc(c.cg)+'</div><div style="flex:1;height:22px;background:var(--g6);border-radius:6px;overflow:hidden"><div style="width:'+c.pct+'%;height:100%;background:'+color+';border-radius:6px;display:flex;align-items:center;padding-left:8px"><span style="font-size:9px;color:#fff;font-weight:700">'+c.pct+'%</span></div></div></div>';
+  });
+  html += '</div>';
+
+  el.innerHTML = html;
+}
+
+function renderCoachAbsensi() {
+  const el = document.getElementById('tab-c-absensi');
+  const region = coachRole === 'tl' ? 'all' : coachReg;
+  const cgs = getCGsForRegion(region);
+  const dates = region === 'all' ? ALL_DATES : ALL_DATES.filter(d => d.region === region);
+
+  let html = '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px">';
+  if (coachRole !== 'tl') {
+    html += '<div class="region-toggle" style="display:inline-flex;margin:0"><button class="region-btn '+(coachReg==='jaktim1'?'active':'')+'" onclick="coachReg=\'jaktim1\';renderCoachAbsensi()" style="padding:6px 16px;font-size:11px">JAKTIM 1</button><button class="region-btn '+(coachReg==='jaktim2'?'active':'')+'" onclick="coachReg=\'jaktim2\';renderCoachAbsensi()" style="padding:6px 16px;font-size:11px">JAKTIM 2</button></div>';
+  }
+  html += '</div>';
+
+  html += '<div style="overflow-x:auto"><table class="t"><thead><tr><th>Nama</th><th>CG</th>';
+  dates.forEach(d => { html += '<th>' + esc(d.label||d.id) + '</th>'; });
+  html += '<th>% Hadir</th></tr></thead><tbody>';
+
+  cgs.sort().forEach(cg => {
+    const mems = ALL_MEMBERS.filter(m => m.cg === cg);
+    const color = CG_COLORS[cg] || '#7c3aed';
+    const bg = CG_BG[cg] || '#faf5ff';
+    const info = ALL_CG_INFO.find(c => c.cg === cg) || {};
+    html += '<tr style="background:'+bg+'"><td colspan="'+(dates.length+2)+'" style="font-weight:700;font-size:11px;letter-spacing:1px;color:'+color+';text-align:left;padding:8px 10px;border-left:3px solid '+color+'">'+esc(cg)+' \u2014 '+esc(info.leader||'')+'</td></tr>';
+
+    mems.sort((a,b) => (ROLE_ORDER[a.status]||9) - (ROLE_ORDER[b.status]||9)).forEach(m => {
+      let hCount=0, tCount=0;
+      dates.forEach(d => { const s=ALL_ATTENDANCE[m.id+'_'+d.id]; if(s){tCount++;if(s==='H')hCount++;} });
+      const pct = tCount ? Math.round(hCount/tCount*100) : 0;
+      const pctColor = pct>=75?'var(--green)':pct>=50?'var(--orange)':'var(--red)';
+      const atRisk = tCount>1 && pct<50;
+
+      html += '<tr'+(atRisk?' style="border-left:3px solid var(--red)"':'')+'>';
+      html += '<td class="name-cell"'+(atRisk?' style="color:var(--red)"':'')+'>'+esc(m.nama)+'<span class="role-tag">'+esc(m.status)+'</span></td>';
+      html += '<td style="font-size:9px;color:var(--g4)">'+esc(CG_INIT[cg]||cg)+'</td>';
+      dates.forEach(d => {
+        const st = ALL_ATTENDANCE[m.id+'_'+d.id] || null;
+        const cls = st || 'X';
+        html += '<td><span class="dot '+cls+'">'+(st||'-')+'</span></td>';
+      });
+      html += '<td><div class="pbar"><div class="pbar-track"><div class="pbar-fill" style="width:'+pct+'%;background:'+pctColor+'"></div></div><span class="pbar-val" style="color:'+pctColor+'">'+pct+'%</span></div></td></tr>';
+    });
+  });
+
+  html += '</tbody></table></div>';
+  el.innerHTML = html;
+}
+
+function renderCoachMilestone() {
+  const el = document.getElementById('tab-c-milestone');
+  const region = coachRole === 'tl' ? 'all' : coachReg;
+  const cgs = getCGsForRegion(region);
+  const mems = region === 'all' ? ALL_MEMBERS : ALL_MEMBERS.filter(m => m.region === region);
+  const total = mems.length || 1;
+
+  let html = '';
+  if (coachRole !== 'tl') {
+    html += '<div class="region-toggle" style="display:inline-flex;margin-bottom:16px;margin-top:4px"><button class="region-btn '+(coachReg==='jaktim1'?'active':'')+'" onclick="coachReg=\'jaktim1\';renderCoachMilestone()" style="padding:6px 18px;font-size:12px">JAKTIM 1</button><button class="region-btn '+(coachReg==='jaktim2'?'active':'')+'" onclick="coachReg=\'jaktim2\';renderCoachMilestone()" style="padding:6px 18px;font-size:12px">JAKTIM 2</button></div>';
+  }
+
+  html += '<div class="filter-chips" style="margin-bottom:16px"><span class="chip on">Semua</span><span class="chip">MSJ</span><span class="chip">CGT</span><span class="chip">Baptis</span><span class="chip red">Belum MSJ 1</span></div>';
+
+  // Donut stats
+  const donutItems = [
+    {field:'msj1',label:'MSJ 1',stroke:'#16a34a',color:'var(--green)',grad:'linear-gradient(135deg,#f0fdf4,#dcfce7)'},
+    {field:'msj2',label:'MSJ 2',stroke:'#2563eb',color:'var(--blue)',grad:'linear-gradient(135deg,#eff6ff,#dbeafe)'},
+    {field:'cgt1',label:'CGT 1',stroke:'#0f766e',color:'#0f766e',grad:'linear-gradient(135deg,#f0fdfa,#ccfbf1)'},
+    {field:'baptis_air',label:'B. Air',stroke:'#7c3aed',color:'#7c3aed',grad:'linear-gradient(135deg,#faf5ff,#ede9fe)'}
+  ];
+
+  html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px">';
+  donutItems.forEach(d => {
+    const cnt = mems.filter(m => m[d.field]).length;
+    const dash = Math.round(cnt/total*97.4);
+    html += '<div style="background:'+d.grad+';border-radius:14px;padding:16px;text-align:center"><div style="position:relative;width:56px;height:56px;margin:0 auto 6px"><svg viewBox="0 0 36 36" style="transform:rotate(-90deg)"><circle cx="18" cy="18" r="15.5" fill="none" stroke="#e5e7eb" stroke-width="3"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="'+d.stroke+'" stroke-width="3" stroke-dasharray="'+dash+' 97.4" stroke-linecap="round"/></svg><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:\'Instrument Serif\',serif;font-size:15px;color:'+d.color+'">'+cnt+'</div></div><div style="font-size:9px;font-weight:600;letter-spacing:1px;color:'+d.color+'">'+d.label+'</div><div style="font-size:8px;color:var(--g4)">'+cnt+'/'+total+'</div></div>';
+  });
+  html += '</div>';
+
+  // Per-CG accordion
+  html += '<div class="section"><div class="section-title">\ud83d\udccb Breakdown per CG</div>';
+  cgs.sort().forEach(cg => {
+    const cgMems = ALL_MEMBERS.filter(m => m.cg === cg);
+    const cgTotal = cgMems.length || 1;
+    const color = CG_COLORS[cg] || '#7c3aed';
+    const bg = CG_BG[cg] || '#faf5ff';
+    const msCounts = {};
+    MS_FIELDS.forEach(f => { msCounts[f] = cgMems.filter(m => m[f]).length; });
+    const msDone = MS_FIELDS.reduce((s,f) => s + msCounts[f], 0);
+    const msPct = Math.round(msDone / (cgTotal*8) * 100);
+    const blmMsj1 = cgMems.filter(m => !m.msj1).map(m => m.nama);
+
+    html += '<div style="border:1px solid var(--g5);border-radius:10px;margin-bottom:10px;overflow:hidden">';
+    html += '<div style="padding:12px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;background:'+bg+';border-left:3px solid '+color+'" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\';this.querySelector(\'.acc-arrow\').textContent=this.nextElementSibling.style.display===\'none\'?\'+\':\'-\'">';
+    html += '<div><span style="font-weight:700;font-size:13px">'+esc(cg)+'</span> <span style="font-size:10px;color:var(--g3)">\u00b7 '+cgTotal+' member</span></div>';
+    html += '<div style="display:flex;align-items:center;gap:10px"><span style="font-size:11px;font-weight:600;color:'+color+'">'+msPct+'% milestone</span><span class="acc-arrow" style="font-size:14px;color:var(--g3)">+</span></div></div>';
+    html += '<div style="display:none;padding:14px;background:var(--white)">';
+    html += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">';
+    [['msj1','MSJ 1','var(--green)'],['msj2','MSJ 2','var(--blue)'],['cgt1','CGT 1','#0f766e'],['baptis_air','B.Air','#7c3aed']].forEach(([f,l,c]) => {
+      html += '<div style="flex:1;min-width:60px;background:var(--g6);border-radius:8px;padding:8px;text-align:center"><span style="font-family:\'Instrument Serif\',serif;font-size:16px;color:'+c+'">'+msCounts[f]+'</span><div style="font-size:8px;color:var(--g3)">'+l+'</div></div>';
+    });
+    html += '</div>';
+    if (blmMsj1.length) {
+      html += '<div style="font-size:10px;color:var(--red);font-weight:600">Belum MSJ 1: '+esc(blmMsj1.join(', '))+'</div>';
+    }
+    html += '</div></div>';
+  });
+  html += '</div>';
+
+  el.innerHTML = html;
+}
+
+function renderCoachVisi() {
+  const el = document.getElementById('tab-c-visi');
+  const region = coachRole === 'tl' ? 'all' : coachReg;
+  const cgs = getCGsForRegion(region);
+
+  let html = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">';
+  html += '<div style="font-size:11px;color:var(--g3)">Edit visi & misi setiap CG. Tambahkan feedback.</div>';
+  if (coachRole !== 'tl') {
+    html += '<div class="region-toggle" style="margin:0;display:inline-flex"><button class="region-btn '+(coachReg==='jaktim1'?'active':'')+'" onclick="coachReg=\'jaktim1\';renderCoachVisi()" style="padding:4px 14px;font-size:11px">JAKTIM 1</button><button class="region-btn '+(coachReg==='jaktim2'?'active':'')+'" onclick="coachReg=\'jaktim2\';renderCoachVisi()" style="padding:4px 14px;font-size:11px">JAKTIM 2</button></div>';
+  }
+  html += '</div>';
+
+  cgs.sort().forEach(cg => {
+    const stats = getCGStats(cg);
+    const color = CG_COLORS[cg] || '#7c3aed';
+    const bg = CG_BG[cg] || '#faf5ff';
+    const init = CG_INIT[cg] || cg.replace('TEEN ','T');
+    const vision = localStorage.getItem('cg_vision_'+cg) || '';
+    const mission = localStorage.getItem('cg_mission_'+cg) || '';
+    const coachNotes = localStorage.getItem('coach_notes_'+cg) || '';
+    const devPlan = JSON.parse(localStorage.getItem('cg_devplan_'+cg) || '[]');
+
+    html += '<div style="background:var(--white);border-radius:16px;overflow:hidden;margin-bottom:16px;box-shadow:0 2px 12px rgba(0,0,0,.04)">';
+    html += '<div style="background:linear-gradient(135deg,'+bg+','+bg+'cc);padding:16px 20px;display:flex;align-items:center;justify-content:space-between">';
+    html += '<div style="display:flex;align-items:center;gap:10px"><div style="width:40px;height:40px;border-radius:10px;background:'+color+';display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:11px">'+esc(init)+'</div>';
+    html += '<div><div style="font-weight:700;font-size:14px">'+esc(cg)+'</div><div style="font-size:11px;color:var(--g3)">CGL: '+esc(stats.leader)+'</div></div></div>';
+    html += '<div style="text-align:right"><div style="font-family:\'Instrument Serif\',serif;font-size:22px;color:'+color+'">'+stats.pct+'%</div><div style="font-size:9px;color:var(--g3)">Kehadiran</div></div></div>';
+
+    html += '<div style="padding:16px 20px">';
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">';
+    html += '<div style="background:var(--g6);border-radius:10px;padding:10px"><div style="font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--g3);margin-bottom:4px">Visi</div><textarea class="vedit" style="min-height:40px;font-size:12px" data-cg="'+cg+'" data-type="vision" onblur="saveCoachVisi(this)">'+esc(vision)+'</textarea></div>';
+    html += '<div style="background:var(--g6);border-radius:10px;padding:10px"><div style="font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--g3);margin-bottom:4px">Misi</div><textarea class="vedit" style="min-height:40px;font-size:12px" data-cg="'+cg+'" data-type="mission" onblur="saveCoachVisi(this)">'+esc(mission)+'</textarea></div>';
+    html += '</div>';
+
+    // Dev plan
+    html += '<div style="background:#fff;border:1px solid var(--g5);border-radius:10px;padding:12px;margin-bottom:10px">';
+    html += '<div style="font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--g3);margin-bottom:8px">\ud83d\udcc8 Rencana Pengembangan oleh CGL</div>';
+    if (devPlan.length) {
+      devPlan.forEach(d => {
+        const roleCls = (d.currentRole||'member').toLowerCase();
+        const targetCls = (d.target||'sponsor').toLowerCase().replace('target: ','');
+        html += '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--g6);font-size:12px"><span style="font-weight:500;flex:1">'+esc(d.name)+'</span><span class="role-btn '+roleCls+'" style="cursor:default;font-size:9px;padding:2px 8px">'+esc(d.currentRole)+'</span><span style="color:var(--g4)">\u2192</span><span class="role-btn sponsor" style="cursor:default;font-size:9px;padding:2px 8px">'+esc(d.target||'Sponsor')+'</span><span style="font-size:10px;color:var(--g3);min-width:65px;text-align:right">'+esc(d.deadline||'')+'</span></div>';
+      });
+    } else {
+      html += '<div style="font-size:11px;color:var(--g3);font-style:italic">Belum ada data dev plan</div>';
+    }
+    html += '</div>';
+
+    // Coach notes
+    html += '<div style="background:linear-gradient(135deg,'+bg+','+bg+'aa);border:1px dashed '+color+'80;border-radius:10px;padding:10px"><div style="font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:'+color+';margin-bottom:4px">\ud83d\udcac Catatan Coach</div><textarea class="vedit" style="min-height:36px;font-size:12px;border-color:'+color+'80" data-cg="'+cg+'" data-type="coach_notes" onblur="saveCoachVisi(this)">'+esc(coachNotes)+'</textarea></div>';
+    html += '</div></div>';
+  });
+
+  html += '<button class="btn-purple" style="margin-top:4px;width:100%" onclick="toast(\'\u2713 Disimpan lokal\')">\ud83d\udcbe Simpan Semua Visi & Catatan</button>';
+  el.innerHTML = html;
+}
+
+function saveCoachVisi(textarea) {
+  const cg = textarea.dataset.cg;
+  const type = textarea.dataset.type;
+  const key = type === 'vision' ? 'cg_vision_'+cg : type === 'mission' ? 'cg_mission_'+cg : 'coach_notes_'+cg;
+  localStorage.setItem(key, textarea.value);
+  toast('\u2713 Disimpan lokal');
+}
+
+function renderCoachEvents() {
+  const el = document.getElementById('tab-c-events');
+  const cgs = coachRole === 'tl' ? getCGsForRegion('all') : getCGsForRegion(coachReg);
+
+  let html = '<div class="filter-chips"><span class="chip on">Semua</span><span class="chip">Ibadah</span><span class="chip">CG Event</span><span class="chip">Birthday</span><span class="chip">Outreach</span></div>';
+
+  // Shared events
+  html += '<div style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--g3);margin-bottom:10px;margin-top:4px">Event Semua CG</div>';
+  ALL_EVENTS.forEach(ev => {
+    const catColor = ev.cat === 'Ibadah' ? 'var(--green)' : ev.cat === 'Outreach' ? 'var(--purple)' : ev.cat === 'Birthday' ? '#ec4899' : 'var(--blue)';
+    html += '<div class="ev-card" style="border-left-color:'+catColor+'"><div class="ev-date">'+esc(ev.date_start||'')+'</div><div class="ev-name">'+esc(ev.name||'')+'</div><div class="ev-note">'+esc(ev.note||'')+'</div><span class="ev-cat" style="background:rgba(0,0,0,.05);color:'+catColor+'">'+esc(ev.cat||'')+'</span><span class="ev-cat" style="background:rgba(108,92,231,.06);color:var(--purple);margin-left:4px">Semua CG</span></div>';
+  });
+
+  // Per-CG events
+  html += '<div style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--g3);margin:20px 0 10px">Event per CG</div>';
+  cgs.forEach(cg => {
+    const cgEvents = JSON.parse(localStorage.getItem('cg_events_'+cg) || '[]');
+    const color = CG_COLORS[cg] || '#7c3aed';
+    cgEvents.forEach(ev => {
+      const catColor = ev.cat === 'Ibadah' ? 'var(--green)' : ev.cat === 'Outreach' ? 'var(--purple)' : ev.cat === 'Birthday' ? '#ec4899' : 'var(--blue)';
+      html += '<div class="ev-card" style="border-left-color:'+color+'"><div class="ev-date">'+esc(ev.date||'')+'</div><div class="ev-name">'+esc(ev.name||'')+'</div><div class="ev-note">'+esc(ev.note||'')+'</div><span class="ev-cat" style="background:rgba(0,0,0,.05);color:'+catColor+'">'+esc(ev.cat||'')+'</span><span class="ev-cat" style="background:rgba(0,0,0,.05);color:'+color+';margin-left:4px">'+esc(cg)+'</span></div>';
+    });
+
+    // Birthdays
+    const cgMems = ALL_MEMBERS.filter(m => m.cg === cg && m.lahir);
+    cgMems.forEach(m => {
+      html += '<div class="ev-card" style="border-left-color:#f472b6"><div class="ev-date">'+esc(m.lahir)+'</div><div class="ev-name">\ud83c\udf82 '+esc(m.nama)+' \u2014 Ulang Tahun</div><div class="ev-note">Member '+esc(cg)+'</div><span class="ev-cat" style="background:rgba(244,114,182,.08);color:#ec4899">Birthday</span><span class="ev-cat" style="background:rgba(0,0,0,.05);color:'+color+';margin-left:4px">'+esc(cg)+'</span></div>';
+    });
+  });
+
+  // Add event form
+  html += '<div style="background:linear-gradient(135deg,#faf5ff,#f5f0ff);border:2px dashed #c4b5fd;border-radius:14px;padding:16px;margin-top:16px">';
+  html += '<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--purple);margin-bottom:10px">\u2795 Tambah Event Baru</div>';
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">';
+  html += '<input type="text" id="coachEvName" placeholder="Nama event" style="padding:8px 10px;border:1px solid var(--g5);border-radius:8px;font-size:12px;font-family:\'Inter\',sans-serif">';
+  html += '<input type="date" id="coachEvDate" style="padding:8px 10px;border:1px solid var(--g5);border-radius:8px;font-size:12px;font-family:\'Inter\',sans-serif"></div>';
+  html += '<textarea id="coachEvNote" placeholder="Catatan event..." style="width:100%;padding:8px 10px;border:1px solid var(--g5);border-radius:8px;font-size:12px;font-family:\'Inter\',sans-serif;resize:vertical;min-height:40px;margin-bottom:8px"></textarea>';
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">';
+  html += '<select class="cgl-select" id="coachEvCat" style="padding:8px 28px 8px 10px;font-size:12px;border-radius:8px"><option value="Ibadah">Ibadah</option><option value="CG Event">CG Event</option><option value="Birthday">Birthday</option><option value="Outreach">Outreach</option></select>';
+  html += '<select class="cgl-select" id="coachEvTarget" style="padding:8px 28px 8px 10px;font-size:12px;border-radius:8px"><option value="all">Semua CG</option>';
+  getCGsForRegion('all').forEach(cg => { html += '<option value="'+cg+'">'+cg+'</option>'; });
+  html += '</select></div>';
+  html += '<button class="btn-purple" style="width:100%" onclick="saveCoachEvent()">\ud83d\udcbe Simpan Event</button></div>';
+
+  el.innerHTML = html;
+}
+
+function saveCoachEvent() {
+  const name = document.getElementById('coachEvName').value.trim();
+  if (!name) { alert('Nama event harus diisi'); return; }
+  const target = document.getElementById('coachEvTarget').value;
+  const ev = {
+    name,
+    date: document.getElementById('coachEvDate').value,
+    cat: document.getElementById('coachEvCat').value,
+    note: document.getElementById('coachEvNote').value
+  };
+
+  if (target === 'all') {
+    // Save to all CGs
+    getCGsForRegion('all').forEach(cg => {
+      const arr = JSON.parse(localStorage.getItem('cg_events_'+cg) || '[]');
+      arr.push(ev);
+      localStorage.setItem('cg_events_'+cg, JSON.stringify(arr));
+    });
+  } else {
+    const arr = JSON.parse(localStorage.getItem('cg_events_'+target) || '[]');
+    arr.push(ev);
+    localStorage.setItem('cg_events_'+target, JSON.stringify(arr));
+  }
+  renderCoachEvents();
+  toast('\u2713 Disimpan lokal');
+}
+
+function switchRole(role) {
+  coachRole = role;
+  const coachBtn = document.getElementById('roleCoachBtn');
+  const tlBtn = document.getElementById('roleTLBtn');
+  const label = document.getElementById('coachRoleLabel');
+  const heroH = document.getElementById('coachHeroH');
+
+  if (role === 'tl') {
+    coachBtn.style.background='transparent';coachBtn.style.color='var(--g3)';
+    tlBtn.style.background='var(--purple)';tlBtn.style.color='#fff';
+    label.textContent = 'Team Leader';
+    heroH.innerHTML = 'Overview<br><em>Total.</em>';
+  } else {
+    tlBtn.style.background='transparent';tlBtn.style.color='var(--g3)';
+    coachBtn.style.background='var(--purple)';coachBtn.style.color='#fff';
+    label.textContent = 'Coach';
+    heroH.innerHTML = 'Semua<br><em>CG.</em>';
+  }
+  renderCoachOverview();
+  renderCoachAbsensi();
+  renderCoachMilestone();
+  renderCoachVisi();
+  renderCoachEvents();
+}
+
+// ========== UTILITY ==========
+function esc(s) { if (!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// Close role menus on outside click
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.role-wrap')) {
+    document.querySelectorAll('.role-menu.show').forEach(m => m.classList.remove('show'));
+  }
+});
+
+// Close modals on overlay click
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', function(e) { if (e.target === m) m.classList.remove('show'); });
+});
+
+// ========== INIT ==========
+(async function() {
+  const p = new URLSearchParams(location.search);
+  if (p.get('role') === 'coach') {
+    document.getElementById('pageL').style.display = 'none';
+    document.getElementById('pageC').style.display = 'block';
+    await loadCoachData();
+  } else {
+    await loadCGLDropdown();
+  }
+})();
+</script>
+</body>
+</html>
