@@ -2298,13 +2298,16 @@ function renderCoachAbsensi() {
   cgs.sort().forEach(cg => {
     const mems = ALL_MEMBERS.filter(m => m.cg === cg);
     if (mems.length === 0) return;
+    // Dates per CG's region (penting utk TL mode supaya tidak duplikat/mix antar region)
+    const cgRegion = mems[0].region;
+    const cgDates = ALL_DATES.filter(d => d.region === cgRegion);
     const color = CG_COLORS[cg] || '#7c3aed';
     const bg = CG_BG[cg] || '#faf5ff';
     const info = ALL_CG_INFO.find(c => c.cg === cg) || {};
 
     // Compute CG average %
     let cgH=0, cgT=0;
-    mems.forEach(m => { dates.forEach(d => { const s=ALL_ATTENDANCE[m.id+'_'+d.id]; if(s){cgT++;if(s==='H')cgH++;} }); });
+    mems.forEach(m => { cgDates.forEach(d => { const s=ALL_ATTENDANCE[m.id+'_'+d.id]; if(s){cgT++;if(s==='H')cgH++;} }); });
     const cgPct = cgT ? Math.round(cgH/cgT*100) : 0;
 
     html += '<div style="background:#fff;border:1px solid var(--g5);border-radius:14px;overflow:hidden;margin-bottom:18px;box-shadow:0 1px 4px rgba(0,0,0,.03)">';
@@ -2312,7 +2315,7 @@ function renderCoachAbsensi() {
     html += '<div style="background:linear-gradient(135deg,'+bg+','+bg+'cc);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid '+color+'33">';
     html += '<div style="display:flex;align-items:center;gap:10px">';
     html += '<div style="width:34px;height:34px;border-radius:8px;background:'+color+';color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:10px;letter-spacing:.3px">'+esc(CG_INIT[cg]||cg)+'</div>';
-    html += '<div><div style="font-weight:700;font-size:13px;color:'+color+'">'+esc(cg)+'</div><div style="font-size:10px;color:var(--g3)">CGL: '+esc(info.leader||'-')+' · '+mems.length+' member</div></div>';
+    html += '<div><div style="font-weight:700;font-size:13px;color:'+color+'">'+esc(cg)+'</div><div style="font-size:10px;color:var(--g3)">CGL: '+esc(info.leader||'-')+' · '+mems.length+' member · '+(cgRegion==='jaktim1'?'Jaktim 1':'Jaktim 2')+'</div></div>';
     html += '</div>';
     html += '<div style="text-align:right"><div style="font-family:\'Instrument Serif\',serif;font-size:20px;color:'+color+';line-height:1">'+cgPct+'%</div><div style="font-size:9px;color:var(--g4);letter-spacing:.5px">avg hadir</div></div>';
     html += '</div>';
@@ -2320,19 +2323,19 @@ function renderCoachAbsensi() {
     // Attendance table inside card
     html += '<div style="overflow-x:auto"><table class="t" style="border-collapse:collapse;width:100%">';
     html += '<thead><tr><th style="background:#fafafa;text-align:left">Nama</th>';
-    dates.forEach(d => { html += '<th style="background:#fafafa">' + esc(d.label||d.id) + '</th>'; });
+    cgDates.forEach(d => { html += '<th style="background:#fafafa">' + esc(d.label||d.id) + '</th>'; });
     html += '<th style="background:#fafafa">% Hadir</th></tr></thead><tbody>';
 
     mems.sort((a,b) => (ROLE_ORDER[a.status]||9) - (ROLE_ORDER[b.status]||9)).forEach(m => {
       let hCount=0, tCount=0;
-      dates.forEach(d => { const s=ALL_ATTENDANCE[m.id+'_'+d.id]; if(s){tCount++;if(s==='H')hCount++;} });
+      cgDates.forEach(d => { const s=ALL_ATTENDANCE[m.id+'_'+d.id]; if(s){tCount++;if(s==='H')hCount++;} });
       const pct = tCount ? Math.round(hCount/tCount*100) : 0;
       const pctColor = pct>=75?'var(--green)':pct>=50?'var(--orange)':'var(--red)';
       const atRisk = tCount>1 && pct<50;
 
       html += '<tr'+(atRisk?' style="background:#fef2f2"':'')+'>';
       html += '<td class="name-cell"'+(atRisk?' style="color:var(--red)"':'')+'>'+esc(m.nama)+'<span class="role-tag">'+esc(m.status)+'</span></td>';
-      dates.forEach(d => {
+      cgDates.forEach(d => {
         const st = ALL_ATTENDANCE[m.id+'_'+d.id] || null;
         const cls = st || 'X';
         html += '<td><span class="dot '+cls+'">'+(st||'-')+'</span></td>';
