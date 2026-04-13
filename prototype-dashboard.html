@@ -214,7 +214,6 @@ body{font-family:'Inter',sans-serif;background:#f8f8f5;color:#1c1c1c;min-height:
         <div style="font-size:10px;color:var(--g3);margin-bottom:4px">Milestone</div>
         <div class="ms-chips"><span class="msc done">MSJ 1 ✓</span><span class="msc done">MSJ 2 ✓</span><span class="msc pending">MSJ 3</span><span class="msc done">CGT 1 ✓</span><span class="msc done">CGT 2 ✓</span><span class="msc pending">CGT 3</span><span class="msc done">B.Air ✓</span><span class="msc done">B.Roh ✓</span></div>
         <textarea class="note" placeholder="Catatan CGL...">Aktif dan setia hadir. Sedang proses MSJ 3.</textarea>
-        <div class="note-h">Catatan hanya terlihat oleh CGL dan Coach</div>
       </div>
       <div class="dcard">
         <div class="dcard-top"><div class="dcard-name">Valerie Alea Darmawan</div><span class="rbadge sponsor">Sponsor</span></div>
@@ -222,7 +221,6 @@ body{font-family:'Inter',sans-serif;background:#f8f8f5;color:#1c1c1c;min-height:
         <div style="font-size:10px;color:var(--g3);margin-bottom:4px">Milestone</div>
         <div class="ms-chips"><span class="msc done">MSJ 1 ✓</span><span class="msc done">MSJ 2 ✓</span><span class="msc done">MSJ 3 ✓</span><span class="msc done">CGT 1 ✓</span><span class="msc done">CGT 2 ✓</span><span class="msc done">CGT 3 ✓</span><span class="msc done">B.Air ✓</span><span class="msc done">B.Roh ✓</span></div>
         <textarea class="note" placeholder="Catatan CGL...">Milestone lengkap. Siap jadi CGL.</textarea>
-        <div class="note-h">Catatan hanya terlihat oleh CGL dan Coach</div>
       </div>
       <div class="dcard" style="border-left:3px solid var(--red)">
         <div class="dcard-top"><div class="dcard-name">Florencia Arumi Koo</div><span class="rbadge simpatisan">Simpatisan</span></div>
@@ -231,7 +229,6 @@ body{font-family:'Inter',sans-serif;background:#f8f8f5;color:#1c1c1c;min-height:
         <div style="font-size:10px;color:var(--g3);margin-bottom:4px">Milestone</div>
         <div class="ms-chips"><span class="msc pending">MSJ 1</span><span class="msc pending">MSJ 2</span><span class="msc pending">MSJ 3</span><span class="msc pending">CGT 1</span><span class="msc pending">CGT 2</span><span class="msc pending">CGT 3</span><span class="msc pending">B.Air</span><span class="msc pending">B.Roh</span></div>
         <textarea class="note" placeholder="Catatan CGL...">4x tidak hadir. Perlu dijemput dan WA personal.</textarea>
-        <div class="note-h">Catatan hanya terlihat oleh CGL dan Coach</div>
       </div>
     </div>
 
@@ -282,9 +279,9 @@ body{font-family:'Inter',sans-serif;background:#f8f8f5;color:#1c1c1c;min-height:
           <select class="pel-select" style="min-width:160px"><option>13 April 2026</option><option>20 April 2026</option><option>27 April 2026</option><option>4 Mei 2026</option></select>
         </div>
         <table class="t">
-          <thead><tr><th>Role</th><th>Petugas</th></tr></thead>
+          <thead><tr><th>Role</th><th>Pelayan</th></tr></thead>
           <tbody>
-            <tr><td style="font-weight:600">🎤 Song Ministry (SM)</td><td><select class="pel-select"><option>Tofanny Zerafim</option><option>Valerie Alea</option><option>Clara Faustine</option></select></td></tr>
+            <tr><td style="font-weight:600">📖 Firman CG</td><td><select class="pel-select"><option>Tofanny Zerafim</option><option>Valerie Alea</option><option>Clara Faustine</option></select></td></tr>
             <tr><td style="font-weight:600">🙏 PAW</td><td><select class="pel-select"><option>Valerie Alea</option><option>Felicia Sagala</option><option>Kefas</option></select></td></tr>
             <tr><td style="font-weight:600">🎮 Game</td><td><select class="pel-select"><option>Fitzgerrald Osvaldo</option><option>Samuel Vialli</option><option>Kefas</option></select></td></tr>
             <tr><td style="font-weight:600">📖 Sharing</td><td><select class="pel-select"><option>Tofanny Zerafim</option><option>Valerie Alea</option></select></td></tr>
@@ -339,11 +336,21 @@ body{font-family:'Inter',sans-serif;background:#f8f8f5;color:#1c1c1c;min-height:
     <!-- TAB: EVENTS -->
     <div class="tab-content" id="tab-events">
       <div class="filter-chips"><span class="chip on">Semua</span><span class="chip">Ibadah</span><span class="chip">CG Event</span><span class="chip">Birthday</span><span class="chip">Outreach</span></div>
-      <div class="ev-card" style="border-left-color:var(--green)"><div class="ev-date">18 Apr 2026</div><div class="ev-name">Good Friday Service</div><div class="ev-note">Ibadah Jumat Agung. Semua member wajib hadir.</div><span class="ev-cat" style="background:rgba(22,163,74,.08);color:var(--green)">Ibadah</span></div>
-      <div class="ev-card" style="border-left-color:var(--orange)"><div class="ev-date">20 Apr 2026</div><div class="ev-name">Easter Sunday</div><div class="ev-note">Ibadah Paskah. Ada drama dari teens.</div><span class="ev-cat" style="background:rgba(22,163,74,.08);color:var(--green)">Ibadah</span></div>
+
+      <!-- Shared events (muncul di semua CG) -->
+      <div style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--g3);margin-bottom:10px;margin-top:4px">📢 Event Semua CG</div>
+      <div class="ev-card" style="border-left-color:var(--green)"><div class="ev-date">18 Apr 2026</div><div class="ev-name">Good Friday Service</div><div class="ev-note">Ibadah Jumat Agung. Semua member wajib hadir.</div><span class="ev-cat" style="background:rgba(22,163,74,.08);color:var(--green)">Ibadah</span><span class="ev-cat" style="background:rgba(108,92,231,.06);color:var(--purple);margin-left:4px">Semua CG</span></div>
+      <div class="ev-card" style="border-left-color:var(--orange)"><div class="ev-date">20 Apr 2026</div><div class="ev-name">Easter Sunday</div><div class="ev-note">Ibadah Paskah. Ada drama dari teens.</div><span class="ev-cat" style="background:rgba(22,163,74,.08);color:var(--green)">Ibadah</span><span class="ev-cat" style="background:rgba(108,92,231,.06);color:var(--purple);margin-left:4px">Semua CG</span></div>
+      <div class="ev-card" style="border-left-color:var(--purple)"><div class="ev-date">7 Jun 2026</div><div class="ev-name">Youth Outreach — Cakung</div><div class="ev-note">Evangelism dan games di area Cakung.</div><span class="ev-cat" style="background:rgba(108,92,231,.08);color:var(--purple)">Outreach</span><span class="ev-cat" style="background:rgba(108,92,231,.06);color:var(--purple);margin-left:4px">Semua CG</span></div>
+
+      <!-- Personal CG events -->
+      <div style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--g3);margin:20px 0 10px">📋 Event CG Ini</div>
       <div class="ev-card" style="border-left-color:var(--blue)"><div class="ev-date">3 Mei 2026</div><div class="ev-name">CG Outing — Taman Mini</div><div class="ev-note">Jalan-jalan CG. Budget 50rb/orang.</div><span class="ev-cat" style="background:rgba(37,99,235,.08);color:var(--blue)">CG Event</span></div>
       <div class="ev-card" style="border-left-color:#f472b6"><div class="ev-date">22 Mei 2026</div><div class="ev-name">🎂 Tofanny Zerafim — Ulang Tahun ke-16</div><div class="ev-note">Surprise party setelah CG session.</div><span class="ev-cat" style="background:rgba(244,114,182,.08);color:#ec4899">Birthday</span></div>
-      <div class="ev-card" style="border-left-color:var(--purple)"><div class="ev-date">7 Jun 2026</div><div class="ev-name">Youth Outreach — Cakung</div><div class="ev-note">Evangelism dan games di area Cakung.</div><span class="ev-cat" style="background:rgba(108,92,231,.08);color:var(--purple)">Outreach</span></div>
+      <div class="ev-card" style="border-left-color:var(--blue)"><div class="ev-date">14 Jun 2026</div><div class="ev-name">CG Movie Night</div><div class="ev-note">Nonton bareng di rumah Tofanny.</div><span class="ev-cat" style="background:rgba(37,99,235,.08);color:var(--blue)">CG Event</span></div>
+
+      <!-- Add event button -->
+      <button class="pel-add" style="margin-top:10px;width:100%;padding:10px;text-align:center">+ Tambah Event CG</button>
     </div>
   </div>
 </div>
