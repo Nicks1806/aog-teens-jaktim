@@ -836,61 +836,88 @@ body{font-family:'Inter',sans-serif;background:#f8f8f5;color:#1c1c1c;min-height:
 
     <!-- COACH TAB: VISI -->
     <div class="tab-content" id="tab-c-visi">
-      <div style="font-size:11px;color:var(--g3);margin-bottom:16px">Edit visi & misi setiap CG. Tambahkan catatan atau feedback sebagai Coach.</div>
-
-      <!-- TEEN 23 -->
-      <div class="section" style="border-left:4px solid #7c3aed">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-          <span style="background:#faf5ff;color:#7c3aed;padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:.8px;border:1px solid #7c3aed40">TEEN 23</span>
-          <span style="font-size:12px;font-weight:600">Tofanny Zerafim</span>
-        </div>
-        <div class="vcard"><div class="vlabel">Visi CG</div><textarea class="vedit">Semua member CG aktif dan bertumbuh dalam iman, menjadi generasi yang berdampak.</textarea></div>
-        <div class="vcard"><div class="vlabel">Misi Semester Ini</div><textarea class="vedit">1. Semua member selesai MSJ 1 sebelum Juni 2026
-2. Minimal 80% kehadiran per bulan
-3. Follow-up member baru setiap minggu</textarea></div>
-        <div class="vcard"><div class="vlabel">Catatan Coach</div><textarea class="vedit" placeholder="Tulis feedback atau catatan untuk CG ini..." style="border-color:var(--purple)">CG ini cukup aktif. Perlu perhatian khusus ke Florencia yang sering absent. Milestone progress bagus.</textarea></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div style="font-size:11px;color:var(--g3)">Edit visi & misi setiap CG. Tambahkan feedback sebagai Coach.</div>
+        <div class="region-toggle" style="margin:0;display:inline-flex"><button class="region-btn active" style="padding:4px 14px;font-size:11px">JAKTIM 1</button><button class="region-btn" style="padding:4px 14px;font-size:11px">JAKTIM 2</button></div>
       </div>
 
-      <!-- TEEN 01 -->
-      <div class="section" style="border-left:4px solid #1d4ed8">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-          <span style="background:#eff6ff;color:#1d4ed8;padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:.8px;border:1px solid #1d4ed840">TEEN 01</span>
-          <span style="font-size:12px;font-weight:600">Stefenie Nathania</span>
+      <!-- CG Card: TEEN 23 -->
+      <div style="background:var(--white);border-radius:16px;overflow:hidden;margin-bottom:16px;box-shadow:0 2px 12px rgba(0,0,0,.04)">
+        <div style="background:linear-gradient(135deg,#faf5ff,#ede9fe);padding:16px 20px;display:flex;align-items:center;justify-content:space-between">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:40px;height:40px;border-radius:10px;background:#7c3aed;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:11px">T23</div>
+            <div><div style="font-weight:700;font-size:14px">TEEN 23</div><div style="font-size:11px;color:var(--g3)">CGL: Tofanny Zerafim</div></div>
+          </div>
+          <div style="text-align:right"><div style="font-family:'Instrument Serif',serif;font-size:22px;color:#7c3aed">78%</div><div style="font-size:9px;color:var(--g3)">Kehadiran</div></div>
         </div>
-        <div class="vcard"><div class="vlabel">Visi CG</div><textarea class="vedit">Membawa setiap member untuk mengenal Tuhan secara pribadi dan bertumbuh bersama.</textarea></div>
-        <div class="vcard"><div class="vlabel">Misi Semester Ini</div><textarea class="vedit">1. Setiap member punya accountability partner
-2. 1 orang baru setiap bulan
-3. Semua member ikut retreat Juni</textarea></div>
-        <div class="vcard"><div class="vlabel">Catatan Coach</div><textarea class="vedit" placeholder="Tulis feedback atau catatan untuk CG ini..." style="border-color:var(--purple)">Kehadiran paling tinggi di Jaktim 1. Pertahankan momentum ini.</textarea></div>
+        <div style="padding:16px 20px">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+            <div style="background:var(--g6);border-radius:10px;padding:10px"><div style="font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--g3);margin-bottom:4px">Visi</div><textarea class="vedit" style="min-height:40px;font-size:12px">Semua member CG aktif dan bertumbuh dalam iman.</textarea></div>
+            <div style="background:var(--g6);border-radius:10px;padding:10px"><div style="font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--g3);margin-bottom:4px">Misi</div><textarea class="vedit" style="min-height:40px;font-size:12px">1. MSJ 1 semua sebelum Juni
+2. 80% kehadiran per bulan</textarea></div>
+          </div>
+          <div style="background:linear-gradient(135deg,#faf5ff,#f5f0ff);border:1px dashed #c4b5fd;border-radius:10px;padding:10px"><div style="font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:#7c3aed;margin-bottom:4px">💬 Catatan Coach</div><textarea class="vedit" style="min-height:36px;font-size:12px;border-color:#c4b5fd">CG aktif. Perhatian ke Florencia. Milestone progress bagus.</textarea></div>
+        </div>
       </div>
 
-      <!-- TEEN 09 -->
-      <div class="section" style="border-left:4px solid #c2410c">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-          <span style="background:#fff7ed;color:#c2410c;padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:.8px;border:1px solid #c2410c40">TEEN 09</span>
-          <span style="font-size:12px;font-weight:600">Jessica Anastasia</span>
+      <!-- CG Card: TEEN 01 -->
+      <div style="background:var(--white);border-radius:16px;overflow:hidden;margin-bottom:16px;box-shadow:0 2px 12px rgba(0,0,0,.04)">
+        <div style="background:linear-gradient(135deg,#eff6ff,#dbeafe);padding:16px 20px;display:flex;align-items:center;justify-content:space-between">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:40px;height:40px;border-radius:10px;background:#1d4ed8;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:11px">T01</div>
+            <div><div style="font-weight:700;font-size:14px">TEEN 01</div><div style="font-size:11px;color:var(--g3)">CGL: Stefenie Nathania</div></div>
+          </div>
+          <div style="text-align:right"><div style="font-family:'Instrument Serif',serif;font-size:22px;color:#1d4ed8">82%</div><div style="font-size:9px;color:var(--g3)">Kehadiran</div></div>
         </div>
-        <div class="vcard"><div class="vlabel">Visi CG</div><textarea class="vedit">Menjadi CG yang saling menguatkan dan berbuah bagi lingkungan sekitar.</textarea></div>
-        <div class="vcard"><div class="vlabel">Misi Semester Ini</div><textarea class="vedit">1. Outreach ke tetangga member sebulan sekali
-2. Setiap member melayani minimal 1x per bulan
-3. MSJ 1 untuk semua member baru</textarea></div>
-        <div class="vcard"><div class="vlabel">Catatan Coach</div><textarea class="vedit" placeholder="Tulis feedback atau catatan untuk CG ini..." style="border-color:var(--purple)">Kehadiran perlu ditingkatkan. 2 member at risk. Bantu Jessica untuk follow-up.</textarea></div>
+        <div style="padding:16px 20px">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+            <div style="background:var(--g6);border-radius:10px;padding:10px"><div style="font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--g3);margin-bottom:4px">Visi</div><textarea class="vedit" style="min-height:40px;font-size:12px">Mengenal Tuhan pribadi dan bertumbuh bersama.</textarea></div>
+            <div style="background:var(--g6);border-radius:10px;padding:10px"><div style="font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--g3);margin-bottom:4px">Misi</div><textarea class="vedit" style="min-height:40px;font-size:12px">1. Accountability partner
+2. 1 orang baru/bulan</textarea></div>
+          </div>
+          <div style="background:linear-gradient(135deg,#eff6ff,#e8f0fe);border:1px dashed #93c5fd;border-radius:10px;padding:10px"><div style="font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:#1d4ed8;margin-bottom:4px">💬 Catatan Coach</div><textarea class="vedit" style="min-height:36px;font-size:12px;border-color:#93c5fd">Kehadiran paling tinggi. Pertahankan!</textarea></div>
+        </div>
       </div>
 
-      <!-- TEEN 06 -->
-      <div class="section" style="border-left:4px solid #be185d">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-          <span style="background:#fdf2f8;color:#be185d;padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:.8px;border:1px solid #be185d40">TEEN 06</span>
-          <span style="font-size:12px;font-weight:600">Keizha Ananta</span>
+      <!-- CG Card: TEEN 09 -->
+      <div style="background:var(--white);border-radius:16px;overflow:hidden;margin-bottom:16px;box-shadow:0 2px 12px rgba(0,0,0,.04)">
+        <div style="background:linear-gradient(135deg,#fff7ed,#ffedd5);padding:16px 20px;display:flex;align-items:center;justify-content:space-between">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:40px;height:40px;border-radius:10px;background:#c2410c;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:11px">T09</div>
+            <div><div style="font-weight:700;font-size:14px">TEEN 09</div><div style="font-size:11px;color:var(--g3)">CGL: Jessica Anastasia</div></div>
+          </div>
+          <div style="text-align:right"><div style="font-family:'Instrument Serif',serif;font-size:22px;color:#c2410c">68%</div><div style="font-size:9px;color:var(--g3)">Kehadiran</div></div>
         </div>
-        <div class="vcard"><div class="vlabel">Visi CG</div><textarea class="vedit">Generasi muda yang on-fire untuk Tuhan dan berdampak di sekolah.</textarea></div>
-        <div class="vcard"><div class="vlabel">Misi Semester Ini</div><textarea class="vedit">1. Setiap member bawa 1 teman baru per semester
-2. CG games night sebulan sekali
-3. Baptis air untuk 2 member</textarea></div>
-        <div class="vcard"><div class="vlabel">Catatan Coach</div><textarea class="vedit" placeholder="Tulis feedback atau catatan untuk CG ini..." style="border-color:var(--purple)">Tidak ada member at risk, bagus. Dorong milestone completion.</textarea></div>
+        <div style="padding:16px 20px">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+            <div style="background:var(--g6);border-radius:10px;padding:10px"><div style="font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--g3);margin-bottom:4px">Visi</div><textarea class="vedit" style="min-height:40px;font-size:12px">CG saling menguatkan dan berbuah.</textarea></div>
+            <div style="background:var(--g6);border-radius:10px;padding:10px"><div style="font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--g3);margin-bottom:4px">Misi</div><textarea class="vedit" style="min-height:40px;font-size:12px">1. Outreach sebulan sekali
+2. Semua melayani 1x/bulan</textarea></div>
+          </div>
+          <div style="background:linear-gradient(135deg,#fff7ed,#fef3e2);border:1px dashed #fdba74;border-radius:10px;padding:10px"><div style="font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:#c2410c;margin-bottom:4px">💬 Catatan Coach</div><textarea class="vedit" style="min-height:36px;font-size:12px;border-color:#fdba74">Kehadiran perlu naik. 2 at risk. Bantu Jessica follow-up.</textarea></div>
+        </div>
       </div>
 
-      <button class="btn-purple" style="margin-top:12px;width:100%">Simpan Semua Visi & Catatan</button>
+      <!-- CG Card: TEEN 06 -->
+      <div style="background:var(--white);border-radius:16px;overflow:hidden;margin-bottom:16px;box-shadow:0 2px 12px rgba(0,0,0,.04)">
+        <div style="background:linear-gradient(135deg,#fdf2f8,#fce7f3);padding:16px 20px;display:flex;align-items:center;justify-content:space-between">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:40px;height:40px;border-radius:10px;background:#be185d;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:11px">T06</div>
+            <div><div style="font-weight:700;font-size:14px">TEEN 06</div><div style="font-size:11px;color:var(--g3)">CGL: Keizha Ananta</div></div>
+          </div>
+          <div style="text-align:right"><div style="font-family:'Instrument Serif',serif;font-size:22px;color:#be185d">71%</div><div style="font-size:9px;color:var(--g3)">Kehadiran</div></div>
+        </div>
+        <div style="padding:16px 20px">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+            <div style="background:var(--g6);border-radius:10px;padding:10px"><div style="font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--g3);margin-bottom:4px">Visi</div><textarea class="vedit" style="min-height:40px;font-size:12px">On-fire untuk Tuhan, berdampak di sekolah.</textarea></div>
+            <div style="background:var(--g6);border-radius:10px;padding:10px"><div style="font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--g3);margin-bottom:4px">Misi</div><textarea class="vedit" style="min-height:40px;font-size:12px">1. Bawa 1 teman baru/semester
+2. Baptis air 2 member</textarea></div>
+          </div>
+          <div style="background:linear-gradient(135deg,#fdf2f8,#fce7f3);border:1px dashed #f9a8d4;border-radius:10px;padding:10px"><div style="font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:#be185d;margin-bottom:4px">💬 Catatan Coach</div><textarea class="vedit" style="min-height:36px;font-size:12px;border-color:#f9a8d4">0 at risk, bagus. Dorong milestone completion.</textarea></div>
+        </div>
+      </div>
+
+      <button class="btn-purple" style="margin-top:4px;width:100%">💾 Simpan Semua Visi & Catatan</button>
     </div>
 
     <!-- COACH TAB: EVENTS -->
@@ -913,14 +940,22 @@ body{font-family:'Inter',sans-serif;background:#f8f8f5;color:#1c1c1c;min-height:
       <div class="ev-card" style="border-left-color:var(--purple)"><div class="ev-date">7 Jun 2026</div><div class="ev-name">Youth Outreach — Cakung</div><div class="ev-note">Evangelism dan games di area Cakung.</div><span class="ev-cat" style="background:rgba(108,92,231,.08);color:var(--purple)">Outreach</span><span class="ev-cat" style="background:rgba(108,92,231,.06);color:var(--purple);margin-left:4px">Semua CG</span></div>
       <div class="ev-card" style="border-left-color:var(--blue)"><div class="ev-date">28 Jun 2026</div><div class="ev-name">Youth Retreat — Puncak</div><div class="ev-note">Retreat 2 hari 1 malam di Puncak. Wajib semua CG.</div><span class="ev-cat" style="background:rgba(37,99,235,.08);color:var(--blue)">CG Event</span><span class="ev-cat" style="background:rgba(108,92,231,.06);color:var(--purple);margin-left:4px">Semua CG</span></div>
 
-      <!-- Per-CG events -->
-      <div style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--g3);margin:20px 0 10px">Event per CG</div>
+      <!-- Per-CG events: JAKTIM 1 -->
+      <div style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--g3);margin:20px 0 10px">Event CG — Jaktim 1</div>
 
-      <div class="ev-card" style="border-left-color:#7c3aed"><div class="ev-date">3 Mei 2026</div><div class="ev-name">CG Outing — Taman Mini</div><div class="ev-note">Jalan-jalan CG TEEN 23. Budget 50rb/orang.</div><span class="ev-cat" style="background:rgba(37,99,235,.08);color:var(--blue)">CG Event</span><span class="ev-cat" style="background:rgba(124,58,237,.08);color:#7c3aed;margin-left:4px">TEEN 23</span></div>
-      <div class="ev-card" style="border-left-color:#7c3aed"><div class="ev-date">22 Mei 2026</div><div class="ev-name">Tofanny Zerafim — Ulang Tahun</div><div class="ev-note">Surprise party setelah CG session.</div><span class="ev-cat" style="background:rgba(244,114,182,.08);color:#ec4899">Birthday</span><span class="ev-cat" style="background:rgba(124,58,237,.08);color:#7c3aed;margin-left:4px">TEEN 23</span></div>
+      <div class="ev-card" style="border-left-color:#7c3aed"><div class="ev-date">3 Mei 2026</div><div class="ev-name">CG Outing — Taman Mini</div><div class="ev-note">Jalan-jalan CG TEEN 23.</div><span class="ev-cat" style="background:rgba(37,99,235,.08);color:var(--blue)">CG Event</span><span class="ev-cat" style="background:rgba(124,58,237,.08);color:#7c3aed;margin-left:4px">TEEN 23</span></div>
+      <div class="ev-card" style="border-left-color:#7c3aed"><div class="ev-date">22 Mei 2026</div><div class="ev-name">🎂 Tofanny Zerafim — Ulang Tahun</div><div class="ev-note">Surprise party setelah CG.</div><span class="ev-cat" style="background:rgba(244,114,182,.08);color:#ec4899">Birthday</span><span class="ev-cat" style="background:rgba(124,58,237,.08);color:#7c3aed;margin-left:4px">TEEN 23</span></div>
       <div class="ev-card" style="border-left-color:#1d4ed8"><div class="ev-date">10 Mei 2026</div><div class="ev-name">CG Movie Night</div><div class="ev-note">Nonton bareng di rumah Stefi.</div><span class="ev-cat" style="background:rgba(37,99,235,.08);color:var(--blue)">CG Event</span><span class="ev-cat" style="background:rgba(29,78,216,.08);color:#1d4ed8;margin-left:4px">TEEN 01</span></div>
-      <div class="ev-card" style="border-left-color:#c2410c"><div class="ev-date">17 Mei 2026</div><div class="ev-name">Outreach Cakung Barat</div><div class="ev-note">Evangelism ke RT sekitar rumah Jessica.</div><span class="ev-cat" style="background:rgba(108,92,231,.08);color:var(--purple)">Outreach</span><span class="ev-cat" style="background:rgba(194,65,12,.08);color:#c2410c;margin-left:4px">TEEN 09</span></div>
-      <div class="ev-card" style="border-left-color:#be185d"><div class="ev-date">24 Mei 2026</div><div class="ev-name">CG Games Day</div><div class="ev-note">Games seharian di taman. Ajak teman baru.</div><span class="ev-cat" style="background:rgba(37,99,235,.08);color:var(--blue)">CG Event</span><span class="ev-cat" style="background:rgba(190,24,93,.08);color:#be185d;margin-left:4px">TEEN 06</span></div>
+      <div class="ev-card" style="border-left-color:#c2410c"><div class="ev-date">17 Mei 2026</div><div class="ev-name">Outreach Cakung Barat</div><div class="ev-note">Evangelism ke RT sekitar.</div><span class="ev-cat" style="background:rgba(108,92,231,.08);color:var(--purple)">Outreach</span><span class="ev-cat" style="background:rgba(194,65,12,.08);color:#c2410c;margin-left:4px">TEEN 09</span></div>
+      <div class="ev-card" style="border-left-color:#be185d"><div class="ev-date">24 Mei 2026</div><div class="ev-name">CG Games Day</div><div class="ev-note">Games di taman. Ajak teman baru.</div><span class="ev-cat" style="background:rgba(37,99,235,.08);color:var(--blue)">CG Event</span><span class="ev-cat" style="background:rgba(190,24,93,.08);color:#be185d;margin-left:4px">TEEN 06</span></div>
+
+      <!-- Per-CG events: JAKTIM 2 -->
+      <div style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--g3);margin:20px 0 10px">Event CG — Jaktim 2</div>
+
+      <div class="ev-card" style="border-left-color:#0f766e"><div class="ev-date">1 Mei 2026</div><div class="ev-name">CG Worship Night</div><div class="ev-note">Worship bersama di Gafa Cawang.</div><span class="ev-cat" style="background:rgba(37,99,235,.08);color:var(--blue)">CG Event</span><span class="ev-cat" style="background:rgba(15,118,110,.08);color:#0f766e;margin-left:4px">TEEN 12</span></div>
+      <div class="ev-card" style="border-left-color:#b45309"><div class="ev-date">8 Mei 2026</div><div class="ev-name">CG Futsal Bareng</div><div class="ev-note">Main futsal sore. Ajak teman.</div><span class="ev-cat" style="background:rgba(37,99,235,.08);color:var(--blue)">CG Event</span><span class="ev-cat" style="background:rgba(180,83,9,.08);color:#b45309;margin-left:4px">TEEN 07</span></div>
+      <div class="ev-card" style="border-left-color:#0e7490"><div class="ev-date">🎂 1 Aug 2026</div><div class="ev-name">Samantha Jane — Ulang Tahun</div><div class="ev-note">Online surprise party via Zoom.</div><span class="ev-cat" style="background:rgba(244,114,182,.08);color:#ec4899">Birthday</span><span class="ev-cat" style="background:rgba(14,116,144,.08);color:#0e7490;margin-left:4px">TEEN 17</span></div>
+      <div class="ev-card" style="border-left-color:#be123c"><div class="ev-date">15 Mei 2026</div><div class="ev-name">Outreach Duren Sawit</div><div class="ev-note">Evangelism area Duren Sawit.</div><span class="ev-cat" style="background:rgba(108,92,231,.08);color:var(--purple)">Outreach</span><span class="ev-cat" style="background:rgba(190,18,60,.08);color:#be123c;margin-left:4px">TEEN 20</span></div>
 
       <button class="btn-purple" style="margin-top:14px;width:100%">+ Tambah Event Baru (Semua CG)</button>
     </div>
