@@ -849,9 +849,20 @@ async function openCGDashboard(cg) {
     }
   });
 
-  // Hanya render tab Absensi dulu — sisanya lazy-render saat user klik
+  // Render tab Absensi dulu (instant), sisanya prefetch di background
   renderAbsensi();
   TAB_RENDERED.absensi = true;
+
+  // Prefetch tab lain di background dengan delay kecil supaya tidak block
+  // tab aktif. Setiap tab di-render saat browser idle.
+  const prefetchTabs = ['milestone','detail','events','visi','pelayanan'];
+  const idleQueue = (cb, delay) => {
+    if (typeof requestIdleCallback === 'function') requestIdleCallback(cb, {timeout: 2000});
+    else setTimeout(cb, delay || 100);
+  };
+  prefetchTabs.forEach((id, idx) => {
+    idleQueue(() => { ensureTabRendered(id); }, 80 * (idx + 1));
+  });
 }
 
 // Lazy render untuk tab yang dipilih
@@ -2225,6 +2236,16 @@ async function loadCoachData() {
   });
   renderCoachOverview();
   COACH_TAB_RENDERED['c-overview'] = true;
+
+  // Prefetch sisa tab Coach di background (idle callback) — biar klik tab instant
+  const coachPrefetch = ['c-absensi','c-milestone','c-events','c-visi'];
+  const idleQ = (cb, delay) => {
+    if (typeof requestIdleCallback === 'function') requestIdleCallback(cb, {timeout: 2000});
+    else setTimeout(cb, delay || 100);
+  };
+  coachPrefetch.forEach((id, idx) => {
+    idleQ(() => { ensureCoachTabRendered(id); }, 80 * (idx + 1));
+  });
 }
 
 let COACH_TAB_RENDERED = {};
