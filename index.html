@@ -543,10 +543,19 @@ function selReg(r, b) {
 function popDD() {
   const s = document.getElementById('cglSel');
   s.innerHTML = '<option value="" disabled selected>Pilih CG Leader...</option>';
+  // Debug log (bisa dihapus kalau sudah jalan)
+  try {
+    console.log('[popDD] curReg:', JSON.stringify(curReg), 'total members:', ALL_MEMBERS.length);
+    console.log('[popDD] unique statuses:', [...new Set(ALL_MEMBERS.map(m=>m.status))]);
+    console.log('[popDD] unique regions:', [...new Set(ALL_MEMBERS.map(m=>m.region))]);
+  } catch(e){}
   const cgls = ALL_MEMBERS.filter(m => {
-    var s = String(m.status||'').toLowerCase().trim();
-    return (s === 'cgl' || s === 'leader') && m.region === curReg;
+    var st = String(m.status||'').toLowerCase().trim();
+    var r = String(m.region||'').toLowerCase().trim();
+    var target = String(curReg||'').toLowerCase().trim();
+    return (st === 'cgl' || st === 'leader') && r === target;
   });
+  console.log('[popDD] matched CGLs:', cgls.length);
   const seen = new Set();
   cgls.forEach(m => {
     if (seen.has(m.cg)) return;
