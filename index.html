@@ -639,6 +639,11 @@ async function openCGDashboard(cg) {
   document.getElementById('pageD').style.display = 'block';
   window.scrollTo(0, 0);
 
+  // Set default tab ke Absensi SEKARANG (sebelum async load) supaya user click tab
+  // selama loading tidak ter-override di akhir
+  document.querySelectorAll('#pageD .app-tab').forEach((t,i) => t.classList.toggle('on', i===0));
+  document.querySelectorAll('#pageD .tab-content').forEach((t,i) => t.classList.toggle('active', i===0));
+
   // Load cg_info
   const { data: cgInfoArr } = await supa.from('cg_info').select('*').eq('cg', cg);
   CUR_CG_INFO = cgInfoArr && cgInfoArr[0] ? cgInfoArr[0] : {};
@@ -683,10 +688,8 @@ async function openCGDashboard(cg) {
   await renderPelayanan();
   renderMilestone();
   await renderEvents();
-
-  // Reset to absensi tab
-  document.querySelectorAll('#pageD .app-tab').forEach((t,i) => t.classList.toggle('on', i===0));
-  document.querySelectorAll('#pageD .tab-content').forEach((t,i) => t.classList.toggle('active', i===0));
+  // (Default tab sudah di-set di awal — tidak override di sini supaya user click tab
+  //  selama loading tetap terhormati)
 }
 
 function computeStats() {
