@@ -1306,13 +1306,30 @@ async function renderEvents() {
   // Load CG-specific events from Supabase
   const cgEvents = await loadCGEventsForCG(CUR_CG, CUR_REGION);
 
-  // Birthdays from members
-  const birthdays = MEMBERS.filter(m => m.lahir).map(m => ({
-    name: '\ud83c\udf82 ' + m.nama + ' \u2014 Ulang Tahun',
-    date_start: m.lahir,
-    cat: 'Birthday',
-    note: 'Ulang tahun member CG'
-  }));
+  // Birthdays from members - calculate next occurrence + days left
+  function parseBirthday(s){
+    s = String(s||'').trim();
+    // Try formats: DD/MM/YYYY, YYYY-MM-DD, DD-MM-YYYY
+    let m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
+    if (m) return {day:+m[1], month:+m[2], year:+m[3]>99?+m[3]:2000+ +m[3]};
+    m = s.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/);
+    if (m) return {year:+m[1], month:+m[2], day:+m[3]};
+    return null;
+  }
+  const today = new Date(); today.setHours(0,0,0,0);
+  const MONTH_ID = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Ags','Sep','Okt','Nov','Des'];
+  const birthdays = MEMBERS.filter(m => m.lahir).map(m => {
+    const bd = parseBirthday(m.lahir);
+    if (!bd) return null;
+    const thisYear = today.getFullYear();
+    let next = new Date(thisYear, bd.month-1, bd.day);
+    next.setHours(0,0,0,0);
+    if (next < today) next = new Date(thisYear+1, bd.month-1, bd.day);
+    const daysLeft = Math.ceil((next - today)/(1000*60*60*24));
+    const turnAge = next.getFullYear() - bd.year;
+    const dateLabel = bd.day + ' ' + MONTH_ID[bd.month-1] + ' ' + next.getFullYear();
+    return { ...m, _bd: bd, _next: next, _daysLeft: daysLeft, _turnAge: turnAge, _dateLabel: dateLabel };
+  }).filter(Boolean).sort((a,b) => a._daysLeft - b._daysLeft);
 
   let html = '<div class="filter-chips"><span class="chip on">Semua</span><span class="chip">Ibadah</span><span class="chip">CG Event</span><span class="chip">Birthday</span><span class="chip">Outreach</span></div>';
 
@@ -1329,7 +1346,8 @@ async function renderEvents() {
     cardHtml += '<div style="display:flex;gap:4px">';
     cardHtml += '<button onclick="copyEventText(\''+evId+'\')" title="Copy text" style="padding:5px 8px;border-radius:6px;border:1px solid var(--g5);background:#fff;cursor:pointer;font-size:11px">📋</button>';
     cardHtml += '<button onclick="broadcastEvent(\''+evId+'\')" title="Broadcast WA" style="padding:5px 8px;border-radius:6px;border:1px solid #25d366;background:#dcfce7;color:#15803d;cursor:pointer;font-size:11px">📤</button>';
-    if (!isShared && ev.id) cardHtml += '<button onclick="deleteEventCard('+ev.id+')" title="Hapus" style="padding:5px 8px;border-radius:6px;border:1px solid #fecaca;background:#fef2f2;color:#dc2626;cursor:pointer;font-size:11px">🗑</button>';
+    cardHtml += '<button onclick="openEditEvent(\''+evId+'\')" title="Edit" style="padding:5px 8px;border-radius:6px;border:1px solid #c4b5fd;background:#ede9fe;color:#7c3aed;cursor:pointer;font-size:11px">✏️</button>';
+    if (ev.id) cardHtml += '<button onclick="deleteEventCard(\''+evId+'\')" title="Hapus" style="padding:5px 8px;border-radius:6px;border:1px solid #fecaca;background:#fef2f2;color:#dc2626;cursor:pointer;font-size:11px">🗑</button>';
     cardHtml += '</div></div>';
     if (img) cardHtml += '<div style="margin:8px 0"><img src="'+esc(img)+'" alt="event" style="max-width:100%;border-radius:8px;max-height:200px;object-fit:cover" onerror="this.style.display=\'none\'"></div>';
     cardHtml += '<div class="ev-note" id="evtxt_'+evId+'" style="white-space:pre-wrap;line-height:1.4">'+noteEsc+'</div>';
@@ -1353,15 +1371,30 @@ async function renderEvents() {
   if (cgEvents.length === 0) html += '<div style="font-size:11px;color:var(--g4);font-style:italic;margin-bottom:10px">Belum ada event khusus CG ini</div>';
   cgEvents.forEach(ev => { html += buildEventCard(ev, false); });
 
-  // Birthdays
+  // Birthdays - sorted by upcoming, with days countdown
   if (birthdays.length > 0) {
     html += '<div style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--g3);margin:20px 0 10px">🎂 Ulang Tahun Member</div>';
-    birthdays.forEach(ev => {
-      html += '<div class="ev-card" style="border-left-color:#f472b6"><div class="ev-date">'+esc(ev.date_start||'')+'</div><div class="ev-name">'+esc(ev.name)+'</div><div class="ev-note">'+esc(ev.note)+'</div><span class="ev-cat" style="background:rgba(244,114,182,.08);color:#ec4899">Birthday</span></div>';
+    birthdays.forEach(m => {
+      let badgeText, badgeBg, badgeColor;
+      if (m._daysLeft === 0) { badgeText='HARI INI! 🎉'; badgeBg='#fce7f3'; badgeColor='#be185d'; }
+      else if (m._daysLeft === 1) { badgeText='Besok'; badgeBg='#fce7f3'; badgeColor='#be185d'; }
+      else if (m._daysLeft <= 7) { badgeText=m._daysLeft+' hari lagi'; badgeBg='#fef3c7'; badgeColor='#92400e'; }
+      else if (m._daysLeft <= 30) { badgeText=m._daysLeft+' hari lagi'; badgeBg='#dbeafe'; badgeColor='#1e40af'; }
+      else { badgeText=m._daysLeft+' hari lagi'; badgeBg='#f3f4f6'; badgeColor='#6b7280'; }
+
+      html += '<div class="ev-card" style="border-left-color:#f472b6;display:flex;justify-content:space-between;align-items:center;gap:12px">';
+      html += '<div style="flex:1">';
+      html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span class="ev-date" style="margin:0">'+esc(m._dateLabel)+'</span><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:'+badgeBg+';color:'+badgeColor+'">'+badgeText+'</span></div>';
+      html += '<div class="ev-name">🎂 '+esc(m.nama)+'</div>';
+      html += '<div class="ev-note">Ulang tahun ke-'+m._turnAge+' · '+esc(m.status||'Member')+'</div>';
+      html += '<span class="ev-cat" style="background:rgba(244,114,182,.08);color:#ec4899;margin-top:6px;display:inline-block">Birthday</span>';
+      html += '</div>';
+      html += '<div style="text-align:center;min-width:70px"><div style="font-family:\'Instrument Serif\',serif;font-size:32px;line-height:1;color:#ec4899">'+m._daysLeft+'</div><div style="font-size:9px;color:var(--g4);letter-spacing:.5px">HARI</div></div>';
+      html += '</div>';
     });
   }
 
-  html += '<button class="pel-add" style="margin-top:10px;width:100%;padding:10px;text-align:center" onclick="openModal(\'addCGEventModal\')">+ Tambah Event CG</button>';
+  html += '<button class="pel-add" style="margin-top:10px;width:100%;padding:10px;text-align:center" onclick="openAddEventModal()">+ Tambah Event CG</button>';
   el.innerHTML = html;
 }
 
@@ -1383,11 +1416,37 @@ function broadcastEvent(evId) {
   window.open(url, '_blank');
 }
 
-async function deleteEventCard(id) {
+async function deleteEventCard(evId) {
   if (!confirm('Hapus event ini?')) return;
-  await deleteCGEvent(id);
+  const ev = window.__eventCache?.[evId];
+  if (!ev) return;
+  const isShared = evId.startsWith('shared_');
+  if (isShared) {
+    await supa.from('events').delete().eq('id', ev.id);
+  } else {
+    await deleteCGEvent(ev.id);
+  }
   toast('✓ Event dihapus');
   renderEvents();
+}
+
+// ===== Edit event =====
+function openEditEvent(evId) {
+  const ev = window.__eventCache?.[evId];
+  if (!ev) return;
+  window.__editingEventId = evId;
+  document.getElementById('evName').value = ev.name || '';
+  document.getElementById('evDate').value = ev.date_start || '';
+  document.getElementById('evCat').value = ev.cat || 'CG Event';
+  document.getElementById('evNote').value = ev.note || '';
+  document.getElementById('evImageUrl').value = ev.image && ev.image.startsWith('http') ? ev.image : '';
+  if (ev.image) {
+    document.getElementById('evImagePreview').innerHTML = '<img src="'+esc(ev.image)+'" style="max-width:100%;max-height:140px;border-radius:8px;border:1px solid var(--g5)">';
+    if (!ev.image.startsWith('http')) window.__evImageDataUrl = ev.image;
+  }
+  // Update modal title and button
+  document.querySelector('#addCGEventModal .modal-title').textContent = '✏️ Edit Event';
+  openModal('addCGEventModal');
 }
 
 async function saveCGEvent() {
@@ -1396,18 +1455,34 @@ async function saveCGEvent() {
   const imgUrl = (document.getElementById('evImageUrl').value || '').trim();
   const imgData = window.__evImageDataUrl || '';
   const image = imgUrl || imgData || null;
-  const ev = {
-    cg: CUR_CG,
-    region: CUR_REGION,
-    is_shared: false,
+  const editingId = window.__editingEventId;
+
+  const evData = {
     name,
     date_start: document.getElementById('evDate').value,
     cat: document.getElementById('evCat').value,
     note: document.getElementById('evNote').value,
     image
   };
-  await addCGEvent(ev);
-  // Reset form
+
+  if (editingId) {
+    // EDIT mode
+    const cached = window.__eventCache?.[editingId];
+    const isShared = editingId.startsWith('shared_');
+    if (isShared) {
+      await supa.from('events').update(evData).eq('id', cached.id);
+    } else {
+      await supa.from('cg_events').update(evData).eq('id', cached.id);
+    }
+    toast('✓ Event diupdate');
+  } else {
+    // ADD mode (new CG event)
+    await addCGEvent({ cg: CUR_CG, region: CUR_REGION, is_shared: false, ...evData });
+  }
+
+  // Reset form & state
+  window.__editingEventId = null;
+  document.querySelector('#addCGEventModal .modal-title').textContent = '+ Tambah Event CG';
   document.getElementById('evName').value = '';
   document.getElementById('evDate').value = '';
   document.getElementById('evNote').value = '';
@@ -1416,6 +1491,19 @@ async function saveCGEvent() {
   window.__evImageDataUrl = '';
   closeModal('addCGEventModal');
   await renderEvents();
+}
+
+// Reset edit mode when opening modal via "+ Tambah Event CG" button
+function openAddEventModal() {
+  window.__editingEventId = null;
+  document.querySelector('#addCGEventModal .modal-title').textContent = '+ Tambah Event CG';
+  document.getElementById('evName').value = '';
+  document.getElementById('evDate').value = '';
+  document.getElementById('evNote').value = '';
+  document.getElementById('evImageUrl').value = '';
+  document.getElementById('evImagePreview').innerHTML = '';
+  window.__evImageDataUrl = '';
+  openModal('addCGEventModal');
 }
 
 function handleEvImage(e) {
