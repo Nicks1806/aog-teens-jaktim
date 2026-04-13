@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AOG Teens — Dashboard Prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#f8f8f5;color:#1c1c1c;min-height:100vh}
+:root{--purple:#6C5CE7;--green:#16a34a;--blue:#2563eb;--orange:#d97706;--red:#dc2626;--g1:#1c1c1c;--g2:#555;--g3:#888;--g4:#bbb;--g5:#ddd;--g6:#f0f0ed}
+
+/* ─── LANDING PAGE ─── */
+.landing{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.landing-logo{width:60px;margin-bottom:16px}
+.landing-title{font-family:'Instrument Serif',serif;font-size:36px;margin-bottom:4px}
+.landing-sub{font-size:12px;color:var(--g3);letter-spacing:2px;text-transform:uppercase;margin-bottom:40px}
+.landing-section{margin-bottom:32px;text-align:center}
+.landing-section h3{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--g3);margin-bottom:12px}
+.landing-cards{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.landing-card{background:#fff;border:1px solid var(--g5);border-radius:14px;padding:20px 24px;min-width:140px;cursor:pointer;transition:all .2s;text-align:center}
+.landing-card:hover{border-color:var(--purple);box-shadow:0 4px 20px rgba(108,92,231,.15);transform:translateY(-2px)}
+.landing-card .icon{font-size:28px;margin-bottom:8px}
+.landing-card .name{font-weight:700;font-size:14px;margin-bottom:2px}
+.landing-card .role{font-size:10px;color:var(--g3);letter-spacing:1px;text-transform:uppercase}
+.landing-card.coach{border:2px solid var(--purple);background:linear-gradient(135deg,#faf5ff,#f0e7ff)}
+.landing-card.coach .name{color:var(--purple)}
+.divider-text{font-size:10px;color:var(--g4);letter-spacing:2px;text-transform:uppercase;margin:24px 0 16px;position:relative}
+.divider-text::before,.divider-text::after{content:'';position:absolute;top:50%;width:60px;height:1px;background:var(--g5)}
+.divider-text::before{right:calc(100% + 12px)}
+.divider-text::after{left:calc(100% + 12px)}
+
+/* ─── CGL DASHBOARD ─── */
+.dashboard{display:none;max-width:900px;margin:0 auto;padding:20px}
+.dash-header{background:#fff;border:1px solid var(--g5);border-radius:16px;padding:28px;margin-bottom:20px}
+.dash-back{font-size:12px;color:var(--g3);cursor:pointer;margin-bottom:12px;display:inline-flex;align-items:center;gap:4px}
+.dash-back:hover{color:var(--g1)}
+.dash-cg-badge{display:inline-block;padding:4px 12px;border-radius:8px;font-size:11px;font-weight:700;letter-spacing:1px;margin-bottom:8px}
+.dash-cgl-name{font-family:'Instrument Serif',serif;font-size:32px;margin-bottom:4px}
+.dash-info{display:flex;gap:20px;flex-wrap:wrap;margin-top:12px}
+.dash-info-item{font-size:12px;color:var(--g3)}
+.dash-info-item strong{color:var(--g1)}
+
+/* Stats row */
+.dash-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.dash-stat{background:#fff;border:1px solid var(--g5);border-radius:12px;padding:16px;text-align:center}
+.dash-stat .num{font-family:'Instrument Serif',serif;font-size:28px;font-weight:400}
+.dash-stat .label{font-size:10px;color:var(--g3);letter-spacing:1px;text-transform:uppercase;margin-top:2px}
+.dash-stat.green .num{color:var(--green)}
+.dash-stat.blue .num{color:var(--blue)}
+.dash-stat.orange .num{color:var(--orange)}
+.dash-stat.red .num{color:var(--red)}
+
+/* Sections */
+.dash-section{background:#fff;border:1px solid var(--g5);border-radius:16px;padding:24px;margin-bottom:20px}
+.dash-section-title{font-size:14px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+
+/* Vision/Mission */
+.vision-box{background:var(--g6);border-radius:10px;padding:16px;margin-bottom:12px}
+.vision-label{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--g3);margin-bottom:6px}
+.vision-text{font-size:13px;line-height:1.6;color:var(--g1);min-height:40px}
+.vision-text[contenteditable]{outline:none;border:1px dashed transparent;border-radius:6px;padding:4px 8px}
+.vision-text[contenteditable]:focus{border-color:var(--purple);background:#fff}
+
+/* Member cards */
+.member-card{border:1px solid var(--g5);border-radius:12px;padding:16px;margin-bottom:12px;transition:all .2s}
+.member-card:hover{border-color:var(--purple);box-shadow:0 2px 12px rgba(0,0,0,.05)}
+.member-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.member-name{font-weight:600;font-size:14px}
+.member-role{font-size:10px;padding:2px 8px;border-radius:4px;font-weight:600;letter-spacing:.5px}
+.member-role.cgl{background:#f0fdf4;color:var(--green);border:1px solid #bbf7d0}
+.member-role.sponsor{background:#eff6ff;color:var(--blue);border:1px solid #bfdbfe}
+.member-role.member{background:#faf5ff;color:#7c3aed;border:1px solid #c4b5fd}
+.member-role.simpatisan{background:#fff7ed;color:var(--orange);border:1px solid #fdba74}
+.member-role.vip{background:#fef2f2;color:var(--red);border:1px solid #fecaca}
+.member-detail{display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px;color:var(--g2);margin-bottom:12px}
+.member-detail span{display:flex;align-items:center;gap:4px}
+
+/* Milestone progress */
+.milestone-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.ms-chip{padding:3px 8px;border-radius:6px;font-size:10px;font-weight:600;letter-spacing:.5px}
+.ms-chip.done{background:#f0fdf4;color:var(--green);border:1px solid #bbf7d0}
+.ms-chip.pending{background:#f5f5f4;color:var(--g4);border:1px solid var(--g5)}
+.ms-progress{height:4px;background:var(--g5);border-radius:4px;overflow:hidden;margin-bottom:6px}
+.ms-progress-bar{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--green),#34d399);transition:width .3s}
+.ms-pct{font-size:10px;color:var(--g3)}
+
+/* Notes */
+.note-area{width:100%;border:1px solid var(--g5);border-radius:8px;padding:10px 12px;font-size:12px;font-family:'Inter',sans-serif;resize:vertical;min-height:60px;outline:none;transition:border .2s}
+.note-area:focus{border-color:var(--purple)}
+.note-hint{font-size:10px;color:var(--g4);margin-top:4px}
+
+/* Attendance mini table */
+.att-mini{width:100%;border-collapse:collapse;font-size:11px;margin-top:12px}
+.att-mini th{padding:6px 8px;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--g3);font-weight:500;border-bottom:1px solid var(--g5)}
+.att-mini td{padding:6px 8px;text-align:center;border-bottom:1px solid var(--g6)}
+.att-mini .dot{width:24px;height:24px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
+.dot.H{background:#f0fdf4;color:var(--green)}
+.dot.I{background:#eff6ff;color:var(--blue)}
+.dot.S{background:#fffbeb;color:var(--orange)}
+.dot.A{background:#fef2f2;color:var(--red)}
+.dot.X{color:var(--g4)}
+
+/* At risk */
+.risk-card{display:flex;align-items:center;gap:12px;padding:12px;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;margin-bottom:8px}
+.risk-card .risk-icon{font-size:20px}
+.risk-card .risk-name{font-weight:600;font-size:13px}
+.risk-card .risk-reason{font-size:11px;color:var(--red)}
+
+/* Coach dashboard extras */
+.coach-cg-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.coach-cg-card{background:#fff;border:1px solid var(--g5);border-radius:14px;padding:20px;cursor:pointer;transition:all .2s}
+.coach-cg-card:hover{border-color:var(--purple);box-shadow:0 4px 16px rgba(0,0,0,.06);transform:translateY(-2px)}
+.coach-cg-card .cg-name{font-weight:800;font-size:16px;margin-bottom:4px}
+.coach-cg-card .cg-leader{font-size:12px;color:var(--g3)}
+.coach-cg-card .cg-stats{display:flex;gap:16px;margin-top:12px;font-size:12px}
+.coach-cg-card .cg-stat{text-align:center}
+.coach-cg-card .cg-stat .val{font-family:'Instrument Serif',serif;font-size:22px;display:block}
+
+@media(max-width:640px){
+  .dash-stats{grid-template-columns:repeat(2,1fr)}
+  .member-detail{grid-template-columns:1fr}
+  .landing-cards{flex-direction:column;align-items:center}
+  .coach-cg-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- LANDING PAGE                               -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="landing" id="pageL">
+  <div style="font-family:'Instrument Serif',serif;font-size:11px;letter-spacing:2px;color:var(--g3);text-transform:uppercase;margin-bottom:4px">AOG Teens Jakarta Timur</div>
+  <div class="landing-title">Dashboard</div>
+  <div class="landing-sub">Kehadiran 2026</div>
+
+  <div class="landing-section">
+    <div class="landing-cards">
+      <div class="landing-card coach" onclick="showCoach()">
+        <div class="icon">👑</div>
+        <div class="name">Coach / TL</div>
+        <div class="role">Lihat semua CG</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider-text">JAKTIM 1</div>
+  <div class="landing-cards" style="margin-bottom:24px">
+    <div class="landing-card" onclick="showCGL('TEEN 23','Tofanny Zerafim','#7c3aed','#faf5ff')"><div class="icon">📋</div><div class="name">TEEN 23</div><div class="role">Tofanny Zerafim</div></div>
+    <div class="landing-card" onclick="showCGL('TEEN 01','Stefenie Nathania','#1d4ed8','#eff6ff')"><div class="icon">📋</div><div class="name">TEEN 01</div><div class="role">Stefenie Nathania</div></div>
+    <div class="landing-card" onclick="showCGL('TEEN 09','Jessica Anastasia','#c2410c','#fff7ed')"><div class="icon">📋</div><div class="name">TEEN 09</div><div class="role">Jessica Anastasia</div></div>
+    <div class="landing-card" onclick="showCGL('TEEN 06','Keizha Ananta','#be185d','#fdf2f8')"><div class="icon">📋</div><div class="name">TEEN 06</div><div class="role">Keizha Ananta</div></div>
+  </div>
+
+  <div class="divider-text">JAKTIM 2</div>
+  <div class="landing-cards">
+    <div class="landing-card" onclick="showCGL('TEEN 12','Nathanael Wilson','#0f766e','#f0fdfa')"><div class="icon">📋</div><div class="name">TEEN 12</div><div class="role">Nathanael Wilson</div></div>
+    <div class="landing-card" onclick="showCGL('TEEN 07','Edson Matthew','#b45309','#fffbeb')"><div class="icon">📋</div><div class="name">TEEN 07</div><div class="role">Edson Matthew</div></div>
+    <div class="landing-card" onclick="showCGL('TEEN 17','Samantha Jane','#0e7490','#ecfeff')"><div class="icon">📋</div><div class="name">TEEN 17</div><div class="role">Samantha Jane</div></div>
+    <div class="landing-card" onclick="showCGL('TEEN 20','Yemima Grace','#be123c','#fff1f2')"><div class="icon">📋</div><div class="name">TEEN 20</div><div class="role">Yemima Grace</div></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- CGL DASHBOARD                              -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="dashboard" id="pageD">
+  <div class="dash-header">
+    <div class="dash-back" onclick="showLanding()">← Kembali</div>
+    <div class="dash-cg-badge" id="dBadge">TEEN 23</div>
+    <div class="dash-cgl-name" id="dName">Tofanny Zerafim</div>
+    <div class="dash-info">
+      <div class="dash-info-item">📅 <strong>Minggu – 13.00</strong></div>
+      <div class="dash-info-item">📍 <strong>Foodcourt MAG/Gmeet</strong></div>
+      <div class="dash-info-item">👥 <strong>10 member</strong></div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="dash-stats">
+    <div class="dash-stat green"><div class="num">78%</div><div class="label">Kehadiran</div></div>
+    <div class="dash-stat blue"><div class="num">6/10</div><div class="label">MSJ 1</div></div>
+    <div class="dash-stat orange"><div class="num">3/10</div><div class="label">CGT 1</div></div>
+    <div class="dash-stat red"><div class="num">2</div><div class="label">At Risk</div></div>
+  </div>
+
+  <!-- Visi & Misi -->
+  <div class="dash-section">
+    <div class="dash-section-title">🎯 Visi & Misi CG</div>
+    <div class="vision-box">
+      <div class="vision-label">Visi</div>
+      <div class="vision-text" contenteditable="true">Semua member CG aktif dan bertumbuh dalam iman</div>
+    </div>
+    <div class="vision-box">
+      <div class="vision-label">Misi Semester Ini</div>
+      <div class="vision-text" contenteditable="true">1. Semua member selesai MSJ 1 sebelum Juni 2026
+2. Minimal 80% kehadiran ibadah per bulan
+3. Follow-up member baru setiap minggu</div>
+    </div>
+    <div class="vision-box">
+      <div class="vision-label">Target</div>
+      <div class="vision-text" contenteditable="true">10 member aktif, 2 member baru dari outreach Mei</div>
+    </div>
+  </div>
+
+  <!-- Member at Risk -->
+  <div class="dash-section">
+    <div class="dash-section-title">⚠️ Perlu Follow-Up</div>
+    <div class="risk-card">
+      <div class="risk-icon">🔴</div>
+      <div>
+        <div class="risk-name">Florencia Arumi Koo</div>
+        <div class="risk-reason">Kehadiran 38% · 4x Alpa berturut-turut · Belum MSJ 1</div>
+      </div>
+    </div>
+    <div class="risk-card">
+      <div class="risk-icon">🟡</div>
+      <div>
+        <div class="risk-name">Ivy Yolanda W. Gerrit</div>
+        <div class="risk-reason">Kehadiran 31% · Simpatisan · Belum ada milestone</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Members -->
+  <div class="dash-section">
+    <div class="dash-section-title">👥 Anggota CG (10 member)</div>
+
+    <!-- Member 1 -->
+    <div class="member-card">
+      <div class="member-top">
+        <div class="member-name">Tofanny Zerafim Alexandra</div>
+        <span class="member-role cgl">CGL</span>
+      </div>
+      <div class="member-detail">
+        <span>📱 0889-7317-7676</span>
+        <span>🎂 22 Mei 2010</span>
+        <span>🏫 SMAN 31 · Kelas 10</span>
+        <span>📍 Rawamangun, Pulo Gadung</span>
+      </div>
+      <div style="font-size:11px;color:var(--g3);margin-bottom:6px">Milestone Progress (62%)</div>
+      <div class="ms-progress"><div class="ms-progress-bar" style="width:62%"></div></div>
+      <div class="milestone-row">
+        <span class="ms-chip done">MSJ 1 ✓</span>
+        <span class="ms-chip done">MSJ 2 ✓</span>
+        <span class="ms-chip pending">MSJ 3</span>
+        <span class="ms-chip done">CGT 1 ✓</span>
+        <span class="ms-chip done">CGT 2 ✓</span>
+        <span class="ms-chip pending">CGT 3</span>
+        <span class="ms-chip done">B.Air ✓</span>
+        <span class="ms-chip done">B.Roh ✓</span>
+      </div>
+      <div style="font-size:11px;color:var(--g3);margin-bottom:4px">Catatan CGL:</div>
+      <textarea class="note-area" placeholder="Tulis catatan perkembangan member...">Aktif dan setia hadir. Sedang proses MSJ 3.</textarea>
+      <div class="note-hint">Catatan ini hanya terlihat oleh CGL dan Coach</div>
+    </div>
+
+    <!-- Member 2 -->
+    <div class="member-card">
+      <div class="member-top">
+        <div class="member-name">Valerie Alea Darmawan</div>
+        <span class="member-role sponsor">Sponsor</span>
+      </div>
+      <div class="member-detail">
+        <span>📱 0813-1888-3186</span>
+        <span>🎂 12 Okt 2008</span>
+        <span>🏫 SMA Fons Vitae 1 · Kelas 11</span>
+        <span>📍 Cipinang Cempedak, Jatinegara</span>
+      </div>
+      <div style="font-size:11px;color:var(--g3);margin-bottom:6px">Milestone Progress (100%)</div>
+      <div class="ms-progress"><div class="ms-progress-bar" style="width:100%"></div></div>
+      <div class="milestone-row">
+        <span class="ms-chip done">MSJ 1 ✓</span>
+        <span class="ms-chip done">MSJ 2 ✓</span>
+        <span class="ms-chip done">MSJ 3 ✓</span>
+        <span class="ms-chip done">CGT 1 ✓</span>
+        <span class="ms-chip done">CGT 2 ✓</span>
+        <span class="ms-chip done">CGT 3 ✓</span>
+        <span class="ms-chip done">B.Air ✓</span>
+        <span class="ms-chip done">B.Roh ✓</span>
+      </div>
+      <textarea class="note-area" placeholder="Tulis catatan perkembangan member...">Milestone lengkap! Siap jadi CGL.</textarea>
+      <div class="note-hint">Catatan ini hanya terlihat oleh CGL dan Coach</div>
+    </div>
+
+    <!-- Member 3 (at risk) -->
+    <div class="member-card" style="border-left:3px solid var(--red)">
+      <div class="member-top">
+        <div class="member-name">Florencia Arumi Koo</div>
+        <span class="member-role simpatisan">Simpatisan</span>
+      </div>
+      <div class="member-detail">
+        <span>📱 0857-2410-7837</span>
+        <span>🎂 30 Jul 2010</span>
+        <span>🏫 Don Bosco 2 · Kelas 10</span>
+        <span>📍 -</span>
+      </div>
+      <div style="font-size:11px;color:var(--red);margin-bottom:6px;font-weight:600">⚠️ Kehadiran 38% · Perlu follow-up</div>
+      <div style="font-size:11px;color:var(--g3);margin-bottom:6px">Milestone Progress (0%)</div>
+      <div class="ms-progress"><div class="ms-progress-bar" style="width:0%"></div></div>
+      <div class="milestone-row">
+        <span class="ms-chip pending">MSJ 1</span>
+        <span class="ms-chip pending">MSJ 2</span>
+        <span class="ms-chip pending">MSJ 3</span>
+        <span class="ms-chip pending">CGT 1</span>
+        <span class="ms-chip pending">CGT 2</span>
+        <span class="ms-chip pending">CGT 3</span>
+        <span class="ms-chip pending">B.Air</span>
+        <span class="ms-chip pending">B.Roh</span>
+      </div>
+      <textarea class="note-area" placeholder="Tulis catatan perkembangan member...">Sudah 4x tidak hadir. Perlu dijemput dan di-WA personal.</textarea>
+      <div class="note-hint">Catatan ini hanya terlihat oleh CGL dan Coach</div>
+    </div>
+  </div>
+
+  <!-- Absensi Mini -->
+  <div class="dash-section">
+    <div class="dash-section-title">📊 Absensi Bulan Ini (April)</div>
+    <div style="overflow-x:auto">
+      <table class="att-mini">
+        <thead>
+          <tr>
+            <th style="text-align:left">Nama</th>
+            <th>4 Apr</th>
+            <th>11 Apr</th>
+            <th>18 Apr</th>
+            <th>25 Apr</th>
+            <th>%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="text-align:left;font-weight:500">Tofanny Zerafim</td>
+            <td><span class="dot H">H</span></td>
+            <td><span class="dot H">H</span></td>
+            <td><span class="dot X">–</span></td>
+            <td><span class="dot X">–</span></td>
+            <td style="font-weight:600;color:var(--green)">100%</td>
+          </tr>
+          <tr>
+            <td style="text-align:left;font-weight:500">Valerie Alea D.</td>
+            <td><span class="dot H">H</span></td>
+            <td><span class="dot I">I</span></td>
+            <td><span class="dot X">–</span></td>
+            <td><span class="dot X">–</span></td>
+            <td style="font-weight:600;color:var(--orange)">50%</td>
+          </tr>
+          <tr>
+            <td style="text-align:left;font-weight:500;color:var(--red)">Florencia Arumi</td>
+            <td><span class="dot A">A</span></td>
+            <td><span class="dot A">A</span></td>
+            <td><span class="dot X">–</span></td>
+            <td><span class="dot X">–</span></td>
+            <td style="font-weight:600;color:var(--red)">0%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- COACH DASHBOARD                            -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="dashboard" id="pageC">
+  <div class="dash-header">
+    <div class="dash-back" onclick="showLanding()">← Kembali</div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <div>
+        <div style="font-size:10px;letter-spacing:2px;color:var(--g3);text-transform:uppercase">Coach / Team Leader</div>
+        <div class="dash-cgl-name">Overview Semua CG</div>
+      </div>
+      <div style="font-size:36px">👑</div>
+    </div>
+    <div class="dash-info" style="margin-top:16px">
+      <div class="dash-info-item"><strong>8 CG</strong> aktif</div>
+      <div class="dash-info-item"><strong>54 member</strong> total</div>
+      <div class="dash-info-item"><strong>72%</strong> rata-rata kehadiran</div>
+    </div>
+  </div>
+
+  <!-- Toggle Jaktim -->
+  <div style="display:flex;gap:8px;margin-bottom:20px">
+    <button onclick="this.style.background='var(--purple)';this.style.color='#fff';this.nextElementSibling.style.background='#e8e8e8';this.nextElementSibling.style.color='#888'" style="padding:8px 20px;border-radius:20px;border:none;font-weight:700;font-size:12px;cursor:pointer;background:var(--purple);color:#fff">JAKTIM 1</button>
+    <button onclick="this.style.background='var(--purple)';this.style.color='#fff';this.previousElementSibling.style.background='#e8e8e8';this.previousElementSibling.style.color='#888'" style="padding:8px 20px;border-radius:20px;border:none;font-weight:700;font-size:12px;cursor:pointer;background:#e8e8e8;color:#888">JAKTIM 2</button>
+  </div>
+
+  <!-- CG Cards Grid -->
+  <div class="coach-cg-grid">
+    <div class="coach-cg-card" onclick="showCGL('TEEN 23','Tofanny Zerafim','#7c3aed','#faf5ff')" style="border-left:4px solid #7c3aed">
+      <div class="cg-name">TEEN 23</div>
+      <div class="cg-leader">CGL: Tofanny Zerafim</div>
+      <div class="cg-stats">
+        <div class="cg-stat"><span class="val" style="color:var(--green)">78%</span>Hadir</div>
+        <div class="cg-stat"><span class="val">10</span>Member</div>
+        <div class="cg-stat"><span class="val" style="color:var(--orange)">6</span>MSJ 1</div>
+        <div class="cg-stat"><span class="val" style="color:var(--red)">2</span>At Risk</div>
+      </div>
+    </div>
+    <div class="coach-cg-card" onclick="showCGL('TEEN 01','Stefenie Nathania','#1d4ed8','#eff6ff')" style="border-left:4px solid #1d4ed8">
+      <div class="cg-name">TEEN 01</div>
+      <div class="cg-leader">CGL: Stefenie Nathania</div>
+      <div class="cg-stats">
+        <div class="cg-stat"><span class="val" style="color:var(--green)">82%</span>Hadir</div>
+        <div class="cg-stat"><span class="val">7</span>Member</div>
+        <div class="cg-stat"><span class="val" style="color:var(--orange)">5</span>MSJ 1</div>
+        <div class="cg-stat"><span class="val" style="color:var(--red)">1</span>At Risk</div>
+      </div>
+    </div>
+    <div class="coach-cg-card" onclick="showCGL('TEEN 09','Jessica Anastasia','#c2410c','#fff7ed')" style="border-left:4px solid #c2410c">
+      <div class="cg-name">TEEN 09</div>
+      <div class="cg-leader">CGL: Jessica Anastasia</div>
+      <div class="cg-stats">
+        <div class="cg-stat"><span class="val" style="color:var(--green)">68%</span>Hadir</div>
+        <div class="cg-stat"><span class="val">6</span>Member</div>
+        <div class="cg-stat"><span class="val" style="color:var(--orange)">4</span>MSJ 1</div>
+        <div class="cg-stat"><span class="val" style="color:var(--red)">2</span>At Risk</div>
+      </div>
+    </div>
+    <div class="coach-cg-card" onclick="showCGL('TEEN 06','Keizha Ananta','#be185d','#fdf2f8')" style="border-left:4px solid #be185d">
+      <div class="cg-name">TEEN 06</div>
+      <div class="cg-leader">CGL: Keizha Ananta</div>
+      <div class="cg-stats">
+        <div class="cg-stat"><span class="val" style="color:var(--green)">71%</span>Hadir</div>
+        <div class="cg-stat"><span class="val">8</span>Member</div>
+        <div class="cg-stat"><span class="val" style="color:var(--orange)">7</span>MSJ 1</div>
+        <div class="cg-stat"><span class="val" style="color:var(--red)">0</span>At Risk</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showLanding(){
+  document.getElementById('pageL').style.display='flex';
+  document.getElementById('pageD').style.display='none';
+  document.getElementById('pageC').style.display='none';
+}
+function showCGL(cg, name, color, bg){
+  document.getElementById('pageL').style.display='none';
+  document.getElementById('pageC').style.display='none';
+  document.getElementById('pageD').style.display='block';
+  document.getElementById('dBadge').textContent=cg;
+  document.getElementById('dBadge').style.background=bg;
+  document.getElementById('dBadge').style.color=color;
+  document.getElementById('dBadge').style.border='1px solid '+color+'40';
+  document.getElementById('dName').textContent=name;
+}
+function showCoach(){
+  document.getElementById('pageL').style.display='none';
+  document.getElementById('pageD').style.display='none';
+  document.getElementById('pageC').style.display='block';
+}
+</script>
+</body>
+</html>
