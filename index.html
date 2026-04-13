@@ -52,7 +52,9 @@ body{font-family:'Inter',sans-serif;background:#f8f8f5;color:#1c1c1c;min-height:
 .live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block;animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
-.app-hero{padding:24px 20px 20px;border-bottom:1px solid var(--g5);background:var(--white)}
+.app-hero{padding:24px 20px 20px;border-bottom:1px solid var(--g5);background:var(--white);display:flex;gap:24px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.app-hero-left{flex:0 0 auto;min-width:160px}
+.app-hero-visi{flex:1;min-width:240px;text-align:right;font-family:'Instrument Serif',serif;font-size:clamp(22px,3.4vw,34px);line-height:1.1;color:var(--g1);font-style:italic;opacity:.95}
 .app-hero-tag{font-size:10px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:var(--g4);margin-bottom:6px}
 .app-hero-h{font-family:'Instrument Serif',serif;font-size:clamp(26px,5vw,42px);line-height:1.05;color:var(--g1)}
 .app-hero-h em{font-style:italic;color:var(--g3)}
@@ -334,8 +336,14 @@ body{font-family:'Inter',sans-serif;background:#f8f8f5;color:#1c1c1c;min-height:
 <!-- CGL DASHBOARD -->
 <div class="app" id="pageD">
   <div class="app-nav"><div class="app-nav-left"><div class="app-back" onclick="goBack()">&larr;</div><span class="app-cg-badge" id="nB"></span><span class="app-cgl" id="nN"></span></div><div style="display:flex;align-items:center;gap:6px"><span class="live-dot"></span><span style="font-size:10px;color:var(--green);font-weight:600">Live</span></div></div>
-  <div class="app-hero"><div class="app-hero-tag">Januari &mdash; April 2026</div><div class="app-hero-h">Rekap<br><em>CG.</em></div><div class="app-hero-meta"><span id="hC">0</span> anggota &middot; <span id="hS"></span> &middot; <span id="hL"></span></div></div>
-  <div id="regionVisiBanner" style="display:none;margin:0 20px 8px;padding:0"></div>
+  <div class="app-hero">
+    <div class="app-hero-left">
+      <div class="app-hero-tag">Januari &mdash; April 2026</div>
+      <div class="app-hero-h">Rekap<br><em>CG.</em></div>
+      <div class="app-hero-meta"><span id="hC">0</span> anggota &middot; <span id="hS"></span> &middot; <span id="hL"></span></div>
+    </div>
+    <div class="app-hero-visi" id="regionVisiBanner" style="display:none"></div>
+  </div>
   <div class="app-stats">
     <div class="app-stat ct"><div class="app-stat-label">Hadir</div><div class="app-stat-num" id="sH">0</div><div class="app-stat-pct" id="sHp">0%</div></div>
     <div class="app-stat cb"><div class="app-stat-label">Izin</div><div class="app-stat-num" id="sI">0</div><div class="app-stat-pct" id="sIp">0%</div></div>
@@ -741,11 +749,8 @@ async function openCGDashboard(cg) {
     if (!b) return;
     if (cv && cv.visi) {
       b.style.display = 'block';
-      let inner = '<div style="text-align:center;padding:10px 0 6px">';
-      inner += '<div style="font-size:10px;letter-spacing:2.5px;color:var(--g3);text-transform:uppercase;margin-bottom:6px;font-weight:600">The Year Of</div>';
-      inner += '<div style="font-family:\'Instrument Serif\',serif;font-size:44px;line-height:1.05;color:var(--g1);white-space:pre-wrap;font-style:italic">'+esc(cv.visi)+'</div>';
-      if (cv.misi) inner += '<div style="font-size:11px;color:var(--g3);line-height:1.5;margin-top:10px;letter-spacing:.5px;white-space:pre-wrap">'+esc(cv.misi)+'</div>';
-      inner += '</div>';
+      let inner = '<div style="white-space:pre-wrap">'+esc(cv.visi)+'</div>';
+      if (cv.misi) inner += '<div style="font-size:11px;color:var(--g3);line-height:1.5;margin-top:8px;letter-spacing:.5px;white-space:pre-wrap;font-style:normal;font-family:Inter,sans-serif">'+esc(cv.misi)+'</div>';
       b.innerHTML = inner;
     } else {
       b.style.display = 'none';
