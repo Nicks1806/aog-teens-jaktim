@@ -181,6 +181,7 @@ body{font-family:'Inter',sans-serif;background:#f8f8f5;color:#1c1c1c;min-height:
   .dgrid{grid-template-columns:1fr}
   .region-btn{padding:8px 24px;font-size:13px}
   .dev-row{flex-direction:column;align-items:flex-start;gap:6px}
+  #visiCardsContainer > div[style*="grid-template-columns:repeat(2"]{grid-template-columns:1fr !important}
 }
 </style>
 </head>
@@ -1197,11 +1198,50 @@ function buildVisiCard(c){
     '</div></div>';
 }
 
+function buildVisiCardCompact(c,idx){
+  var bgGrad='linear-gradient(135deg,'+c.bg+','+c.bg+'cc)';
+  return '<div class="tl-visi-card" data-idx="'+idx+'" style="background:var(--white);border-radius:14px;overflow:hidden;cursor:pointer;transition:all .2s;border:1px solid var(--g5)" onmouseover="this.style.transform=\'translateY(-2px)\';this.style.boxShadow=\'0 8px 20px rgba(0,0,0,.08)\'" onmouseout="this.style.transform=\'\';this.style.boxShadow=\'\'" onclick="openVisiDetail('+idx+')">'+
+    '<div style="background:'+bgGrad+';padding:12px 14px;display:flex;align-items:center;justify-content:space-between">'+
+      '<div style="display:flex;align-items:center;gap:8px"><div style="width:32px;height:32px;border-radius:8px;background:'+c.color+';display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:10px">'+c.init+'</div>'+
+      '<div><div style="font-weight:700;font-size:12px">'+c.cg+'</div><div style="font-size:9px;color:var(--g3)">'+c.leader+'</div></div></div>'+
+      '<div style="text-align:right"><div style="font-family:\'Instrument Serif\',serif;font-size:18px;color:'+c.color+';line-height:1">'+c.pct+'%</div></div>'+
+    '</div>'+
+    '<div style="padding:12px 14px">'+
+      '<div style="font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--g3);margin-bottom:3px">Visi</div>'+
+      '<div style="font-size:11px;line-height:1.4;color:var(--g2);margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">Visi CG '+c.cg+' di sini.</div>'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid var(--g6)">'+
+        '<div style="display:flex;gap:8px;font-size:10px"><span><b style="color:var(--g1)">'+c.mbr+'</b> <span style="color:var(--g3)">member</span></span><span><b style="color:var(--red)">'+c.risk+'</b> <span style="color:var(--g3)">risk</span></span></div>'+
+        '<span style="font-size:10px;color:'+c.color+';font-weight:600">Lihat detail →</span>'+
+      '</div>'+
+    '</div></div>';
+}
+
+function openVisiDetail(idx){
+  var c=ALL_CG_DATA[idx];
+  var container=document.getElementById('visiCardsContainer');
+  if(!container) return;
+  var detailHTML='<div style="margin-bottom:14px"><button onclick="renderVisiCards(\'all\')" style="font-size:11px;color:var(--g3);background:none;border:none;cursor:pointer;padding:6px 0">← Kembali ke semua CG</button></div>';
+  detailHTML+=buildVisiCard(c);
+  container.innerHTML=detailHTML;
+  window.scrollTo({top:container.offsetTop-100,behavior:'smooth'});
+}
+
 function renderVisiCards(region){
   var container=document.getElementById('visiCardsContainer');
   if(!container) return;
-  var cgs=region==='all'?ALL_CG_DATA:(region==='jaktim1'?ALL_CG_DATA.slice(0,4):ALL_CG_DATA.slice(4));
-  container.innerHTML=cgs.map(buildVisiCard).join('');
+  var subtitle=document.getElementById('visiSubtitle');
+  if(region==='all'){
+    // TL view - compact grid
+    if(subtitle) subtitle.textContent='Klik card untuk edit visi & misi setiap CG';
+    container.innerHTML='<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px">'+
+      ALL_CG_DATA.map(function(c,i){return buildVisiCardCompact(c,i);}).join('')+
+      '</div>';
+  } else {
+    // Coach view - full cards
+    if(subtitle) subtitle.textContent='Edit visi & misi setiap CG. Tambahkan feedback sebagai Coach.';
+    var cgs=region==='jaktim1'?ALL_CG_DATA.slice(0,4):ALL_CG_DATA.slice(4);
+    container.innerHTML=cgs.map(buildVisiCard).join('');
+  }
 }
 
 function switchVisiReg(reg,btn){
