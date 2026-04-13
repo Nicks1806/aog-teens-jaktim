@@ -1522,12 +1522,21 @@ async function renderPelayanan() {
         html += '<span style="display:inline-flex;align-items:center;gap:2px;padding:3px 3px 3px 9px;background:'+r.bg+';color:'+r.color+';border-radius:12px;font-size:10.5px;font-weight:600;line-height:1.2">'+esc(name)+'<button onclick="removePelAssignee(\''+roleKey+'\',\''+esc(name)+'\')" style="background:none;border:0;cursor:pointer;color:'+r.color+';opacity:.65;font-size:13px;line-height:1;padding:0 4px 0 2px;border-radius:50%" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.65" title="Hapus">&times;</button></span>';
       });
       // "+" add button (styled wrapper with hidden select overlay)
-      html += '<span style="position:relative;display:inline-flex">';
-      html += '<button type="button" style="padding:3px 10px;background:transparent;border:1px dashed '+r.color+'55;border-radius:12px;color:'+r.color+';font-size:11px;font-weight:700;cursor:pointer;opacity:.8;transition:all .15s" onmouseover="this.style.opacity=1;this.style.background=\''+r.bg+'\'" onmouseout="this.style.opacity=.8;this.style.background=\'transparent\'">+ Tambah</button>';
-      html += '<select onchange="addPelAssignee(\''+roleKey+'\',this.value);this.value=\'\'" style="position:absolute;inset:0;opacity:0;cursor:pointer;font-size:12px">';
-      html += '<option value=""></option>';
-      MEMBERS.forEach(m => { if (!assignedSet.has(m.nama)) html += '<option value="'+esc(m.nama)+'">'+esc(m.nama)+'</option>'; });
-      html += '</select></span>';
+      // "+" add button — custom popover (bukan native select, biar UI konsisten)
+      const ddId = 'peldd_'+esc(r.name).replace(/[^a-zA-Z0-9]/g,'_');
+      html += '<span style="position:relative;display:inline-block">';
+      html += '<button type="button" onclick="togglePelDD(\''+ddId+'\',event)" style="padding:3px 10px;background:transparent;border:1px dashed '+r.color+'55;border-radius:12px;color:'+r.color+';font-size:11px;font-weight:700;cursor:pointer;opacity:.85;transition:all .15s" onmouseover="this.style.opacity=1;this.style.background=\''+r.bg+'\'" onmouseout="this.style.opacity=.85;this.style.background=\'transparent\'">+ Tambah</button>';
+      html += '<div id="'+ddId+'" class="pel-dd-panel" style="display:none;position:absolute;top:calc(100% + 6px);right:0;background:#fff;border:1px solid '+r.color+'44;border-radius:12px;box-shadow:0 12px 28px rgba(0,0,0,.14);min-width:220px;max-height:280px;overflow-y:auto;z-index:50">';
+      const avail = MEMBERS.filter(m => !assignedSet.has(m.nama));
+      if (avail.length === 0) {
+        html += '<div style="padding:14px;font-size:11px;color:var(--g4);font-style:italic;text-align:center">Semua member sudah di-assign</div>';
+      } else {
+        avail.forEach(m => {
+          const initial = String(m.nama||'?').trim().slice(0,1).toUpperCase();
+          html += '<div onclick="addPelAssignee(\''+roleKey+'\',\''+esc(m.nama)+'\');closePelDD(\''+ddId+'\')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;cursor:pointer;border-bottom:1px solid #f5f0ff;transition:background .12s" onmouseover="this.style.background=\''+r.bg+'\'" onmouseout="this.style.background=\'\'"><div style="width:26px;height:26px;border-radius:50%;background:'+r.bg+';color:'+r.color+';display:flex;align-items:center;justify-content:center;font-weight:800;font-size:10px;border:1.5px solid '+r.color+'66;flex-shrink:0">'+esc(initial)+'</div><div style="flex:1;min-width:0"><div style="font-weight:600;font-size:12px;color:var(--g1);line-height:1.2">'+esc(m.nama)+'</div><div style="font-size:9px;color:var(--g4);margin-top:1px">'+esc(m.status||'Member')+'</div></div></div>';
+        });
+      }
+      html += '</div></span>';
       html += '</div></div>';
     });
     html += '</div>';
@@ -1739,6 +1748,31 @@ async function deletePelWeek(date) {
   await renderPelayanan();
   toast('\u2713 Minggu dihapus');
 }
+
+// Toggle popover "+ Tambah" pelayanan (custom dropdown, bukan native select)
+function togglePelDD(id, ev) {
+  if (ev) ev.stopPropagation();
+  // Tutup semua popover lain dulu
+  document.querySelectorAll('.pel-dd-panel').forEach(el => { if (el.id !== id) el.style.display = 'none'; });
+  const p = document.getElementById(id);
+  if (!p) return;
+  p.style.display = p.style.display === 'block' ? 'none' : 'block';
+}
+function closePelDD(id) {
+  const p = document.getElementById(id);
+  if (p) p.style.display = 'none';
+}
+// Click di luar = tutup semua popover pelayanan
+document.addEventListener('click', (e) => {
+  document.querySelectorAll('.pel-dd-panel').forEach(p => {
+    if (p.style.display !== 'block') return;
+    // jangan tutup kalau klik di dalam popover atau tombol toggle-nya
+    if (p.contains(e.target)) return;
+    const btn = p.previousElementSibling;
+    if (btn && btn.contains(e.target)) return;
+    p.style.display = 'none';
+  });
+});
 
 // Multi-assignee helpers: baca nilai current → modifikasi list → save gabungan comma-separated
 async function _getCurrentAssignees(roleName) {
