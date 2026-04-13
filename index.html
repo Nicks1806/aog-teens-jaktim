@@ -602,7 +602,16 @@ function renderAbsensi() {
   DATES.forEach(d => { html += '<th>' + (d.label||d.id) + '</th>'; });
   html += '<th>% Hadir</th></tr></thead><tbody>';
 
-  MEMBERS.forEach(m => {
+  // Sort by role: CGL > Sponsor > Member > Simpatisan > VIP
+  const ROLE_ORDER = {'cgl':0,'leader':0,'sponsor':1,'member':2,'simpatisan':3,'vip':4};
+  const sortedMembers = [...MEMBERS].sort((a,b) => {
+    const ra = ROLE_ORDER[(a.status||'member').toLowerCase().trim()] ?? 5;
+    const rb = ROLE_ORDER[(b.status||'member').toLowerCase().trim()] ?? 5;
+    if (ra !== rb) return ra - rb;
+    return (a.nama||'').localeCompare(b.nama||'');
+  });
+
+  sortedMembers.forEach(m => {
     const hadirCount = DATES.filter(d => ATTENDANCE[m.id+'_'+d.id]==='H').length;
     const totalDates = DATES.filter(d => ATTENDANCE[m.id+'_'+d.id]).length || 1;
     const pct = Math.round(hadirCount / totalDates * 100);
@@ -663,9 +672,18 @@ async function renderDetail() {
   const memberNotes = {};
   MEMBERS.forEach((m, idx) => { memberNotes[m.id] = notes[idx]; });
 
+  // Sort by role priority: CGL > Sponsor > Member > Simpatisan > VIP
+  const ROLE_ORDER = {'cgl':0,'leader':0,'sponsor':1,'member':2,'simpatisan':3,'vip':4};
+  const sortedMembers = [...MEMBERS].sort((a,b) => {
+    const ra = ROLE_ORDER[(a.status||'member').toLowerCase().trim()] ?? 5;
+    const rb = ROLE_ORDER[(b.status||'member').toLowerCase().trim()] ?? 5;
+    if (ra !== rb) return ra - rb;
+    return (a.nama||'').localeCompare(b.nama||'');
+  });
+
   let html = '';
 
-  MEMBERS.forEach(m => {
+  sortedMembers.forEach(m => {
     const hadirCount = DATES.filter(d => ATTENDANCE[m.id+'_'+d.id]==='H').length;
     const totalDates = DATES.filter(d => ATTENDANCE[m.id+'_'+d.id]).length || 1;
     const pct = Math.round(hadirCount / totalDates * 100);
