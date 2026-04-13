@@ -3,435 +3,422 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AOG Teens — Dashboard Prototype</title>
+<title>AOG Teens — CG Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Inter',sans-serif;background:#f8f8f5;color:#1c1c1c;min-height:100vh}
-:root{--purple:#6C5CE7;--green:#16a34a;--blue:#2563eb;--orange:#d97706;--red:#dc2626;--g1:#1c1c1c;--g2:#555;--g3:#888;--g4:#bbb;--g5:#ddd;--g6:#f0f0ed;--white:#fff}
+:root{--purple:#6C5CE7;--green:#16a34a;--blue:#2563eb;--orange:#d97706;--red:#dc2626;--g1:#1c1c1c;--g2:#555;--g3:#888;--g4:#bbb;--g5:#ddd;--g6:#f0f0ed;--white:#fff;
+--H:#16a34a;--Hb:#f0fdf4;--Hbr:#bbf7d0;--I:#2563eb;--Ib:#eff6ff;--Ibr:#bfdbfe;--S:#d97706;--Sb:#fffbeb;--Sbr:#fde68a;--A:#dc2626;--Ab:#fef2f2;--Abr:#fecaca}
 
-/* ─── LANDING PAGE ─── */
+/* ─── LANDING ─── */
 .landing{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:20px}
 .landing-title{font-family:'Instrument Serif',serif;font-size:32px;margin-bottom:2px}
 .landing-sub{font-size:11px;color:var(--g3);letter-spacing:2px;text-transform:uppercase;margin-bottom:36px}
-
-/* Region toggle */
 .region-toggle{display:flex;background:#e8e8e8;border-radius:24px;padding:3px;margin-bottom:28px}
-.region-btn{padding:10px 32px;border-radius:22px;border:none;font-size:14px;font-weight:700;cursor:pointer;transition:all .25s;letter-spacing:.5px;background:transparent;color:var(--g3)}
+.region-btn{padding:10px 32px;border-radius:22px;border:none;font-size:14px;font-weight:700;cursor:pointer;transition:all .25s;background:transparent;color:var(--g3)}
 .region-btn.active{background:var(--purple);color:#fff;box-shadow:0 2px 10px rgba(108,92,231,.3)}
-
-/* CGL selector */
 .cgl-selector{width:100%;max-width:400px;margin-bottom:20px}
-.cgl-select{width:100%;padding:14px 18px;border:2px solid var(--g5);border-radius:14px;font-size:14px;font-family:'Inter',sans-serif;font-weight:500;appearance:none;background:var(--white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 16px center;cursor:pointer;transition:border .2s}
+.cgl-select{width:100%;padding:14px 18px;border:2px solid var(--g5);border-radius:14px;font-size:14px;font-family:'Inter',sans-serif;font-weight:500;appearance:none;background:var(--white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 16px center;cursor:pointer}
 .cgl-select:focus{outline:none;border-color:var(--purple)}
-.cgl-select option{padding:8px}
-
-.enter-btn{width:100%;max-width:400px;padding:14px;border:none;border-radius:14px;background:var(--purple);color:#fff;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.5px}
+.enter-btn{width:100%;max-width:400px;padding:14px;border:none;border-radius:14px;background:var(--purple);color:#fff;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s}
 .enter-btn:hover{background:#5a4bd6;box-shadow:0 4px 16px rgba(108,92,231,.3)}
-.enter-btn:disabled{background:var(--g5);color:var(--g4);cursor:not-allowed;box-shadow:none}
+.enter-btn:disabled{background:var(--g5);color:var(--g4);cursor:not-allowed}
 
-/* ─── CGL DASHBOARD ─── */
-.dashboard{display:none;max-width:900px;margin:0 auto;padding:20px}
-.dash-header{background:var(--white);border:1px solid var(--g5);border-radius:16px;padding:24px 28px;margin-bottom:20px}
-.dash-back{font-size:12px;color:var(--g3);cursor:pointer;margin-bottom:12px;display:inline-flex;align-items:center;gap:4px}
-.dash-back:hover{color:var(--g1)}
-.dash-cg-badge{display:inline-block;padding:4px 12px;border-radius:8px;font-size:11px;font-weight:700;letter-spacing:1px;margin-bottom:6px}
-.dash-cgl-name{font-family:'Instrument Serif',serif;font-size:30px;margin-bottom:2px}
-.dash-info{display:flex;gap:20px;flex-wrap:wrap;margin-top:10px}
-.dash-info-item{font-size:12px;color:var(--g3)}
-.dash-info-item strong{color:var(--g1)}
+/* ─── DASHBOARD SHELL ─── */
+.app{display:none}
+.app-nav{background:var(--white);border-bottom:1px solid var(--g5);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.app-nav-left{display:flex;align-items:center;gap:12px}
+.app-back{font-size:18px;cursor:pointer;color:var(--g3);padding:4px}
+.app-back:hover{color:var(--g1)}
+.app-cg-badge{padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:.8px}
+.app-cgl{font-size:13px;font-weight:600}
+.app-nav-right{display:flex;align-items:center;gap:8px}
+.app-nav-right .live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* Hero */
+.app-hero{padding:24px 20px 20px;border-bottom:1px solid var(--g5);background:var(--white)}
+.app-hero-tag{font-size:10px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:var(--g4);margin-bottom:6px}
+.app-hero-h{font-family:'Instrument Serif',serif;font-size:clamp(26px,5vw,42px);line-height:1.05;color:var(--g1);letter-spacing:-1px}
+.app-hero-h em{font-style:italic;color:var(--g3)}
+.app-hero-meta{font-size:12px;color:var(--g3);margin-top:6px}
+@media(min-width:768px){.app-hero{padding:32px 40px 28px}}
 
 /* Stats */
-.dash-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
-.dash-stat{background:var(--white);border:1px solid var(--g5);border-radius:12px;padding:16px;text-align:center}
-.dash-stat .num{font-family:'Instrument Serif',serif;font-size:28px}
-.dash-stat .label{font-size:10px;color:var(--g3);letter-spacing:1px;text-transform:uppercase;margin-top:2px}
-.dash-stat.green .num{color:var(--green)}
-.dash-stat.blue .num{color:var(--blue)}
-.dash-stat.orange .num{color:var(--orange)}
-.dash-stat.red .num{color:var(--red)}
+.app-stats{display:grid;grid-template-columns:repeat(4,1fr);background:var(--white);border-bottom:1px solid var(--g5)}
+.app-stat{padding:14px 12px;text-align:center;border-right:1px solid var(--g5)}
+.app-stat:last-child{border-right:none}
+.app-stat-label{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--g3);font-weight:500}
+.app-stat-num{font-family:'Instrument Serif',serif;font-size:24px;margin-top:2px}
+.app-stat-pct{font-size:10px;color:var(--g3)}
+.ct .app-stat-num{color:var(--green)}.cb .app-stat-num{color:var(--blue)}.co .app-stat-num{color:var(--orange)}.cr .app-stat-num{color:var(--red)}
 
-/* Sections */
-.dash-section{background:var(--white);border:1px solid var(--g5);border-radius:16px;padding:24px;margin-bottom:20px}
-.dash-section-title{font-size:14px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+/* Tabs */
+.app-body{max-width:900px;margin:0 auto;padding:0 16px}
+.app-tabs{display:flex;gap:0;padding:12px 0 0;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--g5);background:var(--white);margin:0 -16px;padding-left:16px;padding-right:16px;position:sticky;top:49px;z-index:99}
+.app-tabs::-webkit-scrollbar{display:none}
+.app-tab{padding:8px 14px;font-size:12px;font-weight:600;color:var(--g3);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .2s}
+.app-tab:hover{color:var(--g1)}
+.app-tab.on{color:var(--g1);border-bottom-color:var(--purple)}
 
-/* Vision */
-.vision-box{background:var(--g6);border-radius:10px;padding:14px;margin-bottom:10px}
+/* Tab content */
+.tab-content{display:none;padding:20px 0}
+.tab-content.active{display:block}
+
+/* ─── TAB: Absensi ─── */
+.att-table{width:100%;border-collapse:collapse}
+.att-table th{padding:8px 10px;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--g3);font-weight:500;border-bottom:1px solid var(--g5);position:sticky;top:99px;background:var(--white);z-index:5}
+.att-table td{padding:10px;border-bottom:1px solid var(--g6);font-size:12px}
+.att-table .name-cell{font-weight:500;min-width:140px}
+.att-table .role-tag{font-size:9px;color:var(--g4);display:block}
+.dot{width:28px;height:28px;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;cursor:pointer;transition:all .15s}
+.dot:hover{transform:scale(1.15)}
+.dot.H{background:var(--Hb);color:var(--H);border:1px solid var(--Hbr)}
+.dot.I{background:var(--Ib);color:var(--I);border:1px solid var(--Ibr)}
+.dot.S{background:var(--Sb);color:var(--S);border:1px solid var(--Sbr)}
+.dot.A{background:var(--Ab);color:var(--A);border:1px solid var(--Abr)}
+.dot.X{color:var(--g4);background:var(--g6);border:1px solid var(--g5)}
+.pct-bar{display:flex;align-items:center;gap:6px}
+.pct-bar-track{flex:1;height:3px;background:var(--g5);border-radius:3px;overflow:hidden;min-width:32px}
+.pct-bar-fill{height:100%;border-radius:3px}
+.pct-val{font-family:'Instrument Serif',serif;font-size:15px;min-width:36px;text-align:right}
+
+/* ─── TAB: Detail ─── */
+.detail-card{background:var(--white);border:1px solid var(--g5);border-radius:12px;padding:16px;margin-bottom:12px}
+.detail-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.detail-name{font-weight:600;font-size:14px}
+.role-badge{font-size:10px;padding:2px 8px;border-radius:4px;font-weight:600}
+.role-badge.cgl{background:#f0fdf4;color:var(--green);border:1px solid #bbf7d0}
+.role-badge.sponsor{background:#eff6ff;color:var(--blue);border:1px solid #bfdbfe}
+.role-badge.member{background:#faf5ff;color:#7c3aed;border:1px solid #c4b5fd}
+.role-badge.simpatisan{background:#fff7ed;color:var(--orange);border:1px solid #fdba74}
+.role-badge.vip{background:#fef2f2;color:var(--red);border:1px solid #fecaca}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px;color:var(--g2)}
+.detail-grid span{display:flex;align-items:center;gap:4px}
+
+/* ─── TAB: Visi ─── */
+.vision-card{background:var(--g6);border-radius:10px;padding:14px;margin-bottom:12px}
 .vision-label{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--g3);margin-bottom:4px}
-.vision-text{font-size:13px;line-height:1.6;color:var(--g1);min-height:36px;outline:none;padding:4px 8px;border:1px dashed transparent;border-radius:6px}
-.vision-text:focus{border-color:var(--purple);background:var(--white)}
+.vision-edit{width:100%;border:1px dashed var(--g5);border-radius:8px;padding:10px 12px;font-size:13px;font-family:'Inter',sans-serif;line-height:1.6;min-height:60px;background:var(--white);resize:vertical;outline:none}
+.vision-edit:focus{border-color:var(--purple)}
+.vision-save{margin-top:12px;padding:8px 20px;border:none;border-radius:8px;background:var(--purple);color:#fff;font-size:12px;font-weight:600;cursor:pointer}
 
-/* Members */
-.member-card{border:1px solid var(--g5);border-radius:12px;padding:16px;margin-bottom:12px;transition:all .2s}
-.member-card:hover{border-color:var(--purple);box-shadow:0 2px 12px rgba(0,0,0,.04)}
-.member-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.member-name{font-weight:600;font-size:14px}
-.member-role{font-size:10px;padding:2px 8px;border-radius:4px;font-weight:600;letter-spacing:.5px}
-.member-role.cgl{background:#f0fdf4;color:var(--green);border:1px solid #bbf7d0}
-.member-role.sponsor{background:#eff6ff;color:var(--blue);border:1px solid #bfdbfe}
-.member-role.member{background:#faf5ff;color:#7c3aed;border:1px solid #c4b5fd}
-.member-role.simpatisan{background:#fff7ed;color:var(--orange);border:1px solid #fdba74}
-.member-role.vip{background:#fef2f2;color:var(--red);border:1px solid #fecaca}
-.member-detail{display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px;color:var(--g2);margin-bottom:12px}
-.member-detail span{display:flex;align-items:center;gap:4px}
+/* ─── TAB: Pelayanan ─── */
+.pelayanan-card{background:var(--white);border:1px solid var(--g5);border-radius:10px;padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:12px}
+.pelayanan-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.pelayanan-name{font-weight:600;font-size:13px}
+.pelayanan-role{font-size:11px;color:var(--g3)}
 
-/* Milestone */
-.milestone-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
-.ms-chip{padding:3px 8px;border-radius:6px;font-size:10px;font-weight:600;letter-spacing:.5px}
+/* ─── TAB: Milestone ─── */
+.ms-member{background:var(--white);border:1px solid var(--g5);border-radius:12px;padding:14px;margin-bottom:12px}
+.ms-member-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.ms-member-name{font-weight:600;font-size:13px}
+.ms-pct{font-size:11px;font-weight:600}
+.ms-progress{height:4px;background:var(--g5);border-radius:4px;overflow:hidden;margin-bottom:8px}
+.ms-progress-bar{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--green),#34d399)}
+.ms-chips{display:flex;gap:5px;flex-wrap:wrap}
+.ms-chip{padding:2px 7px;border-radius:5px;font-size:9px;font-weight:600;letter-spacing:.3px}
 .ms-chip.done{background:#f0fdf4;color:var(--green);border:1px solid #bbf7d0}
 .ms-chip.pending{background:#f5f5f4;color:var(--g4);border:1px solid var(--g5)}
-.ms-progress{height:4px;background:var(--g5);border-radius:4px;overflow:hidden;margin-bottom:6px}
-.ms-progress-bar{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--green),#34d399)}
-.note-area{width:100%;border:1px solid var(--g5);border-radius:8px;padding:10px 12px;font-size:12px;font-family:'Inter',sans-serif;resize:vertical;min-height:50px;outline:none}
+
+/* ─── TAB: Events ─── */
+.event-card{background:var(--white);border:1px solid var(--g5);border-radius:12px;padding:16px;margin-bottom:12px;border-left:4px solid var(--purple)}
+.event-date{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--purple);margin-bottom:4px}
+.event-name{font-weight:700;font-size:15px;margin-bottom:4px}
+.event-note{font-size:12px;color:var(--g3);line-height:1.5}
+.event-cat{display:inline-block;padding:2px 8px;border-radius:4px;font-size:9px;font-weight:600;background:rgba(108,92,231,.08);color:var(--purple);margin-top:6px}
+
+/* Notes area (shared) */
+.note-area{width:100%;border:1px solid var(--g5);border-radius:8px;padding:8px 10px;font-size:11px;font-family:'Inter',sans-serif;resize:vertical;min-height:40px;outline:none;margin-top:8px}
 .note-area:focus{border-color:var(--purple)}
-.note-hint{font-size:10px;color:var(--g4);margin-top:3px}
+.note-hint{font-size:9px;color:var(--g4);margin-top:2px}
 
-/* Risk */
-.risk-card{display:flex;align-items:center;gap:12px;padding:12px;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;margin-bottom:8px}
-.risk-name{font-weight:600;font-size:13px}
-.risk-reason{font-size:11px;color:var(--red)}
-
-/* Attendance */
-.att-mini{width:100%;border-collapse:collapse;font-size:11px;margin-top:12px}
-.att-mini th{padding:6px 8px;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--g3);font-weight:500;border-bottom:1px solid var(--g5)}
-.att-mini td{padding:6px 8px;text-align:center;border-bottom:1px solid var(--g6)}
-.dot{width:24px;height:24px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
-.dot.H{background:#f0fdf4;color:var(--green)}.dot.I{background:#eff6ff;color:var(--blue)}.dot.S{background:#fffbeb;color:var(--orange)}.dot.A{background:#fef2f2;color:var(--red)}.dot.X{color:var(--g4)}
-
-/* Coach */
-.coach-cg-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
-.coach-cg-card{background:var(--white);border:1px solid var(--g5);border-radius:14px;padding:20px;cursor:pointer;transition:all .2s}
-.coach-cg-card:hover{border-color:var(--purple);box-shadow:0 4px 16px rgba(0,0,0,.06);transform:translateY(-2px)}
-.coach-cg-card .cg-name{font-weight:800;font-size:16px;margin-bottom:4px}
-.coach-cg-card .cg-leader{font-size:12px;color:var(--g3)}
-.coach-cg-card .cg-stats{display:flex;gap:16px;margin-top:12px;font-size:12px}
-.coach-cg-card .cg-stat{text-align:center}
-.coach-cg-card .cg-stat .val{font-family:'Instrument Serif',serif;font-size:22px;display:block}
+/* Coach dashboard */
+.coach-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-top:16px}
+.coach-card{background:var(--white);border:1px solid var(--g5);border-radius:14px;padding:18px;cursor:pointer;transition:all .2s}
+.coach-card:hover{border-color:var(--purple);box-shadow:0 4px 16px rgba(0,0,0,.06);transform:translateY(-2px)}
+.coach-card .cc-name{font-weight:800;font-size:15px;margin-bottom:2px}
+.coach-card .cc-leader{font-size:11px;color:var(--g3)}
+.coach-card .cc-stats{display:flex;gap:14px;margin-top:10px;font-size:11px}
+.coach-card .cc-stat .val{font-family:'Instrument Serif',serif;font-size:20px;display:block}
 
 @media(max-width:640px){
-  .dash-stats{grid-template-columns:repeat(2,1fr)}
-  .member-detail{grid-template-columns:1fr}
+  .app-stats{grid-template-columns:repeat(2,1fr)}
+  .app-stat{border-bottom:1px solid var(--g5)}
+  .detail-grid{grid-template-columns:1fr}
+  .att-table{font-size:11px}
   .region-btn{padding:8px 24px;font-size:13px}
-  .coach-cg-grid{grid-template-columns:1fr}
 }
 </style>
 </head>
 <body>
 
-<!-- ═══════════════════════════════════════ -->
-<!-- LANDING PAGE                           -->
-<!-- ═══════════════════════════════════════ -->
+<!-- ═══ LANDING ═══ -->
 <div class="landing" id="pageL">
-  <div style="font-size:10px;letter-spacing:2px;color:var(--g3);text-transform:uppercase;margin-bottom:6px">THE YEAR OF</div>
-  <div style="font-family:'Inter',sans-serif;font-weight:900;font-size:28px;letter-spacing:-1.5px;margin-bottom:0">UNITY</div>
-  <div style="font-family:'Inter',sans-serif;font-weight:800;font-size:16px;letter-spacing:-.3px;margin-bottom:24px">& OPEN HEAVENS</div>
-
+  <div style="font-size:10px;letter-spacing:2px;color:var(--g3);text-transform:uppercase;margin-bottom:4px">THE YEAR OF</div>
+  <div style="font-family:'Inter',sans-serif;font-weight:900;font-size:26px;letter-spacing:-1.5px">UNITY</div>
+  <div style="font-family:'Inter',sans-serif;font-weight:800;font-size:15px;margin-bottom:20px">& OPEN HEAVENS</div>
   <div class="landing-title">CG Dashboard</div>
   <div class="landing-sub">AOG Teens Jaktim 2026</div>
-
-  <!-- Region toggle -->
   <div class="region-toggle">
     <button class="region-btn active" onclick="selectRegion('jaktim1',this)">JAKTIM 1</button>
     <button class="region-btn" onclick="selectRegion('jaktim2',this)">JAKTIM 2</button>
   </div>
-
-  <!-- CGL dropdown -->
   <div class="cgl-selector">
-    <select class="cgl-select" id="cglSelect" onchange="updateEnterBtn()">
+    <select class="cgl-select" id="cglSelect" onchange="updateBtn()">
       <option value="" disabled selected>Pilih CG Leader...</option>
     </select>
   </div>
-
-  <!-- Enter button -->
-  <button class="enter-btn" id="enterBtn" disabled onclick="enterDashboard()">Masuk Dashboard</button>
-
-  <div style="margin-top:24px;font-size:11px;color:var(--g4)">
-    Coach / TL? <a href="?role=coach" style="color:var(--purple);text-decoration:none;font-weight:600">Masuk disini →</a>
-  </div>
+  <button class="enter-btn" id="enterBtn" disabled onclick="enterDash()">Masuk Dashboard</button>
+  <div style="margin-top:20px;font-size:11px;color:var(--g4)">Coach / TL? <a href="?role=coach" style="color:var(--purple);font-weight:600;text-decoration:none">Masuk disini →</a></div>
 </div>
 
-<!-- ═══════════════════════════════════════ -->
-<!-- CGL DASHBOARD                          -->
-<!-- ═══════════════════════════════════════ -->
-<div class="dashboard" id="pageD">
-  <div class="dash-header">
-    <div class="dash-back" onclick="showLanding()">← Kembali ke pilihan CG</div>
-    <div class="dash-cg-badge" id="dBadge">TEEN 23</div>
-    <div class="dash-cgl-name" id="dName">Tofanny Zerafim</div>
-    <div class="dash-info">
-      <div class="dash-info-item">📅 <strong id="dSchedule">Minggu – 13.00</strong></div>
-      <div class="dash-info-item">📍 <strong id="dLocation">Foodcourt MAG/Gmeet</strong></div>
-      <div class="dash-info-item">👥 <strong id="dCount">10 member</strong></div>
+<!-- ═══ CGL DASHBOARD APP ═══ -->
+<div class="app" id="pageD">
+  <!-- Nav -->
+  <div class="app-nav">
+    <div class="app-nav-left">
+      <div class="app-back" onclick="goBack()">←</div>
+      <span class="app-cg-badge" id="navBadge">TEEN 23</span>
+      <span class="app-cgl" id="navName">Tofanny Zerafim</span>
+    </div>
+    <div class="app-nav-right">
+      <span class="live-dot"></span>
+      <span style="font-size:10px;color:var(--green);font-weight:600">Live</span>
     </div>
   </div>
 
-  <div class="dash-stats">
-    <div class="dash-stat green"><div class="num">78%</div><div class="label">Kehadiran</div></div>
-    <div class="dash-stat blue"><div class="num">6/10</div><div class="label">MSJ 1</div></div>
-    <div class="dash-stat orange"><div class="num">3/10</div><div class="label">CGT 1</div></div>
-    <div class="dash-stat red"><div class="num">2</div><div class="label">At Risk</div></div>
+  <!-- Hero -->
+  <div class="app-hero">
+    <div class="app-hero-tag" id="heroTag">Januari — April 2026</div>
+    <div class="app-hero-h">Rekap<br><em>CG.</em></div>
+    <div class="app-hero-meta"><span id="heroCount">10</span> anggota &nbsp;·&nbsp; <span id="heroSchedule">Minggu 13.00</span> &nbsp;·&nbsp; <span id="heroLoc">Foodcourt MAG</span></div>
   </div>
 
-  <!-- Visi Misi -->
-  <div class="dash-section">
-    <div class="dash-section-title">🎯 Visi & Misi CG</div>
-    <div class="vision-box">
-      <div class="vision-label">Visi</div>
-      <div class="vision-text" contenteditable="true">Semua member CG aktif dan bertumbuh dalam iman</div>
+  <!-- Stats -->
+  <div class="app-stats">
+    <div class="app-stat ct"><div class="app-stat-label">Hadir</div><div class="app-stat-num">82</div><div class="app-stat-pct">72% total</div></div>
+    <div class="app-stat cb"><div class="app-stat-label">Izin</div><div class="app-stat-num">24</div><div class="app-stat-pct">21% total</div></div>
+    <div class="app-stat co"><div class="app-stat-label">Sakit</div><div class="app-stat-num">4</div><div class="app-stat-pct">3% total</div></div>
+    <div class="app-stat cr"><div class="app-stat-label">Alpa</div><div class="app-stat-num">5</div><div class="app-stat-pct">4% total</div></div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="app-body">
+    <div class="app-tabs">
+      <div class="app-tab on" onclick="switchTab('absensi',this)">Absensi</div>
+      <div class="app-tab" onclick="switchTab('detail',this)">Detail CG</div>
+      <div class="app-tab" onclick="switchTab('visi',this)">Visi CG</div>
+      <div class="app-tab" onclick="switchTab('pelayanan',this)">Pelayanan</div>
+      <div class="app-tab" onclick="switchTab('milestone',this)">Milestone</div>
+      <div class="app-tab" onclick="switchTab('events',this)">Events</div>
     </div>
-    <div class="vision-box">
-      <div class="vision-label">Misi Semester Ini</div>
-      <div class="vision-text" contenteditable="true">1. Semua member selesai MSJ 1 sebelum Juni 2026
+
+    <!-- TAB: Absensi -->
+    <div class="tab-content active" id="tab-absensi">
+      <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap">
+        <span style="font-size:10px;padding:4px 10px;border-radius:12px;background:var(--g1);color:#fff;font-weight:600">Semua</span>
+        <span style="font-size:10px;padding:4px 10px;border-radius:12px;border:1px solid var(--g5);color:var(--g3);cursor:pointer">Jan</span>
+        <span style="font-size:10px;padding:4px 10px;border-radius:12px;border:1px solid var(--g5);color:var(--g3);cursor:pointer">Feb</span>
+        <span style="font-size:10px;padding:4px 10px;border-radius:12px;border:1px solid var(--g5);color:var(--g3);cursor:pointer">Mar</span>
+        <span style="font-size:10px;padding:4px 10px;border-radius:12px;border:1px solid var(--g5);color:var(--g3);cursor:pointer">Apr</span>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="att-table">
+          <thead><tr>
+            <th style="text-align:left">Nama</th>
+            <th>3 Jan</th><th>10 Jan</th><th>17 Jan</th><th>24 Jan</th><th>31 Jan</th>
+            <th>7 Feb</th><th>14 Feb</th><th>21 Feb</th><th>28 Feb</th>
+            <th>7 Mar</th><th>14 Mar</th><th>21 Mar</th><th>28 Mar</th>
+            <th>% Hadir</th>
+          </tr></thead>
+          <tbody>
+            <tr><td class="name-cell">Tofanny Zerafim<span class="role-tag">CGL</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><div class="pct-bar"><div class="pct-bar-track"><div class="pct-bar-fill" style="width:100%;background:var(--green)"></div></div><span class="pct-val" style="color:var(--green)">100%</span></div></td></tr>
+            <tr><td class="name-cell">Valerie Alea D.<span class="role-tag">Sponsor</span></td><td><span class="dot I">I</span></td><td><span class="dot S">S</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot S">S</span></td><td><span class="dot H">H</span></td><td><span class="dot I">I</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot I">I</span></td><td><span class="dot H">H</span></td><td><div class="pct-bar"><div class="pct-bar-track"><div class="pct-bar-fill" style="width:69%;background:var(--orange)"></div></div><span class="pct-val" style="color:var(--orange)">69%</span></div></td></tr>
+            <tr style="border-left:3px solid var(--red)"><td class="name-cell" style="color:var(--red)">Florencia Arumi K.<span class="role-tag">Simpatisan</span></td><td><span class="dot A">A</span></td><td><span class="dot A">A</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot A">A</span></td><td><span class="dot A">A</span></td><td><span class="dot H">H</span></td><td><span class="dot A">A</span></td><td><span class="dot A">A</span></td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot A">A</span></td><td><div class="pct-bar"><div class="pct-bar-track"><div class="pct-bar-fill" style="width:38%;background:var(--red)"></div></div><span class="pct-val" style="color:var(--red)">38%</span></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="font-size:10px;color:var(--g4);margin-top:12px;text-align:right">klik status untuk edit</div>
+    </div>
+
+    <!-- TAB: Detail CG -->
+    <div class="tab-content" id="tab-detail">
+      <div class="detail-card">
+        <div class="detail-top"><div class="detail-name">Tofanny Zerafim Alexandra</div><span class="role-badge cgl">CGL</span></div>
+        <div class="detail-grid">
+          <span>📱 0889-7317-7676</span><span>🎂 22 Mei 2010</span>
+          <span>🏫 SMAN 31 · Kelas 10</span><span>📍 Rawamangun, Pulo Gadung</span>
+        </div>
+        <textarea class="note-area" placeholder="Catatan CGL...">Aktif dan setia. Sedang proses MSJ 3.</textarea>
+        <div class="note-hint">Catatan hanya terlihat oleh CGL dan Coach</div>
+      </div>
+      <div class="detail-card">
+        <div class="detail-top"><div class="detail-name">Valerie Alea Darmawan</div><span class="role-badge sponsor">Sponsor</span></div>
+        <div class="detail-grid">
+          <span>📱 0813-1888-3186</span><span>🎂 12 Okt 2008</span>
+          <span>🏫 SMA Fons Vitae 1 · Kelas 11</span><span>📍 Cipinang Cempedak</span>
+        </div>
+        <textarea class="note-area" placeholder="Catatan CGL...">Milestone lengkap. Siap jadi CGL.</textarea>
+        <div class="note-hint">Catatan hanya terlihat oleh CGL dan Coach</div>
+      </div>
+      <div class="detail-card" style="border-left:3px solid var(--red)">
+        <div class="detail-top"><div class="detail-name">Florencia Arumi Koo</div><span class="role-badge simpatisan">Simpatisan</span></div>
+        <div class="detail-grid">
+          <span>📱 0857-2410-7837</span><span>🎂 30 Jul 2010</span>
+          <span>🏫 Don Bosco 2 · Kelas 10</span><span>📍 -</span>
+        </div>
+        <div style="font-size:11px;color:var(--red);font-weight:600;margin-top:8px">⚠️ Kehadiran 38% · Perlu follow-up</div>
+        <textarea class="note-area" placeholder="Catatan CGL...">4x tidak hadir. Perlu dijemput.</textarea>
+        <div class="note-hint">Catatan hanya terlihat oleh CGL dan Coach</div>
+      </div>
+    </div>
+
+    <!-- TAB: Visi CG -->
+    <div class="tab-content" id="tab-visi">
+      <div class="vision-card">
+        <div class="vision-label">Visi CG</div>
+        <textarea class="vision-edit">Semua member CG aktif dan bertumbuh dalam iman, menjadi generasi yang berdampak.</textarea>
+      </div>
+      <div class="vision-card">
+        <div class="vision-label">Misi Semester Ini</div>
+        <textarea class="vision-edit">1. Semua member selesai MSJ 1 sebelum Juni 2026
 2. Minimal 80% kehadiran ibadah per bulan
-3. Follow-up member baru setiap minggu</div>
-    </div>
-    <div class="vision-box">
-      <div class="vision-label">Target</div>
-      <div class="vision-text" contenteditable="true">10 member aktif, 2 member baru dari outreach Mei</div>
-    </div>
-  </div>
-
-  <!-- At Risk -->
-  <div class="dash-section">
-    <div class="dash-section-title">⚠️ Perlu Follow-Up</div>
-    <div class="risk-card">
-      <div style="font-size:20px">🔴</div>
-      <div>
-        <div class="risk-name">Florencia Arumi Koo</div>
-        <div class="risk-reason">Kehadiran 38% · 4x Alpa berturut-turut · Belum MSJ 1</div>
+3. Follow-up member baru setiap minggu
+4. 2 outreach per semester</textarea>
       </div>
-    </div>
-    <div class="risk-card">
-      <div style="font-size:20px">🟡</div>
-      <div>
-        <div class="risk-name">Ivy Yolanda W. Gerrit</div>
-        <div class="risk-reason">Kehadiran 31% · Simpatisan · Belum ada milestone</div>
+      <div class="vision-card">
+        <div class="vision-label">Target Kuartal</div>
+        <textarea class="vision-edit">- 10 member aktif
+- 2 member baru dari outreach Mei
+- Semua member punya accountability partner</textarea>
       </div>
-    </div>
-  </div>
-
-  <!-- Members -->
-  <div class="dash-section">
-    <div class="dash-section-title">👥 Anggota CG</div>
-
-    <div class="member-card">
-      <div class="member-top">
-        <div class="member-name">Tofanny Zerafim Alexandra</div>
-        <span class="member-role cgl">CGL</span>
-      </div>
-      <div class="member-detail">
-        <span>📱 0889-7317-7676</span>
-        <span>🎂 22 Mei 2010</span>
-        <span>🏫 SMAN 31 · Kelas 10</span>
-        <span>📍 Rawamangun, Pulo Gadung</span>
-      </div>
-      <div style="font-size:11px;color:var(--g3);margin-bottom:4px">Milestone (62%)</div>
-      <div class="ms-progress"><div class="ms-progress-bar" style="width:62%"></div></div>
-      <div class="milestone-row">
-        <span class="ms-chip done">MSJ 1 ✓</span>
-        <span class="ms-chip done">MSJ 2 ✓</span>
-        <span class="ms-chip pending">MSJ 3</span>
-        <span class="ms-chip done">CGT 1 ✓</span>
-        <span class="ms-chip done">CGT 2 ✓</span>
-        <span class="ms-chip pending">CGT 3</span>
-        <span class="ms-chip done">B.Air ✓</span>
-        <span class="ms-chip done">B.Roh ✓</span>
-      </div>
-      <textarea class="note-area" placeholder="Tulis catatan perkembangan...">Aktif dan setia hadir. Sedang proses MSJ 3.</textarea>
-      <div class="note-hint">Hanya terlihat oleh CGL dan Coach</div>
+      <button class="vision-save">💾 Simpan Visi & Misi</button>
     </div>
 
-    <div class="member-card" style="border-left:3px solid var(--red)">
-      <div class="member-top">
-        <div class="member-name">Florencia Arumi Koo</div>
-        <span class="member-role simpatisan">Simpatisan</span>
+    <!-- TAB: Pelayanan -->
+    <div class="tab-content" id="tab-pelayanan">
+      <div style="font-size:12px;color:var(--g3);margin-bottom:14px">Posisi pelayanan anggota CG di ibadah & kegiatan gereja</div>
+      <div class="pelayanan-card">
+        <div class="pelayanan-icon" style="background:#f0fdf4">🎤</div>
+        <div><div class="pelayanan-name">Worship Leader</div><div class="pelayanan-role">Tofanny Zerafim, Valerie Alea</div></div>
       </div>
-      <div class="member-detail">
-        <span>📱 0857-2410-7837</span>
-        <span>🎂 30 Jul 2010</span>
-        <span>🏫 Don Bosco 2 · Kelas 10</span>
-        <span>📍 -</span>
+      <div class="pelayanan-card">
+        <div class="pelayanan-icon" style="background:#eff6ff">🎹</div>
+        <div><div class="pelayanan-name">Musik / Band</div><div class="pelayanan-role">Clara Faustine (Keys), Samuel Vialli (Drum)</div></div>
       </div>
-      <div style="font-size:11px;color:var(--red);margin-bottom:4px;font-weight:600">⚠️ Kehadiran 38% · Perlu follow-up</div>
-      <div style="font-size:11px;color:var(--g3);margin-bottom:4px">Milestone (0%)</div>
-      <div class="ms-progress"><div class="ms-progress-bar" style="width:0%"></div></div>
-      <div class="milestone-row">
-        <span class="ms-chip pending">MSJ 1</span><span class="ms-chip pending">MSJ 2</span><span class="ms-chip pending">MSJ 3</span>
-        <span class="ms-chip pending">CGT 1</span><span class="ms-chip pending">CGT 2</span><span class="ms-chip pending">CGT 3</span>
-        <span class="ms-chip pending">B.Air</span><span class="ms-chip pending">B.Roh</span>
+      <div class="pelayanan-card">
+        <div class="pelayanan-icon" style="background:#faf5ff">📸</div>
+        <div><div class="pelayanan-name">Multimedia</div><div class="pelayanan-role">Felicia Sagala</div></div>
       </div>
-      <textarea class="note-area" placeholder="Tulis catatan perkembangan...">Sudah 4x tidak hadir. Perlu dijemput dan di-WA personal.</textarea>
-      <div class="note-hint">Hanya terlihat oleh CGL dan Coach</div>
+      <div class="pelayanan-card">
+        <div class="pelayanan-icon" style="background:#fff7ed">🙏</div>
+        <div><div class="pelayanan-name">Usher / Penyambut</div><div class="pelayanan-role">Kefas, Fitzgerrald Osvaldo</div></div>
+      </div>
+      <div class="pelayanan-card">
+        <div class="pelayanan-icon" style="background:#fef2f2">📖</div>
+        <div><div class="pelayanan-name">Belum Ada Pelayanan</div><div class="pelayanan-role">Florencia Arumi, Ivy Yolanda, Callista Lorraine</div></div>
+      </div>
     </div>
-  </div>
 
-  <!-- Absensi -->
-  <div class="dash-section">
-    <div class="dash-section-title">📊 Absensi Bulan Ini (April)</div>
-    <div style="overflow-x:auto">
-      <table class="att-mini">
-        <thead><tr>
-          <th style="text-align:left">Nama</th><th>4 Apr</th><th>11 Apr</th><th>18 Apr</th><th>25 Apr</th><th>%</th>
-        </tr></thead>
-        <tbody>
-          <tr><td style="text-align:left;font-weight:500">Tofanny Zerafim</td><td><span class="dot H">H</span></td><td><span class="dot H">H</span></td><td><span class="dot X">–</span></td><td><span class="dot X">–</span></td><td style="font-weight:600;color:var(--green)">100%</td></tr>
-          <tr><td style="text-align:left;font-weight:500">Valerie Alea D.</td><td><span class="dot H">H</span></td><td><span class="dot I">I</span></td><td><span class="dot X">–</span></td><td><span class="dot X">–</span></td><td style="font-weight:600;color:var(--orange)">50%</td></tr>
-          <tr><td style="text-align:left;font-weight:500;color:var(--red)">Florencia Arumi</td><td><span class="dot A">A</span></td><td><span class="dot A">A</span></td><td><span class="dot X">–</span></td><td><span class="dot X">–</span></td><td style="font-weight:600;color:var(--red)">0%</td></tr>
-        </tbody>
-      </table>
+    <!-- TAB: Milestone -->
+    <div class="tab-content" id="tab-milestone">
+      <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+        <div style="background:var(--white);border:1px solid var(--g5);border-radius:10px;padding:12px 16px;text-align:center;flex:1;min-width:80px"><div style="font-family:'Instrument Serif',serif;font-size:22px;color:var(--green)">6/10</div><div style="font-size:9px;color:var(--g3);letter-spacing:1px">MSJ 1</div></div>
+        <div style="background:var(--white);border:1px solid var(--g5);border-radius:10px;padding:12px 16px;text-align:center;flex:1;min-width:80px"><div style="font-family:'Instrument Serif',serif;font-size:22px;color:var(--blue)">4/10</div><div style="font-size:9px;color:var(--g3);letter-spacing:1px">MSJ 2</div></div>
+        <div style="background:var(--white);border:1px solid var(--g5);border-radius:10px;padding:12px 16px;text-align:center;flex:1;min-width:80px"><div style="font-family:'Instrument Serif',serif;font-size:22px;color:var(--orange)">3/10</div><div style="font-size:9px;color:var(--g3);letter-spacing:1px">CGT 1</div></div>
+        <div style="background:var(--white);border:1px solid var(--g5);border-radius:10px;padding:12px 16px;text-align:center;flex:1;min-width:80px"><div style="font-family:'Instrument Serif',serif;font-size:22px;color:var(--purple)">7/10</div><div style="font-size:9px;color:var(--g3);letter-spacing:1px">B.Air</div></div>
+      </div>
+      <div class="ms-member">
+        <div class="ms-member-top"><div class="ms-member-name">Tofanny Zerafim</div><div class="ms-pct" style="color:var(--green)">75%</div></div>
+        <div class="ms-progress"><div class="ms-progress-bar" style="width:75%"></div></div>
+        <div class="ms-chips"><span class="ms-chip done">MSJ 1 ✓</span><span class="ms-chip done">MSJ 2 ✓</span><span class="ms-chip pending">MSJ 3</span><span class="ms-chip done">CGT 1 ✓</span><span class="ms-chip done">CGT 2 ✓</span><span class="ms-chip pending">CGT 3</span><span class="ms-chip done">B.Air ✓</span><span class="ms-chip done">B.Roh ✓</span></div>
+      </div>
+      <div class="ms-member">
+        <div class="ms-member-top"><div class="ms-member-name">Valerie Alea Darmawan</div><div class="ms-pct" style="color:var(--green)">100%</div></div>
+        <div class="ms-progress"><div class="ms-progress-bar" style="width:100%"></div></div>
+        <div class="ms-chips"><span class="ms-chip done">MSJ 1 ✓</span><span class="ms-chip done">MSJ 2 ✓</span><span class="ms-chip done">MSJ 3 ✓</span><span class="ms-chip done">CGT 1 ✓</span><span class="ms-chip done">CGT 2 ✓</span><span class="ms-chip done">CGT 3 ✓</span><span class="ms-chip done">B.Air ✓</span><span class="ms-chip done">B.Roh ✓</span></div>
+      </div>
+      <div class="ms-member" style="border-left:3px solid var(--red)">
+        <div class="ms-member-top"><div class="ms-member-name" style="color:var(--red)">Florencia Arumi Koo</div><div class="ms-pct" style="color:var(--red)">0%</div></div>
+        <div class="ms-progress"><div class="ms-progress-bar" style="width:0%"></div></div>
+        <div class="ms-chips"><span class="ms-chip pending">MSJ 1</span><span class="ms-chip pending">MSJ 2</span><span class="ms-chip pending">MSJ 3</span><span class="ms-chip pending">CGT 1</span><span class="ms-chip pending">CGT 2</span><span class="ms-chip pending">CGT 3</span><span class="ms-chip pending">B.Air</span><span class="ms-chip pending">B.Roh</span></div>
+      </div>
+    </div>
+
+    <!-- TAB: Events -->
+    <div class="tab-content" id="tab-events">
+      <div style="font-size:12px;color:var(--g3);margin-bottom:14px">Event & kegiatan yang melibatkan anggota CG</div>
+      <div class="event-card" style="border-left-color:var(--green)">
+        <div class="event-date">18 Apr 2026</div>
+        <div class="event-name">Good Friday Service</div>
+        <div class="event-note">Ibadah Jumat Agung. Semua member wajib hadir. Dress code: putih.</div>
+        <span class="event-cat">Ibadah</span>
+      </div>
+      <div class="event-card" style="border-left-color:var(--orange)">
+        <div class="event-date">20 Apr 2026</div>
+        <div class="event-name">Easter Sunday</div>
+        <div class="event-note">Ibadah Paskah. Ada drama dari teens.</div>
+        <span class="event-cat">Ibadah</span>
+      </div>
+      <div class="event-card" style="border-left-color:var(--blue)">
+        <div class="event-date">3 Mei 2026</div>
+        <div class="event-name">CG Outing — Taman Mini</div>
+        <div class="event-note">Jalan-jalan CG ke TMII. Budget 50rb/orang.</div>
+        <span class="event-cat">CG Event</span>
+      </div>
+      <div class="event-card" style="border-left-color:#f472b6">
+        <div class="event-date">22 Mei 2026</div>
+        <div class="event-name">🎂 Tofanny Zerafim — Ulang Tahun ke-16</div>
+        <div class="event-note">Surprise party setelah CG session.</div>
+        <span class="event-cat">Birthday</span>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════ -->
-<!-- COACH DASHBOARD                        -->
-<!-- ═══════════════════════════════════════ -->
-<div class="dashboard" id="pageC">
-  <div class="dash-header">
-    <div class="dash-back" onclick="showLanding()">← Kembali</div>
-    <div style="display:flex;align-items:center;justify-content:space-between">
-      <div>
-        <div style="font-size:10px;letter-spacing:2px;color:var(--g3);text-transform:uppercase">Coach / Team Leader</div>
-        <div class="dash-cgl-name">Overview Semua CG</div>
-      </div>
-      <div style="font-size:36px">👑</div>
+<!-- ═══ COACH DASHBOARD ═══ -->
+<div class="app" id="pageC">
+  <div class="app-nav">
+    <div class="app-nav-left">
+      <div class="app-back" onclick="goBack()">←</div>
+      <span style="font-size:13px;font-weight:700">👑 Coach / TL</span>
     </div>
-    <div class="dash-info" style="margin-top:12px">
-      <div class="dash-info-item"><strong>8 CG</strong> aktif</div>
-      <div class="dash-info-item"><strong>54 member</strong> total</div>
-      <div class="dash-info-item"><strong>72%</strong> rata-rata kehadiran</div>
-    </div>
+    <div class="app-nav-right"><span class="live-dot"></span><span style="font-size:10px;color:var(--green);font-weight:600">Live</span></div>
   </div>
-
-  <div style="display:flex;gap:8px;margin-bottom:20px">
-    <button class="region-btn active" onclick="this.classList.add('active');this.nextElementSibling.classList.remove('active')" style="padding:8px 20px;border-radius:20px;border:none;font-size:12px;font-weight:700;cursor:pointer">JAKTIM 1</button>
-    <button class="region-btn" onclick="this.classList.add('active');this.previousElementSibling.classList.remove('active')" style="padding:8px 20px;border-radius:20px;border:none;font-size:12px;font-weight:700;cursor:pointer">JAKTIM 2</button>
+  <div class="app-hero">
+    <div class="app-hero-tag">Overview</div>
+    <div class="app-hero-h">Semua<br><em>CG.</em></div>
+    <div class="app-hero-meta">8 CG aktif &nbsp;·&nbsp; 54 member total &nbsp;·&nbsp; 72% rata-rata kehadiran</div>
   </div>
-
-  <div class="coach-cg-grid">
-    <div class="coach-cg-card" style="border-left:4px solid #7c3aed" onclick="enterFromCoach('TEEN 23','Tofanny Zerafim','#7c3aed','#faf5ff')">
-      <div class="cg-name">TEEN 23</div><div class="cg-leader">CGL: Tofanny Zerafim</div>
-      <div class="cg-stats">
-        <div class="cg-stat"><span class="val" style="color:var(--green)">78%</span>Hadir</div>
-        <div class="cg-stat"><span class="val">10</span>Member</div>
-        <div class="cg-stat"><span class="val" style="color:var(--orange)">6</span>MSJ 1</div>
-        <div class="cg-stat"><span class="val" style="color:var(--red)">2</span>At Risk</div>
-      </div>
+  <div style="max-width:900px;margin:0 auto;padding:20px">
+    <div class="region-toggle" style="margin-bottom:16px;display:inline-flex">
+      <button class="region-btn active" style="padding:6px 18px;font-size:12px" onclick="this.classList.add('active');this.nextElementSibling.classList.remove('active')">JAKTIM 1</button>
+      <button class="region-btn" style="padding:6px 18px;font-size:12px" onclick="this.classList.add('active');this.previousElementSibling.classList.remove('active')">JAKTIM 2</button>
     </div>
-    <div class="coach-cg-card" style="border-left:4px solid #1d4ed8">
-      <div class="cg-name">TEEN 01</div><div class="cg-leader">CGL: Stefenie Nathania</div>
-      <div class="cg-stats">
-        <div class="cg-stat"><span class="val" style="color:var(--green)">82%</span>Hadir</div>
-        <div class="cg-stat"><span class="val">7</span>Member</div>
-        <div class="cg-stat"><span class="val" style="color:var(--orange)">5</span>MSJ 1</div>
-        <div class="cg-stat"><span class="val" style="color:var(--red)">1</span>At Risk</div>
-      </div>
-    </div>
-    <div class="coach-cg-card" style="border-left:4px solid #c2410c">
-      <div class="cg-name">TEEN 09</div><div class="cg-leader">CGL: Jessica Anastasia</div>
-      <div class="cg-stats">
-        <div class="cg-stat"><span class="val" style="color:var(--green)">68%</span>Hadir</div>
-        <div class="cg-stat"><span class="val">6</span>Member</div>
-        <div class="cg-stat"><span class="val" style="color:var(--orange)">4</span>MSJ 1</div>
-        <div class="cg-stat"><span class="val" style="color:var(--red)">2</span>At Risk</div>
-      </div>
-    </div>
-    <div class="coach-cg-card" style="border-left:4px solid #be185d">
-      <div class="cg-name">TEEN 06</div><div class="cg-leader">CGL: Keizha Ananta</div>
-      <div class="cg-stats">
-        <div class="cg-stat"><span class="val" style="color:var(--green)">71%</span>Hadir</div>
-        <div class="cg-stat"><span class="val">8</span>Member</div>
-        <div class="cg-stat"><span class="val" style="color:var(--orange)">7</span>MSJ 1</div>
-        <div class="cg-stat"><span class="val" style="color:var(--red)">0</span>At Risk</div>
-      </div>
+    <div class="coach-grid">
+      <div class="coach-card" style="border-left:4px solid #7c3aed" onclick="enterFromCoach('TEEN 23')"><div class="cc-name">TEEN 23</div><div class="cc-leader">CGL: Tofanny Zerafim</div><div class="cc-stats"><div class="cc-stat"><span class="val" style="color:var(--green)">78%</span>Hadir</div><div class="cc-stat"><span class="val">10</span>Member</div><div class="cc-stat"><span class="val" style="color:var(--red)">2</span>At Risk</div></div></div>
+      <div class="coach-card" style="border-left:4px solid #1d4ed8"><div class="cc-name">TEEN 01</div><div class="cc-leader">CGL: Stefenie Nathania</div><div class="cc-stats"><div class="cc-stat"><span class="val" style="color:var(--green)">82%</span>Hadir</div><div class="cc-stat"><span class="val">7</span>Member</div><div class="cc-stat"><span class="val" style="color:var(--red)">1</span>At Risk</div></div></div>
+      <div class="coach-card" style="border-left:4px solid #c2410c"><div class="cc-name">TEEN 09</div><div class="cc-leader">CGL: Jessica Anastasia</div><div class="cc-stats"><div class="cc-stat"><span class="val" style="color:var(--green)">68%</span>Hadir</div><div class="cc-stat"><span class="val">6</span>Member</div><div class="cc-stat"><span class="val" style="color:var(--red)">2</span>At Risk</div></div></div>
+      <div class="coach-card" style="border-left:4px solid #be185d"><div class="cc-name">TEEN 06</div><div class="cc-leader">CGL: Keizha Ananta</div><div class="cc-stats"><div class="cc-stat"><span class="val" style="color:var(--green)">71%</span>Hadir</div><div class="cc-stat"><span class="val">8</span>Member</div><div class="cc-stat"><span class="val" style="color:var(--red)">0</span>At Risk</div></div></div>
     </div>
   </div>
 </div>
 
 <script>
-const CG_DATA = {
-  jaktim1: [
-    {cg:'TEEN 23',leader:'Tofanny Zerafim',color:'#7c3aed',bg:'#faf5ff',schedule:'Minggu – 13.00',loc:'Foodcourt MAG/Gmeet',count:10},
-    {cg:'TEEN 01',leader:'Stefenie Nathania',color:'#1d4ed8',bg:'#eff6ff',schedule:'Senin/Kamis – 17.00',loc:'JGC (Rumah Stefi)',count:7},
-    {cg:'TEEN 09',leader:'Jessica Anastasia',color:'#c2410c',bg:'#fff7ed',schedule:'Minggu – 13.00',loc:'Chapel/Foodcourt MAG',count:6},
-    {cg:'TEEN 06',leader:'Keizha Ananta',color:'#be185d',bg:'#fdf2f8',schedule:'Minggu – 13.00',loc:'Chapel/FC MAG/Pulomas',count:8},
-  ],
-  jaktim2: [
-    {cg:'TEEN 12',leader:'Nathanael Wilson',color:'#0f766e',bg:'#f0fdfa',schedule:'Minggu – 13.00',loc:'Gafa Cawang',count:8},
-    {cg:'TEEN 07',leader:'Edson Matthew',color:'#b45309',bg:'#fffbeb',schedule:'Minggu – 10.00',loc:'Gafa Cawang & Zoom',count:6},
-    {cg:'TEEN 17',leader:'Samantha Jane',color:'#0e7490',bg:'#ecfeff',schedule:'Jumat – 19.00',loc:'Online',count:4},
-    {cg:'TEEN 20',leader:'Yemima Grace',color:'#be123c',bg:'#fff1f2',schedule:'Minggu – 17.00',loc:'Online',count:5},
-  ]
-};
+const CG_DATA={jaktim1:[{cg:'TEEN 23',leader:'Tofanny Zerafim',color:'#7c3aed',bg:'#faf5ff',schedule:'Minggu – 13.00',loc:'Foodcourt MAG/Gmeet',count:10},{cg:'TEEN 01',leader:'Stefenie Nathania',color:'#1d4ed8',bg:'#eff6ff',schedule:'Senin/Kamis – 17.00',loc:'JGC (Rumah Stefi)',count:7},{cg:'TEEN 09',leader:'Jessica Anastasia',color:'#c2410c',bg:'#fff7ed',schedule:'Minggu – 13.00',loc:'Chapel/Foodcourt MAG',count:6},{cg:'TEEN 06',leader:'Keizha Ananta',color:'#be185d',bg:'#fdf2f8',schedule:'Minggu – 13.00',loc:'Chapel/FC MAG/Pulomas',count:8}],jaktim2:[{cg:'TEEN 12',leader:'Nathanael Wilson',color:'#0f766e',bg:'#f0fdfa',schedule:'Minggu – 13.00',loc:'Gafa Cawang',count:8},{cg:'TEEN 07',leader:'Edson Matthew',color:'#b45309',bg:'#fffbeb',schedule:'Minggu – 10.00',loc:'Gafa Cawang & Zoom',count:6},{cg:'TEEN 17',leader:'Samantha Jane',color:'#0e7490',bg:'#ecfeff',schedule:'Jumat – 19.00',loc:'Online',count:4},{cg:'TEEN 20',leader:'Yemima Grace',color:'#be123c',bg:'#fff1f2',schedule:'Minggu – 17.00',loc:'Online',count:5}]};
+let currentRegion='jaktim1',cameFromCoach=false;
 
-let currentRegion = 'jaktim1';
-
-function selectRegion(region, btn){
-  currentRegion = region;
-  document.querySelectorAll('.region-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  populateCGLDropdown();
-}
-
-function populateCGLDropdown(){
-  const sel = document.getElementById('cglSelect');
-  sel.innerHTML = '<option value="" disabled selected>Pilih CG Leader...</option>';
-  CG_DATA[currentRegion].forEach((cg,i) => {
-    const opt = document.createElement('option');
-    opt.value = i;
-    opt.textContent = cg.cg + ' — ' + cg.leader;
-    sel.appendChild(opt);
-  });
-  document.getElementById('enterBtn').disabled = true;
-}
-
-function updateEnterBtn(){
-  document.getElementById('enterBtn').disabled = !document.getElementById('cglSelect').value;
-}
-
-function enterDashboard(){
-  const idx = document.getElementById('cglSelect').value;
-  const cg = CG_DATA[currentRegion][idx];
-  openCGLDashboard(cg);
-}
-
-function enterFromCoach(cgName, leader, color, bg){
-  const allCGs = [...CG_DATA.jaktim1, ...CG_DATA.jaktim2];
-  const cg = allCGs.find(c=>c.cg===cgName) || allCGs[0];
-  openCGLDashboard(cg);
-}
-
-function openCGLDashboard(cg){
-  document.getElementById('pageL').style.display='none';
-  document.getElementById('pageC').style.display='none';
-  document.getElementById('pageD').style.display='block';
-  document.getElementById('dBadge').textContent=cg.cg;
-  document.getElementById('dBadge').style.background=cg.bg;
-  document.getElementById('dBadge').style.color=cg.color;
-  document.getElementById('dBadge').style.border='1px solid '+cg.color+'40';
-  document.getElementById('dName').textContent=cg.leader;
-  document.getElementById('dSchedule').textContent=cg.schedule;
-  document.getElementById('dLocation').textContent=cg.loc;
-  document.getElementById('dCount').textContent=cg.count+' member';
-  window.scrollTo(0,0);
-}
-
-function showLanding(){
-  document.getElementById('pageL').style.display='flex';
-  document.getElementById('pageD').style.display='none';
-  document.getElementById('pageC').style.display='none';
-  window.scrollTo(0,0);
-}
-
-// Check URL params
-(function(){
-  const params = new URLSearchParams(window.location.search);
-  if(params.get('role')==='coach'){
-    document.getElementById('pageL').style.display='none';
-    document.getElementById('pageC').style.display='block';
-  }
-  populateCGLDropdown();
-})();
+function selectRegion(r,btn){currentRegion=r;document.querySelectorAll('#pageL .region-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');populateDD();}
+function populateDD(){const s=document.getElementById('cglSelect');s.innerHTML='<option value="" disabled selected>Pilih CG Leader...</option>';CG_DATA[currentRegion].forEach((c,i)=>{const o=document.createElement('option');o.value=i;o.textContent=c.cg+' — '+c.leader;s.appendChild(o)});document.getElementById('enterBtn').disabled=true;}
+function updateBtn(){document.getElementById('enterBtn').disabled=!document.getElementById('cglSelect').value;}
+function enterDash(){const c=CG_DATA[currentRegion][document.getElementById('cglSelect').value];cameFromCoach=false;openDash(c);}
+function enterFromCoach(cgName){const c=[...CG_DATA.jaktim1,...CG_DATA.jaktim2].find(x=>x.cg===cgName);cameFromCoach=true;openDash(c);}
+function openDash(c){document.getElementById('pageL').style.display='none';document.getElementById('pageC').style.display='none';document.getElementById('pageD').style.display='block';document.getElementById('navBadge').textContent=c.cg;document.getElementById('navBadge').style.background=c.bg;document.getElementById('navBadge').style.color=c.color;document.getElementById('navBadge').style.border='1px solid '+c.color+'40';document.getElementById('navName').textContent=c.leader;document.getElementById('heroCount').textContent=c.count;document.getElementById('heroSchedule').textContent=c.schedule;document.getElementById('heroLoc').textContent=c.loc;window.scrollTo(0,0);}
+function goBack(){if(cameFromCoach){document.getElementById('pageD').style.display='none';document.getElementById('pageC').style.display='block';}else{document.getElementById('pageD').style.display='none';document.getElementById('pageL').style.display='flex';}window.scrollTo(0,0);}
+function switchTab(id,btn){document.querySelectorAll('.app-tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));document.getElementById('tab-'+id).classList.add('active');}
+(function(){const p=new URLSearchParams(window.location.search);if(p.get('role')==='coach'){document.getElementById('pageL').style.display='none';document.getElementById('pageC').style.display='block';}populateDD();})();
 </script>
 </body>
 </html>
