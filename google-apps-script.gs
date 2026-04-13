@@ -1,521 +1,412 @@
 // ============================================================
 // AOG Teens Jaktim — Auto Sync Supabase → Google Sheets
-// Support: JAKTIM 1 & JAKTIM 2 (dual region)
-//
-// SETUP:
-// 1. Buat Google Spreadsheet dengan 4 tab:
-//    - "JAKTIM 1"       (absensi jaktim 1)
-//    - "JAKTIM 2"       (absensi jaktim 2)
-//    - "DETAIL JAKTIM 1" (detail member jaktim 1)
-//    - "DETAIL JAKTIM 2" (detail member jaktim 2)
-// 2. Paste kode ini di Extensions → Apps Script
-// 3. Isi SUPABASE_URL dan SUPABASE_KEY di bawah
-// 4. Klik tombol "▶ syncAll" sekali untuk test
-// 5. Klik "Triggers (jam)" → tambah trigger runAutoSync tiap 5 menit
+// PILIHAN B: Auto-insert kolom tanggal & baris member baru (sorted)
 // ============================================================
 
-// ── CONFIG ───────────────────────────────────────────────────
 const SUPABASE_URL  = 'https://gqppviugodokncxezdwd.supabase.co';
 const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxcHB2aXVnb2Rva25jeGV6ZHdkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4NjIwOTcsImV4cCI6MjA5MDQzODA5N30.w2oUJYWk4yr_tJQuhk0UyxJKwgH1C3FkmJB6CXclSpk';
 
-// Sheet config per region
 const REGION_CONFIG = {
-  jaktim1: {
-    sheetAbsensi: 'JAKTIM 1',
-    sheetDetail:  'DETAIL JAKTIM 1',
-  },
-  jaktim2: {
-    sheetAbsensi: 'JAKTIM 2',
-    sheetDetail:  'DETAIL JAKTIM 2',
-  }
+  jaktim1: { sheetAbsensi: 'JAKTIM 1', sheetDetail: 'DETAIL JAKTIM 1 ', dateStartCol: 5 },
+  jaktim2: { sheetAbsensi: 'JAKTIM 2', sheetDetail: 'DETAIL JAKTIM 2 ', dateStartCol: 4 }
 };
 
-// Layout config (sama untuk kedua region)
-const HEADER_DATE_ROW = 3;   // Row 3 = tanggal
-const DATA_START_ROW  = 4;   // Row 4 = mulai data nama
-const NAMA_COL        = 3;   // Kolom C = Nama
-const CG_COL          = 1;   // Kolom A = CG
-const NO_COL          = 2;   // Kolom B = No
-const DATE_START_COL  = 5;   // Kolom E = tanggal pertama
+const HEADER_DATE_ROW = 3;
+const DATA_START_ROW  = 4;
+const NAMA_COL        = 3;
+const CG_COL          = 1;
+const NO_COL          = 2;
+const DETAIL_DATA_ROW = 4;
+const DETAIL_COLS = {cg:1,no:2,nama:3,status:4,lahir:5,wa:6,kelurahan:7,kecamatan:8,msj1:9,msj2:10,msj3:11,cgt1:12,cgt2:13,cgt3:14,baptisAir:15,baptisRoh:16,sekolah:17,kelas:18};
 
-// Detail sheet layout
-const DETAIL_HEADER_ROW = 3;
-const DETAIL_DATA_ROW   = 4;
-const DETAIL_COLS = {
-  cg: 1, no: 2, nama: 3, status: 4, lahir: 5, wa: 6,
-  kelurahan: 7, kecamatan: 8,
-  msj1: 9, msj2: 10, msj3: 11, cgt1: 12, cgt2: 13, cgt3: 14,
-  baptisAir: 15, baptisRoh: 16,
-  sekolah: 17, kelas: 18
-};
+const STATUS_COLORS = {'Hadir':{bg:'#c6efce',font:'#276221'},'Izin':{bg:'#bdd7ee',font:'#1f497d'},'Sakit':{bg:'#ffeb9c',font:'#9c6500'},'Alpa':{bg:'#ffc7ce',font:'#9c0006'},'':{bg:null,font:null}};
 
-const STATUS_COLORS = {
-  'Hadir': { bg:'#c6efce', font:'#276221' },
-  'Izin':  { bg:'#bdd7ee', font:'#1f497d' },
-  'Sakit': { bg:'#ffeb9c', font:'#9c6500' },
-  'Alpa':  { bg:'#ffc7ce', font:'#9c0006' },
-  '':      { bg:null,      font:null      },
-};
+// Role priority for sorting members within a CG
+const ROLE_ORDER = {'cgl':0,'leader':0,'sponsor':1,'member':2,'simpatisan':3,'vip':4};
+function roleRank(s){return ROLE_ORDER[(s||'member').toLowerCase().trim()] !== undefined ? ROLE_ORDER[(s||'member').toLowerCase().trim()] : 5;}
 
-// ── WEB APP ENDPOINT ─────────────────────────────────────────
-function doGet(e) {
-  var action = (e.parameter.action || '').trim();
-  var region = (e.parameter.region || 'jaktim1').trim();
-  var callback = e.parameter.callback || '';
+const MONTHS_ID = {1:'JAN',2:'FEB',3:'MAR',4:'APR',5:'MEI',6:'JUN',7:'JUL',8:'AGS',9:'SEP',10:'OKT',11:'NOV',12:'DES'};
 
-  if (action === 'ping') {
-    return jsonpResponse(callback, { ok: true, message: 'Connected! Region: ' + region });
-  }
+// Max inserts per run (avoid timeout)
+const MAX_INSERTS_PER_RUN = 5;
 
-  if (action === 'syncAll') {
-    syncRegion(region);
-    return jsonpResponse(callback, { ok: true, message: 'Sync ' + region + ' selesai!' });
-  }
+// ───────────────────────────────────────────────────────────
+// WEB APP ENDPOINT
+// ───────────────────────────────────────────────────────────
+function doGet(e){
+  var action=(e.parameter.action||'').trim(),region=(e.parameter.region||'jaktim1').trim(),callback=e.parameter.callback||'';
+  if(action==='ping') return jr(callback,{ok:true,message:'Connected!'});
+  if(action==='syncAll'){syncRegion(region);return jr(callback,{ok:true,message:'Sync '+region+' selesai!'});}
+  return jr(callback,{ok:false,message:'Unknown action'});
+}
+function jr(cb,obj){if(cb)return ContentService.createTextOutput(cb+'('+JSON.stringify(obj)+')').setMimeType(ContentService.MimeType.JAVASCRIPT);return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);}
 
-  if (action === 'update_attendance') {
-    var data = {};
-    try {
-      data = JSON.parse(decodeURIComponent(e.parameter.data || '{}'));
-    } catch(ex) { data = e.parameter; }
-    var r = data.region || region;
-    updateSingleAttendance(data.nama, data.tanggal, data.status, r);
-    return jsonpResponse(callback, { ok: true });
-  }
-
-  if (action === 'update_detail') {
-    var data = {};
-    try {
-      data = JSON.parse(decodeURIComponent(e.parameter.data || '{}'));
-    } catch(ex) { data = e.parameter; }
-    var r = data.region || region;
-    updateSingleDetail(data.nama, data.fields || data, r);
-    return jsonpResponse(callback, { ok: true });
-  }
-
-  return jsonpResponse(callback, { ok: false, message: 'Unknown action: ' + action });
+function syncRegion(region){
+  region=region||'jaktim1';var cfg=REGION_CONFIG[region];if(!cfg)return;
+  syncAbsensi(region,cfg.sheetAbsensi,cfg.dateStartCol);
+  syncDetail(region,cfg.sheetDetail);
 }
 
-function jsonpResponse(callback, obj) {
-  if (callback) {
-    return ContentService.createTextOutput(callback + '(' + JSON.stringify(obj) + ')')
-      .setMimeType(ContentService.MimeType.JAVASCRIPT);
-  }
-  return ContentService.createTextOutput(JSON.stringify(obj))
-    .setMimeType(ContentService.MimeType.JSON);
-}
+function syncAll(){syncRegion('jaktim1');syncRegion('jaktim2');}
+function runAutoSync(){try{syncAll();}catch(e){Logger.log('Error: '+e.message);}}
 
-// ── MAIN SYNC: Sync satu region ──────────────────────────────
-function syncRegion(region) {
-  region = region || 'jaktim1';
-  var cfg = REGION_CONFIG[region];
-  if (!cfg) { Logger.log('❌ Region tidak dikenal: ' + region); return; }
-
-  Logger.log('🔄 Sync ' + region + '...');
-  syncAbsensi(region, cfg.sheetAbsensi);
-  syncDetail(region, cfg.sheetDetail);
-  Logger.log('✅ Sync ' + region + ' selesai!');
-}
-
-// ── SYNC ABSENSI ─────────────────────────────────────────────
-function syncAbsensi(region, sheetName) {
+// ───────────────────────────────────────────────────────────
+// SYNC ABSENSI (with auto-insert columns & rows)
+// ───────────────────────────────────────────────────────────
+function syncAbsensi(region, sheetName, dateStartCol){
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
-  if (!sheet) { Logger.log('❌ Sheet tidak ditemukan: ' + sheetName); return; }
+  if(!sheet){Logger.log('Sheet tidak ditemukan: '+sheetName);return;}
 
-  // Fetch dari Supabase dengan filter region
-  var members = fetchSupabase('/rest/v1/members?select=id,nama,cg&region=eq.' + region + '&order=cg,nama');
-  var dates = fetchSupabase('/rest/v1/dates?select=id,label,month_code&region=eq.' + region + '&order=sort_order');
+  var members = fetchSupabase('/rest/v1/members?select=id,nama,cg,status&region=eq.'+region+'&order=cg,nama');
+  var dates = fetchSupabase('/rest/v1/dates?select=id,label,month_code,sort_order&region=eq.'+region+'&order=sort_order');
   var attendance = fetchSupabase('/rest/v1/attendance?select=member_id,date_id,status');
+  if(!members||!dates||!attendance) return;
 
-  if (!members || !dates || !attendance) { Logger.log('❌ Gagal fetch data'); return; }
-  Logger.log('✓ ' + region + ' - Members: ' + members.length + ', Dates: ' + dates.length + ', Att: ' + attendance.length);
+  // ───── 1. Auto-insert NEW DATE COLUMNS (sorted) ─────
+  var insertedCols = autoInsertDateColumns(sheet, dates, dateStartCol);
+  if(insertedCols > 0) Logger.log('+'+insertedCols+' kolom tanggal baru di '+sheetName);
 
-  // Build lookup maps
-  var memberMap = {};
-  members.forEach(function(m) { memberMap[m.id] = m; });
-  var memberIds = new Set(members.map(function(m) { return m.id; }));
+  // ───── 2. Auto-insert NEW MEMBER ROWS (per CG group) ─────
+  var insertedRows = autoInsertMemberRows(sheet, members, false);
+  if(insertedRows > 0) Logger.log('+'+insertedRows+' baris member baru di '+sheetName);
 
-  var dateMap = {};
-  dates.forEach(function(d) { dateMap[d.id] = d.label; });
-  var dateIds = new Set(dates.map(function(d) { return d.id; }));
-
-  // Build attendance lookup: nama → {dateLabel → status}
-  var attMap = {};
-  attendance.forEach(function(a) {
-    if (!memberIds.has(a.member_id)) return; // skip other region
-    if (!dateIds.has(a.date_id)) return;
-    var m = memberMap[a.member_id];
-    if (!m) return;
-    if (!attMap[m.nama]) attMap[m.nama] = {};
-    attMap[m.nama][dateMap[a.date_id]] = a.status;
+  // ───── 3. Build attendance lookup ─────
+  var memberMap={}, memberIds=new Set();
+  members.forEach(function(m){memberMap[m.id]=m;memberIds.add(m.id);});
+  var dateMap={}, dateIds=new Set();
+  dates.forEach(function(d){dateMap[d.id]=d.label;dateIds.add(d.id);});
+  var attMap={};
+  attendance.forEach(function(a){
+    if(!memberIds.has(a.member_id)||!dateIds.has(a.date_id))return;
+    var m=memberMap[a.member_id];if(!m)return;
+    if(!attMap[m.nama])attMap[m.nama]={};
+    attMap[m.nama][dateMap[a.date_id]]=a.status;
   });
 
-  // ── Auto-generate kolom tanggal baru dari Supabase ──
+  // ───── 4. Update existing cells with attendance data ─────
+  var lastCol=sheet.getLastColumn(),dateCount=lastCol-dateStartCol+1;
+  if(dateCount<1)return;
+  var sheetDates=sheet.getRange(HEADER_DATE_ROW,dateStartCol,1,dateCount).getValues()[0];
+  var lastRow=sheet.getLastRow(),nameCount=lastRow-DATA_START_ROW+1;if(nameCount<1)return;
+  var sheetNames=sheet.getRange(DATA_START_ROW,NAMA_COL,nameCount,1).getValues();
+  var updated=0;
+  sheetNames.forEach(function(row,ri){
+    var sn=norm(row[0]);if(!sn)return;
+    var key=Object.keys(attMap).find(function(n){return norm(n)===sn;});if(!key)return;
+    var ma=attMap[key],mr=DATA_START_ROW+ri;
+    sheetDates.forEach(function(sd,ci){
+      var dl=normDate(sd);
+      var ak=Object.keys(ma).find(function(k){return normDate(k)===dl;});if(!ak)return;
+      var st=ma[ak]||'',sm={H:'Hadir',I:'Izin',S:'Sakit',A:'Alpa'},val=sm[st]||st;
+      var cell=sheet.getRange(mr,dateStartCol+ci);
+      if(cell.getValue()!==val){cell.setValue(val);applyColor(cell,val);updated++;}
+    });
+  });
+  SpreadsheetApp.flush();
+  Logger.log('Absensi '+sheetName+': '+updated+' cell, +'+insertedCols+' kolom, +'+insertedRows+' baris');
+}
+
+// ───────────────────────────────────────────────────────────
+// AUTO-INSERT NEW DATE COLUMNS (with smart sorting)
+// ───────────────────────────────────────────────────────────
+function autoInsertDateColumns(sheet, supaDates, dateStartCol){
   var lastCol = sheet.getLastColumn();
-  var dateCount = lastCol - DATE_START_COL + 1;
-  var sheetDates = dateCount > 0 ? sheet.getRange(HEADER_DATE_ROW, DATE_START_COL, 1, dateCount).getValues()[0] : [];
-  var sheetDateNorms = sheetDates.map(function(d){ return normDate(String(d)); });
-  var MONTH_LABEL = {JAN:'JAN',FEB:'FEB',MAR:'MAR',APR:'APR',MEI:'MEI',JUN:'JUN',JUL:'JUL',AGS:'AGS',SEP:'SEP',OKT:'OKT',NOV:'NOV',DES:'DES'};
-  var addedCols = 0;
-  dates.forEach(function(d){
-    var nd = normDate(d.label);
-    if (sheetDateNorms.indexOf(nd) < 0) {
-      // Tanggal baru — tambah kolom di akhir
-      var newCol = DATE_START_COL + sheetDates.length + addedCols;
-      // Cek apakah perlu header bulan baru di row 1
-      var mc = (d.month_code || '').toUpperCase();
-      var prevMC = '';
-      if (addedCols > 0 || sheetDates.length > 0) {
-        var prevColIdx = newCol - 1;
-        if (prevColIdx >= DATE_START_COL) {
-          var prevLabel = sheet.getRange(HEADER_DATE_ROW, prevColIdx).getValue();
-          var prevND = normDate(String(prevLabel));
-          var parts = prevND.split('-');
-          var prevMonths = {1:'JAN',2:'FEB',3:'MAR',4:'APR',5:'MEI',6:'JUN',7:'JUL',8:'AGS',9:'SEP',10:'OKT',11:'NOV',12:'DES'};
-          prevMC = prevMonths[parseInt(parts[1])] || '';
-        }
+  var dateCount = lastCol - dateStartCol + 1;
+  var existingDates = dateCount > 0 ? sheet.getRange(HEADER_DATE_ROW, dateStartCol, 1, dateCount).getValues()[0] : [];
+  var existingNorms = existingDates.map(function(d){return normDate(d);});
+
+  // Find missing dates from Supabase
+  var missing = supaDates.filter(function(d){
+    return existingNorms.indexOf(normDate(d.label)) < 0;
+  });
+  if(missing.length === 0) return 0;
+
+  // Limit per run
+  missing = missing.slice(0, MAX_INSERTS_PER_RUN);
+  var inserted = 0;
+
+  missing.forEach(function(newDate){
+    // Find insert position: find first existing date that should come AFTER this one
+    // Use sort_order from Supabase as truth
+    var supaSortMap = {};
+    supaDates.forEach(function(d){supaSortMap[normDate(d.label)] = d.sort_order;});
+    var newSort = newDate.sort_order;
+
+    // Get fresh existing dates after each insert
+    var lc = sheet.getLastColumn();
+    var dc = lc - dateStartCol + 1;
+    var curDates = dc > 0 ? sheet.getRange(HEADER_DATE_ROW, dateStartCol, 1, dc).getValues()[0] : [];
+
+    var insertCol = -1;
+    for(var i = 0; i < curDates.length; i++){
+      var n = normDate(curDates[i]);
+      if(!n) continue;
+      var existSort = supaSortMap[n];
+      if(existSort !== undefined && existSort > newSort){
+        insertCol = dateStartCol + i;
+        break;
       }
-      // Tulis header bulan di row 1 kalau bulan berubah
-      if (mc && mc !== prevMC) {
-        sheet.getRange(1, newCol).setValue(mc).setFontWeight('bold');
-        sheet.getRange(2, newCol).setValue('IBADAH').setFontWeight('bold');
-      }
-      // Tulis tanggal di row 3 (format: d-m-yy)
-      var dateLabel = d.label; // "3 Jan" format
-      var dnParts = normDate(dateLabel).split('-'); // "3-1"
-      var dateFormatted = dnParts[0] + '-' + dnParts[1] + '-26';
-      sheet.getRange(HEADER_DATE_ROW, newCol).setValue(dateFormatted).setFontWeight('bold');
-      addedCols++;
-      Logger.log('✓ Kolom baru: ' + dateFormatted + ' di kolom ' + newCol);
     }
-  });
-  if (addedCols > 0) SpreadsheetApp.flush();
+    if(insertCol < 0) insertCol = dateStartCol + curDates.length; // append at end
 
-  // Re-read sheet dates after adding new columns
-  lastCol = sheet.getLastColumn();
-  dateCount = lastCol - DATE_START_COL + 1;
-  if (dateCount < 1) return;
-  sheetDates = sheet.getRange(HEADER_DATE_ROW, DATE_START_COL, 1, dateCount).getValues()[0];
+    // Insert column
+    if(insertCol < dateStartCol + curDates.length){
+      sheet.insertColumnBefore(insertCol);
+    } else {
+      // Append at end - just write to next column
+      insertCol = dateStartCol + curDates.length;
+    }
 
-  // Get all names in sheet
-  var lastRow = sheet.getLastRow();
-  var nameCount = lastRow - DATA_START_ROW + 1;
-  if (nameCount < 1) { Logger.log('⚠️ Tidak ada data di sheet'); return; }
-  var sheetNames = sheet.getRange(DATA_START_ROW, NAMA_COL, nameCount, 1).getValues();
+    // Write headers
+    var dnParts = normDate(newDate.label).split('-');
+    var dateFormatted = dnParts[0] + '-' + dnParts[1] + '-26';
+    var mc = (newDate.month_code || '').toUpperCase();
 
-  // Update cells
-  var updated = 0;
-  sheetNames.forEach(function(row, ri) {
-    var sheetNama = norm(row[0]);
-    if (!sheetNama) return;
-
-    var supabaseName = Object.keys(attMap).find(function(n) { return norm(n) === sheetNama; });
-    if (!supabaseName) return;
-
-    var memberAtt = attMap[supabaseName];
-    var memberRow = DATA_START_ROW + ri;
-
-    sheetDates.forEach(function(sheetDate, ci) {
-      var dateLabel = normDate(String(sheetDate));
-      var attKey = Object.keys(memberAtt).find(function(k) { return normDate(k) === dateLabel; });
-      if (!attKey) return;
-
-      var status = memberAtt[attKey] || '';
-      var statusMap = { H:'Hadir', I:'Izin', S:'Sakit', A:'Alpa' };
-      var val = statusMap[status] || status;
-
-      var cell = sheet.getRange(memberRow, DATE_START_COL + ci);
-      if (cell.getValue() !== val) {
-        cell.setValue(val);
-        applyColor(cell, val);
-        updated++;
+    // Check previous column's month — only write month label if changed
+    var prevMC = '';
+    if(insertCol > dateStartCol){
+      var prevLabel = sheet.getRange(HEADER_DATE_ROW, insertCol - 1).getValue();
+      var prevND = normDate(prevLabel);
+      if(prevND){
+        var prevParts = prevND.split('-');
+        prevMC = MONTHS_ID[parseInt(prevParts[1])] || '';
       }
-    });
+    }
+
+    if(mc && mc !== prevMC){
+      sheet.getRange(1, insertCol).setValue(mc).setFontWeight('bold').setHorizontalAlignment('center');
+      sheet.getRange(2, insertCol).setValue('IBADAH').setFontWeight('bold').setHorizontalAlignment('center');
+    }
+    sheet.getRange(HEADER_DATE_ROW, insertCol).setValue(dateFormatted)
+      .setFontWeight('bold').setHorizontalAlignment('center').setNumberFormat('@');
+    sheet.setColumnWidth(insertCol, 80);
+    inserted++;
   });
 
-  SpreadsheetApp.flush();
-  Logger.log('✓ Absensi ' + sheetName + ': ' + updated + ' cell diupdate.');
+  if(inserted > 0) SpreadsheetApp.flush();
+  return inserted;
 }
 
-// ── SYNC DETAIL ──────────────────────────────────────────────
-function syncDetail(region, sheetName) {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
-  if (!sheet) {
-    Logger.log('⚠️ Sheet detail tidak ditemukan: ' + sheetName + ' — buat dulu!');
-    sheet = createDetailSheet(sheetName);
-    if (!sheet) return;
-  }
+// ───────────────────────────────────────────────────────────
+// AUTO-INSERT NEW MEMBER ROWS (per CG group, sorted by role)
+// ───────────────────────────────────────────────────────────
+function autoInsertMemberRows(sheet, supaMembers, isDetail){
+  var lastRow = sheet.getLastRow();
+  var dataStart = isDetail ? DETAIL_DATA_ROW : DATA_START_ROW;
+  var nameCol = isDetail ? DETAIL_COLS.nama : NAMA_COL;
+  var cgCol = isDetail ? DETAIL_COLS.cg : CG_COL;
+  var nameCount = lastRow - dataStart + 1;
+  if(nameCount < 1) return 0;
 
-  var members = fetchSupabase('/rest/v1/members?select=*&region=eq.' + region + '&order=cg,nama');
-  if (!members || members.length === 0) { Logger.log('⚠️ Tidak ada members untuk ' + region); return; }
-
-  // Group by CG
-  var cgOrder = [];
-  var cgMap = {};
-  members.forEach(function(m) {
-    if (!cgMap[m.cg]) { cgMap[m.cg] = []; cgOrder.push(m.cg); }
-    cgMap[m.cg].push(m);
+  // Read all sheet rows (CG, name)
+  var range = sheet.getRange(dataStart, 1, nameCount, Math.max(cgCol, nameCol));
+  var values = range.getValues();
+  var existingNames = new Set();
+  values.forEach(function(r){
+    var n = norm(r[nameCol-1]);
+    if(n) existingNames.add(n);
   });
 
-  // Write headers if empty
-  var headerCheck = sheet.getRange(DETAIL_HEADER_ROW, 1).getValue();
-  if (!headerCheck) {
-    writeDetailHeaders(sheet);
-  }
+  // Find missing members
+  var missing = supaMembers.filter(function(m){return !existingNames.has(norm(m.nama));});
+  if(missing.length === 0) return 0;
 
-  // Clear data area & write fresh
-  var dataRows = members.length + cgOrder.length; // members + CG header spacers
-  if (sheet.getLastRow() >= DETAIL_DATA_ROW) {
-    sheet.getRange(DETAIL_DATA_ROW, 1, Math.max(sheet.getLastRow() - DETAIL_DATA_ROW + 1, 1), 18).clear();
-  }
+  // Sort missing by CG then role
+  missing.sort(function(a,b){
+    var ca = (a.cg||'').localeCompare(b.cg||'');
+    if(ca !== 0) return ca;
+    return roleRank(a.status) - roleRank(b.status);
+  });
 
-  var row = DETAIL_DATA_ROW;
-  var no = 0;
-  cgOrder.forEach(function(cg) {
-    no = 0;
-    cgMap[cg].forEach(function(m, idx) {
-      no++;
-      sheet.getRange(row, DETAIL_COLS.cg).setValue(idx === 0 ? cg : '');
-      sheet.getRange(row, DETAIL_COLS.no).setValue(no);
-      sheet.getRange(row, DETAIL_COLS.nama).setValue(m.nama || '');
-      sheet.getRange(row, DETAIL_COLS.status).setValue(m.status || '');
-      sheet.getRange(row, DETAIL_COLS.lahir).setValue(m.lahir || '');
-      sheet.getRange(row, DETAIL_COLS.wa).setValue(m.wa || '');
-      sheet.getRange(row, DETAIL_COLS.kelurahan).setValue(m.kelurahan || '');
-      sheet.getRange(row, DETAIL_COLS.kecamatan).setValue(m.kecamatan || '');
-      sheet.getRange(row, DETAIL_COLS.msj1).setValue(m.msj1 ? 'TRUE' : 'FALSE');
-      sheet.getRange(row, DETAIL_COLS.msj2).setValue(m.msj2 ? 'TRUE' : 'FALSE');
-      sheet.getRange(row, DETAIL_COLS.msj3).setValue(m.msj3 ? 'TRUE' : 'FALSE');
-      sheet.getRange(row, DETAIL_COLS.cgt1).setValue(m.cgt1 ? 'TRUE' : 'FALSE');
-      sheet.getRange(row, DETAIL_COLS.cgt2).setValue(m.cgt2 ? 'TRUE' : 'FALSE');
-      sheet.getRange(row, DETAIL_COLS.cgt3).setValue(m.cgt3 ? 'TRUE' : 'FALSE');
-      sheet.getRange(row, DETAIL_COLS.baptisAir).setValue(m.baptis_air ? 'TRUE' : 'FALSE');
-      sheet.getRange(row, DETAIL_COLS.baptisRoh).setValue(m.baptis_roh ? 'TRUE' : 'FALSE');
-      sheet.getRange(row, DETAIL_COLS.sekolah).setValue(m.sekolah || '');
-      sheet.getRange(row, DETAIL_COLS.kelas).setValue(m.kelas || '');
+  // Limit per run
+  missing = missing.slice(0, MAX_INSERTS_PER_RUN);
+  var inserted = 0;
 
-      // Color TRUE/FALSE cells
-      for (var c = DETAIL_COLS.msj1; c <= DETAIL_COLS.baptisRoh; c++) {
-        var cell = sheet.getRange(row, c);
-        var v = cell.getValue();
-        if (v === 'TRUE') {
-          cell.setBackground('#c6efce').setFontColor('#276221');
-        } else {
-          cell.setBackground('#ffc7ce').setFontColor('#9c0006');
+  missing.forEach(function(newM){
+    // Find row range of CG group in sheet
+    var lr = sheet.getLastRow();
+    var nc = lr - dataStart + 1;
+    if(nc < 1) return;
+    var rows = sheet.getRange(dataStart, 1, nc, Math.max(cgCol, nameCol)).getValues();
+
+    // Track current CG group based on cgCol (header row of CG)
+    var groupStart = -1, groupEnd = -1;
+    var curCG = '';
+    for(var i = 0; i < rows.length; i++){
+      var rowCG = String(rows[i][cgCol-1]||'').trim();
+      if(rowCG) curCG = rowCG;
+      if(curCG === newM.cg){
+        if(groupStart < 0) groupStart = dataStart + i;
+        groupEnd = dataStart + i;
+      } else if(groupStart >= 0){
+        break;
+      }
+    }
+
+    if(groupStart < 0){
+      // CG group doesn't exist yet — append at end
+      var insertRow = lr + 1;
+      sheet.insertRowAfter(lr);
+      writeMemberRow(sheet, insertRow, newM, true, isDetail);
+    } else {
+      // Find insert position within group based on role
+      var newRank = roleRank(newM.status);
+      var insertRow = groupEnd + 1; // default: end of group
+      for(var j = groupStart; j <= groupEnd; j++){
+        var existingNama = sheet.getRange(j, nameCol).getValue();
+        var existingMember = supaMembers.find(function(m){return norm(m.nama) === norm(existingNama);});
+        if(existingMember){
+          var existRank = roleRank(existingMember.status);
+          if(existRank > newRank){
+            insertRow = j;
+            break;
+          }
         }
       }
-      row++;
-    });
+
+      sheet.insertRowBefore(insertRow);
+      var isFirstInGroup = (insertRow === groupStart);
+      writeMemberRow(sheet, insertRow, newM, isFirstInGroup, isDetail);
+
+      // If we inserted at top of group, the old top row no longer needs CG label
+      // (but we keep it for safety - user can clean up)
+    }
+
+    // Update No column for this CG group
+    renumberCG(sheet, newM.cg, dataStart, cgCol, isDetail);
+    inserted++;
   });
 
-  SpreadsheetApp.flush();
-  Logger.log('✓ Detail ' + sheetName + ': ' + members.length + ' members diupdate.');
+  if(inserted > 0) SpreadsheetApp.flush();
+  return inserted;
 }
 
-// ── CREATE DETAIL SHEET ──────────────────────────────────────
-function createDetailSheet(name) {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.insertSheet(name);
-  writeDetailHeaders(sheet);
-  return sheet;
-}
-
-function writeDetailHeaders(sheet) {
-  var headers = ['CG', 'No', 'Nama', 'Status', 'Tanggal Lahir', 'NO WA',
-                 'Kelurahan', 'Kecamatan',
-                 'MSJ 1', 'MSJ 2', 'MSJ 3', 'CGT 1', 'CGT 2', 'CGT 3',
-                 'B. Air', 'B. Roh Kudus', 'Sekolah', 'Kelas'];
-
-  // Write title row
-  sheet.getRange(1, 1).setValue('DETAIL MEMBER').setFontWeight('bold').setFontSize(14);
-  // Write sub-headers in row 2
-  sheet.getRange(2, 7).setValue('Lokasi').setFontWeight('bold');
-  sheet.getRange(2, 9).setValue('EDUKASI').setFontWeight('bold');
-  sheet.getRange(2, 15).setValue('Baptisan').setFontWeight('bold');
-  // Write headers in row 3
-  headers.forEach(function(h, i) {
-    var cell = sheet.getRange(DETAIL_HEADER_ROW, i + 1);
-    cell.setValue(h).setFontWeight('bold').setBackground('#d9e2f3').setFontColor('#1f497d');
-  });
-  // Auto-resize
-  for (var i = 1; i <= 18; i++) sheet.autoResizeColumn(i);
-}
-
-// ── UPDATE SINGLE ATTENDANCE (dari web app) ──────────────────
-function updateSingleAttendance(nama, tanggal, status, region) {
-  region = region || 'jaktim1';
-  var cfg = REGION_CONFIG[region];
-  if (!cfg) return;
-
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(cfg.sheetAbsensi);
-  if (!sheet) return;
-
-  var statusMap = { H:'Hadir', I:'Izin', S:'Sakit', A:'Alpa' };
-  var val = statusMap[status] || status || '';
-
-  // Find name row
-  var lastRow = sheet.getLastRow();
-  var nameCount = lastRow - DATA_START_ROW + 1;
-  if (nameCount < 1) return;
-  var names = sheet.getRange(DATA_START_ROW, NAMA_COL, nameCount, 1).getValues();
-  var targetRow = -1;
-  var normNama = norm(nama);
-  for (var i = 0; i < names.length; i++) {
-    if (norm(names[i][0]) === normNama) { targetRow = DATA_START_ROW + i; break; }
-  }
-  if (targetRow < 0) return;
-
-  // Find date column
-  var lastCol = sheet.getLastColumn();
-  var dateCount = lastCol - DATE_START_COL + 1;
-  if (dateCount < 1) return;
-  var sheetDates = sheet.getRange(HEADER_DATE_ROW, DATE_START_COL, 1, dateCount).getValues()[0];
-  var targetCol = -1;
-  var normTgl = normDate(tanggal);
-  for (var j = 0; j < sheetDates.length; j++) {
-    if (normDate(String(sheetDates[j])) === normTgl) { targetCol = DATE_START_COL + j; break; }
-  }
-  if (targetCol < 0) return;
-
-  var cell = sheet.getRange(targetRow, targetCol);
-  cell.setValue(val);
-  applyColor(cell, val);
-  SpreadsheetApp.flush();
-}
-
-// ── UPDATE SINGLE DETAIL (dari web app) ──────────────────────
-function updateSingleDetail(nama, fields, region) {
-  region = region || 'jaktim1';
-  var cfg = REGION_CONFIG[region];
-  if (!cfg) return;
-
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(cfg.sheetDetail);
-  if (!sheet) return;
-
-  // Find name row
-  var lastRow = sheet.getLastRow();
-  var dataCount = lastRow - DETAIL_DATA_ROW + 1;
-  if (dataCount < 1) return;
-  var names = sheet.getRange(DETAIL_DATA_ROW, DETAIL_COLS.nama, dataCount, 1).getValues();
-  var targetRow = -1;
-  var normNama = norm(nama);
-  for (var i = 0; i < names.length; i++) {
-    if (norm(names[i][0]) === normNama) { targetRow = DETAIL_DATA_ROW + i; break; }
-  }
-  if (targetRow < 0) return;
-
-  // Update fields
-  if (fields.status !== undefined) sheet.getRange(targetRow, DETAIL_COLS.status).setValue(fields.status);
-  if (fields.lahir !== undefined) sheet.getRange(targetRow, DETAIL_COLS.lahir).setValue(fields.lahir);
-  if (fields.wa !== undefined) sheet.getRange(targetRow, DETAIL_COLS.wa).setValue(fields.wa);
-  if (fields.kelurahan !== undefined) sheet.getRange(targetRow, DETAIL_COLS.kelurahan).setValue(fields.kelurahan);
-  if (fields.kecamatan !== undefined) sheet.getRange(targetRow, DETAIL_COLS.kecamatan).setValue(fields.kecamatan);
-  if (fields.sekolah !== undefined) sheet.getRange(targetRow, DETAIL_COLS.sekolah).setValue(fields.sekolah);
-  if (fields.kelas !== undefined) sheet.getRange(targetRow, DETAIL_COLS.kelas).setValue(fields.kelas);
-
-  // Milestone booleans
-  var boolFields = {msj1:'msj1',msj2:'msj2',msj3:'msj3',cgt1:'cgt1',cgt2:'cgt2',cgt3:'cgt3',
-                    baptis_air:'baptisAir',baptis_roh:'baptisRoh'};
-  for (var key in boolFields) {
-    var col = DETAIL_COLS[boolFields[key]] || DETAIL_COLS[key];
-    if (col && fields[key] !== undefined) {
-      var cell = sheet.getRange(targetRow, col);
-      var val = fields[key] ? 'TRUE' : 'FALSE';
-      cell.setValue(val);
-      if (val === 'TRUE') cell.setBackground('#c6efce').setFontColor('#276221');
+function writeMemberRow(sheet, row, m, isFirstInGroup, isDetail){
+  if(isDetail){
+    if(isFirstInGroup) sheet.getRange(row, DETAIL_COLS.cg).setValue(m.cg);
+    sheet.getRange(row, DETAIL_COLS.nama).setValue(m.nama||'');
+    sheet.getRange(row, DETAIL_COLS.status).setValue(m.status||'');
+    sheet.getRange(row, DETAIL_COLS.lahir).setValue(m.lahir||'');
+    sheet.getRange(row, DETAIL_COLS.wa).setValue(m.wa||'');
+    sheet.getRange(row, DETAIL_COLS.kelurahan).setValue(m.kelurahan||'');
+    sheet.getRange(row, DETAIL_COLS.kecamatan).setValue(m.kecamatan||'');
+    sheet.getRange(row, DETAIL_COLS.sekolah).setValue(m.sekolah||'');
+    sheet.getRange(row, DETAIL_COLS.kelas).setValue(m.kelas||'');
+    var bools = ['msj1','msj2','msj3','cgt1','cgt2','cgt3','baptis_air','baptis_roh'];
+    var detailKeys = ['msj1','msj2','msj3','cgt1','cgt2','cgt3','baptisAir','baptisRoh'];
+    bools.forEach(function(b, i){
+      var cell = sheet.getRange(row, DETAIL_COLS[detailKeys[i]]);
+      var v = m[b] ? 'TRUE' : 'FALSE';
+      cell.setValue(v);
+      if(v==='TRUE') cell.setBackground('#c6efce').setFontColor('#276221');
       else cell.setBackground('#ffc7ce').setFontColor('#9c0006');
+    });
+  } else {
+    if(isFirstInGroup) sheet.getRange(row, CG_COL).setValue(m.cg);
+    sheet.getRange(row, NAMA_COL).setValue(m.nama||'');
+    // Color row by role
+    var roleBg = {cgl:'#fff3e0', sponsor:'#e8eaf6', member:'#ffffff', simpatisan:'#fce4ec', vip:'#f3e5f5'};
+    var bg = roleBg[(m.status||'member').toLowerCase().trim()];
+    if(bg) sheet.getRange(row, 1, 1, NAMA_COL+1).setBackground(bg);
+  }
+}
+
+function renumberCG(sheet, cg, dataStart, cgCol, isDetail){
+  var lr = sheet.getLastRow();
+  if(lr < dataStart) return;
+  var nameCol = isDetail ? DETAIL_COLS.nama : NAMA_COL;
+  var noCol = isDetail ? DETAIL_COLS.no : NO_COL;
+  var rows = sheet.getRange(dataStart, 1, lr - dataStart + 1, Math.max(cgCol, nameCol)).getValues();
+  var curCG = '', no = 0;
+  for(var i = 0; i < rows.length; i++){
+    var rowCG = String(rows[i][cgCol-1]||'').trim();
+    if(rowCG) curCG = rowCG;
+    if(curCG === cg){
+      no++;
+      var n = String(rows[i][nameCol-1]||'').trim();
+      if(n) sheet.getRange(dataStart + i, noCol).setValue(no);
     }
   }
+}
 
+// ───────────────────────────────────────────────────────────
+// SYNC DETAIL
+// ───────────────────────────────────────────────────────────
+function syncDetail(region, sheetName){
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
+  if(!sheet) return;
+  var members = fetchSupabase('/rest/v1/members?select=*&region=eq.'+region+'&order=cg,nama');
+  if(!members || members.length === 0) return;
+
+  // Auto-insert new member rows (in detail format)
+  var insertedRows = autoInsertMemberRows(sheet, members, true);
+  if(insertedRows > 0) Logger.log('+'+insertedRows+' baris detail di '+sheetName);
+
+  // Update existing rows
+  var lastRow = sheet.getLastRow(), dataCount = lastRow - DETAIL_DATA_ROW + 1;
+  if(dataCount < 1) return;
+  var names = sheet.getRange(DETAIL_DATA_ROW, DETAIL_COLS.nama, dataCount, 1).getValues();
+  var updated = 0;
+  members.forEach(function(m){
+    var tr = -1, nn = norm(m.nama);
+    for(var i = 0; i < names.length; i++){
+      if(norm(names[i][0]) === nn){tr = DETAIL_DATA_ROW + i; break;}
+    }
+    if(tr < 0) return;
+    sheet.getRange(tr, DETAIL_COLS.status, 1, 5).setValues([[m.status||'',m.lahir||'',m.wa||'',m.kelurahan||'',m.kecamatan||'']]);
+    sheet.getRange(tr, DETAIL_COLS.msj1, 1, 8).setValues([[m.msj1?'TRUE':'FALSE',m.msj2?'TRUE':'FALSE',m.msj3?'TRUE':'FALSE',m.cgt1?'TRUE':'FALSE',m.cgt2?'TRUE':'FALSE',m.cgt3?'TRUE':'FALSE',m.baptis_air?'TRUE':'FALSE',m.baptis_roh?'TRUE':'FALSE']]);
+    sheet.getRange(tr, DETAIL_COLS.sekolah, 1, 2).setValues([[m.sekolah||'',m.kelas||'']]);
+    var boolRange = sheet.getRange(tr, DETAIL_COLS.msj1, 1, 8);
+    var vals = boolRange.getValues()[0];
+    var bgs = [], fcs = [];
+    vals.forEach(function(v){
+      if(v === 'TRUE'){bgs.push('#c6efce');fcs.push('#276221');}
+      else{bgs.push('#ffc7ce');fcs.push('#9c0006');}
+    });
+    boolRange.setBackgrounds([bgs]).setFontColors([fcs]);
+    updated++;
+  });
   SpreadsheetApp.flush();
+  Logger.log('Detail '+sheetName+': '+updated+' members diupdate, +'+insertedRows+' baris baru');
 }
 
-// ── SYNC SEMUA (kedua region) ────────────────────────────────
-function syncAll() {
-  syncRegion('jaktim1');
-  syncRegion('jaktim2');
+// ───────────────────────────────────────────────────────────
+// HELPERS
+// ───────────────────────────────────────────────────────────
+function fetchSupabase(path){
+  try{
+    var r = UrlFetchApp.fetch(SUPABASE_URL+path, {
+      method:'GET',
+      headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'},
+      muteHttpExceptions:true
+    });
+    if(r.getResponseCode() !== 200) return null;
+    return JSON.parse(r.getContentText());
+  } catch(e){return null;}
 }
 
-// Auto-sync trigger
-function runAutoSync() {
-  try { syncAll(); }
-  catch(e) { Logger.log('❌ Auto-sync error: ' + e.message); }
-}
+function norm(s){return String(s||'').trim().toLowerCase().replace(/\s+/g,' ');}
 
-// ── SUPABASE FETCH ───────────────────────────────────────────
-function fetchSupabase(path) {
-  var url = SUPABASE_URL + path;
-  var options = {
-    method: 'GET',
-    headers: {
-      'apikey': SUPABASE_KEY,
-      'Authorization': 'Bearer ' + SUPABASE_KEY,
-      'Content-Type': 'application/json'
-    },
-    muteHttpExceptions: true
-  };
-  try {
-    var response = UrlFetchApp.fetch(url, options);
-    if (response.getResponseCode() !== 200) {
-      Logger.log('❌ HTTP ' + response.getResponseCode() + ' dari ' + path);
-      return null;
-    }
-    return JSON.parse(response.getContentText());
-  } catch(e) {
-    Logger.log('❌ Fetch error: ' + e.message);
-    return null;
-  }
-}
-
-// ── HELPERS ──────────────────────────────────────────────────
-function norm(s) {
-  return String(s||'').trim().toLowerCase().replace(/\s+/g,' ');
-}
-
-function normDate(s) {
+function normDate(s){
+  if(s instanceof Date) return s.getDate()+'-'+(s.getMonth()+1);
   s = String(s||'').trim();
-  var mo = {jan:1,feb:2,mar:3,apr:4,mei:5,may:5,jun:6,jul:7,
-            agu:8,aug:8,sep:9,okt:10,oct:10,nov:11,des:12,dec:12};
+  var dm = s.match(/^\w+\s+(\w+)\s+(\d+)\s+(\d+)/);
+  if(dm){
+    var mo2 = {Jan:1,Feb:2,Mar:3,Apr:4,May:5,Jun:6,Jul:7,Aug:8,Sep:9,Oct:10,Nov:11,Dec:12};
+    if(mo2[dm[1]]) return dm[2]+'-'+mo2[dm[1]];
+  }
+  var mo = {jan:1,feb:2,mar:3,apr:4,mei:5,may:5,jun:6,jul:7,agu:8,aug:8,sep:9,okt:10,oct:10,nov:11,des:12,dec:12};
   var m = s.match(/^(\d+)\s+([a-zA-Z]+)/);
-  if (m) { var n=mo[m[2].toLowerCase()]; return n ? m[1]+'-'+n : s.toLowerCase(); }
+  if(m){var n = mo[m[2].toLowerCase()]; return n ? m[1]+'-'+n : s.toLowerCase();}
   m = s.match(/^(\d+)[\/\-](\d+)[\/\-]/);
-  if (m) return m[1]+'-'+parseInt(m[2]);
+  if(m) return m[1]+'-'+parseInt(m[2]);
   m = s.match(/^(\d+)[\/\-](\d+)$/);
-  if (m) return m[1]+'-'+parseInt(m[2]);
+  if(m) return m[1]+'-'+parseInt(m[2]);
   return s.toLowerCase();
 }
 
-function applyColor(cell, status) {
+function applyColor(cell, status){
   var c = STATUS_COLORS[status] || STATUS_COLORS[''];
-  if (c.bg) { cell.setBackground(c.bg); cell.setFontColor(c.font); }
-  else { cell.setBackground(null); cell.setFontColor(null); }
+  if(c.bg){cell.setBackground(c.bg); cell.setFontColor(c.font);}
+  else{cell.setBackground(null); cell.setFontColor(null);}
 }
-
-// ── DEBUG ────────────────────────────────────────────────────
-function debugNamaMismatch() {
-  ['jaktim1','jaktim2'].forEach(function(region) {
-    var cfg = REGION_CONFIG[region];
-    var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(cfg.sheetAbsensi);
-    if (!sheet) return;
-    var members = fetchSupabase('/rest/v1/members?select=id,nama&region=eq.' + region);
-    if (!members) return;
-    var supaNames = members.map(function(m) { return norm(m.nama); });
-    var lastRow = sheet.getLastRow();
-    var sheetNames = sheet.getRange(DATA_START_ROW, NAMA_COL, lastRow - DATA_START_ROW + 1, 1).getValues();
-    Logger.log('=== ' + region.toUpperCase() + ' ===');
-    sheetNames.forEach(function(row) {
-      var sn = norm(row[0]);
-      if (!sn) return;
-      Logger.log((supaNames.indexOf(sn) >= 0 ? '✓ ' : '❌ ') + '"' + row[0] + '"');
-    });
-  });
-}
-
-// ============================================================
-// SETUP:
-// 1. Buat 4 tab di Google Sheets:
-//    "JAKTIM 1", "JAKTIM 2", "DETAIL JAKTIM 1", "DETAIL JAKTIM 2"
-// 2. Tab JAKTIM 1 & 2: Row 3 = tanggal, Row 4+ = data
-// 3. Paste kode ini → Deploy as Web App
-// 4. Set trigger runAutoSync tiap 5 menit
-// 5. Paste URL deployment di web app (📊 icon)
-// ============================================================
