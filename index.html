@@ -229,15 +229,27 @@ body{font-family:'Inter',sans-serif;background:#f8f8f5;color:#1c1c1c;min-height:
 
 <!-- ADD CG EVENT MODAL -->
 <div class="modal-overlay" id="addCGEventModal">
-  <div class="modal-box">
+  <div class="modal-box" style="max-width:480px">
     <div class="modal-title">+ Tambah Event CG</div>
     <input class="modal-input" id="evName" placeholder="Nama event">
     <input class="modal-input" id="evDate" type="date">
     <select class="modal-input" id="evCat">
       <option value="CG Event">CG Event</option><option value="Outreach">Outreach</option><option value="Birthday">Birthday</option><option value="Ibadah">Ibadah</option>
     </select>
-    <textarea class="modal-input" id="evNote" placeholder="Catatan..." style="min-height:60px;resize:vertical"></textarea>
-    <div style="display:flex;gap:8px;margin-top:10px">
+    <textarea class="modal-input" id="evNote" placeholder="Catatan / deskripsi event..." style="min-height:90px;resize:vertical"></textarea>
+
+    <!-- Image upload/URL -->
+    <div style="margin-top:8px">
+      <label style="display:block;font-size:11px;color:var(--g3);margin-bottom:6px">📷 Gambar (opsional)</label>
+      <input type="file" id="evImageFile" accept="image/*" onchange="handleEvImage(event)" style="display:none">
+      <div style="display:flex;gap:6px">
+        <button type="button" class="pel-add" style="flex:1;padding:8px;font-size:11px" onclick="document.getElementById('evImageFile').click()">📎 Pilih dari device</button>
+        <input class="modal-input" id="evImageUrl" placeholder="atau paste URL gambar..." style="flex:2;margin:0">
+      </div>
+      <div id="evImagePreview" style="margin-top:8px"></div>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-top:14px">
       <button class="btn-purple" style="flex:1" onclick="saveCGEvent()">Simpan</button>
       <button class="pel-add" style="flex:1;padding:10px" onclick="closeModal('addCGEventModal')">Batal</button>
     </div>
@@ -441,6 +453,8 @@ let curReg = 'jaktim1';
 let fromCoach = false;
 let CUR_CG = null; // current CG name
 let CUR_REGION = null; // current region
+let MS_FILTER = 'all'; // milestone filter
+function setMilestoneFilter(key){ MS_FILTER = key; renderMilestone(); }
 let CUR_CG_INFO = null;
 let MEMBERS = [];
 let DATES = [];
@@ -1175,7 +1189,25 @@ function renderMilestone() {
   let html = '';
 
   // Filter chips
-  html += '<div class="filter-chips" style="margin-bottom:16px"><span class="chip on">Semua</span><span class="chip">MSJ</span><span class="chip">CGT</span><span class="chip">Baptis</span><span class="chip red">Belum MSJ 1</span></div>';
+  // Filter chips - more granular
+  const filters = [
+    {key:'all', label:'Semua', cls:''},
+    {key:'msj1', label:'MSJ 1', cls:''},
+    {key:'msj2', label:'MSJ 2', cls:''},
+    {key:'msj3', label:'MSJ 3', cls:''},
+    {key:'cgt1', label:'CGT 1', cls:''},
+    {key:'cgt2', label:'CGT 2', cls:''},
+    {key:'cgt3', label:'CGT 3', cls:''},
+    {key:'baptis_air', label:'B. Air', cls:''},
+    {key:'baptis_roh', label:'B. Roh', cls:''},
+    {key:'belum_msj1', label:'Belum MSJ 1', cls:'red'}
+  ];
+  html += '<div class="filter-chips" style="margin-bottom:16px;flex-wrap:wrap">';
+  filters.forEach(f => {
+    const active = (MS_FILTER||'all')===f.key;
+    html += '<span class="chip '+f.cls+(active?' on':'')+'" onclick="setMilestoneFilter(\''+f.key+'\')">'+f.label+'</span>';
+  });
+  html += '</div>';
 
   // Hero
   const heroDash = Math.round(avgPct / 100 * 97.4);
@@ -1226,10 +1258,18 @@ function renderMilestone() {
   // Per-member cards
   html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><div style="font-size:11px;font-weight:700;letter-spacing:1.2px;color:var(--g3);text-transform:uppercase">\ud83d\udc65 Progress per Member</div><span style="font-size:10px;color:var(--g4)">Sorted by progress</span></div>';
 
-  const memberProgress = MEMBERS.map(m => {
+  let memberProgress = MEMBERS.map(m => {
     const done = MS_FIELDS.filter(f => m[f]).length;
     return { ...m, msDone: done, msPct: Math.round(done/8*100) };
   }).sort((a, b) => b.msPct - a.msPct);
+
+  // Apply filter
+  if (MS_FILTER === 'belum_msj1') {
+    memberProgress = memberProgress.filter(m => !m.msj1);
+  } else if (MS_FILTER && MS_FILTER !== 'all' && MS_FIELDS.includes(MS_FILTER)) {
+    // Show only members who DON'T have this milestone yet (need to complete it)
+    memberProgress = memberProgress.filter(m => !m[MS_FILTER]);
+  }
 
   memberProgress.forEach(m => {
     const pct = m.msPct;
@@ -1277,32 +1317,86 @@ async function renderEvents() {
 
   let html = '<div class="filter-chips"><span class="chip on">Semua</span><span class="chip">Ibadah</span><span class="chip">CG Event</span><span class="chip">Birthday</span><span class="chip">Outreach</span></div>';
 
-  // Shared events
-  html += '<div style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--g3);margin-bottom:10px;margin-top:4px">\ud83d\udce2 Event Semua CG</div>';
-  ALL_EVENTS.forEach(ev => {
+  // Render helper for event card
+  function buildEventCard(ev, isShared) {
     const catColor = ev.cat === 'Ibadah' ? 'var(--green)' : ev.cat === 'Outreach' ? 'var(--purple)' : ev.cat === 'Birthday' ? '#ec4899' : 'var(--blue)';
-    html += '<div class="ev-card" style="border-left-color:'+catColor+'"><div class="ev-date">'+esc(ev.date_start||'')+'</div><div class="ev-name">'+esc(ev.name||'')+'</div><div class="ev-note">'+esc(ev.note||'')+'</div><span class="ev-cat" style="background:rgba(0,0,0,.05);color:'+catColor+'">'+esc(ev.cat||'')+'</span><span class="ev-cat" style="background:rgba(108,92,231,.06);color:var(--purple);margin-left:4px">Semua CG</span></div>';
-  });
+    const evId = isShared ? 'shared_'+(ev.id||'') : 'cg_'+(ev.id||'');
+    const note = ev.note || '';
+    const noteEsc = esc(note).replace(/\n/g, '<br>');
+    const img = ev.image || '';
+    let cardHtml = '<div class="ev-card" style="border-left-color:'+catColor+';padding:14px;margin-bottom:12px" id="ev_'+evId+'">';
+    cardHtml += '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px">';
+    cardHtml += '<div style="flex:1"><div class="ev-date">'+esc(ev.date_start||'')+'</div><div class="ev-name">'+esc(ev.name||'')+'</div></div>';
+    cardHtml += '<div style="display:flex;gap:4px">';
+    cardHtml += '<button onclick="copyEventText(\''+evId+'\')" title="Copy text" style="padding:5px 8px;border-radius:6px;border:1px solid var(--g5);background:#fff;cursor:pointer;font-size:11px">📋</button>';
+    cardHtml += '<button onclick="broadcastEvent(\''+evId+'\')" title="Broadcast WA" style="padding:5px 8px;border-radius:6px;border:1px solid #25d366;background:#dcfce7;color:#15803d;cursor:pointer;font-size:11px">📤</button>';
+    if (!isShared && ev.id) cardHtml += '<button onclick="deleteEventCard('+ev.id+')" title="Hapus" style="padding:5px 8px;border-radius:6px;border:1px solid #fecaca;background:#fef2f2;color:#dc2626;cursor:pointer;font-size:11px">🗑</button>';
+    cardHtml += '</div></div>';
+    if (img) cardHtml += '<div style="margin:8px 0"><img src="'+esc(img)+'" alt="event" style="max-width:100%;border-radius:8px;max-height:200px;object-fit:cover" onerror="this.style.display=\'none\'"></div>';
+    cardHtml += '<div class="ev-note" id="evtxt_'+evId+'" style="white-space:pre-wrap;line-height:1.4">'+noteEsc+'</div>';
+    cardHtml += '<div style="margin-top:8px"><span class="ev-cat" style="background:rgba(0,0,0,.05);color:'+catColor+'">'+esc(ev.cat||'')+'</span>';
+    if (isShared) cardHtml += '<span class="ev-cat" style="background:rgba(108,92,231,.06);color:var(--purple);margin-left:4px">Semua CG</span>';
+    cardHtml += '</div></div>';
+    return cardHtml;
+  }
+
+  // Stash events for copy/broadcast functions
+  window.__eventCache = {};
+  ALL_EVENTS.forEach(ev => { window.__eventCache['shared_'+ev.id] = ev; });
+  cgEvents.forEach(ev => { window.__eventCache['cg_'+ev.id] = ev; });
+
+  // Shared events
+  html += '<div style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--g3);margin-bottom:10px;margin-top:4px">📢 Event Semua CG</div>';
+  ALL_EVENTS.forEach(ev => { html += buildEventCard(ev, true); });
 
   // CG events
-  html += '<div style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--g3);margin:20px 0 10px">\ud83d\udccb Event CG Ini</div>';
-  cgEvents.forEach(ev => {
-    const catColor = ev.cat === 'Ibadah' ? 'var(--green)' : ev.cat === 'Outreach' ? 'var(--purple)' : ev.cat === 'Birthday' ? '#ec4899' : 'var(--blue)';
-    html += '<div class="ev-card" style="border-left-color:'+catColor+'"><div class="ev-date">'+esc(ev.date_start||ev.date||'')+'</div><div class="ev-name">'+esc(ev.name||'')+'</div><div class="ev-note">'+esc(ev.note||'')+'</div><span class="ev-cat" style="background:rgba(0,0,0,.05);color:'+catColor+'">'+esc(ev.cat||'')+'</span></div>';
-  });
+  html += '<div style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--g3);margin:20px 0 10px">📋 Event CG Ini</div>';
+  if (cgEvents.length === 0) html += '<div style="font-size:11px;color:var(--g4);font-style:italic;margin-bottom:10px">Belum ada event khusus CG ini</div>';
+  cgEvents.forEach(ev => { html += buildEventCard(ev, false); });
 
   // Birthdays
-  birthdays.forEach(ev => {
-    html += '<div class="ev-card" style="border-left-color:#f472b6"><div class="ev-date">'+esc(ev.date_start||'')+'</div><div class="ev-name">'+esc(ev.name)+'</div><div class="ev-note">'+esc(ev.note)+'</div><span class="ev-cat" style="background:rgba(244,114,182,.08);color:#ec4899">Birthday</span></div>';
-  });
+  if (birthdays.length > 0) {
+    html += '<div style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--g3);margin:20px 0 10px">🎂 Ulang Tahun Member</div>';
+    birthdays.forEach(ev => {
+      html += '<div class="ev-card" style="border-left-color:#f472b6"><div class="ev-date">'+esc(ev.date_start||'')+'</div><div class="ev-name">'+esc(ev.name)+'</div><div class="ev-note">'+esc(ev.note)+'</div><span class="ev-cat" style="background:rgba(244,114,182,.08);color:#ec4899">Birthday</span></div>';
+    });
+  }
 
   html += '<button class="pel-add" style="margin-top:10px;width:100%;padding:10px;text-align:center" onclick="openModal(\'addCGEventModal\')">+ Tambah Event CG</button>';
   el.innerHTML = html;
 }
 
+// ===== Event helpers (copy, broadcast, delete) =====
+function copyEventText(evId) {
+  const ev = window.__eventCache?.[evId];
+  if (!ev) return;
+  const text = '*'+(ev.name||'')+'*\n📅 '+(ev.date_start||'')+(ev.date_end?' - '+ev.date_end:'')+'\n\n'+(ev.note||'');
+  navigator.clipboard.writeText(text).then(()=>toast('✓ Tersalin ke clipboard')).catch(()=>{
+    const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();toast('✓ Tersalin');
+  });
+}
+
+function broadcastEvent(evId) {
+  const ev = window.__eventCache?.[evId];
+  if (!ev) return;
+  const text = '*'+(ev.name||'')+'*\n📅 '+(ev.date_start||'')+(ev.date_end?' - '+ev.date_end:'')+'\n\n'+(ev.note||'');
+  const url = 'https://wa.me/?text=' + encodeURIComponent(text);
+  window.open(url, '_blank');
+}
+
+async function deleteEventCard(id) {
+  if (!confirm('Hapus event ini?')) return;
+  await deleteCGEvent(id);
+  toast('✓ Event dihapus');
+  renderEvents();
+}
+
 async function saveCGEvent() {
   const name = document.getElementById('evName').value.trim();
   if (!name) { alert('Nama event harus diisi'); return; }
+  const imgUrl = (document.getElementById('evImageUrl').value || '').trim();
+  const imgData = window.__evImageDataUrl || '';
+  const image = imgUrl || imgData || null;
   const ev = {
     cg: CUR_CG,
     region: CUR_REGION,
@@ -1310,11 +1404,32 @@ async function saveCGEvent() {
     name,
     date_start: document.getElementById('evDate').value,
     cat: document.getElementById('evCat').value,
-    note: document.getElementById('evNote').value
+    note: document.getElementById('evNote').value,
+    image
   };
   await addCGEvent(ev);
+  // Reset form
+  document.getElementById('evName').value = '';
+  document.getElementById('evDate').value = '';
+  document.getElementById('evNote').value = '';
+  document.getElementById('evImageUrl').value = '';
+  document.getElementById('evImagePreview').innerHTML = '';
+  window.__evImageDataUrl = '';
   closeModal('addCGEventModal');
   await renderEvents();
+}
+
+function handleEvImage(e) {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  if (file.size > 1024*1024) { alert('Ukuran gambar maks 1MB'); return; }
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    window.__evImageDataUrl = ev.target.result;
+    document.getElementById('evImagePreview').innerHTML = '<img src="'+ev.target.result+'" style="max-width:100%;max-height:140px;border-radius:8px;border:1px solid var(--g5)">';
+    document.getElementById('evImageUrl').value = '';
+  };
+  reader.readAsDataURL(file);
 }
 
 // ========== NAVIGATION ==========
