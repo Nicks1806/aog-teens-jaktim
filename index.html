@@ -244,7 +244,16 @@ body{font-family:'Inter',sans-serif;background:#f8f8f5;color:#1c1c1c;min-height:
     <input class="modal-input" id="evName" placeholder="Nama event">
     <input class="modal-input" id="evDate" type="date">
     <select class="modal-input" id="evCat">
-      <option value="CG Event">CG Event</option><option value="Outreach">Outreach</option><option value="Birthday">Birthday</option><option value="Ibadah">Ibadah</option>
+      <option value="msj">📖 MSJ</option>
+      <option value="cgt">👥 CGT</option>
+      <option value="ct">🏕️ CT</option>
+      <option value="ibadah">⛪ Ibadah</option>
+      <option value="outreach">🌏 Outreach</option>
+      <option value="retreat">🏕️ Retreat</option>
+      <option value="event">📌 Event</option>
+      <option value="birthday">🎂 Ulang Tahun</option>
+      <option value="reminder">🔔 Pengingat</option>
+      <option value="other">📌 Lainnya</option>
     </select>
     <textarea class="modal-input" id="evNote" placeholder="Catatan / deskripsi event..." style="min-height:90px;resize:vertical"></textarea>
 
@@ -465,6 +474,15 @@ let CUR_CG = null; // current CG name
 let CUR_REGION = null; // current region
 let MS_FILTER = 'all'; // milestone filter
 function setMilestoneFilter(key){ MS_FILTER = key; renderMilestone(); }
+
+// Event categories config (matches main dashboard)
+const CAT_LABEL = {msj:'MSJ',cgt:'CGT',ct:'CT',ibadah:'Ibadah',outreach:'Outreach',other:'Lainnya',birthday:'Ulang Tahun',event:'Event',retreat:'Retreat',reminder:'Pengingat'};
+const CAT_ICON = {msj:'📖',cgt:'👥',ct:'🏕️',ibadah:'⛪',outreach:'🌏',other:'📌',birthday:'🎂',event:'📌',retreat:'🏕️',reminder:'🔔'};
+const CAT_COLOR = {msj:'#7c3aed',cgt:'#0f766e',ct:'#b45309',ibadah:'#16a34a',outreach:'#6C5CE7',other:'#6b7280',birthday:'#ec4899',event:'#2563eb',retreat:'#0e7490',reminder:'#d97706'};
+function catColor(cat){ return CAT_COLOR[(cat||'').toLowerCase()] || '#2563eb'; }
+function catLabel(cat){ const k=(cat||'').toLowerCase(); return (CAT_ICON[k]||'')+' '+(CAT_LABEL[k]||cat||'Event'); }
+let EV_FILTER = 'all';
+function setEventFilter(key,btn){ EV_FILTER = key; renderEvents(); }
 let CUR_CG_INFO = null;
 let MEMBERS = [];
 let DATES = [];
@@ -1341,16 +1359,40 @@ async function renderEvents() {
     return { ...m, _bd: bd, _next: next, _daysLeft: daysLeft, _turnAge: turnAge, _dateLabel: dateLabel };
   }).filter(Boolean).sort((a,b) => a._daysLeft - b._daysLeft);
 
-  let html = '<div class="filter-chips"><span class="chip on">Semua</span><span class="chip">Ibadah</span><span class="chip">CG Event</span><span class="chip">Birthday</span><span class="chip">Outreach</span></div>';
+  // Filter chips with all categories
+  const evCats = [
+    {key:'all', label:'Semua'},
+    {key:'msj', label:'📖 MSJ'},
+    {key:'cgt', label:'👥 CGT'},
+    {key:'ct', label:'🏕️ CT'},
+    {key:'ibadah', label:'⛪ Ibadah'},
+    {key:'outreach', label:'🌏 Outreach'},
+    {key:'retreat', label:'🏕️ Retreat'},
+    {key:'event', label:'📌 Event'},
+    {key:'birthday', label:'🎂 Ultah'},
+    {key:'reminder', label:'🔔 Pengingat'},
+    {key:'other', label:'📌 Lainnya'}
+  ];
+  let html = '<div class="filter-chips" style="flex-wrap:wrap">';
+  evCats.forEach(c => {
+    html += '<span class="chip '+(EV_FILTER===c.key?'on':'')+'" onclick="setEventFilter(\''+c.key+'\')">'+c.label+'</span>';
+  });
+  html += '</div>';
+
+  // Filter helper
+  function passFilter(ev){
+    if (EV_FILTER==='all') return true;
+    return (ev.cat||'').toLowerCase() === EV_FILTER;
+  }
 
   // Render helper for event card
   function buildEventCard(ev, isShared) {
-    const catColor = ev.cat === 'Ibadah' ? 'var(--green)' : ev.cat === 'Outreach' ? 'var(--purple)' : ev.cat === 'Birthday' ? '#ec4899' : 'var(--blue)';
+    const cColor = catColor(ev.cat);
     const evId = isShared ? 'shared_'+(ev.id||'') : 'cg_'+(ev.id||'');
     const note = ev.note || '';
     const noteEsc = esc(note).replace(/\n/g, '<br>');
     const img = ev.image || '';
-    let cardHtml = '<div class="ev-card" style="border-left-color:'+catColor+';padding:14px;margin-bottom:12px" id="ev_'+evId+'">';
+    let cardHtml = '<div class="ev-card" style="border-left-color:'+cColor+';padding:14px;margin-bottom:12px" id="ev_'+evId+'">';
     cardHtml += '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px">';
     cardHtml += '<div style="flex:1"><div class="ev-date">'+esc(ev.date_start||'')+'</div><div class="ev-name">'+esc(ev.name||'')+'</div></div>';
     cardHtml += '<div style="display:flex;gap:4px">';
@@ -1361,7 +1403,7 @@ async function renderEvents() {
     cardHtml += '</div></div>';
     if (img) cardHtml += '<div style="margin:8px 0"><img src="'+esc(img)+'" alt="event" style="max-width:100%;border-radius:8px;max-height:200px;object-fit:cover" onerror="this.style.display=\'none\'"></div>';
     cardHtml += '<div class="ev-note" id="evtxt_'+evId+'" style="white-space:pre-wrap;line-height:1.4">'+noteEsc+'</div>';
-    cardHtml += '<div style="margin-top:8px"><span class="ev-cat" style="background:rgba(0,0,0,.05);color:'+catColor+'">'+esc(ev.cat||'')+'</span>';
+    cardHtml += '<div style="margin-top:8px"><span class="ev-cat" style="background:rgba(0,0,0,.05);color:'+cColor+'">'+catLabel(ev.cat)+'</span>';
     if (isShared) cardHtml += '<span class="ev-cat" style="background:rgba(108,92,231,.06);color:var(--purple);margin-left:4px">Semua CG</span>';
     cardHtml += '</div></div>';
     return cardHtml;
@@ -1374,12 +1416,12 @@ async function renderEvents() {
 
   // Shared events
   html += '<div style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--g3);margin-bottom:10px;margin-top:4px">📢 Event Semua CG</div>';
-  ALL_EVENTS.forEach(ev => { html += buildEventCard(ev, true); });
+  ALL_EVENTS.filter(passFilter).forEach(ev => { html += buildEventCard(ev, true); });
 
   // CG events
   html += '<div style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--g3);margin:20px 0 10px">📋 Event CG Ini</div>';
   if (cgEvents.length === 0) html += '<div style="font-size:11px;color:var(--g4);font-style:italic;margin-bottom:10px">Belum ada event khusus CG ini</div>';
-  cgEvents.forEach(ev => { html += buildEventCard(ev, false); });
+  cgEvents.filter(passFilter).forEach(ev => { html += buildEventCard(ev, false); });
 
   // Birthdays - sorted by upcoming, with days countdown
   if (birthdays.length > 0) {
@@ -1447,7 +1489,7 @@ function openEditEvent(evId) {
   window.__editingEventId = evId;
   document.getElementById('evName').value = ev.name || '';
   document.getElementById('evDate').value = ev.date_start || '';
-  document.getElementById('evCat').value = ev.cat || 'CG Event';
+  document.getElementById('evCat').value = (ev.cat || 'event').toLowerCase();
   document.getElementById('evNote').value = ev.note || '';
   document.getElementById('evImageUrl').value = ev.image && ev.image.startsWith('http') ? ev.image : '';
   if (ev.image) {
