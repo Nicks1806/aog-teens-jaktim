@@ -1740,16 +1740,111 @@ function renderCoachOverview() {
   el.innerHTML = html;
 }
 
+// Auto-generate Sabtu: hitung bulan target berikutnya
+function computeNextMonth(dates) {
+  const MONTHS_ID_FULL = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+  let lastDate = null;
+  dates.forEach(d => {
+    const parsed = parseDateLabel(d.label);
+    if (parsed && (!lastDate || parsed > lastDate)) lastDate = parsed;
+  });
+  const base = lastDate || new Date();
+  const nextMonth = new Date(base.getFullYear(), base.getMonth()+1, 1);
+  return { year: nextMonth.getFullYear(), month: nextMonth.getMonth()+1, monthName: MONTHS_ID_FULL[nextMonth.getMonth()] };
+}
+
+function parseDateLabel(label) {
+  if (!label) return null;
+  const s = String(label).trim();
+  const MO_SHORT = {jan:1,feb:2,mar:3,apr:4,mei:5,may:5,jun:6,jul:7,agu:8,aug:8,ags:8,sep:9,okt:10,oct:10,nov:11,des:12,dec:12};
+  let m = s.match(/^(\d+)\s+([a-zA-Z]+)(?:\s+(\d+))?/);
+  if (m) {
+    const mo = MO_SHORT[m[2].toLowerCase().slice(0,3)];
+    if (mo) {
+      const y = m[3] ? (parseInt(m[3]) < 100 ? 2000+parseInt(m[3]) : parseInt(m[3])) : new Date().getFullYear();
+      return new Date(y, mo-1, parseInt(m[1]));
+    }
+  }
+  return null;
+}
+
+async function generateSabtuBulan(scope, year, month) {
+  const MONTHS_ID_SHORT = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Ags','Sep','Okt','Nov','Des'];
+  const MONTHS_CODE = ['JAN','FEB','MAR','APR','MEI','JUN','JUL','AGS','SEP','OKT','NOV','DES'];
+  const monthName = MONTHS_ID_SHORT[month-1];
+  const monthCode = MONTHS_CODE[month-1];
+
+  // Kumpulkan semua Sabtu di bulan target
+  const sabtuList = [];
+  const daysInMonth = new Date(year, month, 0).getDate();
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dt = new Date(year, month-1, d);
+    if (dt.getDay() === 6) sabtuList.push(d); // 6 = Saturday
+  }
+  if (sabtuList.length === 0) { alert('Tidak ada Sabtu di bulan '+monthName+' '+year); return; }
+
+  const regions = scope === 'all' ? ['jaktim1','jaktim2'] : [scope];
+  const labelList = sabtuList.map(d => d+' '+monthName+' '+String(year).slice(-2));
+
+  if (!confirm('Generate '+sabtuList.length+' hari Sabtu '+monthName+' '+year+' untuk '+(scope==='all'?'semua region':scope.toUpperCase())+'?\n\n'+labelList.join('\n'))) return;
+
+  const btns = document.querySelectorAll('button');
+  btns.forEach(b => b.disabled = true);
+
+  try {
+    let totalInserted = 0;
+    let totalSkipped = 0;
+    for (const reg of regions) {
+      // Ambil existing sort_order max + labels utk skip duplikat
+      const { data: existing } = await supa.from('dates').select('label,sort_order').eq('region', reg);
+      const existingLabels = new Set((existing||[]).map(d => String(d.label||'').trim().toLowerCase()));
+      let maxSort = 0;
+      (existing||[]).forEach(d => { if (d.sort_order > maxSort) maxSort = d.sort_order; });
+
+      const toInsert = [];
+      sabtuList.forEach(d => {
+        const lbl = d+' '+monthName+' '+String(year).slice(-2);
+        if (existingLabels.has(lbl.toLowerCase())) { totalSkipped++; return; }
+        maxSort++;
+        toInsert.push({ label: lbl, month_code: monthCode, sort_order: maxSort, region: reg });
+      });
+
+      if (toInsert.length > 0) {
+        const { error } = await supa.from('dates').insert(toInsert);
+        if (error) { alert('Gagal insert untuk '+reg+': '+error.message); continue; }
+        totalInserted += toInsert.length;
+      }
+    }
+    alert('✓ Berhasil!\n'+totalInserted+' tanggal Sabtu ditambahkan'+(totalSkipped>0?' ('+totalSkipped+' sudah ada, di-skip)':'')+'.\n\nRefresh halaman untuk melihat perubahan.');
+    // Reload data
+    await loadCoachData();
+  } catch(e) {
+    alert('Error: '+e.message);
+  } finally {
+    btns.forEach(b => b.disabled = false);
+  }
+}
+
 function renderCoachAbsensi() {
   const el = document.getElementById('tab-c-absensi');
   const region = coachRole === 'tl' ? 'all' : coachReg;
   const cgs = getCGsForRegion(region);
   const dates = region === 'all' ? ALL_DATES : ALL_DATES.filter(d => d.region === region);
 
-  let html = '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px">';
+  // Figure out next month to generate
+  const regionDates = region === 'all' ? ALL_DATES : ALL_DATES.filter(d => d.region === region);
+  const nextMonthInfo = computeNextMonth(regionDates);
+
+  let html = '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-bottom:14px">';
+  html += '<div style="display:flex;gap:10px;align-items:center">';
   if (coachRole !== 'tl') {
     html += '<div class="region-toggle" style="display:inline-flex;margin:0"><button class="region-btn '+(coachReg==='jaktim1'?'active':'')+'" onclick="coachReg=\'jaktim1\';renderCoachAbsensi()" style="padding:6px 16px;font-size:11px">JAKTIM 1</button><button class="region-btn '+(coachReg==='jaktim2'?'active':'')+'" onclick="coachReg=\'jaktim2\';renderCoachAbsensi()" style="padding:6px 16px;font-size:11px">JAKTIM 2</button></div>';
   }
+  html += '</div>';
+  // Generate Sabtu button (Coach + TL only — already inside Coach dashboard)
+  const genLabel = 'Generate Sabtu ' + nextMonthInfo.monthName + ' ' + nextMonthInfo.year;
+  const scope = coachRole === 'tl' ? 'all' : coachReg;
+  html += '<button onclick="generateSabtuBulan(\''+scope+'\','+nextMonthInfo.year+','+nextMonthInfo.month+')" style="padding:8px 14px;border-radius:10px;border:1.5px solid #6C5CE7;background:linear-gradient(135deg,#f5f3ff,#ede9fe);color:#6C5CE7;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.3px;transition:all .2s;box-shadow:0 2px 6px rgba(108,92,231,.1)" onmouseover="this.style.transform=\'translateY(-1px)\';this.style.boxShadow=\'0 4px 12px rgba(108,92,231,.2)\'" onmouseout="this.style.transform=\'\';this.style.boxShadow=\'0 2px 6px rgba(108,92,231,.1)\'">+ '+genLabel+'</button>';
   html += '</div>';
 
   // Per-CG card layout for cleaner visual separation
