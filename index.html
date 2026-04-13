@@ -52,7 +52,8 @@ body{font-family:'Inter',sans-serif;background:#f8f8f5;color:#1c1c1c;min-height:
 .live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block;animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
-.app-hero{padding:24px 20px 20px;border-bottom:1px solid var(--g5);background:var(--white);display:flex;gap:24px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.app-hero{padding:24px 20px 20px;border-bottom:1px solid var(--g5);background:var(--white)}
+#pageD .app-hero{display:flex;gap:24px;align-items:center;justify-content:space-between;flex-wrap:wrap}
 .app-hero-left{flex:0 0 auto;min-width:160px}
 .app-hero-visi{flex:1;min-width:240px;text-align:right;font-family:'Instrument Serif',serif;font-size:clamp(22px,3.4vw,34px);line-height:1.1;color:var(--g1);font-style:italic;opacity:.95}
 .app-hero-tag{font-size:10px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:var(--g4);margin-bottom:6px}
@@ -912,6 +913,10 @@ function renderAbsensi() {
     return (a.nama||'').localeCompare(b.nama||'');
   });
 
+  // Per-date column totals + grand totals
+  const dateHadirCounts = DATES.map(d => MEMBERS.filter(m => ATTENDANCE[m.id+'_'+d.id]==='H').length);
+  const dateTotalCounts = DATES.map(d => MEMBERS.filter(m => ATTENDANCE[m.id+'_'+d.id]).length);
+
   sortedMembers.forEach(m => {
     const hadirCount = DATES.filter(d => ATTENDANCE[m.id+'_'+d.id]==='H').length;
     const totalDates = DATES.filter(d => ATTENDANCE[m.id+'_'+d.id]).length || 1;
@@ -929,9 +934,27 @@ function renderAbsensi() {
       html += '<td><span class="dot ' + cls + '" onclick="cycleDot(this,' + m.id + ',\'' + d.id + '\')">' + label + '</span></td>';
     });
 
-    html += '<td><div class="pbar"><div class="pbar-track"><div class="pbar-fill" style="width:'+pct+'%;background:'+pctColor+'"></div></div><span class="pbar-val" style="color:'+pctColor+'">'+pct+'%</span></div></td>';
+    html += '<td><div class="pbar"><div class="pbar-track"><div class="pbar-fill" style="width:'+pct+'%;background:'+pctColor+'"></div></div><span class="pbar-val" style="color:'+pctColor+'">'+hadirCount+'/'+totalDates+' &middot; '+pct+'%</span></div></td>';
     html += '</tr>';
   });
+
+  // Total row: count hadir per-tanggal
+  html += '<tr style="background:linear-gradient(180deg,#fafafa,#f5f5f5);border-top:2px solid var(--g4);font-weight:700">';
+  html += '<td style="font-weight:700;color:var(--g2);font-size:11px;letter-spacing:.5px;text-transform:uppercase">Total Hadir</td>';
+  DATES.forEach((d, i) => {
+    const h = dateHadirCounts[i];
+    const t = dateTotalCounts[i] || MEMBERS.length;
+    const pctCol = t ? Math.round(h/t*100) : 0;
+    const col = pctCol >= 75 ? 'var(--green)' : pctCol >= 50 ? 'var(--orange)' : 'var(--red)';
+    html += '<td style="text-align:center;font-size:10px"><div style="font-weight:700;color:'+col+';line-height:1.1">'+h+'/'+t+'</div><div style="font-size:9px;color:var(--g4);font-weight:500">'+pctCol+'%</div></td>';
+  });
+  // Grand total
+  const grandHadir = dateHadirCounts.reduce((s,n)=>s+n,0);
+  const grandTotal = dateTotalCounts.reduce((s,n)=>s+n,0) || 1;
+  const grandPct = Math.round(grandHadir/grandTotal*100);
+  const grandCol = grandPct >= 75 ? 'var(--green)' : grandPct >= 50 ? 'var(--orange)' : 'var(--red)';
+  html += '<td style="text-align:center;font-size:11px"><div style="font-weight:800;color:'+grandCol+'">'+grandHadir+'/'+grandTotal+'</div><div style="font-size:9px;color:var(--g4)">'+grandPct+'%</div></td>';
+  html += '</tr>';
 
   html += '</tbody></table></div>';
   html += '<div style="font-size:10px;color:var(--g4);margin-top:10px;text-align:right">klik status untuk edit</div>';
