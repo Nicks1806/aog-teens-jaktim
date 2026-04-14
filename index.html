@@ -2553,12 +2553,22 @@ async function renderCoachOverview() {
   visiRegions.forEach(r => {
     const cv = visiData[r] || {visi:'',misi:''};
     const rlbl = r === 'jaktim1' ? 'Jaktim 1' : 'Jaktim 2';
-    html += '<div style="background:linear-gradient(135deg,#faf5ff,#f5f0ff);border:1.5px solid #c4b5fd;border-radius:14px;padding:14px 16px;margin-bottom:14px">';
-    html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><div style="font-size:10px;font-weight:700;letter-spacing:1.2px;color:var(--purple);text-transform:uppercase">🎯 Visi Coach '+rlbl+'</div><span style="font-size:9px;color:var(--g4)">auto-save saat klik di luar</span></div>';
-    html += '<textarea id="coachVisi_'+r+'" placeholder="Tulis visi untuk '+rlbl+'..." onblur="saveCoachVisiFromUI(\''+r+'\')" style="width:100%;min-height:60px;padding:10px 12px;border:1px solid var(--g5);border-radius:10px;font-family:Inter,sans-serif;font-size:12px;color:var(--g1);background:#fff;resize:vertical;line-height:1.5">'+esc(cv.visi||'')+'</textarea>';
-    html += '<div style="font-size:9px;font-weight:700;letter-spacing:1.2px;color:var(--purple);text-transform:uppercase;margin:10px 0 6px">Misi (opsional)</div>';
-    html += '<textarea id="coachMisi_'+r+'" placeholder="Tulis misi..." onblur="saveCoachVisiFromUI(\''+r+'\')" style="width:100%;min-height:50px;padding:10px 12px;border:1px solid var(--g5);border-radius:10px;font-family:Inter,sans-serif;font-size:12px;color:var(--g1);background:#fff;resize:vertical;line-height:1.5">'+esc(cv.misi||'')+'</textarea>';
-    html += '</div>';
+    const hasVisi = cv.visi && cv.visi.trim();
+    // Card container
+    html += '<div style="background:#fff;border:1px solid #e9e3ff;border-radius:16px;overflow:hidden;margin-bottom:16px;box-shadow:0 4px 20px rgba(108,92,231,.06)">';
+    // Header gradient bar
+    html += '<div style="background:linear-gradient(135deg,#6C5CE7,#a855f7);padding:14px 18px;display:flex;align-items:center;justify-content:space-between">';
+    html += '<div style="display:flex;align-items:center;gap:10px"><div style="width:32px;height:32px;border-radius:10px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></div>';
+    html += '<div><div style="font-weight:700;font-size:13px;color:#fff;letter-spacing:.3px">Visi '+rlbl+'</div><div style="font-size:10px;color:rgba(255,255,255,.7);margin-top:1px">Arah & tujuan CG region ini</div></div></div>';
+    html += '<span style="font-size:9px;color:rgba(255,255,255,.6);letter-spacing:.5px">auto-save</span></div>';
+    // Body — Visi
+    html += '<div style="padding:16px 18px">';
+    html += '<div style="margin-bottom:14px"><div style="font-size:10px;font-weight:700;letter-spacing:1px;color:var(--purple);text-transform:uppercase;margin-bottom:6px">Visi</div>';
+    html += '<textarea id="coachVisi_'+r+'" placeholder="Contoh: Loving God Loving People" onblur="saveCoachVisiFromUI(\''+r+'\')" style="width:100%;min-height:56px;padding:12px 14px;border:1.5px solid #e4dcff;border-radius:12px;font-family:\'Instrument Serif\',serif;font-size:16px;color:var(--g1);background:linear-gradient(135deg,#fdfaff,#fff);resize:vertical;line-height:1.4;transition:border-color .2s;font-style:italic" onfocus="this.style.borderColor=\'#6C5CE7\'" onblur="this.style.borderColor=\'#e4dcff\';saveCoachVisiFromUI(\''+r+'\')">'+esc(cv.visi||'')+'</textarea></div>';
+    // Body — Misi
+    html += '<div><div style="font-size:10px;font-weight:700;letter-spacing:1px;color:var(--g3);text-transform:uppercase;margin-bottom:6px">Misi <span style="font-weight:500;letter-spacing:0;text-transform:none;color:var(--g4)">(opsional)</span></div>';
+    html += '<textarea id="coachMisi_'+r+'" placeholder="Langkah konkret untuk mencapai visi..." onblur="saveCoachVisiFromUI(\''+r+'\')" style="width:100%;min-height:48px;padding:10px 14px;border:1.5px solid var(--g5);border-radius:12px;font-family:Inter,sans-serif;font-size:12px;color:var(--g2);background:#fafafa;resize:vertical;line-height:1.5;transition:border-color .2s" onfocus="this.style.borderColor=\'#6C5CE7\';this.style.background=\'#fff\'" onblur="this.style.borderColor=\'var(--g5)\';this.style.background=\'#fafafa\';saveCoachVisiFromUI(\''+r+'\')">'+esc(cv.misi||'')+'</textarea></div>';
+    html += '</div></div>';
   });
 
   // CG Cards Grid
