@@ -540,6 +540,9 @@ function handlePelayananChange(payload) {
 function handleEventsChange(payload) {
   rtDebounce('events', async () => {
     try {
+      // Invalidate cache supaya refetch saat render
+      _CACHED_CG_EVENTS = null;
+      _CACHED_ALL_CG_EVENTS = null;
       if (document.getElementById('tab-events')?.classList.contains('active')) {
         TAB_RENDERED.events = false;
         await ensureTabRendered('events');
@@ -762,7 +765,7 @@ function eventCountdownBadge(dateStart) {
   return '<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:'+bg+';color:'+col+';margin-left:8px;white-space:nowrap">'+txt+'</span>';
 }
 let EV_FILTER = 'all';
-function setEventFilter(key,btn){ EV_FILTER = key; renderEvents(); }
+function setEventFilter(key,btn){ EV_FILTER = key; renderEvents(false); }
 let CUR_CG_INFO = null;
 let MEMBERS = [];
 let DATES = [];
@@ -939,6 +942,7 @@ async function openCGDashboard(cg) {
 
   // Reset default tab + clear stale global data segera (sebelum async load)
   MEMBERS = []; DATES = []; ATTENDANCE = {};
+  _CACHED_CG_EVENTS = null; // Reset event cache untuk CG baru
   document.querySelectorAll('#pageD .app-tab').forEach((t,i) => t.classList.toggle('on', i===0));
   document.querySelectorAll('#pageD .tab-content').forEach((t,i) => t.classList.toggle('active', i===0));
 
@@ -2102,15 +2106,18 @@ function renderMilestone() {
 }
 
 // ========== EVENTS TAB ==========
-async function renderEvents() {
+let _CACHED_CG_EVENTS = null; // Cache untuk hindari re-fetch saat filter chip diklik
+
+async function renderEvents(forceRefetch) {
   const el = document.getElementById('tab-events');
 
-  // Load from Supabase events table
-  const { data: events } = await supa.from('events').select('id,name,date_start,date_end,cat,note,image').order('date_start');
-  ALL_EVENTS = events || [];
-
-  // Load CG-specific events from Supabase
-  const cgEvents = await loadCGEventsForCG(CUR_CG, CUR_REGION);
+  // Fetch data hanya kalau belum ada cache atau forceRefetch
+  if (forceRefetch || !_CACHED_CG_EVENTS) {
+    const { data: events } = await supa.from('events').select('id,name,date_start,date_end,cat,note,image').order('date_start');
+    ALL_EVENTS = events || [];
+    _CACHED_CG_EVENTS = await loadCGEventsForCG(CUR_CG, CUR_REGION);
+  }
+  const cgEvents = _CACHED_CG_EVENTS || [];
 
   // Birthdays from members - calculate next occurrence + days left
   function parseBirthday(s){
@@ -2254,8 +2261,8 @@ async function deleteEventCard(evId) {
   }
   toast('✓ Event dihapus');
   const pageC = document.getElementById('pageC');
-  if (pageC && pageC.style.display === 'block') { await renderCoachEvents(); }
-  else { renderEvents(); }
+  if (pageC && pageC.style.display === 'block') { await renderCoachEvents(true); }
+  else { await renderEvents(true); }
 }
 
 // ===== Edit event =====
@@ -2334,8 +2341,8 @@ async function saveCGEvent() {
   window.__evImageDataUrl = '';
   closeModal('addCGEventModal');
   const pageC2 = document.getElementById('pageC');
-  if (pageC2 && pageC2.style.display === 'block') { await renderCoachEvents(); }
-  else { await renderEvents(); }
+  if (pageC2 && pageC2.style.display === 'block') { await renderCoachEvents(true); }
+  else { await renderEvents(true); }
 }
 
 // Reset edit mode when opening modal via "+ Tambah Event CG" button
@@ -3071,14 +3078,19 @@ async function saveCoachVisiField(textarea) {
 }
 
 let COACH_EV_FILTER = 'all';
-function setCoachEventFilter(f) { COACH_EV_FILTER = f; renderCoachEvents(); }
+function setCoachEventFilter(f) { COACH_EV_FILTER = f; renderCoachEvents(false); }
 
-async function renderCoachEvents() {
+let _CACHED_ALL_CG_EVENTS = null;
+
+async function renderCoachEvents(forceRefetch) {
   const el = document.getElementById('tab-c-events');
   const cgs = coachRole === 'tl' ? getCGsForRegion('all') : getCGsForRegion(coachReg);
 
-  // Load all CG events from Supabase
-  const allCGEventsData = await loadAllCGEvents();
+  // Fetch hanya kalau belum ada cache atau force
+  if (forceRefetch || !_CACHED_ALL_CG_EVENTS) {
+    _CACHED_ALL_CG_EVENTS = await loadAllCGEvents();
+  }
+  const allCGEventsData = _CACHED_ALL_CG_EVENTS || [];
   const sharedEvents = allCGEventsData.filter(e => e.is_shared);
   const perCGEvents = {};
   allCGEventsData.filter(e => !e.is_shared).forEach(e => {
@@ -3197,7 +3209,7 @@ async function saveCoachEvent() {
       name, date_start: dateVal, cat, note
     });
   }
-  await renderCoachEvents();
+  await renderCoachEvents(true);
 }
 
 async function switchRole(role) {
@@ -3218,11 +3230,12 @@ async function switchRole(role) {
     label.textContent = 'Coach';
     heroH.innerHTML = 'Semua<br><em>CG.</em>';
   }
+  _CACHED_ALL_CG_EVENTS = null; // Reset coach event cache saat switch role
   renderCoachOverview();
   renderCoachAbsensi();
   renderCoachMilestone();
   await renderCoachVisi();
-  await renderCoachEvents();
+  await renderCoachEvents(true);
 }
 
 // ========== UTILITY ==========
