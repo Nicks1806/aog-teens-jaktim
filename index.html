@@ -1235,7 +1235,12 @@ function renderAbsensi() {
 
   // Per-date column totals + grand totals (basis = datesView)
   const dateHadirCounts = datesView.map(d => MEMBERS.filter(m => ATTENDANCE[m.id+'_'+d.id]==='H').length);
-  const dateTotalCounts = datesView.map(d => MEMBERS.filter(m => ATTENDANCE[m.id+'_'+d.id]).length);
+  // Denominator = total member (bukan cuma yg ter-record). Member belum diisi = dianggap tidak hadir.
+  // Kalau TIDAK ADA record sama sekali di tanggal itu → 0 (tanggal belum diisi siapapun)
+  const dateTotalCounts = datesView.map(d => {
+    const anyRecord = MEMBERS.some(m => ATTENDANCE[m.id+'_'+d.id]);
+    return anyRecord ? MEMBERS.length : 0;
+  });
 
   sortedMembers.forEach(m => {
     const hadirCount = datesView.filter(d => ATTENDANCE[m.id+'_'+d.id]==='H').length;
@@ -1263,7 +1268,7 @@ function renderAbsensi() {
   html += '<td style="font-weight:700;color:var(--g2);font-size:11px;letter-spacing:.5px;text-transform:uppercase">Total Hadir</td>';
   datesView.forEach((d, i) => {
     const h = dateHadirCounts[i];
-    const t = dateTotalCounts[i] || MEMBERS.length;
+    const t = dateTotalCounts[i];
     const pctCol = t ? Math.round(h/t*100) : 0;
     const col = pctCol >= 75 ? 'var(--green)' : pctCol >= 50 ? 'var(--orange)' : 'var(--red)';
     html += '<td style="text-align:center;font-size:10px"><div style="font-weight:700;color:'+col+';line-height:1.1">'+h+'/'+t+'</div><div style="font-size:9px;color:var(--g4);font-weight:500">'+pctCol+'%</div></td>';
