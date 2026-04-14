@@ -812,7 +812,9 @@ function closeModal(id) { document.getElementById(id).classList.remove('show'); 
 
 // ========== LANDING ==========
 async function loadCGLDropdown() {
-  const { data: members } = await supa.from('members').select('id,nama,cg,status,region').order('cg');
+  // HARUS select('*') karena ALL_MEMBERS juga dipakai Coach dashboard
+  // (milestone, birthday, dll butuh msj1-3, cgt1-3, baptis_air/roh, lahir)
+  const { data: members } = await supa.from('members').select('*').order('cg');
   if (!members) return;
   ALL_MEMBERS = members;
   popDD();
