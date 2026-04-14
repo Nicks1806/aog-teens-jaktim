@@ -3031,57 +3031,78 @@ async function renderCoachVisi() {
     const devPlan = cd.devPlan || [];
     const cgRegion = cd.region || 'jaktim1';
 
-    // ── Card wrapper ──
-    html += '<div style="background:#fff;border:1px solid #e9e3ff;border-radius:16px;overflow:hidden;margin-bottom:20px;box-shadow:0 4px 20px rgba(108,92,231,.06)">';
+    // Quick stats pills
+    const msPct = stats.msPct || 0;
+    const devCount = devPlan.length;
+    const hasNotes = coachNotes.trim().length > 0;
 
-    // ── Header with gradient ──
-    html += '<div style="background:linear-gradient(135deg,'+color+','+color+'cc);padding:16px 20px;display:flex;align-items:center;justify-content:space-between">';
-    html += '<div style="display:flex;align-items:center;gap:12px"><div style="width:42px;height:42px;border-radius:12px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:12px;letter-spacing:.3px;backdrop-filter:blur(4px)">'+esc(init)+'</div>';
-    html += '<div><div style="font-weight:700;font-size:15px;color:#fff">'+esc(cg)+'</div><div style="font-size:11px;color:rgba(255,255,255,.8)">CGL: '+esc(stats.leader)+' · '+stats.total+' member</div></div></div>';
-    html += '<div style="text-align:right"><div style="font-family:\'Instrument Serif\',serif;font-size:28px;color:#fff;line-height:1">'+stats.pct+'%</div><div style="font-size:9px;color:rgba(255,255,255,.7);letter-spacing:.5px">Kehadiran</div></div></div>';
+    // ── Accordion card wrapper ──
+    html += '<div style="background:#fff;border:1px solid '+color+'22;border-radius:16px;overflow:hidden;margin-bottom:12px;box-shadow:0 2px 12px rgba(0,0,0,.04);transition:box-shadow .2s" onmouseover="this.style.boxShadow=\'0 6px 24px '+color+'18\'" onmouseout="this.style.boxShadow=\'0 2px 12px rgba(0,0,0,.04)\'">';
 
-    // ── Body — 4 cards vertikal, masing-masing distinct ──
+    // ── Clickable header (always visible) ──
+    html += '<div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\';this.querySelector(\'.visi-arrow\').textContent=this.nextElementSibling.style.display===\'none\'?\'+\':\'\u2212\'" style="padding:14px 18px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;background:linear-gradient(135deg,'+bg+' 0%,#fff 100%);border-left:4px solid '+color+';transition:background .15s" onmouseover="this.style.background=\''+bg+'\'" onmouseout="this.style.background=\'linear-gradient(135deg,'+bg+' 0%,#fff 100%)\'">';
+
+    // Left: badge + info
+    html += '<div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0">';
+    html += '<div style="width:40px;height:40px;border-radius:10px;background:'+color+';display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:11px;letter-spacing:.3px;flex-shrink:0">'+esc(init)+'</div>';
+    html += '<div style="flex:1;min-width:0"><div style="font-weight:700;font-size:14px;color:var(--g1)">'+esc(cg)+'</div>';
+    html += '<div style="font-size:10px;color:var(--g3);margin-top:2px">CGL: '+esc(stats.leader)+' · '+stats.total+' member</div></div></div>';
+
+    // Right: quick stats + % + arrow
+    html += '<div style="display:flex;align-items:center;gap:10px;flex-shrink:0">';
+    // Mini stat pills
+    html += '<div style="display:flex;gap:4px">';
+    if (vision) html += '<span style="padding:2px 6px;border-radius:6px;background:#f0fdf4;color:#16a34a;font-size:9px;font-weight:700">Visi</span>';
+    if (devCount) html += '<span style="padding:2px 6px;border-radius:6px;background:#eff6ff;color:#2563eb;font-size:9px;font-weight:700">'+devCount+' Dev</span>';
+    if (hasNotes) html += '<span style="padding:2px 6px;border-radius:6px;background:'+bg+';color:'+color+';font-size:9px;font-weight:700">Notes</span>';
+    html += '</div>';
+    html += '<div style="text-align:right"><div style="font-family:\'Instrument Serif\',serif;font-size:22px;color:'+color+';line-height:1">'+stats.pct+'%</div><div style="font-size:8px;color:var(--g4);letter-spacing:.5px">Hadir</div></div>';
+    html += '<span class="visi-arrow" style="font-size:18px;color:var(--g3);font-weight:300;width:20px;text-align:center">+</span>';
+    html += '</div></div>';
+
+    // ── Collapsible body (hidden by default) ──
+    html += '<div style="display:none;border-top:1px solid '+color+'15">';
     html += '<div style="padding:16px 18px;display:flex;flex-direction:column;gap:12px">';
 
-    // Card 1 — Visi (prominent, serif)
-    html += '<div style="background:linear-gradient(135deg,#fdfaff,#fff);border:1.5px solid #e4dcff;border-radius:14px;padding:14px 16px">';
-    html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><div style="width:24px;height:24px;border-radius:8px;background:linear-gradient(135deg,#6C5CE7,#a855f7);display:flex;align-items:center;justify-content:center"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></div><span style="font-size:11px;font-weight:700;letter-spacing:.8px;color:var(--purple);text-transform:uppercase">Visi</span><span style="font-size:9px;color:var(--g4);margin-left:auto">auto-save</span></div>';
-    html += '<textarea class="vedit" style="min-height:44px;font-family:\'Instrument Serif\',serif;font-size:16px;font-style:italic;line-height:1.3;border-color:#e4dcff;background:transparent" data-cg="'+cg+'" data-region="'+cgRegion+'" data-type="vision" onfocus="this.style.borderColor=\'#6C5CE7\'" onblur="this.style.borderColor=\'#e4dcff\';saveCoachVisiField(this)" placeholder="Tulis visi CG...">'+esc(vision)+'</textarea></div>';
+    // Card 1 — Visi
+    html += '<div style="background:linear-gradient(135deg,#fdfaff,#fff);border:1.5px solid #e4dcff;border-radius:12px;padding:12px 14px">';
+    html += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px"><div style="width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,#6C5CE7,#a855f7);display:flex;align-items:center;justify-content:center"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></div><span style="font-size:10px;font-weight:700;letter-spacing:.8px;color:var(--purple);text-transform:uppercase">Visi</span></div>';
+    html += '<textarea class="vedit" style="min-height:40px;font-family:\'Instrument Serif\',serif;font-size:15px;font-style:italic;line-height:1.3;border-color:#e4dcff;background:transparent" data-cg="'+cg+'" data-region="'+cgRegion+'" data-type="vision" onfocus="this.style.borderColor=\'#6C5CE7\'" onblur="this.style.borderColor=\'#e4dcff\';saveCoachVisiField(this)" placeholder="Tulis visi CG...">'+esc(vision)+'</textarea></div>';
 
-    // Card 2 — Misi (secondary)
-    html += '<div style="background:#fafafa;border:1.5px solid var(--g5);border-radius:14px;padding:14px 16px">';
-    html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><div style="width:24px;height:24px;border-radius:8px;background:#e5e7eb;display:flex;align-items:center;justify-content:center"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2.5"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></div><span style="font-size:11px;font-weight:700;letter-spacing:.8px;color:var(--g3);text-transform:uppercase">Misi</span></div>';
-    html += '<textarea class="vedit" style="min-height:40px;font-size:12px;line-height:1.4;border-color:var(--g5);background:transparent" data-cg="'+cg+'" data-region="'+cgRegion+'" data-type="mission" onfocus="this.style.borderColor=\'#6C5CE7\';this.parentElement.style.background=\'#fff\'" onblur="this.style.borderColor=\'var(--g5)\';this.parentElement.style.background=\'#fafafa\';saveCoachVisiField(this)" placeholder="Langkah konkret...">'+esc(mission)+'</textarea></div>';
+    // Card 2 — Misi
+    html += '<div style="background:#fafafa;border:1.5px solid var(--g5);border-radius:12px;padding:12px 14px">';
+    html += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px"><div style="width:20px;height:20px;border-radius:6px;background:#e5e7eb;display:flex;align-items:center;justify-content:center"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2.5"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></div><span style="font-size:10px;font-weight:700;letter-spacing:.8px;color:var(--g3);text-transform:uppercase">Misi</span></div>';
+    html += '<textarea class="vedit" style="min-height:36px;font-size:12px;line-height:1.4;border-color:var(--g5);background:transparent" data-cg="'+cg+'" data-region="'+cgRegion+'" data-type="mission" onfocus="this.style.borderColor=\'#6C5CE7\';this.parentElement.style.background=\'#fff\'" onblur="this.style.borderColor=\'var(--g5)\';this.parentElement.style.background=\'#fafafa\';saveCoachVisiField(this)" placeholder="Langkah konkret...">'+esc(mission)+'</textarea></div>';
 
-    // Card 3 — Dev Plan (read-only list)
-    html += '<div style="background:#fff;border:1.5px solid #dbeafe;border-radius:14px;padding:14px 16px">';
-    html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><div style="width:24px;height:24px;border-radius:8px;background:linear-gradient(135deg,#2563eb,#60a5fa);display:flex;align-items:center;justify-content:center"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><span style="font-size:11px;font-weight:700;letter-spacing:.8px;color:#1e40af;text-transform:uppercase">Dev Plan</span><span style="font-size:9px;color:var(--g4);margin-left:auto">oleh CGL</span></div>';
+    // Card 3 — Dev Plan
+    html += '<div style="background:#fff;border:1.5px solid #dbeafe;border-radius:12px;padding:12px 14px">';
+    html += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px"><div style="width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,#2563eb,#60a5fa);display:flex;align-items:center;justify-content:center"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><span style="font-size:10px;font-weight:700;letter-spacing:.8px;color:#1e40af;text-transform:uppercase">Dev Plan</span></div>';
     if (devPlan.length) {
       devPlan.forEach(d => {
         const memberName = d.member_name || d.name || '';
         const currentRole = d.current_status || d.currentRole || 'Member';
         const targetRole = d.target_status || d.target || 'Sponsor';
         const roleCls = (currentRole).toLowerCase();
-        html += '<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #f0f4ff;font-size:12px">';
+        html += '<div style="display:flex;align-items:center;gap:6px;padding:6px 0;border-bottom:1px solid #f0f4ff;font-size:11px">';
         html += '<span style="font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(memberName)+'</span>';
-        html += '<span class="role-btn '+roleCls+'" style="cursor:default;font-size:9px;padding:2px 8px">'+esc(currentRole)+'</span>';
-        html += '<span style="color:var(--g4);font-size:10px">\u2192</span>';
-        html += '<span class="role-btn sponsor" style="cursor:default;font-size:9px;padding:2px 8px">'+esc(targetRole)+'</span>';
-        if (d.deadline) html += '<span style="font-size:9px;color:var(--g4);margin-left:4px">'+esc(d.deadline)+'</span>';
+        html += '<span class="role-btn '+roleCls+'" style="cursor:default;font-size:8px;padding:2px 6px">'+esc(currentRole)+'</span>';
+        html += '<span style="color:var(--g4);font-size:9px">\u2192</span>';
+        html += '<span class="role-btn sponsor" style="cursor:default;font-size:8px;padding:2px 6px">'+esc(targetRole)+'</span>';
         html += '</div>';
       });
     } else {
-      html += '<div style="font-size:11px;color:var(--g4);font-style:italic;padding:4px 0">Belum ada dev plan</div>';
+      html += '<div style="font-size:11px;color:var(--g4);font-style:italic">Belum ada dev plan</div>';
     }
     html += '</div>';
 
-    // Card 4 — Catatan Coach (editable, CG-colored)
-    html += '<div style="background:'+bg+';border:1.5px solid '+color+'33;border-radius:14px;padding:14px 16px">';
-    html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><div style="width:24px;height:24px;border-radius:8px;background:'+color+';display:flex;align-items:center;justify-content:center"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><span style="font-size:11px;font-weight:700;letter-spacing:.8px;color:'+color+';text-transform:uppercase">Catatan Coach</span></div>';
-    html += '<textarea class="vedit" style="min-height:44px;font-size:12px;line-height:1.4;border-color:'+color+'44;background:rgba(255,255,255,.6)" data-cg="'+cg+'" data-region="'+cgRegion+'" data-type="coach_notes" onfocus="this.style.borderColor=\''+color+'\';this.style.background=\'#fff\'" onblur="this.style.borderColor=\''+color+'44\';this.style.background=\'rgba(255,255,255,.6)\';saveCoachVisiField(this)" placeholder="Tulis catatan untuk CGL...">'+esc(coachNotes)+'</textarea>';
+    // Card 4 — Catatan Coach
+    html += '<div style="background:'+bg+';border:1.5px solid '+color+'33;border-radius:12px;padding:12px 14px">';
+    html += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px"><div style="width:20px;height:20px;border-radius:6px;background:'+color+';display:flex;align-items:center;justify-content:center"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><span style="font-size:10px;font-weight:700;letter-spacing:.8px;color:'+color+';text-transform:uppercase">Catatan Coach</span></div>';
+    html += '<textarea class="vedit" style="min-height:40px;font-size:12px;line-height:1.4;border-color:'+color+'44;background:rgba(255,255,255,.6)" data-cg="'+cg+'" data-region="'+cgRegion+'" data-type="coach_notes" onfocus="this.style.borderColor=\''+color+'\';this.style.background=\'#fff\'" onblur="this.style.borderColor=\''+color+'44\';this.style.background=\'rgba(255,255,255,.6)\';saveCoachVisiField(this)" placeholder="Tulis catatan untuk CGL...">'+esc(coachNotes)+'</textarea>';
     html += '</div>';
 
-    html += '</div></div>'; // end body + card
+    html += '</div></div>'; // end collapsible body
+    html += '</div>'; // end card wrapper
   });
 
   el.innerHTML = html;
