@@ -24,11 +24,6 @@ body{font-family:'Inter',sans-serif;background:#f8f8f5;color:#1c1c1c;min-height:
 
 /* Custom dropdown */
 .cgl-selector{width:100%;max-width:420px;margin-bottom:16px;position:relative}
-.cgl-select{position:relative;z-index:1;width:100%;padding:18px 52px 18px 52px;border:1.5px solid rgba(108,92,231,.18);border-radius:16px;font-size:14px;font-family:'Inter',sans-serif;font-weight:600;color:var(--g1);appearance:none;background:linear-gradient(135deg,#ffffff 0%,#faf8ff 100%) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%236C5CE7' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 18px center;cursor:pointer;transition:all .25s cubic-bezier(.4,0,.2,1);box-shadow:0 4px 14px rgba(108,92,231,.08),0 1px 2px rgba(0,0,0,.04);letter-spacing:.2px}
-.cgl-select:hover{border-color:rgba(108,92,231,.45);box-shadow:0 8px 22px rgba(108,92,231,.15),0 2px 6px rgba(108,92,231,.08);transform:translateY(-1px)}
-.cgl-select:focus{outline:none;border-color:var(--purple);box-shadow:0 0 0 4px rgba(108,92,231,.18),0 10px 28px rgba(108,92,231,.2)}
-.cgl-select option{padding:14px;font-weight:500;background:#fff;color:var(--g1)}
-.cgl-select option:disabled{color:var(--g4);font-style:italic}
 
 /* Enter button */
 .enter-btn{width:100%;max-width:420px;padding:16px;border:none;border-radius:16px;background:linear-gradient(135deg,#6C5CE7,#8B5CF6);color:#fff;font-size:15px;font-weight:700;letter-spacing:.5px;cursor:pointer;transition:all .25s cubic-bezier(.4,0,.2,1);box-shadow:0 6px 20px rgba(108,92,231,.35);position:relative;overflow:hidden}
@@ -522,7 +517,7 @@ function handleMembersChange(payload) {
           await ensureCoachTabRendered(id);
         }
       }
-    } catch(e) { console.warn('[rt members]', e); }
+    } catch(e) { void 0; }
   }, 600);
 }
 
@@ -537,7 +532,7 @@ function handlePelayananChange(payload) {
         TAB_RENDERED.pelayanan = false;
         await ensureTabRendered('pelayanan');
       }
-    } catch(e) { console.warn('[rt pelayanan]', e); }
+    } catch(e) { void 0; }
   }, 500);
 }
 
@@ -553,7 +548,7 @@ function handleEventsChange(payload) {
         COACH_TAB_RENDERED['c-events'] = false;
         await ensureCoachTabRendered('c-events');
       }
-    } catch(e) { console.warn('[rt events]', e); }
+    } catch(e) { void 0; }
   }, 500);
 }
 
@@ -581,13 +576,13 @@ function handleVisionChange(payload) {
         COACH_TAB_RENDERED['c-visi'] = false;
         await ensureCoachTabRendered('c-visi');
       }
-    } catch(e) { console.warn('[rt vision]', e); }
+    } catch(e) { void 0; }
   }, 500);
 }
 
 // ========== SUPABASE HELPERS (new tables) ==========
 async function loadVision(cg, region) {
-  const {data} = await supa.from('cg_vision').select('*').eq('cg', cg).eq('region', region).maybeSingle();
+  const {data} = await supa.from('cg_vision').select('id,cg,region,visi,misi').eq('cg', cg).eq('region', region).maybeSingle();
   return data || {visi:'', misi:''};
 }
 async function saveVision(cg, region, visi, misi) {
@@ -612,7 +607,7 @@ async function saveCoachVisiFromUI(region) {
 async function loadCoachRegionVision(region) {
   if (!region || region === 'all') return {visi:'', misi:''};
   const cg = '__COACH_'+region+'__';
-  const {data} = await supa.from('cg_vision').select('*').eq('cg', cg).eq('region', region).maybeSingle();
+  const {data} = await supa.from('cg_vision').select('id,cg,region,visi,misi').eq('cg', cg).eq('region', region).maybeSingle();
   return data || {visi:'', misi:''};
 }
 async function saveCoachRegionVision(region, visi, misi) {
@@ -622,7 +617,7 @@ async function saveCoachRegionVision(region, visi, misi) {
 }
 
 async function loadDevPlans(cg, region) {
-  const {data} = await supa.from('cg_dev_plans').select('*').eq('cg', cg).eq('region', region).order('created_at');
+  const {data} = await supa.from('cg_dev_plans').select('id,cg,region,member_name,current_status,target_status,deadline,created_at').eq('cg', cg).eq('region', region).order('created_at');
   return data || [];
 }
 async function addDevPlan(cg, region, member_name, current_status, target_status, deadline) {
@@ -658,7 +653,7 @@ async function saveCoachNoteDB(cg, region, note) {
 }
 
 async function loadPelayanan(cg, region) {
-  const {data} = await supa.from('cg_pelayanan').select('*').eq('cg', cg).eq('region', region);
+  const {data} = await supa.from('cg_pelayanan').select('cg,region,month,week_date,role_name,member_name').eq('cg', cg).eq('region', region);
   return data || [];
 }
 async function savePelayananCell(cg, region, month, week_date, role_name, member_name) {
@@ -682,15 +677,15 @@ async function addCustomRole(cg, region, role_name, abbr, color, bg) {
 }
 
 async function loadCGEvents(cg, region) {
-  const {data} = await supa.from('cg_events').select('*').or('and(cg.eq.'+cg+',region.eq.'+region+',is_shared.eq.false),is_shared.eq.true').order('date_start');
+  const {data} = await supa.from('cg_events').select('id,cg,region,is_shared,name,date_start,date_end,cat,note,image').or('and(cg.eq.'+cg+',region.eq.'+region+',is_shared.eq.false),is_shared.eq.true').order('date_start');
   return data || [];
 }
 async function loadCGEventsForCG(cg, region) {
-  const {data} = await supa.from('cg_events').select('*').eq('cg', cg).eq('region', region).eq('is_shared', false).order('date_start');
+  const {data} = await supa.from('cg_events').select('id,cg,region,is_shared,name,date_start,date_end,cat,note,image').eq('cg', cg).eq('region', region).eq('is_shared', false).order('date_start');
   return data || [];
 }
 async function loadAllCGEvents() {
-  const {data} = await supa.from('cg_events').select('*').order('date_start');
+  const {data} = await supa.from('cg_events').select('id,cg,region,is_shared,name,date_start,date_end,cat,note,image').order('date_start');
   return data || [];
 }
 async function addCGEvent(eventData) {
@@ -745,7 +740,7 @@ async function cleanupPastEvents() {
     await supa.from('cg_events').delete().lt('date_end', todayStr).not('date_end','is',null);
     await supa.from('cg_events').delete().lt('date_start', todayStr).is('date_end', null);
   } catch(e) {
-    console.warn('[cleanupPastEvents] skip:', e.message);
+    void 0;
   }
 }
 
@@ -961,9 +956,9 @@ async function openCGDashboard(cg) {
 
   // Parallel load semua data utama
   const [cgInfoRes, memsRes, datesRes] = await Promise.all([
-    supa.from('cg_info').select('*').eq('cg', cg),
+    supa.from('cg_info').select('cg,leader,hari_jam,lokasi').eq('cg', cg),
     supa.from('members').select('*').eq('cg', cg).order('nama'),
-    supa.from('dates').select('*').eq('region', region).order('sort_order')
+    supa.from('dates').select('id,label,region,sort_order,month_code').eq('region', region).order('sort_order')
   ]);
 
   CUR_CG_INFO = cgInfoRes.data && cgInfoRes.data[0] ? cgInfoRes.data[0] : {};
@@ -976,7 +971,7 @@ async function openCGDashboard(cg) {
   const dateIds = DATES.map(d => d.id);
   ATTENDANCE = {};
   if (memberIds.length && dateIds.length) {
-    const { data: att } = await supa.from('attendance').select('*').in('member_id', memberIds).in('date_id', dateIds);
+    const { data: att } = await supa.from('attendance').select('member_id,date_id,status').in('member_id', memberIds).in('date_id', dateIds);
     (att || []).forEach(a => { ATTENDANCE[a.member_id + '_' + a.date_id] = a.status; });
   }
 
@@ -1020,7 +1015,7 @@ async function openCGDashboard(cg) {
     ensureTabRendered('visi'),
     ensureTabRendered('pelayanan'),
     ensureTabRendered('events')
-  ]).catch(e => console.warn('[prefetch tabs]', e));
+  ]).catch(()=>{});
 }
 
 // Lazy render untuk tab yang dipilih
@@ -1458,7 +1453,7 @@ async function saveNewMember() {
     const memberIds = MEMBERS.map(m => m.id);
     const dateIds = DATES.map(d => d.id);
     if (memberIds.length && dateIds.length) {
-      const { data: att } = await supa.from('attendance').select('*').in('member_id', memberIds).in('date_id', dateIds);
+      const { data: att } = await supa.from('attendance').select('member_id,date_id,status').in('member_id', memberIds).in('date_id', dateIds);
       ATTENDANCE = {};
       (att || []).forEach(a => { ATTENDANCE[a.member_id + '_' + a.date_id] = a.status; });
     }
@@ -1897,7 +1892,7 @@ async function editPelWeek(oldDate) {
   const newDate = await asyncPrompt('Edit tanggal (YYYY-MM-DD)', oldDate);
   if (!newDate || newDate === oldDate) return;
   // Get all rows for old date and re-insert with new date
-  const {data: rows} = await supa.from('cg_pelayanan').select('*').eq('cg', CUR_CG).eq('region', CUR_REGION).eq('week_date', oldDate);
+  const {data: rows} = await supa.from('cg_pelayanan').select('cg,region,month,week_date,role_name,member_name').eq('cg', CUR_CG).eq('region', CUR_REGION).eq('week_date', oldDate);
   if (rows && rows.length) {
     for (const r of rows) {
       await savePelayananCell(CUR_CG, CUR_REGION, r.month, newDate, r.role_name, r.member_name);
@@ -2109,7 +2104,7 @@ async function renderEvents() {
   const el = document.getElementById('tab-events');
 
   // Load from Supabase events table
-  const { data: events } = await supa.from('events').select('*').order('date_start');
+  const { data: events } = await supa.from('events').select('id,name,date_start,date_end,cat,note,image').order('date_start');
   ALL_EVENTS = events || [];
 
   // Load CG-specific events from Supabase
@@ -2438,10 +2433,10 @@ async function loadCoachData() {
   await cleanupPastEvents();
   const [membersRes, cgInfoRes, datesRes, attendanceRes, eventsRes] = await Promise.all([
     supa.from('members').select('*').order('cg,nama'),
-    supa.from('cg_info').select('*'),
-    supa.from('dates').select('*').order('sort_order'),
-    supa.from('attendance').select('*'),
-    supa.from('events').select('*').order('date_start')
+    supa.from('cg_info').select('cg,leader,hari_jam,lokasi'),
+    supa.from('dates').select('id,label,region,sort_order,month_code').order('sort_order'),
+    supa.from('attendance').select('member_id,date_id,status'),
+    supa.from('events').select('id,name,date_start,date_end,cat,note,image').order('date_start')
   ]);
 
   ALL_MEMBERS = membersRes.data || [];
@@ -2468,7 +2463,7 @@ async function loadCoachData() {
   Promise.all([
     ensureCoachTabRendered('c-visi'),
     ensureCoachTabRendered('c-events')
-  ]).catch(e => console.warn('[coach prefetch]', e));
+  ]).catch(()=>{});
 }
 
 let COACH_TAB_RENDERED = {};
