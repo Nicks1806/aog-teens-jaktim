@@ -3026,37 +3026,62 @@ async function renderCoachVisi() {
     const devPlan = cd.devPlan || [];
     const cgRegion = cd.region || 'jaktim1';
 
-    html += '<div style="background:var(--white);border-radius:16px;overflow:hidden;margin-bottom:16px;box-shadow:0 2px 12px rgba(0,0,0,.04)">';
-    html += '<div style="background:linear-gradient(135deg,'+bg+','+bg+'cc);padding:16px 20px;display:flex;align-items:center;justify-content:space-between">';
-    html += '<div style="display:flex;align-items:center;gap:10px"><div style="width:40px;height:40px;border-radius:10px;background:'+color+';display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:11px">'+esc(init)+'</div>';
-    html += '<div><div style="font-weight:700;font-size:14px">'+esc(cg)+'</div><div style="font-size:11px;color:var(--g3)">CGL: '+esc(stats.leader)+'</div></div></div>';
-    html += '<div style="text-align:right"><div style="font-family:\'Instrument Serif\',serif;font-size:22px;color:'+color+'">'+stats.pct+'%</div><div style="font-size:9px;color:var(--g3)">Kehadiran</div></div></div>';
+    // ── Card wrapper ──
+    html += '<div style="background:#fff;border:1px solid #e9e3ff;border-radius:16px;overflow:hidden;margin-bottom:20px;box-shadow:0 4px 20px rgba(108,92,231,.06)">';
 
-    html += '<div style="padding:16px 20px">';
-    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">';
-    html += '<div style="background:var(--g6);border-radius:10px;padding:10px"><div style="font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--g3);margin-bottom:4px">Visi</div><textarea class="vedit" style="min-height:40px;font-size:12px" data-cg="'+cg+'" data-region="'+cgRegion+'" data-type="vision" onblur="saveCoachVisiField(this)">'+esc(vision)+'</textarea></div>';
-    html += '<div style="background:var(--g6);border-radius:10px;padding:10px"><div style="font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--g3);margin-bottom:4px">Misi</div><textarea class="vedit" style="min-height:40px;font-size:12px" data-cg="'+cg+'" data-region="'+cgRegion+'" data-type="mission" onblur="saveCoachVisiField(this)">'+esc(mission)+'</textarea></div>';
+    // ── Header with gradient ──
+    html += '<div style="background:linear-gradient(135deg,'+color+','+color+'cc);padding:16px 20px;display:flex;align-items:center;justify-content:space-between">';
+    html += '<div style="display:flex;align-items:center;gap:12px"><div style="width:42px;height:42px;border-radius:12px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:12px;letter-spacing:.3px;backdrop-filter:blur(4px)">'+esc(init)+'</div>';
+    html += '<div><div style="font-weight:700;font-size:15px;color:#fff">'+esc(cg)+'</div><div style="font-size:11px;color:rgba(255,255,255,.8)">CGL: '+esc(stats.leader)+' · '+stats.total+' member</div></div></div>';
+    html += '<div style="text-align:right"><div style="font-family:\'Instrument Serif\',serif;font-size:28px;color:#fff;line-height:1">'+stats.pct+'%</div><div style="font-size:9px;color:rgba(255,255,255,.7);letter-spacing:.5px">Kehadiran</div></div></div>';
+
+    // ── Body ──
+    html += '<div style="padding:18px 20px">';
+
+    // Visi & Misi side by side
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">';
+    // Visi card
+    html += '<div style="background:linear-gradient(135deg,#fdfaff,#fff);border:1.5px solid #e4dcff;border-radius:12px;padding:12px 14px">';
+    html += '<div style="font-size:9px;font-weight:700;letter-spacing:1.2px;color:var(--purple);text-transform:uppercase;margin-bottom:6px">Visi</div>';
+    html += '<textarea class="vedit" style="min-height:48px;font-family:\'Instrument Serif\',serif;font-size:15px;font-style:italic;line-height:1.3;border-color:#e4dcff" data-cg="'+cg+'" data-region="'+cgRegion+'" data-type="vision" onblur="saveCoachVisiField(this)" onfocus="this.style.borderColor=\'#6C5CE7\'" onblur="this.style.borderColor=\'#e4dcff\';saveCoachVisiField(this)">'+esc(vision)+'</textarea></div>';
+    // Misi card
+    html += '<div style="background:#fafafa;border:1.5px solid var(--g5);border-radius:12px;padding:12px 14px">';
+    html += '<div style="font-size:9px;font-weight:700;letter-spacing:1.2px;color:var(--g3);text-transform:uppercase;margin-bottom:6px">Misi</div>';
+    html += '<textarea class="vedit" style="min-height:48px;font-size:12px;line-height:1.4;border-color:var(--g5)" data-cg="'+cg+'" data-region="'+cgRegion+'" data-type="mission" onblur="saveCoachVisiField(this)" onfocus="this.style.borderColor=\'#6C5CE7\';this.style.background=\'#fff\'" onblur="this.style.borderColor=\'var(--g5)\';this.style.background=\'#fafafa\';saveCoachVisiField(this)">'+esc(mission)+'</textarea></div>';
     html += '</div>';
 
-    // Dev plan
-    html += '<div style="background:#fff;border:1px solid var(--g5);border-radius:10px;padding:12px;margin-bottom:10px">';
-    html += '<div style="font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--g3);margin-bottom:8px">\ud83d\udcc8 Rencana Pengembangan oleh CGL</div>';
+    // Rencana Pengembangan + Catatan Coach side by side
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">';
+
+    // Dev plan card
+    html += '<div style="background:#fff;border:1px solid var(--g5);border-radius:12px;padding:14px">';
+    html += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:10px"><div style="width:22px;height:22px;border-radius:6px;background:#eff6ff;display:flex;align-items:center;justify-content:center;font-size:11px">📈</div><span style="font-size:10px;font-weight:700;letter-spacing:.8px;color:var(--g2);text-transform:uppercase">Dev Plan</span></div>';
     if (devPlan.length) {
       devPlan.forEach(d => {
-        const roleCls = (d.current_status||d.currentRole||'member').toLowerCase();
         const memberName = d.member_name || d.name || '';
         const currentRole = d.current_status || d.currentRole || 'Member';
         const targetRole = d.target_status || d.target || 'Sponsor';
-        html += '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--g6);font-size:12px"><span style="font-weight:500;flex:1">'+esc(memberName)+'</span><span class="role-btn '+roleCls+'" style="cursor:default;font-size:9px;padding:2px 8px">'+esc(currentRole)+'</span><span style="color:var(--g4)">\u2192</span><span class="role-btn sponsor" style="cursor:default;font-size:9px;padding:2px 8px">'+esc(targetRole)+'</span><span style="font-size:10px;color:var(--g3);min-width:65px;text-align:right">'+esc(d.deadline||'')+'</span></div>';
+        const roleCls = (currentRole).toLowerCase();
+        html += '<div style="display:flex;align-items:center;gap:6px;padding:6px 0;border-bottom:1px solid var(--g6);font-size:11px">';
+        html += '<span style="font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(memberName)+'</span>';
+        html += '<span class="role-btn '+roleCls+'" style="cursor:default;font-size:8px;padding:2px 6px">'+esc(currentRole)+'</span>';
+        html += '<span style="color:var(--g4);font-size:10px">\u2192</span>';
+        html += '<span class="role-btn sponsor" style="cursor:default;font-size:8px;padding:2px 6px">'+esc(targetRole)+'</span>';
+        html += '</div>';
       });
     } else {
-      html += '<div style="font-size:11px;color:var(--g3);font-style:italic">Belum ada data dev plan</div>';
+      html += '<div style="font-size:11px;color:var(--g4);font-style:italic">Belum ada dev plan</div>';
     }
     html += '</div>';
 
-    // Coach notes
-    html += '<div style="background:linear-gradient(135deg,'+bg+','+bg+'aa);border:1px dashed '+color+'80;border-radius:10px;padding:10px"><div style="font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:'+color+';margin-bottom:4px">\ud83d\udcac Catatan Coach</div><textarea class="vedit" style="min-height:36px;font-size:12px;border-color:'+color+'80" data-cg="'+cg+'" data-region="'+cgRegion+'" data-type="coach_notes" onblur="saveCoachVisiField(this)">'+esc(coachNotes)+'</textarea></div>';
-    html += '</div></div>';
+    // Coach notes card
+    html += '<div style="background:'+bg+';border:1px solid '+color+'22;border-radius:12px;padding:14px">';
+    html += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px"><div style="width:22px;height:22px;border-radius:6px;background:'+color+'22;display:flex;align-items:center;justify-content:center;font-size:11px">💬</div><span style="font-size:10px;font-weight:700;letter-spacing:.8px;color:'+color+';text-transform:uppercase">Catatan Coach</span></div>';
+    html += '<textarea class="vedit" style="min-height:48px;font-size:12px;line-height:1.4;border-color:'+color+'44;background:rgba(255,255,255,.7)" data-cg="'+cg+'" data-region="'+cgRegion+'" data-type="coach_notes" onblur="saveCoachVisiField(this)" onfocus="this.style.borderColor=\''+color+'\';this.style.background=\'#fff\'" onblur="this.style.borderColor=\''+color+'44\';this.style.background=\'rgba(255,255,255,.7)\';saveCoachVisiField(this)" placeholder="Tulis catatan untuk CGL...">'+esc(coachNotes)+'</textarea>';
+    html += '</div>';
+
+    html += '</div>'; // end grid
+    html += '</div></div>'; // end body + card
   });
 
   el.innerHTML = html;
