@@ -470,6 +470,9 @@ function handleAttendanceChange(payload) {
   if (!r) return;
   const key = r.member_id + '_' + r.date_id;
 
+  // SKIP kalau user sedang save key ini (hindari race overwrite optimistic update)
+  if (_DOT_SAVING[key]) return;
+
   // Patch CGL state
   if (eventType === 'DELETE') { delete ATTENDANCE[key]; }
   else if (row && row.status) { ATTENDANCE[key] = row.status; }
@@ -478,13 +481,13 @@ function handleAttendanceChange(payload) {
   if (eventType === 'DELETE') { delete ALL_ATTENDANCE[key]; }
   else if (row && row.status) { ALL_ATTENDANCE[key] = row.status; }
 
-  // Update specific dot in DOM (tanpa full re-render — cepat)
-  const dot = document.querySelector('.dot[onclick*="'+r.member_id+',\\'+"'"+r.date_id+"'"+'\\'+'"]');
-  if (dot) {
-    const st = (eventType === 'DELETE') ? null : (row && row.status);
+  // Update specific dot in DOM via data attributes
+  const st = (eventType === 'DELETE') ? null : (row && row.status);
+  const dots = document.querySelectorAll('.dot[data-mid="'+r.member_id+'"][data-did="'+r.date_id+'"]');
+  dots.forEach(dot => {
     dot.className = 'dot ' + (st || 'X');
     dot.textContent = st || '-';
-  }
+  });
 
   // Re-compute stats header (debounced)
   rtDebounce('att-stats', () => { try { computeStats(); } catch(e) {} }, 300);
@@ -1247,7 +1250,7 @@ function renderAbsensi() {
       const st = ATTENDANCE[m.id+'_'+d.id] || null;
       const cls = st || 'X';
       const label = st || '-';
-      html += '<td><span class="dot ' + cls + '" onclick="cycleDot(this,' + m.id + ',\'' + d.id + '\')">' + label + '</span></td>';
+      html += '<td><span class="dot ' + cls + '" data-mid="'+m.id+'" data-did="'+d.id+'" onclick="cycleDot(this,' + m.id + ',\'' + d.id + '\')">' + label + '</span></td>';
     });
 
     html += '<td><div class="pbar"><div class="pbar-track"><div class="pbar-fill" style="width:'+pct+'%;background:'+pctColor+'"></div></div><span class="pbar-val" style="color:'+pctColor+'">'+hadirCount+'/'+totalDates+' &middot; '+pct+'%</span></div></td>';
@@ -1863,11 +1866,13 @@ async function switchPelWeek(date) {
 }
 
 async function addPelMonth() {
-  const name = prompt('Nama bulan (contoh: Mei 2026)');
+  // Generate smart default: bulan depan dari bulan terakhir
+  const MONTHS_FULL = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+  const now = new Date();
+  const defMonth = MONTHS_FULL[now.getMonth()] + ' ' + now.getFullYear();
+  const name = await asyncPrompt('Nama bulan', defMonth);
   if (!name) return;
-  // Save a placeholder row so the month appears in Supabase
   await savePelayananCell(CUR_CG, CUR_REGION, name, '__placeholder__', '__placeholder__', '');
-  // Delete the placeholder immediately (month will persist in real rows when weeks are added)
   await supa.from('cg_pelayanan').delete().eq('cg', CUR_CG).eq('region', CUR_REGION).eq('week_date', '__placeholder__');
   CUR_PEL_MONTH = name;
   CUR_PEL_WEEK = null;
@@ -1889,7 +1894,7 @@ async function addPelWeek() {
 }
 
 async function editPelWeek(oldDate) {
-  const newDate = prompt('Edit tanggal (format YYYY-MM-DD)', oldDate);
+  const newDate = await asyncPrompt('Edit tanggal (YYYY-MM-DD)', oldDate);
   if (!newDate || newDate === oldDate) return;
   // Get all rows for old date and re-insert with new date
   const {data: rows} = await supa.from('cg_pelayanan').select('*').eq('cg', CUR_CG).eq('region', CUR_REGION).eq('week_date', oldDate);
@@ -1968,9 +1973,9 @@ async function removePelAssignee(roleName, memberName) {
 }
 
 async function addPelRole() {
-  const name = prompt('Nama role custom (contoh: Worship Leader)');
+  const name = await asyncPrompt('Nama role custom', 'Worship Leader');
   if (!name) return;
-  const abbr = prompt('Singkatan (2-3 huruf, contoh: WL)', name.substring(0,2).toUpperCase());
+  const abbr = await asyncPrompt('Singkatan (2-3 huruf)', name.substring(0,2).toUpperCase());
   if (!abbr) return;
   const colors = ['#7c3aed','#0891b2','#be185d','#4f46e5','#059669','#ca8a04'];
   const bgs = ['#f5f3ff','#ecfeff','#fdf2f8','#eef2ff','#ecfdf5','#fefce8'];
@@ -3215,6 +3220,29 @@ async function switchRole(role) {
 
 // ========== UTILITY ==========
 function esc(s) { if (!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
+// Non-blocking prompt replacement (tidak block main thread / disconnect realtime)
+function asyncPrompt(label, defaultVal) {
+  return new Promise(resolve => {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+    overlay.innerHTML = '<div style="background:#fff;border-radius:16px;padding:20px;width:100%;max-width:360px;box-shadow:0 20px 60px rgba(0,0,0,.2)">' +
+      '<div style="font-weight:700;font-size:14px;color:var(--g1);margin-bottom:12px">'+esc(label)+'</div>' +
+      '<input type="text" id="__asyncPromptInput" value="'+esc(defaultVal||'')+'" style="width:100%;padding:12px 14px;border:2px solid #e4dcff;border-radius:10px;font-size:13px;font-family:Inter,sans-serif;outline:none;transition:border-color .15s" onfocus="this.style.borderColor=\'#6C5CE7\'" onblur="this.style.borderColor=\'#e4dcff\'">' +
+      '<div style="display:flex;gap:8px;margin-top:14px">' +
+      '<button id="__apOk" style="flex:1;padding:10px;border:none;border-radius:10px;background:linear-gradient(135deg,#6C5CE7,#8B5CF6);color:#fff;font-weight:700;font-size:13px;cursor:pointer">OK</button>' +
+      '<button id="__apCancel" style="flex:1;padding:10px;border:1px solid var(--g5);border-radius:10px;background:#fff;color:var(--g3);font-weight:600;font-size:13px;cursor:pointer">Batal</button>' +
+      '</div></div>';
+    document.body.appendChild(overlay);
+    const inp = document.getElementById('__asyncPromptInput');
+    inp.focus(); inp.select();
+    const done = (val) => { overlay.remove(); resolve(val); };
+    document.getElementById('__apOk').onclick = () => done(inp.value.trim() || null);
+    document.getElementById('__apCancel').onclick = () => done(null);
+    overlay.onclick = (e) => { if (e.target === overlay) done(null); };
+    inp.onkeydown = (e) => { if (e.key === 'Enter') done(inp.value.trim() || null); if (e.key === 'Escape') done(null); };
+  });
+}
 
 // Shimmer skeleton loader untuk tab yang lagi loading data
 function tabSkeleton(rows = 4) {
