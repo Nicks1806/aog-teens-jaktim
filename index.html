@@ -1712,7 +1712,14 @@ async function renderPelayanan() {
   if (!CUR_PEL_MONTH || !allData[CUR_PEL_MONTH]) CUR_PEL_MONTH = months[0];
   const monthData = allData[CUR_PEL_MONTH] || {};
   // Filter out __placeholder__ dari week list (dipakai sebagai anchor supaya bulan persist)
-  const weeks = Object.keys(monthData).filter(w => !w.startsWith('__p')).sort();
+  // Filter placeholder weeks: __ph_*, __placeholder__, dan tanggal 01 (placeholder bulan)
+  const weeks = Object.keys(monthData).filter(w => {
+    if (w.startsWith('__')) return false;
+    // Filter out role '__init__' only weeks (placeholder bulan)
+    const roles = Object.keys(monthData[w]||{});
+    if (roles.length === 1 && roles[0] === '__init__') return false;
+    return true;
+  }).sort();
 
   // Set current week
   if (!CUR_PEL_WEEK || !monthData[CUR_PEL_WEEK] || CUR_PEL_WEEK === '__placeholder__') CUR_PEL_WEEK = weeks.length ? weeks[0] : null;
@@ -1960,8 +1967,13 @@ async function addPelMonth() {
   const defMonth = MONTHS_FULL[now.getMonth()] + ' ' + now.getFullYear();
   const name = await asyncPrompt('Nama bulan', defMonth);
   if (!name) return;
-  // Insert placeholder row supaya bulan muncul di dropdown
-  // Bypass upsert — pakai fetch langsung ke Supabase REST API
+  // Parse bulan → tanggal placeholder (hari pertama bulan itu)
+  // Format input: "Mei 2026" → "2026-05-01"
+  const moMap = {januari:1,februari:2,maret:3,april:4,mei:5,juni:6,juli:7,agustus:8,september:9,oktober:10,november:11,desember:12};
+  const parts = name.trim().split(/\s+/);
+  const moNum = moMap[(parts[0]||'').toLowerCase()] || (now.getMonth()+1);
+  const yr = parseInt(parts[1]) || now.getFullYear();
+  const phDate = yr+'-'+String(moNum).padStart(2,'0')+'-01';
   try {
     const res = await fetch(SUPABASE_URL+'/rest/v1/cg_pelayanan', {
       method: 'POST',
@@ -1973,7 +1985,7 @@ async function addPelMonth() {
       },
       body: JSON.stringify({
         cg: CUR_CG, region: CUR_REGION, month: name,
-        week_date: '__ph_'+Date.now(), role_name: '__init__', member_name: ''
+        week_date: phDate, role_name: '__init__', member_name: ''
       })
     });
     if (!res.ok) {
