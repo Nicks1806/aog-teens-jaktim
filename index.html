@@ -1674,10 +1674,11 @@ async function renderPelayanan() {
   // Set current month
   if (!CUR_PEL_MONTH || !allData[CUR_PEL_MONTH]) CUR_PEL_MONTH = months[0];
   const monthData = allData[CUR_PEL_MONTH] || {};
-  const weeks = Object.keys(monthData).sort();
+  // Filter out __placeholder__ dari week list (dipakai sebagai anchor supaya bulan persist)
+  const weeks = Object.keys(monthData).filter(w => w !== '__placeholder__').sort();
 
   // Set current week
-  if (!CUR_PEL_WEEK || !monthData[CUR_PEL_WEEK]) CUR_PEL_WEEK = weeks.length ? weeks[0] : null;
+  if (!CUR_PEL_WEEK || !monthData[CUR_PEL_WEEK] || CUR_PEL_WEEK === '__placeholder__') CUR_PEL_WEEK = weeks.length ? weeks[0] : null;
 
   const roles = await getPelRolesAsync();
   const weekAssignments = CUR_PEL_WEEK ? (monthData[CUR_PEL_WEEK] || {}) : {};
@@ -1917,14 +1918,13 @@ async function switchPelWeek(date) {
 }
 
 async function addPelMonth() {
-  // Generate smart default: bulan depan dari bulan terakhir
   const MONTHS_FULL = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
   const now = new Date();
   const defMonth = MONTHS_FULL[now.getMonth()] + ' ' + now.getFullYear();
   const name = await asyncPrompt('Nama bulan', defMonth);
   if (!name) return;
-  await savePelayananCell(CUR_CG, CUR_REGION, name, '__placeholder__', '__placeholder__', '');
-  await supa.from('cg_pelayanan').delete().eq('cg', CUR_CG).eq('region', CUR_REGION).eq('week_date', '__placeholder__');
+  // Simpan placeholder supaya bulan muncul di dropdown (tidak dihapus)
+  await savePelayananCell(CUR_CG, CUR_REGION, name, '__placeholder__', '__init__', '');
   CUR_PEL_MONTH = name;
   CUR_PEL_WEEK = null;
   await renderPelayanan();
