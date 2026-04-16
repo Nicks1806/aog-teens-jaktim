@@ -1422,11 +1422,48 @@ async function renderDetail() {
     html += '</div>';
 
     html += '<textarea class="note" placeholder="Catatan CGL..." data-mid="'+m.id+'" onblur="saveMemberNotes(this)">' + esc(memberNotes[m.id]||'') + '</textarea>';
+    html += '<div style="text-align:right;margin-top:6px"><button onclick="deleteMember('+m.id+',\''+esc(m.nama)+'\')" style="padding:4px 12px;border:1px solid #fecaca;border-radius:8px;background:#fff;color:#dc2626;font-size:10px;font-weight:600;cursor:pointer;opacity:.6;transition:all .15s" onmouseover="this.style.opacity=1;this.style.background=\'#fef2f2\'" onmouseout="this.style.opacity=.6;this.style.background=\'#fff\'">Hapus Member</button></div>';
     html += '</div>';
   });
 
   html += '<button class="pel-add" style="width:100%;padding:14px;text-align:center;border:2px dashed var(--g5);border-radius:12px;font-size:13px;font-weight:600;color:var(--purple)" onclick="openModal(\'addMemberModal\')">+ Tambah Member Baru</button>';
   el.innerHTML = html;
+}
+
+async function deleteMember(memberId, memberName) {
+  if (!confirm('Hapus "'+memberName+'" dari CG ini?\n\nSemua data attendance & notes member ini akan ikut terhapus. Aksi ini tidak bisa di-undo.')) return;
+  try {
+    // Hapus data terkait dulu, lalu member
+    await supa.from('attendance').delete().eq('member_id', memberId);
+    await supa.from('member_notes').delete().eq('member_id', memberId);
+    const { error } = await supa.from('members').delete().eq('id', memberId);
+    if (error) throw error;
+
+    // Refresh data
+    const { data: mems } = await supa.from('members').select('*').eq('cg', CUR_CG).order('nama');
+    MEMBERS = mems || [];
+    MEMBERS.sort((a, b) => roleRankLC(a.status) - roleRankLC(b.status));
+    const memberIds = MEMBERS.map(m => m.id);
+    const dateIds = DATES.map(d => d.id);
+    ATTENDANCE = {};
+    if (memberIds.length && dateIds.length) {
+      const { data: att } = await supa.from('attendance').select('member_id,date_id,status').in('member_id', memberIds).in('date_id', dateIds);
+      (att || []).forEach(a => { ATTENDANCE[a.member_id + '_' + a.date_id] = a.status; });
+    }
+    const hC = document.getElementById('hC'); if (hC) hC.textContent = MEMBERS.length;
+    computeStats();
+    TAB_RENDERED = {};
+    const activeTab = document.querySelector('#pageD .tab-content.active');
+    if (activeTab) {
+      const id = activeTab.id.replace('tab-','');
+      await ensureTabRendered(id);
+    }
+    try { await loadCGLDropdown(); } catch(e) {}
+    toast('\u2713 '+memberName+' dihapus');
+  } catch(e) {
+    toast('\u274c Gagal hapus: '+(e.message||'unknown'));
+    console.error('[deleteMember]', e);
+  }
 }
 
 async function saveMemberField(input) {
@@ -1923,13 +1960,34 @@ async function addPelMonth() {
   const defMonth = MONTHS_FULL[now.getMonth()] + ' ' + now.getFullYear();
   const name = await asyncPrompt('Nama bulan', defMonth);
   if (!name) return;
-  // Simpan via savePelayananCell (yang sudah terbukti jalan untuk assignment)
-  // Pakai week_date unik supaya tidak conflict
-  const phKey = '__ph_'+Date.now();
-  await savePelayananCell(CUR_CG, CUR_REGION, name, phKey, '__init__', '');
-  CUR_PEL_MONTH = name;
-  CUR_PEL_WEEK = null;
-  await renderPelayanan();
+  // Insert placeholder row supaya bulan muncul di dropdown
+  // Bypass upsert — pakai fetch langsung ke Supabase REST API
+  try {
+    const res = await fetch(SUPABASE_URL+'/rest/v1/cg_pelayanan', {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer '+SUPABASE_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({
+        cg: CUR_CG, region: CUR_REGION, month: name,
+        week_date: '__ph_'+Date.now(), role_name: '__init__', member_name: ''
+      })
+    });
+    if (!res.ok) {
+      const txt = await res.text();
+      throw new Error(txt);
+    }
+    CUR_PEL_MONTH = name;
+    CUR_PEL_WEEK = null;
+    await renderPelayanan();
+    toast('\u2713 Bulan '+name+' ditambahkan');
+  } catch(e) {
+    toast('\u274c Gagal: '+(e.message||'').slice(0,80));
+    console.error('[addPelMonth]', e);
+  }
 }
 
 async function addPelWeek() {
