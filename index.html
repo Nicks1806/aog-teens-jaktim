@@ -1923,20 +1923,13 @@ async function addPelMonth() {
   const defMonth = MONTHS_FULL[now.getMonth()] + ' ' + now.getFullYear();
   const name = await asyncPrompt('Nama bulan', defMonth);
   if (!name) return;
-  // Simpan placeholder supaya bulan muncul di dropdown
-  // Pakai insert langsung (bukan upsert) supaya pasti masuk
-  const { error } = await supa.from('cg_pelayanan').insert({
-    cg: CUR_CG, region: CUR_REGION, month: name,
-    week_date: '__ph_'+Date.now(), role_name: '__init__', member_name: ''
-  });
-  if (error) {
-    toast('\u274c Gagal tambah bulan: ' + error.message);
-    return;
-  }
+  // Simpan via savePelayananCell (yang sudah terbukti jalan untuk assignment)
+  // Pakai week_date unik supaya tidak conflict
+  const phKey = '__ph_'+Date.now();
+  await savePelayananCell(CUR_CG, CUR_REGION, name, phKey, '__init__', '');
   CUR_PEL_MONTH = name;
   CUR_PEL_WEEK = null;
   await renderPelayanan();
-  toast('\u2713 Bulan '+name+' ditambahkan');
 }
 
 async function addPelWeek() {
