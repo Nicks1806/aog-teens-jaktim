@@ -897,7 +897,7 @@ function toggleCGDropdown(e) {
 function selectCGOption(cg, shortName, cgInit, cgColor, cgBg) {
   document.getElementById('cglSel').value = cg;
   const label = document.getElementById('cgDDLabel');
-  label.textContent = (cgInit ? 'T'+cgInit+' · ' : (cg+' · ')) + shortName;
+  label.textContent = cg + ' · ' + shortName;
   label.style.color = 'var(--g1)';
   label.style.fontWeight = '700';
   document.getElementById('enterBtn').disabled = false;
@@ -1675,7 +1675,7 @@ async function renderPelayanan() {
   if (!CUR_PEL_MONTH || !allData[CUR_PEL_MONTH]) CUR_PEL_MONTH = months[0];
   const monthData = allData[CUR_PEL_MONTH] || {};
   // Filter out __placeholder__ dari week list (dipakai sebagai anchor supaya bulan persist)
-  const weeks = Object.keys(monthData).filter(w => w !== '__placeholder__').sort();
+  const weeks = Object.keys(monthData).filter(w => !w.startsWith('__p')).sort();
 
   // Set current week
   if (!CUR_PEL_WEEK || !monthData[CUR_PEL_WEEK] || CUR_PEL_WEEK === '__placeholder__') CUR_PEL_WEEK = weeks.length ? weeks[0] : null;
@@ -1923,12 +1923,20 @@ async function addPelMonth() {
   const defMonth = MONTHS_FULL[now.getMonth()] + ' ' + now.getFullYear();
   const name = await asyncPrompt('Nama bulan', defMonth);
   if (!name) return;
-  // Simpan placeholder supaya bulan muncul di dropdown (tidak dihapus)
-  await savePelayananCell(CUR_CG, CUR_REGION, name, '__placeholder__', '__init__', '');
+  // Simpan placeholder supaya bulan muncul di dropdown
+  // Pakai insert langsung (bukan upsert) supaya pasti masuk
+  const { error } = await supa.from('cg_pelayanan').insert({
+    cg: CUR_CG, region: CUR_REGION, month: name,
+    week_date: '__ph_'+Date.now(), role_name: '__init__', member_name: ''
+  });
+  if (error) {
+    toast('\u274c Gagal tambah bulan: ' + error.message);
+    return;
+  }
   CUR_PEL_MONTH = name;
   CUR_PEL_WEEK = null;
   await renderPelayanan();
-  toast('\u2713 Bulan ditambahkan');
+  toast('\u2713 Bulan '+name+' ditambahkan');
 }
 
 async function addPelWeek() {
