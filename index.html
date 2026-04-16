@@ -69,7 +69,7 @@ body{font-family:'Inter',sans-serif;background:#f8f8f5;color:#1c1c1c;min-height:
 .app-tab.on{color:var(--g1);border-bottom-color:var(--purple)}
 
 .tab-content{display:none;padding:20px 0}
-.tab-content.active{display:block}
+.tab-content.active{display:block;animation:tabFadeIn .2s ease}
 
 /* Shared */
 .section{background:var(--white);border:1px solid var(--g5);border-radius:12px;padding:16px;margin-bottom:14px}
@@ -205,6 +205,7 @@ thead th:first-child{position:sticky;left:0;z-index:3;background:#fafafa}
 /* Loading */
 .loading-msg{text-align:center;padding:40px;color:var(--g3);font-size:13px}
 @keyframes skel-pulse{0%,100%{opacity:.55}50%{opacity:.95}}
+@keyframes tabFadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 .skel{background:linear-gradient(90deg,#f3f4f6 0%,#fafafa 50%,#f3f4f6 100%);background-size:200% 100%;border-radius:6px;animation:skel-pulse 1.4s ease-in-out infinite;display:block}
 .skel-row{height:14px;margin-bottom:8px}
 .skel-card{padding:14px;background:#fff;border:1px solid var(--g6);border-radius:10px;margin-bottom:10px}
@@ -1951,14 +1952,20 @@ async function renderPelayanan() {
 }
 
 async function switchPelMonth(month) {
+  const el = document.getElementById('tab-pelayanan');
+  if (el) { el.style.transition = 'opacity .15s'; el.style.opacity = '0'; }
   CUR_PEL_MONTH = month;
   CUR_PEL_WEEK = null;
   await renderPelayanan();
+  if (el) { requestAnimationFrame(() => { el.style.opacity = '1'; }); }
 }
 
 async function switchPelWeek(date) {
+  const el = document.getElementById('tab-pelayanan');
+  if (el) { el.style.transition = 'opacity .12s'; el.style.opacity = '0'; }
   CUR_PEL_WEEK = date;
   await renderPelayanan();
+  if (el) { requestAnimationFrame(() => { el.style.opacity = '1'; }); }
 }
 
 async function addPelMonth() {
