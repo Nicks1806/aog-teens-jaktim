@@ -445,9 +445,16 @@ function setupRealtime() {
     .on('postgres_changes', { event: '*', schema: 'public', table: 'cg_events' }, handleEventsChange)
     .on('postgres_changes', { event: '*', schema: 'public', table: 'cg_vision' }, handleVisionChange)
     .subscribe((status) => {
-      updateLiveIndicator(status === 'SUBSCRIBED');
+      const connected = status === 'SUBSCRIBED';
+      updateLiveIndicator(connected);
+      // Auto-reconnect kalau disconnect (CHANNEL_ERROR / TIMED_OUT / CLOSED)
+      if (!connected && (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED')) {
+        setTimeout(() => { if (navigator.onLine) setupRealtime(); }, 5000);
+      }
     });
 }
+// Reconnect saat browser online setelah offline
+window.addEventListener('online', () => { setTimeout(setupRealtime, 1000); });
 
 function updateLiveIndicator(connected) {
   document.querySelectorAll('.live-dot').forEach(d => {
@@ -970,7 +977,7 @@ async function openCGDashboard(cg) {
 
   CUR_CG_INFO = cgInfoRes.data && cgInfoRes.data[0] ? cgInfoRes.data[0] : {};
   MEMBERS = memsRes.data || [];
-  MEMBERS.sort((a, b) => (ROLE_ORDER[a.status]||9) - (ROLE_ORDER[b.status]||9));
+  MEMBERS.sort((a, b) => roleRankLC(a.status) - roleRankLC(b.status));
   DATES = datesRes.data || [];
 
   // Load attendance (butuh ids dari hasil di atas)
@@ -1312,9 +1319,11 @@ async function undoLastDot() {
 
   // Revert state + UI
   if (prev) { ATTENDANCE[key] = prev; } else { delete ATTENDANCE[key]; }
-  if (dotEl) {
-    dotEl.className = 'dot ' + (prev || 'X');
-    dotEl.textContent = prev || '-';
+  // Re-query DOM untuk case dotEl sudah stale (tab re-render karena realtime)
+  const freshDot = document.querySelector('.dot[data-mid="'+memberId+'"][data-did="'+dateId+'"]') || dotEl;
+  if (freshDot) {
+    freshDot.className = 'dot ' + (prev || 'X');
+    freshDot.textContent = prev || '-';
   }
 
   // Save revert ke DB
@@ -1439,6 +1448,14 @@ async function deleteMember(memberId, memberName) {
     await supa.from('member_notes').delete().eq('member_id', memberId);
     const { error } = await supa.from('members').delete().eq('id', memberId);
     if (error) throw error;
+
+    // Purge dari state Coach juga (ALL_MEMBERS + ALL_ATTENDANCE)
+    if (typeof ALL_MEMBERS !== 'undefined') {
+      ALL_MEMBERS = ALL_MEMBERS.filter(m => m.id !== memberId);
+    }
+    if (typeof ALL_ATTENDANCE !== 'undefined') {
+      Object.keys(ALL_ATTENDANCE).forEach(k => { if (k.startsWith(memberId+'_')) delete ALL_ATTENDANCE[k]; });
+    }
 
     // Refresh data
     const { data: mems } = await supa.from('members').select('*').eq('cg', CUR_CG).order('nama');
@@ -1956,16 +1973,16 @@ async function switchPelMonth(month) {
   if (el) { el.style.transition = 'opacity .15s'; el.style.opacity = '0'; }
   CUR_PEL_MONTH = month;
   CUR_PEL_WEEK = null;
-  await renderPelayanan();
-  if (el) { requestAnimationFrame(() => { el.style.opacity = '1'; }); }
+  try { await renderPelayanan(); }
+  finally { if (el) requestAnimationFrame(() => { el.style.opacity = '1'; }); }
 }
 
 async function switchPelWeek(date) {
   const el = document.getElementById('tab-pelayanan');
   if (el) { el.style.transition = 'opacity .12s'; el.style.opacity = '0'; }
   CUR_PEL_WEEK = date;
-  await renderPelayanan();
-  if (el) { requestAnimationFrame(() => { el.style.opacity = '1'; }); }
+  try { await renderPelayanan(); }
+  finally { if (el) requestAnimationFrame(() => { el.style.opacity = '1'; }); }
 }
 
 async function addPelMonth() {
@@ -2863,7 +2880,7 @@ function buildAttendanceTable(members, dates, attMap) {
   dates.forEach(d => { html += '<th>'+(d.label||'')+'</th>'; });
   html += '<th>% Hadir</th></tr></thead><tbody>';
   let totalH=0, totalT=0;
-  const sorted = [...members].sort((a,b) => (ROLE_ORDER[a.status]||9) - (ROLE_ORDER[b.status]||9));
+  const sorted = [...members].sort((a,b) => roleRankLC(a.status) - roleRankLC(b.status));
   sorted.forEach(m => {
     let h=0, t=0;
     html += '<tr><td>'+(m.nama||'')+'<span class="role">'+(m.status||'')+'</span></td>';
