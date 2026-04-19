@@ -3161,6 +3161,35 @@ function renderCoachMilestone() {
   });
   html += '</div>';
 
+  // Consolidated view across all CGs (helpful for TL/Coach to scan follow-up)
+  const tlGroups = {
+    all: [['msj1','MSJ 1','#16a34a'],['msj2','MSJ 2','#2563eb'],['cgt1','CGT 1','#0f766e'],['baptis_air','B.Air','#7c3aed']],
+    msj: [['msj1','MSJ 1','#16a34a'],['msj2','MSJ 2','#2563eb'],['msj3','MSJ 3','#9333ea']],
+    cgt: [['cgt1','CGT 1','#0f766e'],['cgt2','CGT 2','#059669'],['cgt3','CGT 3','#0891b2']],
+    baptis: [['baptis_air','B.Air','#7c3aed'],['baptis_roh','B.Roh','#db2777']]
+  };
+  const tlGroup = tlGroups[cmsf] || tlGroups.all;
+  html += '<div class="section" style="background:linear-gradient(135deg,#fef2f2,#fff);border:1px solid #fecaca;border-radius:14px;margin-bottom:16px">';
+  html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><div style="width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,#dc2626,#ef4444);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px">🎯</div><div><div style="font-weight:700;font-size:12px;color:#991b1b">Daftar Follow-up Semua CG</div><div style="font-size:10px;color:#dc2626;opacity:.7">Member yang belum complete, dikelompokkan per milestone</div></div></div>';
+  html += '<div style="display:flex;flex-direction:column;gap:8px">';
+  tlGroup.forEach(([f, l, c]) => {
+    const allBelum = mems.filter(m => !m[f]);
+    html += '<div style="background:#fff;border:1px solid '+c+'33;border-radius:10px;padding:10px 12px">';
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:'+(allBelum.length?'8px':'0')+'"><span style="font-size:11px;font-weight:700;color:'+c+'">'+l+' — belum complete</span><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:'+c+'11;color:'+c+'">'+allBelum.length+' member</span></div>';
+    if (allBelum.length) {
+      html += '<div style="display:flex;flex-wrap:wrap;gap:4px">';
+      allBelum.forEach(m => {
+        const cgColor = CG_COLORS[m.cg] || '#6b7280';
+        html += '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;background:#fff;border:1px solid '+cgColor+'55;border-radius:12px;font-size:10.5px"><span style="font-weight:700;color:'+cgColor+';font-size:9px;letter-spacing:.3px">'+esc(m.cg.replace('TEEN ','T'))+'</span><span style="color:var(--g1);font-weight:600">'+esc(m.nama)+'</span></span>';
+      });
+      html += '</div>';
+    } else {
+      html += '<div style="font-size:10px;color:#16a34a;font-style:italic">✓ Semua sudah complete!</div>';
+    }
+    html += '</div>';
+  });
+  html += '</div></div>';
+
   // Per-CG accordion
   html += '<div class="section"><div class="section-title">\ud83d\udccb Breakdown per CG</div>';
   cgs.sort().forEach(cg => {
@@ -3190,35 +3219,41 @@ function renderCoachMilestone() {
     });
     html += '</div>';
 
-    // Breakdown nama per milestone: yang sudah vs belum
-    html += '<div style="display:flex;flex-direction:column;gap:10px">';
+    // Breakdown nama per milestone: yang sudah vs belum (compact chip style)
+    html += '<div style="display:flex;flex-direction:column;gap:8px">';
     currentGroup.forEach(([f, l, c]) => {
       const done = cgMems.filter(m => m[f]);
       const notDone = cgMems.filter(m => !m[f]);
+      const pct = cgMems.length ? Math.round(done.length/cgMems.length*100) : 0;
       html += '<div style="border:1px solid '+c+'33;border-radius:10px;overflow:hidden">';
-      html += '<div style="padding:8px 12px;background:'+c+'11;display:flex;align-items:center;justify-content:space-between;font-size:11px;font-weight:700;color:'+c+'">';
-      html += '<span>'+l+'</span><span style="font-size:10px">'+done.length+'/'+cgMems.length+'</span></div>';
-      html += '<div style="padding:10px 12px;display:grid;grid-template-columns:1fr 1fr;gap:10px">';
-      // Sudah
-      html += '<div><div style="font-size:9px;font-weight:700;letter-spacing:.5px;color:#16a34a;margin-bottom:6px;text-transform:uppercase">✓ Sudah ('+done.length+')</div>';
-      if (done.length) {
-        done.forEach(m => {
-          html += '<div style="font-size:11px;color:var(--g2);padding:2px 0">'+esc(m.nama)+'</div>';
-        });
-      } else {
-        html += '<div style="font-size:10px;color:var(--g4);font-style:italic">—</div>';
-      }
+      // Header with progress bar
+      html += '<div style="padding:8px 12px;background:'+c+'0a">';
+      html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px"><span style="font-size:11px;font-weight:700;color:'+c+'">'+l+'</span><span style="font-size:10px;font-weight:700;color:'+c+'">'+done.length+'/'+cgMems.length+' · '+pct+'%</span></div>';
+      html += '<div style="height:4px;background:'+c+'22;border-radius:4px;overflow:hidden"><div style="width:'+pct+'%;height:100%;background:'+c+';border-radius:4px"></div></div>';
       html += '</div>';
-      // Belum
-      html += '<div><div style="font-size:9px;font-weight:700;letter-spacing:.5px;color:#dc2626;margin-bottom:6px;text-transform:uppercase">✗ Belum ('+notDone.length+')</div>';
+      // Body — chips layout
+      html += '<div style="padding:10px 12px">';
+      // Belum (priority, tampil dulu)
       if (notDone.length) {
+        html += '<div style="margin-bottom:'+(done.length?'8px':'0')+'"><div style="font-size:9px;font-weight:700;letter-spacing:.5px;color:#dc2626;margin-bottom:5px;text-transform:uppercase">✗ Belum ('+notDone.length+')</div>';
+        html += '<div style="display:flex;flex-wrap:wrap;gap:4px">';
         notDone.forEach(m => {
-          html += '<div style="font-size:11px;color:var(--red);padding:2px 0;font-weight:500">'+esc(m.nama)+'</div>';
+          html += '<span style="display:inline-flex;align-items:center;padding:3px 9px;background:#fef2f2;color:#dc2626;border:1px solid #fecaca;border-radius:12px;font-size:10.5px;font-weight:600">'+esc(m.nama)+'</span>';
         });
-      } else {
-        html += '<div style="font-size:10px;color:var(--g4);font-style:italic">—</div>';
+        html += '</div></div>';
       }
-      html += '</div>';
+      // Sudah
+      if (done.length) {
+        html += '<div><div style="font-size:9px;font-weight:700;letter-spacing:.5px;color:#16a34a;margin-bottom:5px;text-transform:uppercase">✓ Sudah ('+done.length+')</div>';
+        html += '<div style="display:flex;flex-wrap:wrap;gap:4px">';
+        done.forEach(m => {
+          html += '<span style="display:inline-flex;align-items:center;padding:3px 9px;background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;border-radius:12px;font-size:10.5px;font-weight:500">'+esc(m.nama)+'</span>';
+        });
+        html += '</div></div>';
+      }
+      if (!done.length && !notDone.length) {
+        html += '<div style="font-size:10px;color:var(--g4);font-style:italic;text-align:center">Tidak ada member</div>';
+      }
       html += '</div></div>';
     });
     html += '</div>';
