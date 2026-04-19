@@ -322,6 +322,16 @@ thead th:first-child{position:sticky;left:0;z-index:3;background:#fafafa}
   </div>
 </div>
 
+<!-- Member Detail Modal (Coach search) -->
+<div class="modal-overlay" id="memberDetailModal">
+  <div class="modal-box" style="max-width:720px;max-height:90vh;overflow-y:auto">
+    <div id="memberDetailBody"></div>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="pel-add" style="flex:1;padding:10px" onclick="closeModal('memberDetailModal')">Tutup</button>
+    </div>
+  </div>
+</div>
+
 <!-- LANDING -->
 <div class="landing" id="pageL">
   <div style="font-size:13px;letter-spacing:3px;color:var(--g3);text-transform:uppercase;margin-bottom:6px;font-weight:600">THE YEAR OF</div>
@@ -390,7 +400,13 @@ thead th:first-child{position:sticky;left:0;z-index:3;background:#fafafa}
         <button id="roleTLBtn" onclick="switchRole('tl')" style="padding:4px 12px;border-radius:12px;border:none;font-size:10px;font-weight:700;cursor:pointer;background:transparent;color:var(--g3);letter-spacing:.4px">TL</button>
       </div>
     </div>
-    <div style="display:flex;align-items:center;gap:6px"><span class="live-dot"></span><span class="live-label" style="font-size:10px;color:var(--green);font-weight:600">Live</span></div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="position:relative">
+        <input id="coachSearch" type="text" placeholder="Cari nama member..." oninput="handleCoachSearch(this.value)" onblur="setTimeout(()=>{document.getElementById('coachSearchResults').style.display='none'},200)" onfocus="if(this.value)handleCoachSearch(this.value)" style="padding:7px 14px 7px 32px;border:1.5px solid #e4dcff;border-radius:20px;font-size:11.5px;font-family:Inter,sans-serif;width:200px;outline:none;transition:all .2s;background:#fff url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236C5CE7' stroke-width='2.5' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E&quot;) no-repeat 10px center;background-size:14px" onfocusstyle="this.style.borderColor='#6C5CE7';this.style.width='260px'">
+        <div id="coachSearchResults" style="display:none;position:absolute;top:calc(100% + 4px);right:0;left:0;background:#fff;border:1px solid #e4dcff;border-radius:12px;box-shadow:0 12px 28px rgba(108,92,231,.15);max-height:360px;overflow-y:auto;z-index:100;min-width:280px"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px"><span class="live-dot"></span><span class="live-label" style="font-size:10px;color:var(--green);font-weight:600">Live</span></div>
+    </div>
   </div>
   <div class="app-hero" id="coachHero"><div class="app-hero-tag">Januari &mdash; April 2026</div><div class="app-hero-h" id="coachHeroH">Semua<br><em>CG.</em></div><div class="app-hero-meta" id="coachMeta">Memuat...</div></div>
   <div class="app-stats">
@@ -2554,6 +2570,129 @@ function sTab(id, b) {
   document.getElementById('tab-' + id).classList.add('active');
   // Lazy render tab kalau belum pernah di-render
   ensureTabRendered(id);
+}
+
+// ═══════════════════════════════════════════════════════════
+// COACH GLOBAL SEARCH — cari member by nama, tampilkan detail lengkap
+// ═══════════════════════════════════════════════════════════
+function handleCoachSearch(q) {
+  const results = document.getElementById('coachSearchResults');
+  if (!results) return;
+  const query = String(q||'').trim().toLowerCase();
+  if (!query) { results.style.display = 'none'; return; }
+
+  const scope = coachRole === 'tl' ? ALL_MEMBERS : ALL_MEMBERS.filter(m => m.region === coachReg);
+  const matches = scope.filter(m => String(m.nama||'').toLowerCase().includes(query)).slice(0, 12);
+
+  if (matches.length === 0) {
+    results.innerHTML = '<div style="padding:14px;text-align:center;font-size:11px;color:var(--g4);font-style:italic">Tidak ada member ditemukan</div>';
+  } else {
+    results.innerHTML = matches.map(m => {
+      const color = CG_COLORS[m.cg] || '#7c3aed';
+      const bg = CG_BG[m.cg] || '#faf5ff';
+      return '<div onclick="showMemberDetail('+m.id+')" style="display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;border-bottom:1px solid #f5f0ff;transition:background .12s" onmouseover="this.style.background=\''+bg+'\'" onmouseout="this.style.background=\'\'">' +
+        '<div style="width:30px;height:30px;border-radius:50%;background:'+bg+';color:'+color+';display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;border:1.5px solid '+color+'55">'+esc(String(m.nama||'?').trim().slice(0,1).toUpperCase())+'</div>' +
+        '<div style="flex:1;min-width:0">' +
+          '<div style="font-weight:600;font-size:12px;color:var(--g1);line-height:1.2">'+esc(m.nama)+'</div>' +
+          '<div style="font-size:10px;color:var(--g4);margin-top:2px">'+esc(m.cg)+' · '+esc(m.status||'Member')+'</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+  results.style.display = 'block';
+}
+
+function showMemberDetail(memberId) {
+  const m = ALL_MEMBERS.find(x => x.id === memberId);
+  if (!m) return;
+  document.getElementById('coachSearchResults').style.display = 'none';
+  const searchInput = document.getElementById('coachSearch');
+  if (searchInput) searchInput.value = '';
+
+  const color = CG_COLORS[m.cg] || '#7c3aed';
+  const bg = CG_BG[m.cg] || '#faf5ff';
+  const initial = String(m.nama||'?').trim().slice(0,1).toUpperCase();
+
+  // Attendance stats
+  const cgDates = ALL_DATES.filter(d => d.region === m.region);
+  let hCount = 0, iCount = 0, sCount = 0, aCount = 0, totalRecorded = 0;
+  cgDates.forEach(d => {
+    const st = ALL_ATTENDANCE[m.id+'_'+d.id];
+    if (!st) return;
+    totalRecorded++;
+    if (st === 'H') hCount++;
+    else if (st === 'I') iCount++;
+    else if (st === 'S') sCount++;
+    else if (st === 'A') aCount++;
+  });
+  const pct = totalRecorded ? Math.round(hCount/totalRecorded*100) : 0;
+  const pctColor = pct >= 75 ? '#16a34a' : pct >= 50 ? '#d97706' : '#dc2626';
+
+  // Milestone list
+  const msFields = [
+    ['msj1','MSJ 1'],['msj2','MSJ 2'],['msj3','MSJ 3'],
+    ['cgt1','CGT 1'],['cgt2','CGT 2'],['cgt3','CGT 3'],
+    ['baptis_air','B.Air'],['baptis_roh','B.Roh']
+  ];
+  const msDone = msFields.filter(f => m[f[0]]).length;
+
+  let html = '';
+  // Header with CG color gradient
+  html += '<div style="background:linear-gradient(135deg,'+color+','+color+'cc);margin:-20px -20px 16px;padding:20px;border-radius:14px 14px 0 0">';
+  html += '<div style="display:flex;align-items:center;gap:14px">';
+  html += '<div style="width:56px;height:56px;border-radius:14px;background:rgba(255,255,255,.25);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px;backdrop-filter:blur(4px)">'+esc(initial)+'</div>';
+  html += '<div style="flex:1"><div style="font-weight:700;font-size:18px;color:#fff;line-height:1.2">'+esc(m.nama)+'</div>';
+  html += '<div style="font-size:11px;color:rgba(255,255,255,.85);margin-top:4px">'+esc(m.cg)+' · '+esc(m.status||'Member')+' · '+(m.region==='jaktim1'?'Jaktim 1':'Jaktim 2')+'</div></div>';
+  html += '<div style="text-align:right"><div style="font-family:\'Instrument Serif\',serif;font-size:32px;color:#fff;line-height:1">'+pct+'%</div><div style="font-size:9px;color:rgba(255,255,255,.75);letter-spacing:.5px">KEHADIRAN</div></div>';
+  html += '</div></div>';
+
+  // Info grid
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;font-size:11px">';
+  const infoItems = [
+    ['📱', 'WA', m.wa || '-'],
+    ['🎂', 'Lahir', m.lahir || '-'],
+    ['🏫', 'Sekolah', (m.sekolah || '-') + (m.kelas ? ' · Kelas '+m.kelas : '')],
+    ['📍', 'Lokasi', (m.kelurahan || '-') + (m.kecamatan ? ', '+m.kecamatan : '')]
+  ];
+  infoItems.forEach(([icon, label, val]) => {
+    html += '<div style="padding:10px 12px;background:var(--g6);border-radius:10px"><div style="font-size:9px;font-weight:700;letter-spacing:.5px;color:var(--g4);text-transform:uppercase;margin-bottom:3px">'+icon+' '+label+'</div><div style="color:var(--g1);font-weight:500">'+esc(val)+'</div></div>';
+  });
+  html += '</div>';
+
+  // Attendance stats cards
+  html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px">';
+  [['Hadir',hCount,'#16a34a','#f0fdf4'],['Izin',iCount,'#2563eb','#eff6ff'],['Sakit',sCount,'#d97706','#fffbeb'],['Alpa',aCount,'#dc2626','#fef2f2']].forEach(([label,cnt,col,b])=>{
+    html += '<div style="text-align:center;padding:10px 6px;background:'+b+';border-radius:10px"><div style="font-family:\'Instrument Serif\',serif;font-size:22px;color:'+col+';line-height:1">'+cnt+'</div><div style="font-size:9px;color:var(--g3);letter-spacing:.5px;margin-top:2px">'+label+'</div></div>';
+  });
+  html += '</div>';
+
+  // Milestone checklist
+  html += '<div style="margin-bottom:14px"><div style="font-size:11px;font-weight:700;letter-spacing:.5px;color:var(--g3);text-transform:uppercase;margin-bottom:8px">Milestone <span style="font-weight:500;color:var(--g4)">('+msDone+'/8)</span></div>';
+  html += '<div style="display:flex;flex-wrap:wrap;gap:6px">';
+  msFields.forEach(([f, l]) => {
+    const done = !!m[f];
+    html += '<span style="padding:5px 12px;border-radius:12px;font-size:10.5px;font-weight:600;'+(done?'background:#dcfce7;color:#166534;border:1px solid #86efac':'background:#fef2f2;color:#991b1b;border:1px solid #fecaca')+'">'+(done?'✓ ':'✗ ')+l+'</span>';
+  });
+  html += '</div></div>';
+
+  // Attendance timeline (kompak, dates + status dots)
+  if (cgDates.length > 0) {
+    html += '<div><div style="font-size:11px;font-weight:700;letter-spacing:.5px;color:var(--g3);text-transform:uppercase;margin-bottom:8px">Riwayat Kehadiran ('+totalRecorded+' tercatat)</div>';
+    html += '<div style="background:#fafafa;border-radius:10px;padding:10px;max-height:220px;overflow-y:auto">';
+    html += '<div style="display:flex;flex-wrap:wrap;gap:4px">';
+    cgDates.forEach(d => {
+      const st = ALL_ATTENDANCE[m.id+'_'+d.id] || null;
+      const cls = st || 'X';
+      html += '<div style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 6px;background:#fff;border:1px solid var(--g6);border-radius:8px;min-width:52px">';
+      html += '<span class="dot '+cls+'" style="width:24px;height:24px;font-size:10px">'+(st||'-')+'</span>';
+      html += '<span style="font-size:8px;color:var(--g4);letter-spacing:.3px">'+esc(String(d.label||'').slice(0,7))+'</span>';
+      html += '</div>';
+    });
+    html += '</div></div></div>';
+  }
+
+  document.getElementById('memberDetailBody').innerHTML = html;
+  openModal('memberDetailModal');
 }
 
 async function goBackCoach() {
