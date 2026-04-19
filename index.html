@@ -3169,26 +3169,58 @@ function renderCoachMilestone() {
     baptis: [['baptis_air','B.Air','#7c3aed'],['baptis_roh','B.Roh','#db2777']]
   };
   const tlGroup = tlGroups[cmsf] || tlGroups.all;
-  html += '<div class="section" style="background:linear-gradient(135deg,#fef2f2,#fff);border:1px solid #fecaca;border-radius:14px;margin-bottom:16px">';
-  html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><div style="width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,#dc2626,#ef4444);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px">🎯</div><div><div style="font-weight:700;font-size:12px;color:#991b1b">Daftar Follow-up Semua CG</div><div style="font-size:10px;color:#dc2626;opacity:.7">Member yang belum complete, dikelompokkan per milestone</div></div></div>';
-  html += '<div style="display:flex;flex-direction:column;gap:8px">';
+  html += '<div class="section" style="background:#fff;border:1px solid var(--g5);border-radius:14px;margin-bottom:16px;padding:0;overflow:hidden">';
+  html += '<div style="padding:14px 16px;background:linear-gradient(135deg,#fef2f2,#fff);border-bottom:1px solid #fecaca;display:flex;align-items:center;gap:10px">';
+  html += '<div style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#dc2626,#ef4444);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px">\u26A0</div>';
+  html += '<div><div style="font-weight:700;font-size:13px;color:#991b1b">Daftar Follow-up</div><div style="font-size:10px;color:#dc2626;opacity:.75">Member yang belum complete per milestone</div></div>';
+  html += '</div>';
+
+  // Setiap milestone: section expandable dengan grouping by CG
   tlGroup.forEach(([f, l, c]) => {
     const allBelum = mems.filter(m => !m[f]);
-    html += '<div style="background:#fff;border:1px solid '+c+'33;border-radius:10px;padding:10px 12px">';
-    html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:'+(allBelum.length?'8px':'0')+'"><span style="font-size:11px;font-weight:700;color:'+c+'">'+l+' — belum complete</span><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:'+c+'11;color:'+c+'">'+allBelum.length+' member</span></div>';
-    if (allBelum.length) {
-      html += '<div style="display:flex;flex-wrap:wrap;gap:4px">';
-      allBelum.forEach(m => {
-        const cgColor = CG_COLORS[m.cg] || '#6b7280';
-        html += '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;background:#fff;border:1px solid '+cgColor+'55;border-radius:12px;font-size:10.5px"><span style="font-weight:700;color:'+cgColor+';font-size:9px;letter-spacing:.3px">'+esc(m.cg.replace('TEEN ','T'))+'</span><span style="color:var(--g1);font-weight:600">'+esc(m.nama)+'</span></span>';
+    // Group by CG
+    const byCG = {};
+    allBelum.forEach(m => { if (!byCG[m.cg]) byCG[m.cg] = []; byCG[m.cg].push(m); });
+    const cgList = Object.keys(byCG).sort();
+    const isCollapsed = allBelum.length > 6; // auto-collapse kalau banyak
+
+    html += '<div style="border-bottom:1px solid var(--g6)">';
+    // Header clickable
+    html += '<div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\';this.querySelector(\'.fu-arrow\').textContent=this.nextElementSibling.style.display===\'none\'?\'+\':\'\u2212\'" style="padding:12px 16px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:background .15s" onmouseover="this.style.background=\''+c+'08\'" onmouseout="this.style.background=\'transparent\'">';
+    html += '<div style="display:flex;align-items:center;gap:10px">';
+    html += '<div style="width:4px;height:20px;background:'+c+';border-radius:2px"></div>';
+    html += '<span style="font-size:12px;font-weight:700;color:'+c+'">'+l+'</span>';
+    html += allBelum.length === 0
+      ? '<span style="font-size:10px;color:#16a34a;font-weight:600">\u2713 Semua complete</span>'
+      : '<span style="font-size:10px;color:var(--g3)">'+allBelum.length+' belum</span>';
+    html += '</div>';
+    html += '<div style="display:flex;align-items:center;gap:8px">';
+    if (allBelum.length > 0) {
+      html += '<span style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:10px;background:'+c+'15;color:'+c+'">'+allBelum.length+'</span>';
+      html += '<span class="fu-arrow" style="font-size:14px;color:var(--g3);font-weight:300;width:16px;text-align:center">'+(isCollapsed?'+':'\u2212')+'</span>';
+    }
+    html += '</div></div>';
+
+    // Body — grouped by CG
+    if (allBelum.length > 0) {
+      html += '<div style="display:'+(isCollapsed?'none':'block')+';padding:4px 16px 14px">';
+      cgList.forEach(cgName => {
+        const cgMembers = byCG[cgName];
+        const cgColor = CG_COLORS[cgName] || '#6b7280';
+        const cgBg = CG_BG[cgName] || '#f5f5f5';
+        html += '<div style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-top:1px dashed var(--g6)">';
+        html += '<span style="padding:3px 10px;background:'+cgColor+';color:#fff;border-radius:8px;font-size:10px;font-weight:700;flex-shrink:0;min-width:62px;text-align:center">'+esc(cgName)+'</span>';
+        html += '<div style="flex:1;font-size:11.5px;color:var(--g1);line-height:1.6">';
+        html += cgMembers.map(m => esc(m.nama)).join('<span style="color:var(--g4);margin:0 4px">\u00b7</span>');
+        html += '</div>';
+        html += '<span style="font-size:10px;color:var(--g3);flex-shrink:0">'+cgMembers.length+'</span>';
+        html += '</div>';
       });
       html += '</div>';
-    } else {
-      html += '<div style="font-size:10px;color:#16a34a;font-style:italic">✓ Semua sudah complete!</div>';
     }
     html += '</div>';
   });
-  html += '</div></div>';
+  html += '</div>';
 
   // Per-CG accordion
   html += '<div class="section"><div class="section-title">\ud83d\udccb Breakdown per CG</div>';
