@@ -3206,7 +3206,6 @@ function renderCoachMilestone() {
     html += '<div><span style="font-weight:700;font-size:13px">'+esc(cg)+'</span> <span style="font-size:10px;color:var(--g3)">\u00b7 '+cgTotal+' member</span></div>';
     html += '<div style="display:flex;align-items:center;gap:10px"><span style="font-size:11px;font-weight:600;color:'+color+'">'+msPct+'% milestone</span><span class="acc-arrow" style="font-size:14px;color:var(--g3)">+</span></div></div>';
     html += '<div style="display:none;padding:14px;background:var(--white)">';
-    html += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">';
     const accGroups = {
       all: [['msj1','MSJ 1','var(--green)'],['msj2','MSJ 2','var(--blue)'],['cgt1','CGT 1','#0f766e'],['baptis_air','B.Air','#7c3aed']],
       msj: [['msj1','MSJ 1','var(--green)'],['msj2','MSJ 2','var(--blue)'],['msj3','MSJ 3','#9333ea']],
@@ -3214,49 +3213,32 @@ function renderCoachMilestone() {
       baptis: [['baptis_air','B.Air','#7c3aed'],['baptis_roh','B.Roh','#db2777']]
     };
     const currentGroup = accGroups[cmsf] || accGroups.all;
-    currentGroup.forEach(([f,l,c]) => {
-      html += '<div style="flex:1;min-width:60px;background:var(--g6);border-radius:8px;padding:8px;text-align:center"><span style="font-family:\'Instrument Serif\',serif;font-size:16px;color:'+c+'">'+msCounts[f]+'</span><div style="font-size:8px;color:var(--g3)">'+l+'</div></div>';
-    });
-    html += '</div>';
 
-    // Breakdown nama per milestone: yang sudah vs belum (compact chip style)
-    html += '<div style="display:flex;flex-direction:column;gap:8px">';
+    // Breakdown per member — tabel matrix yang clean
+    html += '<div style="border:1px solid var(--g5);border-radius:10px;overflow:hidden">';
+    html += '<table class="t" style="width:100%;font-size:11px;border-collapse:collapse">';
+    html += '<thead><tr style="background:#fafafa"><th style="text-align:left;padding:8px 12px;font-size:10px;letter-spacing:.5px;color:var(--g3)">NAMA</th>';
     currentGroup.forEach(([f, l, c]) => {
-      const done = cgMems.filter(m => m[f]);
-      const notDone = cgMems.filter(m => !m[f]);
-      const pct = cgMems.length ? Math.round(done.length/cgMems.length*100) : 0;
-      html += '<div style="border:1px solid '+c+'33;border-radius:10px;overflow:hidden">';
-      // Header with progress bar
-      html += '<div style="padding:8px 12px;background:'+c+'0a">';
-      html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px"><span style="font-size:11px;font-weight:700;color:'+c+'">'+l+'</span><span style="font-size:10px;font-weight:700;color:'+c+'">'+done.length+'/'+cgMems.length+' · '+pct+'%</span></div>';
-      html += '<div style="height:4px;background:'+c+'22;border-radius:4px;overflow:hidden"><div style="width:'+pct+'%;height:100%;background:'+c+';border-radius:4px"></div></div>';
-      html += '</div>';
-      // Body — chips layout
-      html += '<div style="padding:10px 12px">';
-      // Belum (priority, tampil dulu)
-      if (notDone.length) {
-        html += '<div style="margin-bottom:'+(done.length?'8px':'0')+'"><div style="font-size:9px;font-weight:700;letter-spacing:.5px;color:#dc2626;margin-bottom:5px;text-transform:uppercase">✗ Belum ('+notDone.length+')</div>';
-        html += '<div style="display:flex;flex-wrap:wrap;gap:4px">';
-        notDone.forEach(m => {
-          html += '<span style="display:inline-flex;align-items:center;padding:3px 9px;background:#fef2f2;color:#dc2626;border:1px solid #fecaca;border-radius:12px;font-size:10.5px;font-weight:600">'+esc(m.nama)+'</span>';
-        });
-        html += '</div></div>';
-      }
-      // Sudah
-      if (done.length) {
-        html += '<div><div style="font-size:9px;font-weight:700;letter-spacing:.5px;color:#16a34a;margin-bottom:5px;text-transform:uppercase">✓ Sudah ('+done.length+')</div>';
-        html += '<div style="display:flex;flex-wrap:wrap;gap:4px">';
-        done.forEach(m => {
-          html += '<span style="display:inline-flex;align-items:center;padding:3px 9px;background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;border-radius:12px;font-size:10.5px;font-weight:500">'+esc(m.nama)+'</span>';
-        });
-        html += '</div></div>';
-      }
-      if (!done.length && !notDone.length) {
-        html += '<div style="font-size:10px;color:var(--g4);font-style:italic;text-align:center">Tidak ada member</div>';
-      }
-      html += '</div></div>';
+      html += '<th style="padding:8px 6px;font-size:9px;letter-spacing:.3px;color:'+c+';text-align:center;min-width:48px">'+l+'</th>';
     });
-    html += '</div>';
+    html += '</tr></thead><tbody>';
+    const sortedCgMems = [...cgMems].sort((a,b) => roleRankLC(a.status) - roleRankLC(b.status));
+    sortedCgMems.forEach(m => {
+      html += '<tr>';
+      html += '<td style="padding:8px 12px;font-weight:500;color:var(--g1);border-top:1px solid var(--g6)">'+esc(m.nama)+'</td>';
+      currentGroup.forEach(([f, l, c]) => {
+        const done = !!m[f];
+        html += '<td style="padding:6px;text-align:center;border-top:1px solid var(--g6)">';
+        if (done) {
+          html += '<span style="display:inline-block;width:22px;height:22px;border-radius:6px;background:'+c+'22;color:'+c+';font-weight:800;line-height:22px">\u2713</span>';
+        } else {
+          html += '<span style="display:inline-block;width:22px;height:22px;border-radius:6px;background:#fef2f2;color:#dc2626;font-weight:800;line-height:22px">\u2715</span>';
+        }
+        html += '</td>';
+      });
+      html += '</tr>';
+    });
+    html += '</tbody></table></div>';
 
     html += '</div></div>';
   });
