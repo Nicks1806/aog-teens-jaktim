@@ -402,7 +402,7 @@ thead th:first-child{position:sticky;left:0;z-index:3;background:#fafafa}
     </div>
     <div style="display:flex;align-items:center;gap:10px">
       <div style="position:relative">
-        <input id="coachSearch" type="text" placeholder="Cari nama member..." oninput="handleCoachSearch(this.value)" onblur="setTimeout(()=>{document.getElementById('coachSearchResults').style.display='none'},200)" onfocus="if(this.value)handleCoachSearch(this.value)" style="padding:7px 14px 7px 32px;border:1.5px solid #e4dcff;border-radius:20px;font-size:11.5px;font-family:Inter,sans-serif;width:200px;outline:none;transition:all .2s;background:#fff url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236C5CE7' stroke-width='2.5' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E&quot;) no-repeat 10px center;background-size:14px" onfocusstyle="this.style.borderColor='#6C5CE7';this.style.width='260px'">
+        <input id="coachSearch" type="text" placeholder="Cari nama member..." oninput="handleCoachSearch(this.value)" onblur="this.style.borderColor='#e4dcff';this.style.width='200px';setTimeout(()=>{document.getElementById('coachSearchResults').style.display='none'},200)" onfocus="this.style.borderColor='#6C5CE7';this.style.width='260px';if(this.value)handleCoachSearch(this.value)" style="padding:7px 14px 7px 32px;border:1.5px solid #e4dcff;border-radius:20px;font-size:11.5px;font-family:Inter,sans-serif;width:200px;outline:none;transition:all .2s;background:#fff url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236C5CE7' stroke-width='2.5' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E&quot;) no-repeat 10px center;background-size:14px">
         <div id="coachSearchResults" style="display:none;position:absolute;top:calc(100% + 4px);right:0;left:0;background:#fff;border:1px solid #e4dcff;border-radius:12px;box-shadow:0 12px 28px rgba(108,92,231,.15);max-height:360px;overflow-y:auto;z-index:100;min-width:280px"></div>
       </div>
       <div style="display:flex;align-items:center;gap:6px"><span class="live-dot"></span><span class="live-label" style="font-size:10px;color:var(--green);font-weight:600">Live</span></div>
@@ -2604,7 +2604,7 @@ function handleCoachSearch(q) {
     results.innerHTML = matches.map(m => {
       const color = CG_COLORS[m.cg] || '#7c3aed';
       const bg = CG_BG[m.cg] || '#faf5ff';
-      return '<div onclick="showMemberDetail('+m.id+')" style="display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;border-bottom:1px solid #f5f0ff;transition:background .12s" onmouseover="this.style.background=\''+bg+'\'" onmouseout="this.style.background=\'\'">' +
+      return '<div onmousedown="event.preventDefault();showMemberDetail('+m.id+')" ontouchend="event.preventDefault();showMemberDetail('+m.id+')" style="display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;border-bottom:1px solid #f5f0ff;transition:background .12s" onmouseover="this.style.background=\''+bg+'\'" onmouseout="this.style.background=\'\'">' +
         '<div style="width:30px;height:30px;border-radius:50%;background:'+bg+';color:'+color+';display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;border:1.5px solid '+color+'55">'+esc(String(m.nama||'?').trim().slice(0,1).toUpperCase())+'</div>' +
         '<div style="flex:1;min-width:0">' +
           '<div style="font-weight:600;font-size:12px;color:var(--g1);line-height:1.2">'+esc(m.nama)+'</div>' +
@@ -2627,8 +2627,9 @@ function showMemberDetail(memberId) {
   const bg = CG_BG[m.cg] || '#faf5ff';
   const initial = String(m.nama||'?').trim().slice(0,1).toUpperCase();
 
-  // Attendance stats
-  const cgDates = ALL_DATES.filter(d => d.region === m.region);
+  // Attendance stats — fallback ke region dari member lain di CG yg sama kalau null
+  const safeRegion = m.region || (ALL_MEMBERS.find(x => x.cg === m.cg && x.region)?.region) || 'jaktim1';
+  const cgDates = ALL_DATES.filter(d => d.region === safeRegion);
   let hCount = 0, iCount = 0, sCount = 0, aCount = 0, totalRecorded = 0;
   cgDates.forEach(d => {
     const st = ALL_ATTENDANCE[m.id+'_'+d.id];
@@ -2656,7 +2657,7 @@ function showMemberDetail(memberId) {
   html += '<div style="display:flex;align-items:center;gap:14px">';
   html += '<div style="width:56px;height:56px;border-radius:14px;background:rgba(255,255,255,.25);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px;backdrop-filter:blur(4px)">'+esc(initial)+'</div>';
   html += '<div style="flex:1"><div style="font-weight:700;font-size:18px;color:#fff;line-height:1.2">'+esc(m.nama)+'</div>';
-  html += '<div style="font-size:11px;color:rgba(255,255,255,.85);margin-top:4px">'+esc(m.cg)+' · '+esc(m.status||'Member')+' · '+(m.region==='jaktim1'?'Jaktim 1':'Jaktim 2')+'</div></div>';
+  html += '<div style="font-size:11px;color:rgba(255,255,255,.85);margin-top:4px">'+esc(m.cg)+' · '+esc(m.status||'Member')+' · '+(safeRegion==='jaktim1'?'Jaktim 1':'Jaktim 2')+'</div></div>';
   html += '<div style="text-align:right"><div style="font-family:\'Instrument Serif\',serif;font-size:32px;color:#fff;line-height:1">'+pct+'%</div><div style="font-size:9px;color:rgba(255,255,255,.75);letter-spacing:.5px">KEHADIRAN</div></div>';
   html += '</div></div>';
 
