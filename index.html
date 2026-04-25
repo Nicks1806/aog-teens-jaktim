@@ -719,7 +719,11 @@ async function loadAllCGEvents() {
 }
 async function addCGEvent(eventData) {
   const {data, error} = await supa.from('cg_events').insert(eventData).select().single();
-  if (error) { toast('\u274c Gagal simpan'); console.error(error); return null; }
+  if (error) {
+    toast('\u274c Gagal: '+(error.message||'unknown').slice(0,100));
+    console.error('[addCGEvent]', error, eventData);
+    return null;
+  }
   toast('\u2713 Disimpan');
   return data;
 }
@@ -2489,18 +2493,22 @@ async function saveCGEvent() {
     toast('✓ Event diupdate');
   } else {
     // ADD mode
+    let result = null;
     if (window.__coachEventCtx) {
-      // Coach/TL context — pakai target dropdown
       const target = document.getElementById('evTarget').value;
       if (target === 'all') {
-        await addCGEvent({ cg: 'ALL', region: 'all', is_shared: true, ...evData });
+        // Untuk "Semua CG" simpan ke region default (jaktim1) — biar tidak hit constraint region
+        // Tetap is_shared=true supaya muncul di semua CG via loadCGEventsForCG
+        result = await addCGEvent({ cg: 'ALL', region: coachReg || 'jaktim1', is_shared: true, ...evData });
       } else {
         const cgRegion = (ALL_MEMBERS.find(m => m.cg === target) || {}).region || coachReg || 'jaktim1';
-        await addCGEvent({ cg: target, region: cgRegion, is_shared: false, ...evData });
+        result = await addCGEvent({ cg: target, region: cgRegion, is_shared: false, ...evData });
       }
     } else {
-      await addCGEvent({ cg: CUR_CG, region: CUR_REGION, is_shared: false, ...evData });
+      result = await addCGEvent({ cg: CUR_CG, region: CUR_REGION, is_shared: false, ...evData });
     }
+    // Stop kalau gagal — biar user tahu form belum tersimpan
+    if (!result) return;
   }
   window.__coachEventCtx = false;
 
