@@ -1453,7 +1453,7 @@ async function renderDetail() {
     html += '</div>';
 
     html += '<textarea class="note" placeholder="Catatan CGL..." data-mid="'+m.id+'" onblur="saveMemberNotes(this)">' + esc(memberNotes[m.id]||'') + '</textarea>';
-    html += '<div style="text-align:right;margin-top:6px"><button onclick="deleteMember('+m.id+',\''+esc(m.nama)+'\')" style="padding:4px 12px;border:1px solid #fecaca;border-radius:8px;background:#fff;color:#dc2626;font-size:10px;font-weight:600;cursor:pointer;opacity:.6;transition:all .15s" onmouseover="this.style.opacity=1;this.style.background=\'#fef2f2\'" onmouseout="this.style.opacity=.6;this.style.background=\'#fff\'">Hapus Member</button></div>';
+    html += '<div style="text-align:right;margin-top:6px"><button onclick="deleteMember('+m.id+',\''+jsEsc(m.nama)+'\')" style="padding:4px 12px;border:1px solid #fecaca;border-radius:8px;background:#fff;color:#dc2626;font-size:10px;font-weight:600;cursor:pointer;opacity:.6;transition:all .15s" onmouseover="this.style.opacity=1;this.style.background=\'#fef2f2\'" onmouseout="this.style.opacity=.6;this.style.background=\'#fff\'">Hapus Member</button></div>';
     html += '</div>';
   });
 
@@ -1820,7 +1820,7 @@ async function renderPelayanan() {
       // Assignees container (grows to fill)
       html += '<div style="flex:1;display:flex;flex-wrap:wrap;gap:4px;align-items:center;justify-content:flex-end;min-width:180px">';
       assignees.forEach(name => {
-        html += '<span style="display:inline-flex;align-items:center;gap:2px;padding:3px 3px 3px 9px;background:'+r.bg+';color:'+r.color+';border-radius:12px;font-size:10.5px;font-weight:600;line-height:1.2">'+esc(name)+'<button onclick="removePelAssignee(\''+roleKey+'\',\''+esc(name)+'\')" style="background:none;border:0;cursor:pointer;color:'+r.color+';opacity:.65;font-size:13px;line-height:1;padding:0 4px 0 2px;border-radius:50%" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.65" title="Hapus">&times;</button></span>';
+        html += '<span style="display:inline-flex;align-items:center;gap:2px;padding:3px 3px 3px 9px;background:'+r.bg+';color:'+r.color+';border-radius:12px;font-size:10.5px;font-weight:600;line-height:1.2">'+esc(name)+'<button onclick="removePelAssignee(\''+jsEsc(roleKey)+'\',\''+jsEsc(name)+'\')" style="background:none;border:0;cursor:pointer;color:'+r.color+';opacity:.65;font-size:13px;line-height:1;padding:0 4px 0 2px;border-radius:50%" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.65" title="Hapus">&times;</button></span>';
       });
       // "+" add button (styled wrapper with hidden select overlay)
       // "+" add button — custom popover (bukan native select, biar UI konsisten)
@@ -1834,7 +1834,7 @@ async function renderPelayanan() {
       } else {
         avail.forEach(m => {
           const initial = String(m.nama||'?').trim().slice(0,1).toUpperCase();
-          html += '<div onclick="addPelAssignee(\''+roleKey+'\',\''+esc(m.nama)+'\');closePelDD(\''+ddId+'\')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;cursor:pointer;border-bottom:1px solid #f5f0ff;transition:background .12s" onmouseover="this.style.background=\''+r.bg+'\'" onmouseout="this.style.background=\'\'"><div style="width:26px;height:26px;border-radius:50%;background:'+r.bg+';color:'+r.color+';display:flex;align-items:center;justify-content:center;font-weight:800;font-size:10px;border:1.5px solid '+r.color+'66;flex-shrink:0">'+esc(initial)+'</div><div style="flex:1;min-width:0"><div style="font-weight:600;font-size:12px;color:var(--g1);line-height:1.2">'+esc(m.nama)+'</div><div style="font-size:9px;color:var(--g4);margin-top:1px">'+esc(m.status||'Member')+'</div></div></div>';
+          html += '<div onclick="addPelAssignee(\''+jsEsc(roleKey)+'\',\''+jsEsc(m.nama)+'\');closePelDD(\''+ddId+'\')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;cursor:pointer;border-bottom:1px solid #f5f0ff;transition:background .12s" onmouseover="this.style.background=\''+r.bg+'\'" onmouseout="this.style.background=\'\'"><div style="width:26px;height:26px;border-radius:50%;background:'+r.bg+';color:'+r.color+';display:flex;align-items:center;justify-content:center;font-weight:800;font-size:10px;border:1.5px solid '+r.color+'66;flex-shrink:0">'+esc(initial)+'</div><div style="flex:1;min-width:0"><div style="font-weight:600;font-size:12px;color:var(--g1);line-height:1.2">'+esc(m.nama)+'</div><div style="font-size:9px;color:var(--g4);margin-top:1px">'+esc(m.status||'Member')+'</div></div></div>';
         });
       }
       html += '</div></span>';
@@ -2608,7 +2608,11 @@ function handleCoachSearch(q) {
   const query = String(q||'').trim().toLowerCase();
   if (!query) { results.style.display = 'none'; return; }
 
-  const scope = coachRole === 'tl' ? ALL_MEMBERS : ALL_MEMBERS.filter(m => m.region === coachReg);
+  // Fallback: kalau region null, derive dari region member lain di CG yang sama
+  const cgRegionMap = {};
+  ALL_MEMBERS.forEach(m => { if (m.cg && m.region && !cgRegionMap[m.cg]) cgRegionMap[m.cg] = m.region; });
+  const memberRegion = (m) => m.region || cgRegionMap[m.cg] || null;
+  const scope = coachRole === 'tl' ? ALL_MEMBERS : ALL_MEMBERS.filter(m => memberRegion(m) === coachReg);
   const matches = scope.filter(m => String(m.nama||'').toLowerCase().includes(query)).slice(0, 12);
 
   if (matches.length === 0) {
@@ -3795,6 +3799,8 @@ async function switchRole(role) {
 
 // ========== UTILITY ==========
 function esc(s) { if (!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+// JS-string escape: untuk dipakai di dalam onclick="func('...')" — escape backslash + single quote
+function jsEsc(s) { return String(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
 
 // Non-blocking prompt replacement (tidak block main thread / disconnect realtime)
 function asyncPrompt(label, defaultVal) {
