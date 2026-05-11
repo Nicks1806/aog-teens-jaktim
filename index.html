@@ -3343,8 +3343,11 @@ function renderCoachMilestone() {
   html += '</div>';
 
   // Setiap milestone: section expandable dengan grouping by CG
+  // Prerequisite map untuk progression: hanya tampil "belum X" kalau sudah prerequisite-nya
+  const prereq = { msj2:'msj1', msj3:'msj2', cgt2:'cgt1', cgt3:'cgt2', baptis_roh:'baptis_air' };
   tlGroup.forEach(([f, l, c]) => {
-    const allBelum = mems.filter(m => !m[f]);
+    // Filter: belum field ini, DAN (tidak ada prereq ATAU sudah prereq)
+    const allBelum = mems.filter(m => !m[f] && (!prereq[f] || m[prereq[f]]));
     // Group by CG
     const byCG = {};
     allBelum.forEach(m => { if (!byCG[m.cg]) byCG[m.cg] = []; byCG[m.cg].push(m); });
