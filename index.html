@@ -3308,12 +3308,17 @@ function renderCoachMilestone() {
     all: [
       {field:'msj1',label:'MSJ 1',stroke:'#16a34a',color:'var(--green)',grad:'linear-gradient(135deg,#f0fdf4,#dcfce7)'},
       {field:'msj2',label:'MSJ 2',stroke:'#2563eb',color:'var(--blue)',grad:'linear-gradient(135deg,#eff6ff,#dbeafe)'},
+      {field:'msj3',label:'MSJ 3',stroke:'#9333ea',color:'#9333ea',grad:'linear-gradient(135deg,#faf5ff,#f3e8ff)'},
       {field:'cgt1',label:'CGT 1',stroke:'#0f766e',color:'#0f766e',grad:'linear-gradient(135deg,#f0fdfa,#ccfbf1)'},
-      {field:'baptis_air',label:'B. Air',stroke:'#7c3aed',color:'#7c3aed',grad:'linear-gradient(135deg,#faf5ff,#ede9fe)'}
+      {field:'cgt2',label:'CGT 2',stroke:'#059669',color:'#059669',grad:'linear-gradient(135deg,#ecfdf5,#d1fae5)'},
+      {field:'cgt3',label:'CGT 3',stroke:'#0891b2',color:'#0891b2',grad:'linear-gradient(135deg,#ecfeff,#cffafe)'},
+      {field:'baptis_air',label:'B. Air',stroke:'#7c3aed',color:'#7c3aed',grad:'linear-gradient(135deg,#faf5ff,#ede9fe)'},
+      {field:'baptis_roh',label:'B. Roh',stroke:'#db2777',color:'#db2777',grad:'linear-gradient(135deg,#fdf2f8,#fce7f3)'}
     ]
   };
   const donutItems = allDonuts[cmsf] || allDonuts.all;
-  const gridCols = donutItems.length;
+  // 8 donuts di Semua → 4 per baris; filter spesifik → sesuai jumlah (3 atau 2)
+  const gridCols = donutItems.length >= 8 ? 4 : donutItems.length;
 
   html += '<div style="display:grid;grid-template-columns:repeat('+gridCols+',1fr);gap:10px;margin-bottom:20px">';
   donutItems.forEach(d => {
@@ -3325,7 +3330,7 @@ function renderCoachMilestone() {
 
   // Consolidated view across all CGs (helpful for TL/Coach to scan follow-up)
   const tlGroups = {
-    all: [['msj1','MSJ 1','#16a34a'],['msj2','MSJ 2','#2563eb'],['cgt1','CGT 1','#0f766e'],['baptis_air','B.Air','#7c3aed']],
+    all: [['msj1','MSJ 1','#16a34a'],['msj2','MSJ 2','#2563eb'],['msj3','MSJ 3','#9333ea'],['cgt1','CGT 1','#0f766e'],['cgt2','CGT 2','#059669'],['cgt3','CGT 3','#0891b2'],['baptis_air','B.Air','#7c3aed'],['baptis_roh','B.Roh','#db2777']],
     msj: [['msj1','MSJ 1','#16a34a'],['msj2','MSJ 2','#2563eb'],['msj3','MSJ 3','#9333ea']],
     cgt: [['cgt1','CGT 1','#0f766e'],['cgt2','CGT 2','#059669'],['cgt3','CGT 3','#0891b2']],
     baptis: [['baptis_air','B.Air','#7c3aed'],['baptis_roh','B.Roh','#db2777']]
@@ -3401,7 +3406,7 @@ function renderCoachMilestone() {
     html += '<div style="display:flex;align-items:center;gap:10px"><span style="font-size:11px;font-weight:600;color:'+color+'">'+msPct+'% milestone</span><span class="acc-arrow" style="font-size:14px;color:var(--g3)">+</span></div></div>';
     html += '<div style="display:none;padding:14px;background:var(--white)">';
     const accGroups = {
-      all: [['msj1','MSJ 1','var(--green)'],['msj2','MSJ 2','var(--blue)'],['cgt1','CGT 1','#0f766e'],['baptis_air','B.Air','#7c3aed']],
+      all: [['msj1','MSJ 1','var(--green)'],['msj2','MSJ 2','var(--blue)'],['msj3','MSJ 3','#9333ea'],['cgt1','CGT 1','#0f766e'],['cgt2','CGT 2','#059669'],['cgt3','CGT 3','#0891b2'],['baptis_air','B.Air','#7c3aed'],['baptis_roh','B.Roh','#db2777']],
       msj: [['msj1','MSJ 1','var(--green)'],['msj2','MSJ 2','var(--blue)'],['msj3','MSJ 3','#9333ea']],
       cgt: [['cgt1','CGT 1','#0f766e'],['cgt2','CGT 2','#059669'],['cgt3','CGT 3','#0891b2']],
       baptis: [['baptis_air','B.Air','#7c3aed'],['baptis_roh','B.Roh','#db2777']]
