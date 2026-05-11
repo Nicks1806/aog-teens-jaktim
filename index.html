@@ -724,9 +724,11 @@ async function loadCGEvents(cg, region) {
   return data || [];
 }
 async function loadCGEventsForCG(cg, region) {
-  // Include: (1) event CG ini yg non-shared, DAN (2) semua shared events (is_shared=true)
-  // Supaya event "Semua CG" dari Coach dashboard muncul di CGL dashboard
-  const {data} = await supa.from('cg_events').select('id,cg,region,is_shared,name,date_start,date_end,cat,note,image').or('and(cg.eq.'+cg+',region.eq.'+region+',is_shared.eq.false),is_shared.eq.true').order('date_start');
+  // 3 level scope visible:
+  // 1. Event CG ini yg non-shared (cg=X, region=Y, is_shared=false)
+  // 2. Region-scoped shared (is_shared=true, region=Y)
+  // 3. Global shared (is_shared=true, region=all)
+  const {data} = await supa.from('cg_events').select('id,cg,region,is_shared,name,date_start,date_end,cat,note,image').or('and(cg.eq.'+cg+',region.eq.'+region+',is_shared.eq.false),and(is_shared.eq.true,region.eq.'+region+'),and(is_shared.eq.true,region.eq.all)').order('date_start');
   return data || [];
 }
 async function loadAllCGEvents() {
@@ -2377,7 +2379,14 @@ async function renderEvents(forceRefetch) {
       cardHtml += '<div class="ev-note" id="evtxt_'+evId+'" style="white-space:pre-wrap;line-height:1.4">'+noteEsc+'</div>';
     }
     cardHtml += '<div style="margin-top:8px"><span class="ev-cat" style="background:rgba(0,0,0,.05);color:'+cColor+'">'+catLabel(ev.cat)+'</span>';
-    if (showSharedBadge) cardHtml += '<span class="ev-cat" style="background:rgba(108,92,231,.06);color:var(--purple);margin-left:4px">Semua CG</span>';
+    if (showSharedBadge) {
+      // Scope: Global (region=all), region-scoped (region=jaktim1/2), atau default 'Semua CG'
+      let scopeLabel = 'Semua CG';
+      if (ev.region === 'all') scopeLabel = 'Global · Semua Jaktim';
+      else if (ev.region === 'jaktim1') scopeLabel = 'Semua CG Jaktim 1';
+      else if (ev.region === 'jaktim2') scopeLabel = 'Semua CG Jaktim 2';
+      cardHtml += '<span class="ev-cat" style="background:rgba(108,92,231,.06);color:var(--purple);margin-left:4px">'+scopeLabel+'</span>';
+    }
     cardHtml += '</div></div>';
     return cardHtml;
   }
@@ -2518,17 +2527,20 @@ async function saveCGEvent() {
     if (window.__coachEventCtx) {
       const target = document.getElementById('evTarget').value;
       if (target === 'all') {
-        // Untuk "Semua CG" simpan ke region default (jaktim1) — biar tidak hit constraint region
-        // Tetap is_shared=true supaya muncul di semua CG via loadCGEventsForCG
-        result = await addCGEvent({ cg: 'ALL', region: coachReg || 'jaktim1', is_shared: true, ...evData });
+        // Global — semua CG Jaktim 1 + Jaktim 2
+        result = await addCGEvent({ cg: 'ALL', region: 'all', is_shared: true, ...evData });
+      } else if (target.startsWith('region:')) {
+        // Region-scoped — semua CG di 1 region
+        const reg = target.slice(7);
+        result = await addCGEvent({ cg: 'ALL', region: reg, is_shared: true, ...evData });
       } else {
+        // CG spesifik
         const cgRegion = (ALL_MEMBERS.find(m => m.cg === target) || {}).region || coachReg || 'jaktim1';
         result = await addCGEvent({ cg: target, region: cgRegion, is_shared: false, ...evData });
       }
     } else {
       result = await addCGEvent({ cg: CUR_CG, region: CUR_REGION, is_shared: false, ...evData });
     }
-    // Stop kalau gagal — biar user tahu form belum tersimpan
     if (!result) return;
   }
   window.__coachEventCtx = false;
@@ -2576,11 +2588,25 @@ function openCoachAddEvent() {
   document.getElementById('evImageUrl').value = '';
   document.getElementById('evImagePreview').innerHTML = '';
   window.__evImageDataUrl = '';
-  // Populate target dropdown with all CGs (scope sesuai role)
+  // Populate target dropdown 3-level: Global / Region / Per-CG
   const sel = document.getElementById('evTarget');
-  sel.innerHTML = '<option value="all">Semua CG (shared)</option>';
+  let html = '';
+  // Level 1: Global (semua CG di Jaktim 1 + Jaktim 2)
+  html += '<option value="all">🌐 Semua CG (Jaktim 1 + Jaktim 2)</option>';
+  // Level 2: Per region
+  if (coachRole === 'tl') {
+    html += '<option value="region:jaktim1">📍 Semua CG Jaktim 1</option>';
+    html += '<option value="region:jaktim2">📍 Semua CG Jaktim 2</option>';
+  } else {
+    const rlbl = coachReg === 'jaktim1' ? 'Jaktim 1' : 'Jaktim 2';
+    html += '<option value="region:'+coachReg+'">📍 Semua CG '+rlbl+'</option>';
+  }
+  // Level 3: Per CG spesifik
   const cgs = coachRole === 'tl' ? getCGsForRegion('all') : getCGsForRegion(coachReg);
-  cgs.forEach(cg => { const o=document.createElement('option'); o.value=cg; o.textContent=cg; sel.appendChild(o); });
+  html += '<optgroup label="CG Spesifik">';
+  cgs.sort().forEach(cg => { html += '<option value="'+esc(cg)+'">'+esc(cg)+'</option>'; });
+  html += '</optgroup>';
+  sel.innerHTML = html;
   document.getElementById('evTargetWrap').style.display = 'block';
   openModal('addCGEventModal');
 }
@@ -3678,7 +3704,14 @@ async function renderCoachEvents(forceRefetch) {
       h += '<div class="ev-note" style="white-space:pre-wrap;line-height:1.4">'+noteEsc+'</div>';
     }
     h += '<div style="margin-top:8px"><span class="ev-cat" style="background:rgba(0,0,0,.05);color:'+cColor+'">'+esc(ev.cat||'')+'</span>';
-    h += '<span class="ev-cat" style="background:rgba(108,92,231,.06);color:var(--purple);margin-left:4px">'+esc(cgLabel||'Semua CG')+'</span>';
+    // Scope label: kalau is_shared, decode dari region. Else pakai cgLabel.
+    let scopeLabel = cgLabel || 'Semua CG';
+    if (ev.is_shared || isShared) {
+      if (ev.region === 'all') scopeLabel = 'Global · Semua Jaktim';
+      else if (ev.region === 'jaktim1') scopeLabel = 'Semua CG Jaktim 1';
+      else if (ev.region === 'jaktim2') scopeLabel = 'Semua CG Jaktim 2';
+    }
+    h += '<span class="ev-cat" style="background:rgba(108,92,231,.06);color:var(--purple);margin-left:4px">'+esc(scopeLabel)+'</span>';
     h += '</div></div>';
     return h;
   };
