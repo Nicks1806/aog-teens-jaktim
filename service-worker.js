@@ -4,7 +4,7 @@
 // - Supabase API calls: network-only (always fresh, no cache)
 // - Other static (CDN scripts, fonts, icons): cache-first with network fallback
 
-const CACHE_NAME = 'aog-absensi-v4';
+const CACHE_NAME = 'aog-absensi-v5';
 const SHELL_URLS = [
   '/',
   '/index.html',
