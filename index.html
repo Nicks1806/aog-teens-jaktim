@@ -2342,8 +2342,7 @@ async function renderEvents(forceRefetch) {
     const showSharedBadge = isShared || displayAsShared || ev.is_shared;
     const note = ev.note || '';
     const noteEsc = esc(note).replace(/\n/g, '<br>');
-    const isLong = note.length > 220;
-    const shortNote = isLong ? esc(note.slice(0, 220)).replace(/\n/g, '<br>') + '...' : noteEsc;
+    const isLong = note.length > 150 || (note.match(/\n/g) || []).length > 2;
     const img = ev.image || '';
     let cardHtml = '<div class="ev-card" style="border-left-color:'+cColor+';padding:14px;margin-bottom:12px" id="ev_'+evId+'">';
     cardHtml += '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px">';
@@ -2357,8 +2356,8 @@ async function renderEvents(forceRefetch) {
     cardHtml += '</div></div>';
     if (img) cardHtml += '<div style="margin:8px 0"><img src="'+esc(img)+'" alt="event" style="max-width:100%;border-radius:8px;max-height:200px;object-fit:cover" onerror="this.style.display=\'none\'"></div>';
     if (isLong) {
-      cardHtml += '<div class="ev-note" id="evtxt_'+evId+'" style="white-space:pre-wrap;line-height:1.4">'+shortNote+'</div>';
-      cardHtml += '<div style="text-align:right;margin-top:4px"><button onclick="(function(b){var n=document.getElementById(\'evtxt_'+evId+'\');var full='+JSON.stringify(noteEsc)+';var sh='+JSON.stringify(shortNote)+';var isExp=b.dataset.exp===\'1\';n.innerHTML=isExp?sh:full;b.textContent=isExp?\'Lihat selengkapnya ↓\':\'Lihat lebih sedikit ↑\';b.dataset.exp=isExp?\'0\':\'1\';})(this)" data-exp="0" style="background:none;border:none;color:var(--purple);font-size:11px;font-weight:600;cursor:pointer;padding:2px 0">Lihat selengkapnya ↓</button></div>';
+      cardHtml += '<div class="ev-note" id="evtxt_'+evId+'" style="white-space:pre-wrap;line-height:1.4;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">'+noteEsc+'</div>';
+      cardHtml += '<button onclick="(function(b){var n=document.getElementById(\'evtxt_'+evId+'\');var exp=b.dataset.exp===\'1\';if(exp){n.style.webkitLineClamp=\'3\';n.style.display=\'-webkit-box\';b.textContent=\'Baca selengkapnya\';b.dataset.exp=\'0\';}else{n.style.webkitLineClamp=\'unset\';n.style.display=\'block\';b.textContent=\'Sembunyikan\';b.dataset.exp=\'1\';}})(this)" data-exp="0" style="background:none;border:none;color:var(--purple);font-size:11px;font-weight:600;cursor:pointer;padding:4px 0 0;margin-top:2px">Baca selengkapnya</button>';
     } else {
       cardHtml += '<div class="ev-note" id="evtxt_'+evId+'" style="white-space:pre-wrap;line-height:1.4">'+noteEsc+'</div>';
     }
@@ -3638,8 +3637,7 @@ async function renderCoachEvents(forceRefetch) {
     const noteEsc = esc(note).replace(/\n/g, '<br>');
     const img = ev.image || '';
     // Note truncation: kalau > 220 char, tampil singkat + Lihat selengkapnya
-    const isLong = note.length > 220;
-    const shortNote = isLong ? esc(note.slice(0, 220)).replace(/\n/g, '<br>') + '...' : noteEsc;
+    const isLong = note.length > 150 || (note.match(/\n/g) || []).length > 2;
     let h = '<div class="ev-card" style="border-left-color:'+(leftColor||cColor)+';padding:14px;margin-bottom:12px">';
     h += '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px">';
     const dateRange = ev.date_start && ev.date_end && ev.date_end !== ev.date_start ? esc(ev.date_start)+' → '+esc(ev.date_end) : esc(ev.date_start || ev.date_end || 'Tanpa tanggal');
@@ -3652,11 +3650,11 @@ async function renderCoachEvents(forceRefetch) {
     h += '<button onclick="deleteEventCard(\''+evId+'\')" title="Hapus" class="ev-btn ev-btn-del"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>';
     h += '</div></div>';
     if (img) h += '<div style="margin:8px 0"><img src="'+esc(img)+'" alt="event" style="max-width:100%;border-radius:8px;max-height:200px;object-fit:cover" onerror="this.style.display=\'none\'"></div>';
-    // Collapsible note untuk text panjang
+    // Collapsible note (style WhatsApp): clamp ke 3 baris, klik tombol → expand inline
     if (isLong) {
       const nid = 'note_'+evId;
-      h += '<div class="ev-note" id="'+nid+'" style="white-space:pre-wrap;line-height:1.4">'+shortNote+'</div>';
-      h += '<div style="text-align:right;margin-top:4px"><button onclick="(function(b){var n=document.getElementById(\''+nid+'\');var full='+JSON.stringify(noteEsc)+';var sh='+JSON.stringify(shortNote)+';var isExp=b.dataset.exp===\'1\';n.innerHTML=isExp?sh:full;b.textContent=isExp?\'Lihat selengkapnya ↓\':\'Lihat lebih sedikit ↑\';b.dataset.exp=isExp?\'0\':\'1\';})(this)" data-exp="0" style="background:none;border:none;color:var(--purple);font-size:11px;font-weight:600;cursor:pointer;padding:2px 0">Lihat selengkapnya ↓</button></div>';
+      h += '<div class="ev-note" id="'+nid+'" style="white-space:pre-wrap;line-height:1.4;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">'+noteEsc+'</div>';
+      h += '<button onclick="(function(b){var n=document.getElementById(\''+nid+'\');var exp=b.dataset.exp===\'1\';if(exp){n.style.webkitLineClamp=\'3\';n.style.display=\'-webkit-box\';b.textContent=\'Baca selengkapnya\';b.dataset.exp=\'0\';}else{n.style.webkitLineClamp=\'unset\';n.style.display=\'block\';b.textContent=\'Sembunyikan\';b.dataset.exp=\'1\';}})(this)" data-exp="0" style="background:none;border:none;color:var(--purple);font-size:11px;font-weight:600;cursor:pointer;padding:4px 0 0;margin-top:2px">Baca selengkapnya</button>';
     } else {
       h += '<div class="ev-note" style="white-space:pre-wrap;line-height:1.4">'+noteEsc+'</div>';
     }
