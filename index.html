@@ -3661,14 +3661,53 @@ async function renderCoachEvents(forceRefetch) {
     cgEvents.filter(passFilter).forEach(ev => { html += buildCard(ev, false, color, cg); });
   });
 
-  // Birthdays (read-only)
+  // Birthdays (read-only) \u2014 dengan countdown badge + sorted by upcoming
   if (COACH_EV_FILTER==='all' || COACH_EV_FILTER==='birthday') {
+    function parseBirthdayLocal(s){
+      s = String(s||'').trim();
+      let m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
+      if (m) return {day:+m[1], month:+m[2], year:+m[3]>99?+m[3]:2000+ +m[3]};
+      m = s.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/);
+      if (m) return {year:+m[1], month:+m[2], day:+m[3]};
+      return null;
+    }
+    const today = new Date(); today.setHours(0,0,0,0);
+    const MONTH_ID = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Ags','Sep','Okt','Nov','Des'];
+    // Gabungkan semua birthday dari semua CG ke 1 list + sort by upcoming
+    const allBirthdays = [];
     cgs.forEach(cg => {
       const color = CG_COLORS[cg] || '#7c3aed';
-      const cgMems = ALL_MEMBERS.filter(m => m.cg === cg && m.lahir);
-      cgMems.forEach(m => {
-        html += '<div class="ev-card" style="border-left-color:#f472b6"><div class="ev-date">'+esc(m.lahir)+'</div><div class="ev-name">\ud83c\udf82 '+esc(m.nama)+' \u2014 Ulang Tahun</div><div class="ev-note">Member '+esc(cg)+'</div><span class="ev-cat" style="background:rgba(244,114,182,.08);color:#ec4899">Birthday</span><span class="ev-cat" style="background:rgba(0,0,0,.05);color:'+color+';margin-left:4px">'+esc(cg)+'</span></div>';
+      ALL_MEMBERS.filter(m => m.cg === cg && m.lahir).forEach(m => {
+        const bd = parseBirthdayLocal(m.lahir);
+        if (!bd) return;
+        let next = new Date(today.getFullYear(), bd.month-1, bd.day);
+        next.setHours(0,0,0,0);
+        if (next < today) next = new Date(today.getFullYear()+1, bd.month-1, bd.day);
+        const daysLeft = Math.ceil((next - today)/(1000*60*60*24));
+        const turnAge = next.getFullYear() - bd.year;
+        const dateLabel = bd.day + ' ' + MONTH_ID[bd.month-1] + ' ' + next.getFullYear();
+        allBirthdays.push({...m, _color:color, _cg:cg, _daysLeft:daysLeft, _turnAge:turnAge, _dateLabel:dateLabel});
       });
+    });
+    allBirthdays.sort((a,b) => a._daysLeft - b._daysLeft);
+
+    allBirthdays.forEach(m => {
+      let badgeText, badgeBg, badgeColor;
+      if (m._daysLeft === 0)      { badgeText='HARI INI! \ud83c\udf89'; badgeBg='#fce7f3'; badgeColor='#be185d'; }
+      else if (m._daysLeft === 1) { badgeText='Besok';        badgeBg='#fce7f3'; badgeColor='#be185d'; }
+      else if (m._daysLeft <= 7)  { badgeText=m._daysLeft+' hari lagi'; badgeBg='#fef3c7'; badgeColor='#92400e'; }
+      else if (m._daysLeft <= 30) { badgeText=m._daysLeft+' hari lagi'; badgeBg='#dbeafe'; badgeColor='#1e40af'; }
+      else                        { badgeText=m._daysLeft+' hari lagi'; badgeBg='#f3f4f6'; badgeColor='#6b7280'; }
+
+      html += '<div class="ev-card" style="border-left-color:#f472b6;display:flex;justify-content:space-between;align-items:center;gap:12px">';
+      html += '<div style="flex:1">';
+      html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap"><span class="ev-date" style="margin:0">'+esc(m._dateLabel)+'</span><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:'+badgeBg+';color:'+badgeColor+';white-space:nowrap">'+badgeText+'</span></div>';
+      html += '<div class="ev-name">\ud83c\udf82 '+esc(m.nama)+'</div>';
+      html += '<div class="ev-note">Ulang tahun ke-'+m._turnAge+' \u00b7 Member '+esc(m._cg)+'</div>';
+      html += '<div style="margin-top:6px"><span class="ev-cat" style="background:rgba(244,114,182,.08);color:#ec4899">Birthday</span><span class="ev-cat" style="background:rgba(0,0,0,.05);color:'+m._color+';margin-left:4px">'+esc(m._cg)+'</span></div>';
+      html += '</div>';
+      html += '<div style="text-align:center;min-width:70px;flex-shrink:0"><div style="font-family:\'Instrument Serif\',serif;font-size:32px;line-height:1;color:#ec4899">'+m._daysLeft+'</div><div style="font-size:9px;color:var(--g4);letter-spacing:.5px">HARI</div></div>';
+      html += '</div>';
     });
   }
 
