@@ -3357,7 +3357,7 @@ function renderCoachMilestone() {
     const byCG = {};
     allBelum.forEach(m => { if (!byCG[m.cg]) byCG[m.cg] = []; byCG[m.cg].push(m); });
     const cgList = Object.keys(byCG).sort();
-    const isCollapsed = allBelum.length > 6; // auto-collapse kalau banyak
+    const isCollapsed = true; // default selalu tertutup — user klik untuk expand
 
     html += '<div style="border-bottom:1px solid var(--g6)">';
     // Header clickable
