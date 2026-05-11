@@ -4,7 +4,7 @@
 // - Supabase API calls: network-only (always fresh, no cache)
 // - Other static (CDN scripts, fonts, icons): cache-first with network fallback
 
-const CACHE_NAME = 'aog-absensi-v2';
+const CACHE_NAME = 'aog-absensi-v3';
 const SHELL_URLS = [
   '/',
   '/index.html',
@@ -72,6 +72,36 @@ self.addEventListener('fetch', (event) => {
         }
         return res;
       }).catch(() => cached);
+    })
+  );
+});
+
+// ─── Push notifications (Web Push API — kalau ada server VAPID) ───
+self.addEventListener('push', (event) => {
+  let data = {};
+  try { data = event.data ? event.data.json() : {}; } catch(e) { data = { title: 'AOG Teens', body: event.data ? event.data.text() : '' }; }
+  const title = data.title || 'AOG Teens Jaktim';
+  const opts = {
+    body: data.body || '',
+    icon: data.icon || '/manifest.json',
+    badge: data.badge || data.icon,
+    tag: data.tag || 'aog',
+    vibrate: [80, 40, 80],
+    data: { url: data.url || '/' }
+  };
+  event.waitUntil(self.registration.showNotification(title, opts));
+});
+
+// ─── Klik notification → buka/fokus app ───
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const url = (event.notification.data && event.notification.data.url) || '/';
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((wins) => {
+      for (const w of wins) {
+        if ('focus' in w) { w.navigate(url).catch(() => {}); return w.focus(); }
+      }
+      if (self.clients.openWindow) return self.clients.openWindow(url);
     })
   );
 });

@@ -298,6 +298,10 @@ function syncAbsensi(region, sheetName, dateStartCol) {
     return;
   }
 
+  // Cleanup: hapus kolom tanggal duplikat (kalau ada) sebelum proses lanjut
+  dedupDateColumns(sheet, dateStartCol);
+  lastCol = sheet.getLastColumn();
+
   // ═══ Append new dates as columns at end ═══
   var dateCount = lastCol - dateStartCol + 1;
   var sheetDates = dateCount > 0 ? sheet.getRange(HEADER_DATE_ROW, dateStartCol, 1, dateCount).getValues()[0] : [];
@@ -409,33 +413,83 @@ function syncAbsensi(region, sheetName, dateStartCol) {
 
   var newMembers = members.filter(function(m) { return !existingNames[norm(m.nama)]; });
   if (newMembers.length > 0) {
-    // Sort new members by CG+role
-    newMembers.sort(function(a,b) {
-      var ca = (a.cg||'').localeCompare(b.cg||'');
-      if (ca!==0) return ca;
-      return roleRank(a.status) - roleRank(b.status);
+    // Group new members by CG
+    var newByCg = {};
+    newMembers.forEach(function(m) {
+      var cg = m.cg || '';
+      if (!newByCg[cg]) newByCg[cg] = [];
+      newByCg[cg].push(m);
     });
-    // Append at bottom
-    var appendRow = lastRow + 1;
-    // Cek CG header — kalau CG sudah ada, jangan isi CG label lagi
-    var cgInSheet = {};
-    sheet.getRange(DATA_START_ROW, CG_COL, nameCount, 1).getValues().forEach(function(r){
-      var c = String(r[0]||'').trim();
-      if (c) cgInSheet[c] = true;
+    // Sort each CG's new members by role + name
+    Object.keys(newByCg).forEach(function(cg) {
+      newByCg[cg].sort(function(a,b) {
+        var ra = roleRank(a.status), rb = roleRank(b.status);
+        if (ra !== rb) return ra - rb;
+        return (a.nama||'').localeCompare(b.nama||'');
+      });
     });
 
-    var appendData = [];
-    var appendBgs = [];
-    newMembers.forEach(function(m) {
-      var isFirst = !cgInSheet[m.cg];
-      if (isFirst) cgInSheet[m.cg] = true;
-      var roleBg = ROLE_BG[(m.status||'member').toLowerCase().trim()] || '#ffffff';
-      appendData.push([isFirst ? m.cg : '', '', m.nama||'', '']);
-      appendBgs.push([roleBg, roleBg, roleBg, roleBg]);
+    // Build map CG → {firstRow, lastRow, count} dari sheet existing
+    var cgColVals = sheet.getRange(DATA_START_ROW, CG_COL, nameCount, 1).getValues();
+    var cgRanges = {};
+    var curCg = null;
+    for (var i = 0; i < cgColVals.length; i++) {
+      var cgVal = String(cgColVals[i][0]||'').trim();
+      var rowIdx = DATA_START_ROW + i;
+      if (cgVal) {
+        curCg = cgVal;
+        cgRanges[curCg] = { firstRow: rowIdx, lastRow: rowIdx, count: 1 };
+      } else if (curCg) {
+        cgRanges[curCg].lastRow = rowIdx;
+        cgRanges[curCg].count++;
+      }
+    }
+
+    var allCgs = Object.keys(newByCg);
+    var existingCgs = allCgs.filter(function(cg){ return cgRanges[cg]; });
+    var newCgs = allCgs.filter(function(cg){ return !cgRanges[cg]; });
+
+    // Insert dari bawah ke atas supaya row index CG di atasnya tidak shift
+    existingCgs.sort(function(a,b){ return cgRanges[b].lastRow - cgRanges[a].lastRow; });
+
+    var totalInserted = 0;
+    existingCgs.forEach(function(cg) {
+      var ms = newByCg[cg];
+      var insertAfter = cgRanges[cg].lastRow;
+      var startNo = cgRanges[cg].count + 1;
+
+      sheet.insertRowsAfter(insertAfter, ms.length);
+
+      var rowData = [];
+      var rowBgs = [];
+      ms.forEach(function(m, idx) {
+        var bg = ROLE_BG[(m.status||'member').toLowerCase().trim()] || '#ffffff';
+        rowData.push(['', startNo + idx, m.nama||'', '']);
+        rowBgs.push([bg, bg, bg, bg]);
+      });
+      sheet.getRange(insertAfter+1, 1, rowData.length, 4).setValues(rowData).setBackgrounds(rowBgs);
+      totalInserted += ms.length;
     });
-    sheet.getRange(appendRow, 1, appendData.length, 4).setValues(appendData).setBackgrounds(appendBgs);
+
+    // CG baru yang belum ada → append di bawah
+    if (newCgs.length > 0) {
+      var lr = sheet.getLastRow();
+      var appendRow = lr + 1;
+      var appendData = [], appendBgs = [];
+      newCgs.forEach(function(cg) {
+        var ms = newByCg[cg];
+        ms.forEach(function(m, idx) {
+          var bg = ROLE_BG[(m.status||'member').toLowerCase().trim()] || '#ffffff';
+          appendData.push([idx===0 ? cg : '', idx+1, m.nama||'', '']);
+          appendBgs.push([bg, bg, bg, bg]);
+        });
+      });
+      sheet.getRange(appendRow, 1, appendData.length, 4).setValues(appendData).setBackgrounds(appendBgs);
+      totalInserted += appendData.length;
+    }
+
     SpreadsheetApp.flush();
-    Logger.log('+'+newMembers.length+' member rows di '+sheetName);
+    Logger.log('+'+totalInserted+' member rows di '+sheetName+' (in-place per CG)');
     lastRow = sheet.getLastRow();
     nameCount = lastRow - DATA_START_ROW + 1;
     sheetNameRange = sheet.getRange(DATA_START_ROW, NAMA_COL, nameCount, 1).getValues();
@@ -506,43 +560,99 @@ function syncDetail(region, sheetName) {
     if (nn) nameToRow[nn] = DETAIL_DATA_ROW + i;
   }
 
-  // Append new members at bottom
+  // Append new members — in-place per CG (sisipkan ke grup masing-masing)
   var newMembers = members.filter(function(m) { return !nameToRow[norm(m.nama)]; });
   if (newMembers.length > 0) {
-    newMembers.sort(function(a,b) {
-      var ca = (a.cg||'').localeCompare(b.cg||'');
-      if (ca!==0) return ca;
-      return roleRank(a.status) - roleRank(b.status);
-    });
-    var cgInSheet = {};
-    sheet.getRange(DETAIL_DATA_ROW, DETAIL_COLS.cg, dataCount, 1).getValues().forEach(function(r){
-      var c = String(r[0]||'').trim();
-      if (c) cgInSheet[c] = true;
-    });
-    var rows = [];
-    var msBgs = [], msFonts = [];
+    // Group by CG + sort per role
+    var newByCg = {};
     newMembers.forEach(function(m) {
-      var isFirst = !cgInSheet[m.cg];
-      if (isFirst) cgInSheet[m.cg] = true;
-      rows.push([
-        isFirst ? m.cg : '', '', m.nama||'', m.status||'',
+      var cg = m.cg || '';
+      if (!newByCg[cg]) newByCg[cg] = [];
+      newByCg[cg].push(m);
+    });
+    Object.keys(newByCg).forEach(function(cg) {
+      newByCg[cg].sort(function(a,b) {
+        var ra = roleRank(a.status), rb = roleRank(b.status);
+        if (ra !== rb) return ra - rb;
+        return (a.nama||'').localeCompare(b.nama||'');
+      });
+    });
+
+    // Map CG → {firstRow, lastRow, count}
+    var cgColVals = sheet.getRange(DETAIL_DATA_ROW, DETAIL_COLS.cg, dataCount, 1).getValues();
+    var cgRanges = {};
+    var curCg = null;
+    for (var i=0; i<cgColVals.length; i++) {
+      var cgVal = String(cgColVals[i][0]||'').trim();
+      var rowIdx = DETAIL_DATA_ROW + i;
+      if (cgVal) {
+        curCg = cgVal;
+        cgRanges[curCg] = { firstRow: rowIdx, lastRow: rowIdx, count: 1 };
+      } else if (curCg) {
+        cgRanges[curCg].lastRow = rowIdx;
+        cgRanges[curCg].count++;
+      }
+    }
+
+    var allCgs = Object.keys(newByCg);
+    var existingCgs = allCgs.filter(function(cg){ return cgRanges[cg]; });
+    var newCgs = allCgs.filter(function(cg){ return !cgRanges[cg]; });
+
+    // Insert dari bawah ke atas
+    existingCgs.sort(function(a,b){ return cgRanges[b].lastRow - cgRanges[a].lastRow; });
+
+    var buildRow = function(m, no, withCg) {
+      return [
+        withCg ? (m.cg||'') : '', no, m.nama||'', m.status||'',
         m.lahir||'', m.wa||'', m.kelurahan||'', m.kecamatan||'',
         m.msj1?'TRUE':'FALSE', m.msj2?'TRUE':'FALSE', m.msj3?'TRUE':'FALSE',
         m.cgt1?'TRUE':'FALSE', m.cgt2?'TRUE':'FALSE', m.cgt3?'TRUE':'FALSE',
         m.baptis_air?'TRUE':'FALSE', m.baptis_roh?'TRUE':'FALSE',
         m.sekolah||'', m.kelas||''
-      ]);
-      var msRowBg=[], msRowFc=[];
+      ];
+    };
+    var buildMs = function(m) {
+      var bgs=[], fcs=[];
       ['msj1','msj2','msj3','cgt1','cgt2','cgt3','baptis_air','baptis_roh'].forEach(function(f){
-        if (m[f]) { msRowBg.push('#c6efce'); msRowFc.push('#276221'); }
-        else { msRowBg.push('#ffc7ce'); msRowFc.push('#9c0006'); }
+        if (m[f]) { bgs.push('#c6efce'); fcs.push('#276221'); }
+        else { bgs.push('#ffc7ce'); fcs.push('#9c0006'); }
       });
-      msBgs.push(msRowBg); msFonts.push(msRowFc);
+      return { bgs: bgs, fcs: fcs };
+    };
+
+    var totalInserted = 0;
+    existingCgs.forEach(function(cg) {
+      var ms = newByCg[cg];
+      var insertAfter = cgRanges[cg].lastRow;
+      var startNo = cgRanges[cg].count + 1;
+      sheet.insertRowsAfter(insertAfter, ms.length);
+      var rowData = [], msBgs = [], msFonts = [];
+      ms.forEach(function(m, idx) {
+        rowData.push(buildRow(m, startNo+idx, false)); // CG col blank krn bukan first
+        var msc = buildMs(m); msBgs.push(msc.bgs); msFonts.push(msc.fcs);
+      });
+      sheet.getRange(insertAfter+1, 1, rowData.length, 18).setValues(rowData);
+      sheet.getRange(insertAfter+1, DETAIL_COLS.msj1, rowData.length, 8).setBackgrounds(msBgs).setFontColors(msFonts);
+      totalInserted += ms.length;
     });
-    sheet.getRange(lastRow+1, 1, rows.length, 18).setValues(rows);
-    sheet.getRange(lastRow+1, DETAIL_COLS.msj1, rows.length, 8).setBackgrounds(msBgs).setFontColors(msFonts);
+
+    if (newCgs.length > 0) {
+      var lr = sheet.getLastRow();
+      var appendRow = lr + 1;
+      var rowData = [], msBgs = [], msFonts = [];
+      newCgs.forEach(function(cg) {
+        newByCg[cg].forEach(function(m, idx) {
+          rowData.push(buildRow(m, idx+1, idx===0));
+          var msc = buildMs(m); msBgs.push(msc.bgs); msFonts.push(msc.fcs);
+        });
+      });
+      sheet.getRange(appendRow, 1, rowData.length, 18).setValues(rowData);
+      sheet.getRange(appendRow, DETAIL_COLS.msj1, rowData.length, 8).setBackgrounds(msBgs).setFontColors(msFonts);
+      totalInserted += rowData.length;
+    }
+
     SpreadsheetApp.flush();
-    Logger.log('+'+newMembers.length+' detail rows di '+sheetName);
+    Logger.log('+'+totalInserted+' detail rows di '+sheetName+' (in-place per CG)');
     // Refresh row mapping
     lastRow = sheet.getLastRow();
     dataCount = lastRow - DETAIL_DATA_ROW + 1;
@@ -616,17 +726,94 @@ function normDate(s) {
   if (s instanceof Date) return s.getDate()+'-'+(s.getMonth()+1);
   s = String(s||'').trim();
   if (!s) return '';
-  var dm = s.match(/^\w+\s+(\w+)\s+(\d+)\s+(\d+)/);
+
+  // ISO format: 2026-01-03 atau 2026/01/03 → year first (>31)
+  var iso = s.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
+  if (iso) return parseInt(iso[3])+'-'+parseInt(iso[2]);
+
+  // English "Sun Jan 3 2026" or "Sunday Jan 3"
+  var dm = s.match(/^\w+\s+(\w+)\s+(\d+)/);
   if (dm) {
     var mo2 = {Jan:1,Feb:2,Mar:3,Apr:4,May:5,Jun:6,Jul:7,Aug:8,Sep:9,Oct:10,Nov:11,Dec:12};
-    if (mo2[dm[1]]) return dm[2]+'-'+mo2[dm[1]];
+    if (mo2[dm[1]]) return parseInt(dm[2])+'-'+mo2[dm[1]];
   }
-  var mo = {jan:1,feb:2,mar:3,apr:4,mei:5,may:5,jun:6,jul:7,agu:8,aug:8,sep:9,okt:10,oct:10,nov:11,des:12,dec:12};
+
+  // Indonesian/English "3 Januari" / "3 Jan" / "3 January"
+  var mo = {
+    jan:1,januari:1,january:1,
+    feb:2,februari:2,february:2,
+    mar:3,maret:3,march:3,
+    apr:4,april:4,
+    mei:5,may:5,
+    jun:6,juni:6,june:6,
+    jul:7,juli:7,july:7,
+    agu:8,agt:8,agustus:8,aug:8,august:8,
+    sep:9,september:9,
+    okt:10,oktober:10,oct:10,october:10,
+    nov:11,november:11,
+    des:12,desember:12,dec:12,december:12
+  };
   var m = s.match(/^(\d+)\s+([a-zA-Z]+)/);
-  if (m) { var n=mo[m[2].toLowerCase()]; return n ? m[1]+'-'+n : s.toLowerCase(); }
-  m = s.match(/^(\d+)[\/\-](\d+)[\/\-]/);
-  if (m) return m[1]+'-'+parseInt(m[2]);
-  m = s.match(/^(\d+)[\/\-](\d+)$/);
-  if (m) return m[1]+'-'+parseInt(m[2]);
+  if (m) {
+    var n = mo[m[2].toLowerCase()];
+    if (n) return parseInt(m[1])+'-'+n;
+  }
+
+  // DD-MM-YY or DD/MM/YYYY: 3-1-26 atau 3/1/2026
+  m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-]/);
+  if (m) return parseInt(m[1])+'-'+parseInt(m[2]);
+
+  // DD-MM
+  m = s.match(/^(\d{1,2})[\/\-](\d{1,2})$/);
+  if (m) return parseInt(m[1])+'-'+parseInt(m[2]);
+
   return s.toLowerCase();
+}
+
+// Hapus kolom tanggal duplikat (same normDate) — keep yang punya data, hapus yang kosong
+function dedupDateColumns(sheet, dateStartCol) {
+  var lastCol = sheet.getLastColumn();
+  var lastRow = sheet.getLastRow();
+  if (lastCol < dateStartCol || lastRow < DATA_START_ROW) return 0;
+  var dateCount = lastCol - dateStartCol + 1;
+  var sheetDates = sheet.getRange(HEADER_DATE_ROW, dateStartCol, 1, dateCount).getValues()[0];
+  var nameCount = lastRow - DATA_START_ROW + 1;
+  if (nameCount <= 0) return 0;
+  var dataBlock = sheet.getRange(DATA_START_ROW, dateStartCol, nameCount, dateCount).getValues();
+
+  // Map normDate → array of {col, hasData}
+  var seen = {};
+  for (var c = 0; c < dateCount; c++) {
+    var nd = normDate(sheetDates[c]);
+    if (!nd) continue;
+    var has = false;
+    for (var r = 0; r < nameCount; r++) {
+      if (String(dataBlock[r][c]||'').trim() !== '') { has = true; break; }
+    }
+    if (!seen[nd]) seen[nd] = [];
+    seen[nd].push({ col: dateStartCol + c, hasData: has });
+  }
+
+  // Untuk setiap nd dengan >1 entry: keep one dengan data; hapus yang lain
+  var deleteCols = [];
+  Object.keys(seen).forEach(function(nd) {
+    var arr = seen[nd];
+    if (arr.length < 2) return;
+    // Sort: yang punya data dulu, lalu yang kiri
+    arr.sort(function(a,b){
+      if (a.hasData !== b.hasData) return a.hasData ? -1 : 1;
+      return a.col - b.col;
+    });
+    // Keep arr[0], rest hapus
+    for (var i = 1; i < arr.length; i++) deleteCols.push(arr[i].col);
+  });
+
+  // Hapus dari kanan ke kiri supaya index tidak shift
+  deleteCols.sort(function(a,b){ return b - a; });
+  deleteCols.forEach(function(col) { sheet.deleteColumn(col); });
+  if (deleteCols.length > 0) {
+    SpreadsheetApp.flush();
+    Logger.log('Dedup: hapus '+deleteCols.length+' kolom tanggal duplikat di '+sheet.getName());
+  }
+  return deleteCols.length;
 }
