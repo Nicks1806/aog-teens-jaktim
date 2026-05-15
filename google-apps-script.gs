@@ -723,7 +723,11 @@ function roleRank(s) {
 }
 
 function normDate(s) {
-  if (s instanceof Date) return s.getDate()+'-'+(s.getMonth()+1);
+  if (s instanceof Date) {
+    // Pakai timezone Asia/Jakarta supaya konsisten tanpa tergantung script TZ
+    var jktStr = Utilities.formatDate(s, 'Asia/Jakarta', 'd-M');
+    return jktStr;
+  }
   s = String(s||'').trim();
   if (!s) return '';
 

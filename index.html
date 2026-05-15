@@ -505,8 +505,15 @@ function notifEnabled() {
 }
 async function requestNotifPermission() {
   if (!('Notification' in window)) { toast('Browser tidak support notifikasi','err'); return false; }
-  if (Notification.permission === 'granted') { localStorage.setItem(NOTIF_KEY,'1'); return true; }
-  if (Notification.permission === 'denied') { toast('Notifikasi diblokir. Aktifkan di pengaturan browser.','err'); return false; }
+  // iOS: notifikasi hanya jalan kalau PWA sudah di-install (standalone mode) + iOS 16.4+
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  if (isIOS && !isStandalone) {
+    toast('iOS: install dulu ke Home Screen (Share → Add to Home Screen) untuk aktifkan notifikasi','err');
+    return false;
+  }
+  if (Notification.permission === 'granted') { localStorage.setItem(NOTIF_KEY,'1'); toast('Notifikasi aktif 🔔','ok'); return true; }
+  if (Notification.permission === 'denied') { toast('Notifikasi diblokir. Aktifkan di pengaturan browser/aplikasi.','err'); return false; }
   const p = await Notification.requestPermission();
   if (p === 'granted') { localStorage.setItem(NOTIF_KEY,'1'); toast('Notifikasi aktif 🔔','ok'); return true; }
   toast('Notifikasi dibatalkan','err'); return false;
@@ -528,15 +535,14 @@ function pushNotif(title, body, tag) {
   if (document.visibilityState === 'visible') return; // skip kalau app sedang dibuka
   if (tag && _NOTIF_DEDUPE.has(tag)) return;
   if (tag) { _NOTIF_DEDUPE.add(tag); setTimeout(() => _NOTIF_DEDUPE.delete(tag), 5000); }
+  // iOS Safari: new Notification() throws Illegal constructor — hanya boleh via SW.
+  // Kalau SW belum aktif, skip daripada error silent.
+  if (!navigator.serviceWorker || !navigator.serviceWorker.controller) return;
   try {
-    const icon = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIj48cmVjdCB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgcng9IjQ0IiBmaWxsPSIjNkM1Q0U3Ii8+PHRleHQgeD0iOTYiIHk9IjExNSIgZm9udC1mYW1pbHk9Ikdlb3JnaWEsc2VyaWYiIGZvbnQtc2l6ZT0iNzAiIGZvbnQtc3R5bGU9Iml0YWxpYyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZiI+QU9HPC90ZXh0Pjwvc3ZnPg==';
-    if (navigator.serviceWorker && navigator.serviceWorker.controller) {
-      navigator.serviceWorker.ready.then(reg => {
-        reg.showNotification(title, { body, icon, badge: icon, tag: tag || 'aog', vibrate: [80,40,80], data: { url: '/' } });
-      });
-    } else {
-      new Notification(title, { body, icon, tag: tag || 'aog' });
-    }
+    const icon = '/icon.jpg';
+    navigator.serviceWorker.ready.then(reg => {
+      reg.showNotification(title, { body, icon, badge: icon, tag: tag || 'aog', vibrate: [80,40,80], data: { url: '/' } });
+    }).catch(() => {});
   } catch(e) { void 0; }
 }
 
@@ -629,15 +635,25 @@ function handlePelayananChange(payload) {
 }
 
 // ── Events handler: re-render events tab (debounced) ──
+// Track event IDs yang dibuat di session ini — supaya notif tidak fire untuk own writes
+const _OWN_EVENT_IDS = new Set();
+function markOwnEvent(id) {
+  if (!id) return;
+  _OWN_EVENT_IDS.add(String(id));
+  setTimeout(() => _OWN_EVENT_IDS.delete(String(id)), 15000);
+}
+
 function handleEventsChange(payload) {
-  // Push notification untuk event baru
+  // Push notification untuk event baru (skip kalau dibuat di session ini sendiri)
   try {
     if (payload.eventType === 'INSERT' && payload.new) {
       const ev = payload.new;
-      const name = ev.name || 'Event baru';
-      const cat = ev.cat ? ' • ' + ev.cat : '';
-      const when = ev.date_start ? ' • ' + ev.date_start : '';
-      pushNotif('📅 Event baru: ' + name, 'Cek tab Events' + cat + when, 'ev_' + ev.id);
+      if (!_OWN_EVENT_IDS.has(String(ev.id))) {
+        const name = ev.name || 'Event baru';
+        const cat = ev.cat ? ' • ' + ev.cat : '';
+        const when = ev.date_start ? ' • ' + ev.date_start : '';
+        pushNotif('📅 Event baru: ' + name, 'Cek tab Events' + cat + when, 'ev_' + ev.id);
+      }
     }
   } catch(e) { void 0; }
   rtDebounce('events', async () => {
@@ -804,6 +820,7 @@ async function addCGEvent(eventData) {
     console.error('[addCGEvent]', error, eventData);
     return null;
   }
+  if (data && data.id) markOwnEvent(data.id);
   toast('\u2713 Disimpan');
   return data;
 }
@@ -845,12 +862,11 @@ async function cleanupPastEvents() {
   const cutoff = new Date(); cutoff.setHours(0,0,0,0); cutoff.setDate(cutoff.getDate() - 7);
   const cutoffStr = cutoff.toISOString().slice(0,10);
   try {
-    // events table
-    await supa.from('events').delete().lt('date_end', cutoffStr).not('date_end','is',null);
-    await supa.from('events').delete().lt('date_start', cutoffStr).is('date_end', null);
-    // cg_events table
-    await supa.from('cg_events').delete().lt('date_end', cutoffStr).not('date_end','is',null);
-    await supa.from('cg_events').delete().lt('date_start', cutoffStr).is('date_end', null);
+    // events table (shared/global) — JANGAN auto-cleanup, biar admin yang manage manual
+    // Hanya cleanup event per-CG yang sudah lama lewat
+    // cg_events table — skip global events (is_shared=true) supaya tidak hilang dari semua CG sekaligus
+    await supa.from('cg_events').delete().lt('date_end', cutoffStr).not('date_end','is',null).eq('is_shared', false);
+    await supa.from('cg_events').delete().lt('date_start', cutoffStr).is('date_end', null).eq('is_shared', false);
   } catch(e) {
     void 0;
   }
@@ -1544,9 +1560,11 @@ async function renderDetail() {
 async function deleteMember(memberId, memberName) {
   if (!confirm('Hapus "'+memberName+'" dari CG ini?\n\nSemua data attendance & notes member ini akan ikut terhapus. Aksi ini tidak bisa di-undo.')) return;
   try {
-    // Hapus data terkait dulu, lalu member
-    await supa.from('attendance').delete().eq('member_id', memberId);
-    await supa.from('member_notes').delete().eq('member_id', memberId);
+    // Hapus data terkait dulu, lalu member — cek error tiap step supaya tidak ada orphan row
+    const attRes = await supa.from('attendance').delete().eq('member_id', memberId);
+    if (attRes.error) throw new Error('Gagal hapus attendance: ' + attRes.error.message);
+    const notesRes = await supa.from('member_notes').delete().eq('member_id', memberId);
+    if (notesRes.error) throw new Error('Gagal hapus notes: ' + notesRes.error.message);
     const { error } = await supa.from('members').delete().eq('id', memberId);
     if (error) throw error;
 
@@ -1717,15 +1735,15 @@ async function renderVisiCG() {
 }
 
 function buildDevRow(d, i) {
-  const roleCls = (d.current_status||d.currentRole||'member').toLowerCase();
   const memberName = d.member_name || d.name || '';
-  const currentRole = d.current_status || d.currentRole || 'Member';
-  const targetRole = d.target_status || d.target || 'Sponsor';
+  const currentRole = roleLabel(d.current_status || d.currentRole || 'Member');
+  const targetRole = roleLabel(d.target_status || d.target || 'Sponsor');
+  const curCls = roleCls(currentRole);
   const rowId = d.id || '';
   return '<div class="dev-row"><div class="dev-name">' + esc(memberName) + '</div>' +
-    '<span class="dev-current rbadge ' + roleCls + '">' + esc(currentRole) + '</span>' +
+    '<span class="dev-current rbadge ' + curCls + '">' + esc(currentRole) + '</span>' +
     '<span style="font-size:11px;color:var(--g3)">\u2192</span>' +
-    '<select class="dev-select" data-idx="'+i+'"><option'+(targetRole==='CGL'?' selected':'')+'>Target: CGL</option><option'+(targetRole==='Sponsor'?' selected':'')+'>Target: Sponsor</option><option'+(targetRole==='Member'?' selected':'')+'>Target: Member</option></select>' +
+    '<select class="dev-select" data-idx="'+i+'"><option value="CGL"'+(targetRole==='CGL'?' selected':'')+'>Target: CGL</option><option value="Sponsor"'+(targetRole==='Sponsor'?' selected':'')+'>Target: Sponsor</option><option value="Member"'+(targetRole==='Member'?' selected':'')+'>Target: Member</option></select>' +
     '<input type="date" class="dev-date" value="' + (d.deadline||'') + '" data-idx="'+i+'">' +
     (rowId ? '<button onclick="removeDevPlan('+rowId+')" style="background:none;border:none;cursor:pointer;color:var(--red);font-size:14px;padding:2px 6px" title="Hapus">&times;</button>' : '') +
     '</div>';
@@ -1784,6 +1802,7 @@ async function confirmDevPlan() {
 }
 
 async function removeDevPlan(id) {
+  if (!confirm('Hapus rencana pengembangan ini?')) return;
   await deleteDevPlan(id);
   await renderVisiCG();
 }
@@ -3562,6 +3581,17 @@ function renderCoachMilestone() {
   el.innerHTML = html;
 }
 
+// Track CG mana yang accordion-nya expanded — supaya tidak collapse setiap realtime re-render
+const _VISI_EXPANDED = new Set();
+function toggleVisiAccordion(headerEl, cg) {
+  const body = headerEl.nextElementSibling;
+  const isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : 'block';
+  const arrow = headerEl.querySelector('.visi-arrow');
+  if (arrow) arrow.textContent = isOpen ? '+' : '−';
+  if (isOpen) _VISI_EXPANDED.delete(cg); else _VISI_EXPANDED.add(cg);
+}
+
 async function renderCoachVisi() {
   const el = document.getElementById('tab-c-visi');
   const region = coachRole === 'tl' ? 'all' : coachReg;
@@ -3609,7 +3639,9 @@ async function renderCoachVisi() {
     html += '<div style="background:#fff;border:1px solid '+color+'22;border-radius:16px;overflow:hidden;margin-bottom:12px;box-shadow:0 2px 12px rgba(0,0,0,.04);transition:box-shadow .2s" onmouseover="this.style.boxShadow=\'0 6px 24px '+color+'18\'" onmouseout="this.style.boxShadow=\'0 2px 12px rgba(0,0,0,.04)\'">';
 
     // ── Clickable header (always visible) ──
-    html += '<div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\';this.querySelector(\'.visi-arrow\').textContent=this.nextElementSibling.style.display===\'none\'?\'+\':\'\u2212\'" style="padding:14px 18px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;background:linear-gradient(135deg,'+bg+' 0%,#fff 100%);border-left:4px solid '+color+';transition:background .15s" onmouseover="this.style.background=\''+bg+'\'" onmouseout="this.style.background=\'linear-gradient(135deg,'+bg+' 0%,#fff 100%)\'">';
+    const isExpanded = _VISI_EXPANDED.has(cg);
+    const cgEsc = cg.replace(/'/g,"\\'");
+    html += '<div onclick="toggleVisiAccordion(this,\''+cgEsc+'\')" style="padding:14px 18px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;background:linear-gradient(135deg,'+bg+' 0%,#fff 100%);border-left:4px solid '+color+';transition:background .15s" onmouseover="this.style.background=\''+bg+'\'" onmouseout="this.style.background=\'linear-gradient(135deg,'+bg+' 0%,#fff 100%)\'">';
 
     // Left: badge + info
     html += '<div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0">';
@@ -3625,11 +3657,11 @@ async function renderCoachVisi() {
     if (hasNotes) html += '<span style="padding:2px 6px;border-radius:6px;background:'+bg+';color:'+color+';font-size:9px;font-weight:700">Notes</span>';
     html += '</div>';
     html += '<div style="text-align:right"><div style="font-family:\'Instrument Serif\',serif;font-size:22px;color:'+color+';line-height:1">'+stats.pct+'%</div><div style="font-size:8px;color:var(--g4);letter-spacing:.5px">Hadir</div></div>';
-    html += '<span class="visi-arrow" style="font-size:18px;color:var(--g3);font-weight:300;width:20px;text-align:center">+</span>';
+    html += '<span class="visi-arrow" style="font-size:18px;color:var(--g3);font-weight:300;width:20px;text-align:center">'+(isExpanded?'−':'+')+'</span>';
     html += '</div></div>';
 
-    // ── Collapsible body (hidden by default) ──
-    html += '<div style="display:none;border-top:1px solid '+color+'15">';
+    // ── Collapsible body (preserve expand state via _VISI_EXPANDED) ──
+    html += '<div style="display:'+(isExpanded?'block':'none')+';border-top:1px solid '+color+'15">';
     html += '<div style="padding:16px 18px;display:flex;flex-direction:column;gap:12px">';
 
     // Card 1 — Visi
@@ -3658,10 +3690,10 @@ async function renderCoachVisi() {
       const today = new Date(); today.setHours(0,0,0,0);
       sortedDP.forEach((d, idx) => {
         const memberName = d.member_name || d.name || '';
-        const currentRole = d.current_status || d.currentRole || 'Member';
-        const targetRole = d.target_status || d.target || 'Sponsor';
-        const roleCls = (currentRole).toLowerCase();
-        const tgtCls = (targetRole).toLowerCase();
+        const currentRole = roleLabel(d.current_status || d.currentRole || 'Member');
+        const targetRole = roleLabel(d.target_status || d.target || 'Sponsor');
+        const curCls = roleCls(currentRole);
+        const tgtCls = roleCls(targetRole);
         const deadline = d.deadline ? new Date(d.deadline) : null;
         let badgeBg = '#f3f4f6', badgeFc = '#6b7280', badgeTxt = 'Tanpa target', icon = '\u23f3';
         let dateStr = '';
@@ -3678,7 +3710,7 @@ async function renderCoachVisi() {
         html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">';
         html += '<span style="font-weight:700;font-size:12px;color:var(--g1);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(memberName)+'</span>';
         html += '<div style="display:flex;align-items:center;gap:4px;flex-shrink:0">';
-        html += '<span class="role-btn '+roleCls+'" style="cursor:default;font-size:9px;padding:2px 7px;border-radius:6px">'+esc(currentRole)+'</span>';
+        html += '<span class="role-btn '+curCls+'" style="cursor:default;font-size:9px;padding:2px 7px;border-radius:6px">'+esc(currentRole)+'</span>';
         html += '<span style="color:var(--g4);font-size:11px;font-weight:600">\u2192</span>';
         html += '<span class="role-btn '+tgtCls+'" style="cursor:default;font-size:9px;padding:2px 7px;border-radius:6px;font-weight:700">'+esc(targetRole)+'</span>';
         html += '</div></div>';
@@ -3940,6 +3972,16 @@ async function switchRole(role) {
 
 // ========== UTILITY ==========
 function esc(s) { if (!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+// Whitelist role class supaya className tidak rusak walau DB punya value aneh/legacy
+const _ROLE_CLS_VALID = ['cgl','leader','sponsor','member','simpatisan','vip'];
+function roleCls(s) {
+  const k = String(s||'member').toLowerCase().trim().replace(/^target:\s*/i,'');
+  return _ROLE_CLS_VALID.includes(k) ? (k==='leader'?'cgl':k) : 'member';
+}
+function roleLabel(s) {
+  // Strip legacy "Target: " prefix kalau ada
+  return String(s||'').replace(/^target:\s*/i,'').trim() || 'Member';
+}
 // JS-string escape: untuk dipakai di dalam onclick="func('...')" — escape backslash + single quote
 function jsEsc(s) { return String(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
 

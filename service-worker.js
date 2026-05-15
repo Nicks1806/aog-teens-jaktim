@@ -4,7 +4,7 @@
 // - Supabase API calls: network-only (always fresh, no cache)
 // - Other static (CDN scripts, fonts, icons): cache-first with network fallback
 
-const CACHE_NAME = 'aog-absensi-v6';
+const CACHE_NAME = 'aog-absensi-v7';
 const SHELL_URLS = [
   '/',
   '/index.html',
@@ -83,8 +83,8 @@ self.addEventListener('push', (event) => {
   const title = data.title || 'AOG Teens Jaktim';
   const opts = {
     body: data.body || '',
-    icon: data.icon || '/manifest.json',
-    badge: data.badge || data.icon,
+    icon: data.icon || '/icon.jpg',
+    badge: data.badge || '/icon.jpg',
     tag: data.tag || 'aog',
     vibrate: [80, 40, 80],
     data: { url: data.url || '/' }
