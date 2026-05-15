@@ -3643,23 +3643,53 @@ async function renderCoachVisi() {
     html += '<textarea class="vedit" style="min-height:36px;font-size:12px;line-height:1.4;border-color:var(--g5);background:transparent" data-cg="'+cg+'" data-region="'+cgRegion+'" data-type="mission" onfocus="this.style.borderColor=\'#6C5CE7\';this.parentElement.style.background=\'#fff\'" onblur="this.style.borderColor=\'var(--g5)\';this.parentElement.style.background=\'#fafafa\';saveCoachVisiField(this)" placeholder="Langkah konkret...">'+esc(mission)+'</textarea></div>';
 
     // Card 3 — Dev Plan
-    html += '<div style="background:#fff;border:1.5px solid #dbeafe;border-radius:12px;padding:12px 14px">';
-    html += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px"><div style="width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,#2563eb,#60a5fa);display:flex;align-items:center;justify-content:center"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><span style="font-size:10px;font-weight:700;letter-spacing:.8px;color:#1e40af;text-transform:uppercase">Dev Plan</span></div>';
+    html += '<div style="background:linear-gradient(135deg,#f0f7ff,#fff);border:1.5px solid #dbeafe;border-radius:12px;padding:14px 16px">';
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">';
+    html += '<div style="display:flex;align-items:center;gap:6px"><div style="width:22px;height:22px;border-radius:7px;background:linear-gradient(135deg,#2563eb,#60a5fa);display:flex;align-items:center;justify-content:center"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><span style="font-size:10px;font-weight:700;letter-spacing:.8px;color:#1e40af;text-transform:uppercase">Rencana Pengembangan</span></div>';
+    if (devPlan.length) html += '<span style="font-size:9px;font-weight:700;color:#1e40af;background:#dbeafe;padding:2px 8px;border-radius:8px">'+devPlan.length+' member</span>';
+    html += '</div>';
     if (devPlan.length) {
-      devPlan.forEach(d => {
+      const sortedDP = devPlan.slice().sort((a,b) => {
+        if (!a.deadline && !b.deadline) return 0;
+        if (!a.deadline) return 1;
+        if (!b.deadline) return -1;
+        return new Date(a.deadline) - new Date(b.deadline);
+      });
+      const today = new Date(); today.setHours(0,0,0,0);
+      sortedDP.forEach((d, idx) => {
         const memberName = d.member_name || d.name || '';
         const currentRole = d.current_status || d.currentRole || 'Member';
         const targetRole = d.target_status || d.target || 'Sponsor';
         const roleCls = (currentRole).toLowerCase();
-        html += '<div style="display:flex;align-items:center;gap:6px;padding:6px 0;border-bottom:1px solid #f0f4ff;font-size:11px">';
-        html += '<span style="font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(memberName)+'</span>';
-        html += '<span class="role-btn '+roleCls+'" style="cursor:default;font-size:8px;padding:2px 6px">'+esc(currentRole)+'</span>';
-        html += '<span style="color:var(--g4);font-size:9px">\u2192</span>';
-        html += '<span class="role-btn sponsor" style="cursor:default;font-size:8px;padding:2px 6px">'+esc(targetRole)+'</span>';
+        const tgtCls = (targetRole).toLowerCase();
+        const deadline = d.deadline ? new Date(d.deadline) : null;
+        let badgeBg = '#f3f4f6', badgeFc = '#6b7280', badgeTxt = 'Tanpa target', icon = '\u23f3';
+        let dateStr = '';
+        if (deadline) {
+          const diffDays = Math.ceil((deadline - today) / 86400000);
+          dateStr = deadline.toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' });
+          if (diffDays < 0) { badgeBg='#fee2e2'; badgeFc='#b91c1c'; badgeTxt='Lewat '+Math.abs(diffDays)+'h'; icon='\u26a0'; }
+          else if (diffDays === 0) { badgeBg='#fef3c7'; badgeFc='#92400e'; badgeTxt='Hari ini'; icon='\ud83d\udd25'; }
+          else if (diffDays <= 7) { badgeBg='#ffedd5'; badgeFc='#c2410c'; badgeTxt=diffDays+' hari lagi'; icon='\u23f0'; }
+          else if (diffDays <= 30) { badgeBg='#e0f2fe'; badgeFc='#0369a1'; badgeTxt=diffDays+' hari lagi'; icon='\ud83d\udcc5'; }
+          else { badgeBg='#dcfce7'; badgeFc='#15803d'; badgeTxt=diffDays+' hari lagi'; icon='\ud83d\udcc5'; }
+        }
+        html += '<div style="display:flex;flex-direction:column;gap:8px;padding:10px 12px;background:#fff;border:1px solid #e5e7eb;border-radius:10px;'+(idx<sortedDP.length-1?'margin-bottom:8px':'')+';transition:all .15s" onmouseover="this.style.borderColor=\'#93c5fd\';this.style.boxShadow=\'0 2px 8px rgba(37,99,235,.08)\'" onmouseout="this.style.borderColor=\'#e5e7eb\';this.style.boxShadow=\'none\'">';
+        html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">';
+        html += '<span style="font-weight:700;font-size:12px;color:var(--g1);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(memberName)+'</span>';
+        html += '<div style="display:flex;align-items:center;gap:4px;flex-shrink:0">';
+        html += '<span class="role-btn '+roleCls+'" style="cursor:default;font-size:9px;padding:2px 7px;border-radius:6px">'+esc(currentRole)+'</span>';
+        html += '<span style="color:var(--g4);font-size:11px;font-weight:600">\u2192</span>';
+        html += '<span class="role-btn '+tgtCls+'" style="cursor:default;font-size:9px;padding:2px 7px;border-radius:6px;font-weight:700">'+esc(targetRole)+'</span>';
+        html += '</div></div>';
+        html += '<div style="display:flex;align-items:center;gap:8px;font-size:10px;padding-top:6px;border-top:1px dashed #e5e7eb">';
+        html += '<span style="color:var(--g3);display:inline-flex;align-items:center;gap:4px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>'+(dateStr || '<span style="font-style:italic;color:var(--g4)">tanpa tanggal target</span>')+'</span>';
+        html += '<span style="margin-left:auto;background:'+badgeBg+';color:'+badgeFc+';padding:3px 9px;border-radius:8px;font-size:9px;font-weight:700;display:inline-flex;align-items:center;gap:3px">'+icon+' '+badgeTxt+'</span>';
+        html += '</div>';
         html += '</div>';
       });
     } else {
-      html += '<div style="font-size:11px;color:var(--g4);font-style:italic">Belum ada dev plan</div>';
+      html += '<div style="font-size:11px;color:var(--g4);font-style:italic;text-align:center;padding:14px 0">Belum ada rencana pengembangan dari CGL</div>';
     }
     html += '</div>';
 
