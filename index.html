@@ -475,6 +475,7 @@ function setupRealtime() {
     .on('postgres_changes', { event: '*', schema: 'public', table: 'events' }, handleEventsChange)
     .on('postgres_changes', { event: '*', schema: 'public', table: 'cg_events' }, handleEventsChange)
     .on('postgres_changes', { event: '*', schema: 'public', table: 'cg_vision' }, handleVisionChange)
+    .on('broadcast', { event: 'cgl_reminder' }, handleReminderBroadcast)
     .subscribe((status) => {
       const connected = status === 'SUBSCRIBED';
       updateLiveIndicator(connected);
@@ -699,6 +700,142 @@ function handleVisionChange(payload) {
       }
     } catch(e) { void 0; }
   }, 500);
+}
+
+// ── Reminder broadcast handler: Coach kirim pengingat ke CGL ──
+function handleReminderBroadcast(payload) {
+  try {
+    const data = payload.payload || payload;
+    if (!data || !data.cg) return;
+    // CGL: hanya respond kalau reminder untuk CG kita
+    if (typeof CUR_CG !== 'undefined' && CUR_CG && data.cg === CUR_CG) {
+      const dateCount = data.dateCount || (data.dates ? data.dates.length : 0);
+      const dateStr = data.dates && data.dates.length ? data.dates.slice(0,3).join(', ') + (data.dates.length>3?'…':'') : '';
+      pushNotif(
+        '🔔 Pengingat Absensi',
+        'Coach mengingatkan: belum input absensi untuk ' + dateCount + ' tanggal (' + dateStr + ')',
+        'remind_' + data.cg + '_' + Date.now()
+      );
+      // Tampilkan juga toast di app (kalau visible)
+      try { toast('🔔 Coach: pengingat absensi ' + dateCount + ' tanggal','ok'); } catch(e) {}
+    }
+  } catch(e) { void 0; }
+}
+
+// Kirim broadcast pengingat ke CGL (dipanggil dari Coach dashboard)
+async function broadcastReminder(cg, dateLabels) {
+  if (!realtimeChannel) return false;
+  try {
+    await realtimeChannel.send({
+      type: 'broadcast',
+      event: 'cgl_reminder',
+      payload: { cg, dateCount: dateLabels.length, dates: dateLabels.slice(0,5), from: 'coach', ts: Date.now() }
+    });
+    return true;
+  } catch(e) { return false; }
+}
+
+// Helper: parse hari (day number) dari label tanggal
+function parseLabelToDay(label) {
+  const m = String(label||'').match(/(\d+)\s+([a-zA-Z]+)/);
+  return m ? parseInt(m[1]) : 0;
+}
+
+// Compute list CGL yang belum input absensi di bulan berjalan (tanggal yang sudah lewat)
+function computePendingCGLs(region) {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const curM = today.getMonth() + 1;
+  const curY = today.getFullYear();
+  const cgs = (typeof getCGsForRegion === 'function') ? getCGsForRegion(region) : [];
+  if (!cgs.length || typeof ALL_DATES === 'undefined' || typeof ALL_MEMBERS === 'undefined') return [];
+
+  const allDates = region === 'all' ? ALL_DATES : ALL_DATES.filter(d => d.region === region);
+  // Past dates dalam bulan ini saja
+  const pastDates = allDates.filter(d => {
+    const day = parseLabelToDay(d.label);
+    const mon = parseLabelToMonth(d.label);
+    if (!day || !mon || mon !== curM) return false;
+    const dt = new Date(curY, mon - 1, day);
+    return dt < today;
+  });
+  if (pastDates.length === 0) return [];
+
+  const pending = [];
+  cgs.forEach(cg => {
+    const mems = ALL_MEMBERS.filter(m => m.cg === cg);
+    if (mems.length === 0) return;
+    const cgRegion = mems[0].region;
+    const missing = [];
+    pastDates.forEach(d => {
+      if (d.region !== cgRegion) return;
+      const hasRecord = mems.some(m => ALL_ATTENDANCE[m.id + '_' + d.id]);
+      if (!hasRecord) missing.push(d);
+    });
+    if (missing.length > 0) {
+      const info = ALL_CG_INFO.find(c => c.cg === cg) || {};
+      pending.push({
+        cg, leader: info.leader || '-', region: cgRegion,
+        missingDates: missing, totalMembers: mems.length
+      });
+    }
+  });
+  return pending;
+}
+
+// Auto-kirim reminder broadcast (rate-limited per CG per 2 jam) — Coach side
+function autoBroadcastPendingReminders(pendingList) {
+  if (!pendingList || !pendingList.length) return;
+  const key = 'aog_last_remind_ts';
+  let lastMap = {};
+  try { lastMap = JSON.parse(localStorage.getItem(key) || '{}'); } catch(e) {}
+  const now = Date.now();
+  const RATE_LIMIT_MS = 2 * 60 * 60 * 1000; // 2 jam
+  let sent = 0;
+  pendingList.forEach(p => {
+    if (lastMap[p.cg] && now - lastMap[p.cg] < RATE_LIMIT_MS) return;
+    lastMap[p.cg] = now;
+    broadcastReminder(p.cg, p.missingDates.map(d => d.label));
+    sent++;
+  });
+  if (sent > 0) {
+    try { localStorage.setItem(key, JSON.stringify(lastMap)); } catch(e) {}
+  }
+  return sent;
+}
+
+// Kirim pengingat ke semua CG pending (manual button "Ingatkan Semua")
+async function sendAllReminders() {
+  const list = window.__pendingCGLs || [];
+  if (!list.length) { toast('Tidak ada CG yang pending','ok'); return; }
+  if (!confirm('Kirim pengingat ke ' + list.length + ' CG?')) return;
+  let sent = 0;
+  for (const p of list) {
+    const ok = await broadcastReminder(p.cg, p.missingDates.map(d => d.label));
+    if (ok) sent++;
+  }
+  // Update last-remind timestamp
+  const key = 'aog_last_remind_ts';
+  let lastMap = {};
+  try { lastMap = JSON.parse(localStorage.getItem(key) || '{}'); } catch(e) {}
+  const now = Date.now();
+  list.forEach(p => { lastMap[p.cg] = now; });
+  try { localStorage.setItem(key, JSON.stringify(lastMap)); } catch(e) {}
+  toast('🔔 ' + sent + ' pengingat terkirim', sent > 0 ? 'ok' : 'err');
+}
+
+// Manual: kirim ulang reminder untuk 1 CG (skip rate limit)
+async function sendReminderToCG(cg, dateLabels) {
+  const ok = await broadcastReminder(cg, dateLabels);
+  if (ok) {
+    toast('🔔 Pengingat terkirim ke ' + cg, 'ok');
+    const key = 'aog_last_remind_ts';
+    let lastMap = {};
+    try { lastMap = JSON.parse(localStorage.getItem(key) || '{}'); } catch(e) {}
+    lastMap[cg] = Date.now();
+    try { localStorage.setItem(key, JSON.stringify(lastMap)); } catch(e) {}
+  } else {
+    toast('❌ Gagal kirim pengingat (koneksi offline?)', 'err');
+  }
 }
 
 // ========== SUPABASE HELPERS (new tables) ==========
@@ -3328,6 +3465,41 @@ function renderCoachAbsensi() {
   const active = getActiveMonth();
   if (mobile) {
     html += buildMonthNavHeader(regionDates, active.month, active.year, active.label, regionDates.filter(d => parseLabelToMonth(d.label) === active.month).length);
+  }
+
+  // ── Pending CGL section: list CG yang belum input absensi di bulan berjalan ──
+  const pendingList = computePendingCGLs(region);
+  if (pendingList.length > 0) {
+    html += '<div style="background:linear-gradient(135deg,#fff7ed,#fef3c7);border:1.5px solid #fbbf24;border-radius:14px;padding:14px 16px;margin-bottom:18px;box-shadow:0 2px 8px rgba(251,191,36,.15)">';
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;flex-wrap:wrap">';
+    html += '<div style="display:flex;align-items:center;gap:8px">';
+    html += '<div style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#f59e0b,#dc2626);display:flex;align-items:center;justify-content:center;font-size:14px">⚠️</div>';
+    html += '<div><div style="font-weight:800;font-size:13px;color:#92400e;letter-spacing:.3px">CGL Belum Input Absensi</div><div style="font-size:10px;color:#a16207;margin-top:1px">'+pendingList.length+' CG · bulan berjalan</div></div>';
+    html += '</div>';
+    html += '<button onclick="sendAllReminders()" style="padding:7px 14px;border-radius:10px;border:1.5px solid #d97706;background:#fff;color:#92400e;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.3px;display:inline-flex;align-items:center;gap:5px;transition:all .15s" onmouseover="this.style.background=\'#fef3c7\'" onmouseout="this.style.background=\'#fff\'">🔔 Ingatkan Semua</button>';
+    html += '</div>';
+    html += '<div style="display:flex;flex-direction:column;gap:8px">';
+    pendingList.forEach(p => {
+      const color = CG_COLORS[p.cg] || '#7c3aed';
+      const dateList = p.missingDates.map(d => esc(d.label)).join(', ');
+      const dateLabels = p.missingDates.map(d => d.label.replace(/'/g,"\\'"));
+      const dateLabelsJs = "['" + dateLabels.join("','") + "']";
+      html += '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#fff;border:1px solid #fde68a;border-radius:10px;transition:all .15s" onmouseover="this.style.borderColor=\'#f59e0b\';this.style.transform=\'translateX(2px)\'" onmouseout="this.style.borderColor=\'#fde68a\';this.style.transform=\'\'">';
+      html += '<div style="flex:1;min-width:0">';
+      html += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px"><span style="font-weight:700;font-size:12px;color:'+color+'">'+esc(p.cg)+'</span><span style="font-size:9px;color:var(--g4)">·</span><span style="font-size:10px;color:var(--g3)">CGL: '+esc(p.leader)+'</span><span style="font-size:9px;color:#dc2626;font-weight:700;background:#fee2e2;padding:1px 6px;border-radius:5px">'+p.missingDates.length+' tanggal</span></div>';
+      html += '<div style="font-size:10px;color:var(--g3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">📅 '+dateList+'</div>';
+      html += '</div>';
+      html += '<button onclick="sendReminderToCG(\''+p.cg.replace(/\'/g,"\\\'")+'\','+dateLabelsJs+')" style="padding:6px 10px;border-radius:8px;border:1.5px solid #f59e0b;background:#fff;color:#92400e;font-size:10px;font-weight:700;cursor:pointer;flex-shrink:0;display:inline-flex;align-items:center;gap:4px;transition:all .15s" onmouseover="this.style.background=\'#fef3c7\'" onmouseout="this.style.background=\'#fff\'" title="Kirim pengingat ke CGL">🔔 Ingatkan</button>';
+      html += '</div>';
+    });
+    html += '</div>';
+    html += '<div style="font-size:10px;color:#a16207;margin-top:10px;font-style:italic;text-align:center">💡 Pengingat dikirim ke device CGL yang aktif PWA (notifikasi ON). Rate limit 2 jam per CG.</div>';
+    html += '</div>';
+
+    // Auto-broadcast (rate-limited 2 jam per CG)
+    setTimeout(() => autoBroadcastPendingReminders(pendingList), 800);
+    // Simpan ke window supaya tombol "Ingatkan Semua" bisa akses
+    window.__pendingCGLs = pendingList;
   }
 
   // Line chart: progress kehadiran per minggu (selalu full data, tidak ikut mobile filter)
