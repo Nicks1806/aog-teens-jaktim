@@ -714,7 +714,7 @@ function handleReminderBroadcast(payload) {
       pushNotif(
         '🔔 Pengingat Absensi',
         'Coach mengingatkan: belum input absensi untuk ' + dateCount + ' tanggal (' + dateStr + ')',
-        'remind_' + data.cg + '_' + Date.now()
+        'remind_' + data.cg
       );
       // Tampilkan juga toast di app (kalau visible)
       try { toast('🔔 Coach: pengingat absensi ' + dateCount + ' tanggal','ok'); } catch(e) {}
@@ -834,6 +834,14 @@ async function sendAllReminders() {
   list.forEach(p => { lastMap[p.cg] = now; });
   try { localStorage.setItem(key, JSON.stringify(lastMap)); } catch(e) {}
   toast('🔔 ' + sent + ' pengingat terkirim', sent > 0 ? 'ok' : 'err');
+}
+
+// Trigger reminder by index ke window.__pendingCGLs — aman dari label dengan karakter spesial
+async function sendReminderByIdx(idx) {
+  const list = window.__pendingCGLs || [];
+  const p = list[idx];
+  if (!p) { toast('Data tidak ditemukan','err'); return; }
+  await sendReminderToCG(p.cg, p.missingDates.map(d => d.label));
 }
 
 // Manual: kirim ulang reminder untuk 1 CG (skip rate limit)
@@ -1015,10 +1023,12 @@ async function cleanupPastEvents() {
     // events table (shared/global) — JANGAN auto-cleanup, biar admin yang manage manual
     // Hanya cleanup event per-CG yang sudah lama lewat
     // cg_events table — skip global events (is_shared=true) supaya tidak hilang dari semua CG sekaligus
-    await supa.from('cg_events').delete().lt('date_end', cutoffStr).not('date_end','is',null).eq('is_shared', false);
-    await supa.from('cg_events').delete().lt('date_start', cutoffStr).is('date_end', null).eq('is_shared', false);
+    const r1 = await supa.from('cg_events').delete().lt('date_end', cutoffStr).not('date_end','is',null).eq('is_shared', false);
+    const r2 = await supa.from('cg_events').delete().lt('date_start', cutoffStr).is('date_end', null).eq('is_shared', false);
+    if (r1.error) console.warn('[cleanupPastEvents r1]', r1.error);
+    if (r2.error) console.warn('[cleanupPastEvents r2]', r2.error);
   } catch(e) {
-    void 0;
+    console.warn('[cleanupPastEvents]', e);
   }
 }
 
@@ -1669,12 +1679,12 @@ async function renderDetail() {
     const totalDates = DATES.filter(d => ATTENDANCE[m.id+'_'+d.id]).length || 1;
     const pct = Math.round(hadirCount / totalDates * 100);
     const atRisk = pct < 50 && totalDates > 1;
-    const roleCls = (m.status||'member').toLowerCase();
+    const memberRoleCls = roleCls(m.status); // whitelist (kalau status aneh, fallback ke 'member')
 
     html += '<div class="dcard"' + (atRisk ? ' style="border-left:3px solid var(--red)"' : '') + '>';
     html += '<div class="dcard-top">';
     html += '<input type="text" value="' + esc(m.nama) + '" class="dcard-name" data-mid="'+m.id+'" data-field="nama" style="border:none;background:transparent;outline:none;font-weight:600;font-size:14px;flex:1;min-width:0;border-bottom:1px dashed transparent" onfocus="this.style.borderBottomColor=\'var(--purple)\'" onblur="this.style.borderBottomColor=\'transparent\';saveMemberField(this)">';
-    html += '<div class="role-wrap"><button class="role-btn '+roleCls+'" onclick="this.nextElementSibling.classList.toggle(\'show\')">'+esc(m.status)+'</button>';
+    html += '<div class="role-wrap"><button class="role-btn '+memberRoleCls+'" onclick="this.nextElementSibling.classList.toggle(\'show\')">'+esc(m.status)+'</button>';
     html += '<div class="role-menu">';
     ['CGL','Sponsor','Member','Simpatisan','VIP'].forEach(r => {
       html += '<div class="role-opt '+r.toLowerCase()+'" onclick="pickRole(this,\''+r.toLowerCase()+'\',\''+r+'\','+m.id+')"><span class="rdot"></span>'+r+'</div>';
@@ -1794,11 +1804,22 @@ async function toggleMilestone(chip, memberId, field, wasDone) {
 async function pickRole(el, cls, label, memberId) {
   const wrap = el.closest('.role-wrap');
   const btn = wrap.querySelector('.role-btn');
+  const m = MEMBERS.find(x => x.id === memberId);
+  const prevLabel = m ? m.status : '';
+  const prevCls = prevLabel ? prevLabel.toLowerCase() : 'member';
+  // Optimistic UI
   btn.className = 'role-btn ' + cls;
   btn.childNodes[0].textContent = label;
   wrap.querySelector('.role-menu').classList.remove('show');
-  await supa.from('members').update({ status: label }).eq('id', memberId);
-  const m = MEMBERS.find(x => x.id === memberId);
+  // Save + cek error supaya tidak silent fail
+  const { error } = await supa.from('members').update({ status: label }).eq('id', memberId);
+  if (error) {
+    // Revert UI
+    btn.className = 'role-btn ' + prevCls;
+    btn.childNodes[0].textContent = prevLabel || 'Member';
+    toast('\u274c Gagal simpan role: '+(error.message||'unknown').slice(0,80),'err');
+    return;
+  }
   if (m) m.status = label;
   toast('\u2713 Disimpan');
 }
@@ -1868,7 +1889,7 @@ async function renderVisiCG() {
   const vision = visionData.visi || '';
   const mission = visionData.misi || '';
 
-  let html = '<div class="vcard"><div class="vlabel">Visi CG</div><textarea class="vedit" id="visiText" onblur="saveVisiCG()">' + esc(vision) + '</textarea></div>';
+  let html = '<div class="vcard"><div class="vlabel">Visi CG</div><textarea class="vedit" id="visiText" onblur="saveVisiCG(\'visi\')">' + esc(vision) + '</textarea></div>';
 
   // Misi card — display formatted list + click to edit
   const cglMisiLines = parseMissionLines(mission);
@@ -1967,11 +1988,20 @@ async function removeDevPlan(id) {
   await renderVisiCG();
 }
 
-async function saveVisiCG() {
+async function saveVisiCG(which) {
+  // Read-modify-write supaya tidak overwrite field lain (race condition kalau Coach edit bareng)
   const visiEl = document.getElementById('visiText');
   const misiEl = document.getElementById('misiText');
   if (!visiEl || !misiEl) return;
-  await saveVision(CUR_CG, CUR_REGION, visiEl.value, misiEl.value);
+  const existing = await loadVision(CUR_CG, CUR_REGION);
+  const visi = which === 'misi' ? (existing.visi || '') : visiEl.value;
+  const misi = which === 'visi' ? (existing.misi || '') : misiEl.value;
+  // Kalau which tidak di-specify, simpan keduanya (legacy fallback)
+  if (!which) {
+    await saveVision(CUR_CG, CUR_REGION, visiEl.value, misiEl.value);
+  } else {
+    await saveVision(CUR_CG, CUR_REGION, visi, misi);
+  }
 }
 
 // CGL Misi: switch ke edit mode
@@ -1989,7 +2019,7 @@ async function hideCGLMisiEdit() {
   const edit = document.getElementById('misiText');
   const view = document.getElementById('cglMisi_view');
   if (!edit) return;
-  await saveVisiCG();
+  await saveVisiCG('misi');
   if (view) {
     const lines = parseMissionLines(edit.value);
     view.innerHTML = renderMisiList(lines);
@@ -3532,17 +3562,16 @@ function renderCoachAbsensi() {
     html += '<button onclick="sendAllReminders()" style="padding:7px 14px;border-radius:10px;border:1.5px solid #d97706;background:#fff;color:#92400e;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.3px;display:inline-flex;align-items:center;gap:5px;transition:all .15s" onmouseover="this.style.background=\'#fef3c7\'" onmouseout="this.style.background=\'#fff\'">🔔 Ingatkan Semua</button>';
     html += '</div>';
     html += '<div style="display:flex;flex-direction:column;gap:8px">';
-    pendingList.forEach(p => {
+    pendingList.forEach((p, idx) => {
       const color = CG_COLORS[p.cg] || '#7c3aed';
       const dateList = p.missingDates.map(d => esc(d.label)).join(', ');
-      const dateLabels = p.missingDates.map(d => d.label.replace(/'/g,"\\'"));
-      const dateLabelsJs = "['" + dateLabels.join("','") + "']";
       html += '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#fff;border:1px solid #fde68a;border-radius:10px;transition:all .15s" onmouseover="this.style.borderColor=\'#f59e0b\';this.style.transform=\'translateX(2px)\'" onmouseout="this.style.borderColor=\'#fde68a\';this.style.transform=\'\'">';
       html += '<div style="flex:1;min-width:0">';
       html += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px"><span style="font-weight:700;font-size:12px;color:'+color+'">'+esc(p.cg)+'</span><span style="font-size:9px;color:var(--g4)">·</span><span style="font-size:10px;color:var(--g3)">CGL: '+esc(p.leader)+'</span><span style="font-size:9px;color:#dc2626;font-weight:700;background:#fee2e2;padding:1px 6px;border-radius:5px">'+p.missingDates.length+' tanggal</span></div>';
       html += '<div style="font-size:10px;color:var(--g3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">📅 '+dateList+'</div>';
       html += '</div>';
-      html += '<button onclick="sendReminderToCG(\''+p.cg.replace(/\'/g,"\\\'")+'\','+dateLabelsJs+')" style="padding:6px 10px;border-radius:8px;border:1.5px solid #f59e0b;background:#fff;color:#92400e;font-size:10px;font-weight:700;cursor:pointer;flex-shrink:0;display:inline-flex;align-items:center;gap:4px;transition:all .15s" onmouseover="this.style.background=\'#fef3c7\'" onmouseout="this.style.background=\'#fff\'" title="Kirim pengingat ke CGL">🔔 Ingatkan</button>';
+      // Pakai index lookup ke window.__pendingCGLs (set di bawah) supaya tidak rentan terhadap label dengan kutip
+      html += '<button onclick="sendReminderByIdx('+idx+')" style="padding:6px 10px;border-radius:8px;border:1.5px solid #f59e0b;background:#fff;color:#92400e;font-size:10px;font-weight:700;cursor:pointer;flex-shrink:0;display:inline-flex;align-items:center;gap:4px;transition:all .15s" onmouseover="this.style.background=\'#fef3c7\'" onmouseout="this.style.background=\'#fff\'" title="Kirim pengingat ke CGL">🔔 Ingatkan</button>';
       html += '</div>';
     });
     html += '</div>';
