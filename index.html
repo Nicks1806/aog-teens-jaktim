@@ -741,23 +741,36 @@ function parseLabelToDay(label) {
   return m ? parseInt(m[1]) : 0;
 }
 
-// Compute list CGL yang belum input absensi di bulan berjalan (tanggal yang sudah lewat)
+// Compute list CGL yang belum input absensi — window: 4 tanggal ibadah terakhir yang sudah lewat
 function computePendingCGLs(region) {
   const today = new Date(); today.setHours(0,0,0,0);
-  const curM = today.getMonth() + 1;
   const curY = today.getFullYear();
   const cgs = (typeof getCGsForRegion === 'function') ? getCGsForRegion(region) : [];
   if (!cgs.length || typeof ALL_DATES === 'undefined' || typeof ALL_MEMBERS === 'undefined') return [];
 
   const allDates = region === 'all' ? ALL_DATES : ALL_DATES.filter(d => d.region === region);
-  // Past dates dalam bulan ini saja
-  const pastDates = allDates.filter(d => {
+  // Filter: tanggal yang sudah lewat (any month), sorted by sort_order
+  const pastDatesAll = allDates.filter(d => {
     const day = parseLabelToDay(d.label);
     const mon = parseLabelToMonth(d.label);
-    if (!day || !mon || mon !== curM) return false;
+    if (!day || !mon) return false;
     const dt = new Date(curY, mon - 1, day);
+    // Kalau date > today + 6 bulan, anggap dia dari tahun sebelumnya (handle desember akhir)
+    if (dt > today && (dt - today) > 180*86400000) dt.setFullYear(curY - 1);
     return dt < today;
   });
+  // Ambil 4 tanggal terakhir (per region, sort by sort_order desc)
+  const sortedDesc = pastDatesAll.slice().sort((a,b) => (b.sort_order||0) - (a.sort_order||0));
+  // Untuk TL (region='all'), kelompokkan per region supaya tidak campur urutan
+  let pastDates;
+  if (region === 'all') {
+    // Per region, ambil 4 terakhir → gabung
+    const j1 = sortedDesc.filter(d => d.region === 'jaktim1').slice(0, 4);
+    const j2 = sortedDesc.filter(d => d.region === 'jaktim2').slice(0, 4);
+    pastDates = j1.concat(j2);
+  } else {
+    pastDates = sortedDesc.slice(0, 4);
+  }
   if (pastDates.length === 0) return [];
 
   const pending = [];
@@ -3474,7 +3487,7 @@ function renderCoachAbsensi() {
     html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;flex-wrap:wrap">';
     html += '<div style="display:flex;align-items:center;gap:8px">';
     html += '<div style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#f59e0b,#dc2626);display:flex;align-items:center;justify-content:center;font-size:14px">⚠️</div>';
-    html += '<div><div style="font-weight:800;font-size:13px;color:#92400e;letter-spacing:.3px">CGL Belum Input Absensi</div><div style="font-size:10px;color:#a16207;margin-top:1px">'+pendingList.length+' CG · bulan berjalan</div></div>';
+    html += '<div><div style="font-weight:800;font-size:13px;color:#92400e;letter-spacing:.3px">CGL Belum Input Absensi</div><div style="font-size:10px;color:#a16207;margin-top:1px">'+pendingList.length+' CG · 4 ibadah terakhir</div></div>';
     html += '</div>';
     html += '<button onclick="sendAllReminders()" style="padding:7px 14px;border-radius:10px;border:1.5px solid #d97706;background:#fff;color:#92400e;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.3px;display:inline-flex;align-items:center;gap:5px;transition:all .15s" onmouseover="this.style.background=\'#fef3c7\'" onmouseout="this.style.background=\'#fff\'">🔔 Ingatkan Semua</button>';
     html += '</div>';
