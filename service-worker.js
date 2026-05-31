@@ -1,14 +1,13 @@
-// AOG Teens Jaktim — Service Worker (basic offline shell)
-// Strategy:
-// - HTML/CSS/JS shell: cache-first (stale-while-revalidate)
-// - Supabase API calls: network-only (always fresh, no cache)
-// - Other static (CDN scripts, fonts, icons): cache-first with network fallback
+// AOG Teens Jaktim — Service Worker
+// Strategy v18:
+// - HTML/index.html: NETWORK-FIRST (always fresh, fallback cache hanya kalau offline)
+// - Supabase API: bypass (langsung ke browser)
+// - Static assets (fonts, CDN, icon): cache-first
 
-const CACHE_NAME = 'aog-absensi-v17';
+const CACHE_NAME = 'aog-absensi-v18';
 const SHELL_URLS = [
-  '/',
-  '/index.html',
-  '/manifest.json'
+  '/manifest.json',
+  '/icon.jpg'
 ];
 
 self.addEventListener('install', (event) => {
@@ -31,7 +30,7 @@ self.addEventListener('fetch', (event) => {
   const req = event.request;
   const url = new URL(req.url);
 
-  // Never cache: Supabase API, realtime WebSocket, POST/PUT/DELETE
+  // Bypass: Supabase API, realtime WebSocket, non-GET
   if (
     req.method !== 'GET' ||
     url.hostname.includes('supabase.co') ||
@@ -39,29 +38,25 @@ self.addEventListener('fetch', (event) => {
     url.protocol === 'ws:' ||
     url.protocol === 'wss:'
   ) {
-    return; // bypass — let browser handle directly
+    return;
   }
 
-  // For navigation: stale-while-revalidate (instant load + background update)
-  if (req.mode === 'navigate' || req.destination === 'document') {
+  // HTML/navigation: NETWORK-FIRST (always ambil versi terbaru)
+  // Cache hanya dipakai sebagai fallback kalau offline
+  if (req.mode === 'navigate' || req.destination === 'document' || url.pathname === '/' || url.pathname.endsWith('.html')) {
     event.respondWith(
-      caches.match(req).then((cached) => {
-        const fetchPromise = fetch(req)
-          .then((res) => {
-            if (res && res.ok) {
-              const clone = res.clone();
-              caches.open(CACHE_NAME).then((cache) => cache.put(req, clone));
-            }
-            return res;
-          })
-          .catch(() => cached);
-        return cached || fetchPromise;
-      })
+      fetch(req).then((res) => {
+        if (res && res.ok) {
+          const clone = res.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(req, clone));
+        }
+        return res;
+      }).catch(() => caches.match(req))
     );
     return;
   }
 
-  // Other GETs (fonts, CDN scripts, images): cache-first
+  // Other static (fonts, CDN scripts, images): cache-first
   event.respondWith(
     caches.match(req).then((cached) => {
       if (cached) return cached;
