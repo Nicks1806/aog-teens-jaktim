@@ -420,7 +420,7 @@ thead th:first-child{position:sticky;left:0;z-index:3;background:#fafafa}
         <input id="coachSearch" type="text" placeholder="Cari nama member..." oninput="handleCoachSearch(this.value)" onblur="this.style.borderColor='#e4dcff';this.style.width='200px';setTimeout(()=>{document.getElementById('coachSearchResults').style.display='none'},200)" onfocus="this.style.borderColor='#6C5CE7';this.style.width='260px';if(this.value)handleCoachSearch(this.value)" style="padding:7px 14px 7px 32px;border:1.5px solid #e4dcff;border-radius:20px;font-size:11.5px;font-family:Inter,sans-serif;width:200px;outline:none;transition:all .2s;background:#fff url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236C5CE7' stroke-width='2.5' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E&quot;) no-repeat 10px center;background-size:14px">
         <div id="coachSearchResults" style="display:none;position:absolute;top:calc(100% + 4px);right:0;left:0;background:#fff;border:1px solid #e4dcff;border-radius:12px;box-shadow:0 12px 28px rgba(108,92,231,.15);max-height:360px;overflow-y:auto;z-index:100;min-width:280px"></div>
       </div>
-      <div style="display:flex;align-items:center;gap:6px"><span style="font-size:9px;color:var(--g4);font-weight:600;letter-spacing:.3px" title="App version">v21</span><span class="notif-bell" onclick="toggleNotif()" title="Notifikasi" style="cursor:pointer;font-size:14px;user-select:none">🔔</span><span class="live-dot"></span><span class="live-label" style="font-size:10px;color:var(--green);font-weight:600">Live</span></div>
+      <div style="display:flex;align-items:center;gap:6px"><span style="font-size:9px;color:var(--g4);font-weight:600;letter-spacing:.3px" title="App version">v22</span><span class="notif-bell" onclick="toggleNotif()" title="Notifikasi" style="cursor:pointer;font-size:14px;user-select:none">🔔</span><span class="live-dot"></span><span class="live-label" style="font-size:10px;color:var(--green);font-weight:600">Live</span></div>
     </div>
   </div>
   <div class="app-hero" id="coachHero"><div class="app-hero-tag">Januari &mdash; April 2026</div><div class="app-hero-h" id="coachHeroH">Semua<br><em>CG.</em></div><div class="app-hero-meta" id="coachMeta">Memuat...</div></div>
@@ -520,13 +520,13 @@ function startCoachPolling() {
     if (tabId !== 'c-absensi' && tabId !== 'c-overview') return;
     // Silent refresh (tanpa toast) — attendance + dates
     try {
-      const [attRes, datesRes] = await Promise.all([
-        supa.from('attendance').select('member_id,date_id,status').limit(100000),
+      const [attData, datesRes] = await Promise.all([
+        fetchAllAttendance(),
         supa.from('dates').select('id,label,region,sort_order,month_code').order('sort_order')
       ]);
-      if (attRes.data) {
+      {
         const newMap = {};
-        attRes.data.forEach(a => { newMap[a.member_id+'_'+a.date_id] = a.status; });
+        attData.forEach(a => { newMap[a.member_id+'_'+a.date_id] = a.status; });
         const oldKeys = Object.keys(ALL_ATTENDANCE);
         const newKeys = Object.keys(newMap);
         let changed = oldKeys.length !== newKeys.length;
@@ -3191,20 +3191,35 @@ async function goBackCoach() {
   }
 }
 
+// Fetch SEMUA attendance dengan pagination — work-around server max_rows cap (default 1000)
+async function fetchAllAttendance() {
+  const all = [];
+  const pageSize = 1000;
+  let from = 0;
+  for (let i = 0; i < 50; i++) { // max 50 pages = 50k rows (safety guard)
+    const { data, error } = await supa.from('attendance').select('member_id,date_id,status').range(from, from + pageSize - 1);
+    if (error) { console.error('[fetchAllAttendance page]', i, error); break; }
+    if (!data || data.length === 0) break;
+    all.push(...data);
+    if (data.length < pageSize) break;
+    from += pageSize;
+  }
+  return all;
+}
+
 // Refresh attendance + dates + members (silent=true untuk auto, false untuk manual)
 async function refreshCoachAttendance(silent) {
   try {
     if (!silent) toast('🔄 Refresh...');
     // Refetch dates JUGA supaya date_id selalu sinkron dengan CGL
-    const [attRes, datesRes] = await Promise.all([
-      supa.from('attendance').select('member_id,date_id,status').limit(100000),
+    const [attData, datesRes] = await Promise.all([
+      fetchAllAttendance(),
       supa.from('dates').select('id,label,region,sort_order,month_code').order('sort_order')
     ]);
-    if (attRes.error) throw attRes.error;
     if (datesRes.error) throw datesRes.error;
     ALL_DATES = datesRes.data || [];
     ALL_ATTENDANCE = {};
-    (attRes.data||[]).forEach(a => { ALL_ATTENDANCE[a.member_id+'_'+a.date_id] = a.status; });
+    attData.forEach(a => { ALL_ATTENDANCE[a.member_id+'_'+a.date_id] = a.status; });
     COACH_TAB_RENDERED['c-absensi'] = false;
     COACH_TAB_RENDERED['c-overview'] = false;
     const activeTab = document.querySelector('#pageC .tab-content.active');
@@ -3226,16 +3241,14 @@ async function sCoachTab(id, b) {
   // (dates juga penting supaya date_id konsisten dengan CGL)
   if (id === 'c-absensi' || id === 'c-overview') {
     try {
-      const [attRes, datesRes] = await Promise.all([
-        supa.from('attendance').select('member_id,date_id,status').limit(100000),
+      const [attData, datesRes] = await Promise.all([
+        fetchAllAttendance(),
         supa.from('dates').select('id,label,region,sort_order,month_code').order('sort_order')
       ]);
       if (datesRes.data) ALL_DATES = datesRes.data;
-      if (attRes.data) {
-        ALL_ATTENDANCE = {};
-        attRes.data.forEach(a => { ALL_ATTENDANCE[a.member_id+'_'+a.date_id] = a.status; });
-        COACH_TAB_RENDERED[id] = false;
-      }
+      ALL_ATTENDANCE = {};
+      attData.forEach(a => { ALL_ATTENDANCE[a.member_id+'_'+a.date_id] = a.status; });
+      COACH_TAB_RENDERED[id] = false;
     } catch(e) { console.warn('[sCoachTab refetch]', e); }
   }
   ensureCoachTabRendered(id);
@@ -3253,12 +3266,12 @@ async function loadCoachData() {
     supa.from('members').select('*').order('cg,nama'),
     supa.from('cg_info').select('cg,leader,hari_jam,lokasi'),
     supa.from('dates').select('id,label,region,sort_order,month_code').order('sort_order'),
-    supa.from('attendance').select('member_id,date_id,status').limit(100000),
+    fetchAllAttendance(),
     supa.from('events').select('id,name,date_start,date_end,cat,note,image').order('date_start')
   ]);
-  const [membersRes, cgInfoRes, datesRes, attendanceRes, eventsRes] = results.map(r => {
-    if (r.status === 'rejected') { console.error('[loadCoachData query failed]', r.reason); return { data: [] }; }
-    if (r.value && r.value.error) { console.error('[loadCoachData query error]', r.value.error); return { data: [] }; }
+  const [membersRes, cgInfoRes, datesRes, attendanceRaw, eventsRes] = results.map((r, i) => {
+    if (r.status === 'rejected') { console.error('[loadCoachData query failed]', i, r.reason); return i===3 ? [] : { data: [] }; }
+    if (r.value && r.value.error) { console.error('[loadCoachData query error]', i, r.value.error); return i===3 ? [] : { data: [] }; }
     return r.value;
   });
 
@@ -3267,7 +3280,7 @@ async function loadCoachData() {
   ALL_DATES = datesRes.data || [];
   ALL_EVENTS = eventsRes.data || [];
   ALL_ATTENDANCE = {};
-  (attendanceRes.data || []).forEach(a => { ALL_ATTENDANCE[a.member_id + '_' + a.date_id] = a.status; });
+  (Array.isArray(attendanceRaw) ? attendanceRaw : []).forEach(a => { ALL_ATTENDANCE[a.member_id + '_' + a.date_id] = a.status; });
 
   // Show skeleton loader, then render Coach tabs
   COACH_TAB_RENDERED = {};
