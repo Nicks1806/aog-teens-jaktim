@@ -3135,11 +3135,42 @@ async function goBackCoach() {
   }
 }
 
-function sCoachTab(id, b) {
+// Manual refresh: re-fetch attendance + re-render Coach Absensi
+async function refreshCoachAttendance() {
+  try {
+    toast('🔄 Refresh...');
+    const { data, error } = await supa.from('attendance').select('member_id,date_id,status');
+    if (error) throw error;
+    ALL_ATTENDANCE = {};
+    (data||[]).forEach(a => { ALL_ATTENDANCE[a.member_id+'_'+a.date_id] = a.status; });
+    COACH_TAB_RENDERED['c-absensi'] = false;
+    COACH_TAB_RENDERED['c-overview'] = false;
+    await ensureCoachTabRendered('c-absensi');
+    toast('✓ Data ter-update');
+  } catch(e) {
+    toast('❌ Gagal refresh: '+(e.message||'unknown').slice(0,60),'err');
+    console.error('[refreshCoachAttendance]', e);
+  }
+}
+
+async function sCoachTab(id, b) {
   document.querySelectorAll('#pageC .app-tab').forEach(t => t.classList.remove('on'));
   b.classList.add('on');
   document.querySelectorAll('#pageC .tab-content').forEach(t => t.classList.remove('active'));
   document.getElementById('tab-' + id).classList.add('active');
+  // Saat switch ke Absensi/Overview, refetch attendance fresh dari Supabase
+  // supaya selalu lihat data terbaru (bukan stale dari ALL_ATTENDANCE cache)
+  if (id === 'c-absensi' || id === 'c-overview') {
+    try {
+      const { data } = await supa.from('attendance').select('member_id,date_id,status');
+      if (data) {
+        ALL_ATTENDANCE = {};
+        data.forEach(a => { ALL_ATTENDANCE[a.member_id+'_'+a.date_id] = a.status; });
+        // Reset rendered flag supaya re-render dengan data fresh
+        COACH_TAB_RENDERED[id] = false;
+      }
+    } catch(e) { console.warn('[sCoachTab refetch]', e); }
+  }
   ensureCoachTabRendered(id);
 }
 
@@ -3584,7 +3615,8 @@ function renderCoachAbsensi() {
   // Generate Sabtu button (Coach + TL only — already inside Coach dashboard)
   const genLabel = 'Generate Sabtu ' + nextMonthInfo.monthName + ' ' + nextMonthInfo.year;
   const scope = coachRole === 'tl' ? 'all' : coachReg;
-  html += '<div style="display:flex;gap:8px">';
+  html += '<div style="display:flex;gap:8px;flex-wrap:wrap">';
+  html += '<button onclick="refreshCoachAttendance()" style="padding:8px 14px;border-radius:10px;border:1.5px solid #0ea5e9;background:linear-gradient(135deg,#f0f9ff,#e0f2fe);color:#0369a1;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.3px;box-shadow:0 2px 6px rgba(14,165,233,.1);transition:all .2s" onmouseover="this.style.transform=\'translateY(-1px)\'" onmouseout="this.style.transform=\'\'" title="Refresh data dari Supabase">🔄 Refresh</button>';
   html += '<button onclick="exportRegionAttendanceCSV(\''+scope+'\')" style="padding:8px 14px;border-radius:10px;border:1.5px solid #16a34a;background:linear-gradient(135deg,#f0fdf4,#dcfce7);color:#16a34a;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.3px;box-shadow:0 2px 6px rgba(22,163,74,.1);transition:all .2s" onmouseover="this.style.transform=\'translateY(-1px)\'" onmouseout="this.style.transform=\'\'">📊 CSV</button>';
   html += '<button onclick="exportRegionAttendancePDF(\''+scope+'\')" style="padding:8px 14px;border-radius:10px;border:1.5px solid #dc2626;background:linear-gradient(135deg,#fef2f2,#fee2e2);color:#dc2626;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.3px;box-shadow:0 2px 6px rgba(220,38,38,.1);transition:all .2s" onmouseover="this.style.transform=\'translateY(-1px)\'" onmouseout="this.style.transform=\'\'">📄 PDF</button>';
   html += '<button onclick="generateSabtuBulan(\''+scope+'\','+nextMonthInfo.year+','+nextMonthInfo.month+')" style="padding:8px 14px;border-radius:10px;border:1.5px solid #6C5CE7;background:linear-gradient(135deg,#f5f3ff,#ede9fe);color:#6C5CE7;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.3px;transition:all .2s;box-shadow:0 2px 6px rgba(108,92,231,.1)" onmouseover="this.style.transform=\'translateY(-1px)\';this.style.boxShadow=\'0 4px 12px rgba(108,92,231,.2)\'" onmouseout="this.style.transform=\'\';this.style.boxShadow=\'0 2px 6px rgba(108,92,231,.1)\'">+ '+genLabel+'</button>';
