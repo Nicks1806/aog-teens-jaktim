@@ -488,6 +488,61 @@ function setupRealtime() {
 // Reconnect saat browser online setelah offline
 window.addEventListener('online', () => { setTimeout(setupRealtime, 1000); });
 
+// Auto-refresh Coach attendance saat window/PWA kembali ke foreground
+// (safety net kalau realtime miss event saat browser di background)
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState !== 'visible') return;
+  // Coach dashboard aktif?
+  const pageC = document.getElementById('pageC');
+  if (!pageC || pageC.style.display !== 'block') return;
+  // Tab Absensi/Overview aktif?
+  const activeTab = document.querySelector('#pageC .tab-content.active');
+  if (!activeTab) return;
+  const tabId = activeTab.id.replace('tab-','');
+  if (tabId === 'c-absensi' || tabId === 'c-overview') {
+    if (typeof refreshCoachAttendance === 'function') {
+      refreshCoachAttendance();
+    }
+  }
+});
+
+// Polling fallback: kalau Coach Absensi terbuka, refresh attendance tiap 60 detik
+// supaya selalu sinkron walau realtime miss
+let _COACH_POLL_TIMER = null;
+function startCoachPolling() {
+  if (_COACH_POLL_TIMER) clearInterval(_COACH_POLL_TIMER);
+  _COACH_POLL_TIMER = setInterval(async () => {
+    const pageC = document.getElementById('pageC');
+    if (!pageC || pageC.style.display !== 'block') return;
+    const activeTab = document.querySelector('#pageC .tab-content.active');
+    if (!activeTab) return;
+    const tabId = activeTab.id.replace('tab-','');
+    if (tabId !== 'c-absensi' && tabId !== 'c-overview') return;
+    // Silent refresh (tanpa toast)
+    try {
+      const { data } = await supa.from('attendance').select('member_id,date_id,status');
+      if (data) {
+        const newMap = {};
+        data.forEach(a => { newMap[a.member_id+'_'+a.date_id] = a.status; });
+        // Cek apakah ada perubahan
+        const oldKeys = Object.keys(ALL_ATTENDANCE);
+        const newKeys = Object.keys(newMap);
+        let changed = oldKeys.length !== newKeys.length;
+        if (!changed) {
+          for (const k of newKeys) {
+            if (ALL_ATTENDANCE[k] !== newMap[k]) { changed = true; break; }
+          }
+        }
+        if (changed) {
+          ALL_ATTENDANCE = newMap;
+          COACH_TAB_RENDERED[tabId] = false;
+          if (typeof ensureCoachTabRendered === 'function') ensureCoachTabRendered(tabId);
+        }
+      }
+    } catch(e) { /* silent */ }
+  }, 60000); // 60 detik
+}
+
 // ═══════════════════════════════════════════════════════════
 // PWA — Service Worker registration
 // ═══════════════════════════════════════════════════════════
@@ -4442,6 +4497,7 @@ document.querySelectorAll('.modal-overlay').forEach(m => {
     document.getElementById('pageC').style.display = 'block';
     try { history.replaceState(null, '', location.pathname); } catch(e) {}
     await loadCoachData();
+    startCoachPolling(); // Auto-sync attendance tiap 60s
   } else {
     await loadCGLDropdown();
   }
