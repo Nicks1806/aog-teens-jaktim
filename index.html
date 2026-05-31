@@ -1654,6 +1654,40 @@ async function cycleDot(dotEl, memberId, dateId) {
   }
 }
 
+// Coach/TL cycle dot — update ALL_ATTENDANCE (state Coach scope)
+async function cycleDotCoach(dotEl, memberId, dateId) {
+  const key = memberId + '_' + dateId;
+  if (_DOT_SAVING[key]) return;
+  _DOT_SAVING[key] = true;
+  const prev = (typeof ALL_ATTENDANCE !== 'undefined' ? ALL_ATTENDANCE[key] : null) || null;
+  const idx = STATUS_CYCLE.indexOf(prev);
+  const next = STATUS_CYCLE[(idx + 1) % STATUS_CYCLE.length];
+  if (typeof ALL_ATTENDANCE !== 'undefined') {
+    if (next === null) delete ALL_ATTENDANCE[key]; else ALL_ATTENDANCE[key] = next;
+  }
+  dotEl.className = 'dot ' + (next || 'X');
+  dotEl.textContent = next || '-';
+  try {
+    let error;
+    if (next === null) {
+      ({error} = await supa.from('attendance').delete().eq('member_id', memberId).eq('date_id', dateId));
+    } else {
+      ({error} = await supa.from('attendance').upsert({ member_id: memberId, date_id: dateId, status: next }, { onConflict: 'member_id,date_id' }));
+    }
+    if (error) throw error;
+  } catch(e) {
+    if (typeof ALL_ATTENDANCE !== 'undefined') {
+      if (prev) ALL_ATTENDANCE[key] = prev; else delete ALL_ATTENDANCE[key];
+    }
+    dotEl.className = 'dot ' + (prev || 'X');
+    dotEl.textContent = prev || '-';
+    toast('❌ Gagal simpan — cek koneksi','err');
+    console.error('[cycleDotCoach]', e);
+  } finally {
+    delete _DOT_SAVING[key];
+  }
+}
+
 // ========== DETAIL CG TAB ==========
 async function renderDetail() {
   const el = document.getElementById('tab-detail');
@@ -3643,7 +3677,7 @@ function renderCoachAbsensi() {
       cgDates.forEach(d => {
         const st = ALL_ATTENDANCE[m.id+'_'+d.id] || null;
         const cls = st || 'X';
-        html += '<td><span class="dot '+cls+'">'+(st||'-')+'</span></td>';
+        html += '<td><span class="dot '+cls+'" data-mid="'+m.id+'" data-did="'+d.id+'" onclick="cycleDotCoach(this,'+m.id+',\''+d.id+'\')" style="cursor:pointer">'+(st||'-')+'</span></td>';
       });
       html += '<td><div class="pbar"><div class="pbar-track"><div class="pbar-fill" style="width:'+pct+'%;background:'+pctColor+'"></div></div><span class="pbar-val" style="color:'+pctColor+'">'+pct+'%</span></div></td></tr>';
     });
