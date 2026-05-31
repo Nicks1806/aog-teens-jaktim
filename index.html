@@ -420,7 +420,7 @@ thead th:first-child{position:sticky;left:0;z-index:3;background:#fafafa}
         <input id="coachSearch" type="text" placeholder="Cari nama member..." oninput="handleCoachSearch(this.value)" onblur="this.style.borderColor='#e4dcff';this.style.width='200px';setTimeout(()=>{document.getElementById('coachSearchResults').style.display='none'},200)" onfocus="this.style.borderColor='#6C5CE7';this.style.width='260px';if(this.value)handleCoachSearch(this.value)" style="padding:7px 14px 7px 32px;border:1.5px solid #e4dcff;border-radius:20px;font-size:11.5px;font-family:Inter,sans-serif;width:200px;outline:none;transition:all .2s;background:#fff url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236C5CE7' stroke-width='2.5' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E&quot;) no-repeat 10px center;background-size:14px">
         <div id="coachSearchResults" style="display:none;position:absolute;top:calc(100% + 4px);right:0;left:0;background:#fff;border:1px solid #e4dcff;border-radius:12px;box-shadow:0 12px 28px rgba(108,92,231,.15);max-height:360px;overflow-y:auto;z-index:100;min-width:280px"></div>
       </div>
-      <div style="display:flex;align-items:center;gap:6px"><span style="font-size:9px;color:var(--g4);font-weight:600;letter-spacing:.3px" title="App version">v20</span><span class="notif-bell" onclick="toggleNotif()" title="Notifikasi" style="cursor:pointer;font-size:14px;user-select:none">🔔</span><span class="live-dot"></span><span class="live-label" style="font-size:10px;color:var(--green);font-weight:600">Live</span></div>
+      <div style="display:flex;align-items:center;gap:6px"><span style="font-size:9px;color:var(--g4);font-weight:600;letter-spacing:.3px" title="App version">v21</span><span class="notif-bell" onclick="toggleNotif()" title="Notifikasi" style="cursor:pointer;font-size:14px;user-select:none">🔔</span><span class="live-dot"></span><span class="live-label" style="font-size:10px;color:var(--green);font-weight:600">Live</span></div>
     </div>
   </div>
   <div class="app-hero" id="coachHero"><div class="app-hero-tag">Januari &mdash; April 2026</div><div class="app-hero-h" id="coachHeroH">Semua<br><em>CG.</em></div><div class="app-hero-meta" id="coachMeta">Memuat...</div></div>
@@ -501,7 +501,7 @@ document.addEventListener('visibilitychange', () => {
   const tabId = activeTab.id.replace('tab-','');
   if (tabId === 'c-absensi' || tabId === 'c-overview') {
     if (typeof refreshCoachAttendance === 'function') {
-      refreshCoachAttendance();
+      refreshCoachAttendance(true); // silent, no toast
     }
   }
 });
@@ -518,23 +518,24 @@ function startCoachPolling() {
     if (!activeTab) return;
     const tabId = activeTab.id.replace('tab-','');
     if (tabId !== 'c-absensi' && tabId !== 'c-overview') return;
-    // Silent refresh (tanpa toast)
+    // Silent refresh (tanpa toast) — attendance + dates
     try {
-      const { data } = await supa.from('attendance').select('member_id,date_id,status').limit(100000);
-      if (data) {
+      const [attRes, datesRes] = await Promise.all([
+        supa.from('attendance').select('member_id,date_id,status').limit(100000),
+        supa.from('dates').select('id,label,region,sort_order,month_code').order('sort_order')
+      ]);
+      if (attRes.data) {
         const newMap = {};
-        data.forEach(a => { newMap[a.member_id+'_'+a.date_id] = a.status; });
-        // Cek apakah ada perubahan
+        attRes.data.forEach(a => { newMap[a.member_id+'_'+a.date_id] = a.status; });
         const oldKeys = Object.keys(ALL_ATTENDANCE);
         const newKeys = Object.keys(newMap);
         let changed = oldKeys.length !== newKeys.length;
-        if (!changed) {
-          for (const k of newKeys) {
-            if (ALL_ATTENDANCE[k] !== newMap[k]) { changed = true; break; }
-          }
-        }
+        if (!changed) for (const k of newKeys) if (ALL_ATTENDANCE[k] !== newMap[k]) { changed = true; break; }
+        // Cek date_id mismatch juga
+        if (datesRes.data && datesRes.data.length !== ALL_DATES.length) changed = true;
         if (changed) {
           ALL_ATTENDANCE = newMap;
+          if (datesRes.data) ALL_DATES = datesRes.data;
           COACH_TAB_RENDERED[tabId] = false;
           if (typeof ensureCoachTabRendered === 'function') ensureCoachTabRendered(tabId);
         }
@@ -3190,20 +3191,28 @@ async function goBackCoach() {
   }
 }
 
-// Manual refresh: re-fetch attendance + re-render Coach Absensi
-async function refreshCoachAttendance() {
+// Refresh attendance + dates + members (silent=true untuk auto, false untuk manual)
+async function refreshCoachAttendance(silent) {
   try {
-    toast('🔄 Refresh...');
-    const { data, error } = await supa.from('attendance').select('member_id,date_id,status').limit(100000);
-    if (error) throw error;
+    if (!silent) toast('🔄 Refresh...');
+    // Refetch dates JUGA supaya date_id selalu sinkron dengan CGL
+    const [attRes, datesRes] = await Promise.all([
+      supa.from('attendance').select('member_id,date_id,status').limit(100000),
+      supa.from('dates').select('id,label,region,sort_order,month_code').order('sort_order')
+    ]);
+    if (attRes.error) throw attRes.error;
+    if (datesRes.error) throw datesRes.error;
+    ALL_DATES = datesRes.data || [];
     ALL_ATTENDANCE = {};
-    (data||[]).forEach(a => { ALL_ATTENDANCE[a.member_id+'_'+a.date_id] = a.status; });
+    (attRes.data||[]).forEach(a => { ALL_ATTENDANCE[a.member_id+'_'+a.date_id] = a.status; });
     COACH_TAB_RENDERED['c-absensi'] = false;
     COACH_TAB_RENDERED['c-overview'] = false;
-    await ensureCoachTabRendered('c-absensi');
-    toast('✓ Data ter-update');
+    const activeTab = document.querySelector('#pageC .tab-content.active');
+    const tabId = activeTab ? activeTab.id.replace('tab-','') : 'c-absensi';
+    await ensureCoachTabRendered(tabId);
+    if (!silent) toast('✓ Data ter-update');
   } catch(e) {
-    toast('❌ Gagal refresh: '+(e.message||'unknown').slice(0,60),'err');
+    if (!silent) toast('❌ Gagal refresh: '+(e.message||'unknown').slice(0,60),'err');
     console.error('[refreshCoachAttendance]', e);
   }
 }
@@ -3213,15 +3222,18 @@ async function sCoachTab(id, b) {
   b.classList.add('on');
   document.querySelectorAll('#pageC .tab-content').forEach(t => t.classList.remove('active'));
   document.getElementById('tab-' + id).classList.add('active');
-  // Saat switch ke Absensi/Overview, refetch attendance fresh dari Supabase
-  // supaya selalu lihat data terbaru (bukan stale dari ALL_ATTENDANCE cache)
+  // Saat switch ke Absensi/Overview, refetch attendance + dates fresh
+  // (dates juga penting supaya date_id konsisten dengan CGL)
   if (id === 'c-absensi' || id === 'c-overview') {
     try {
-      const { data } = await supa.from('attendance').select('member_id,date_id,status').limit(100000);
-      if (data) {
+      const [attRes, datesRes] = await Promise.all([
+        supa.from('attendance').select('member_id,date_id,status').limit(100000),
+        supa.from('dates').select('id,label,region,sort_order,month_code').order('sort_order')
+      ]);
+      if (datesRes.data) ALL_DATES = datesRes.data;
+      if (attRes.data) {
         ALL_ATTENDANCE = {};
-        data.forEach(a => { ALL_ATTENDANCE[a.member_id+'_'+a.date_id] = a.status; });
-        // Reset rendered flag supaya re-render dengan data fresh
+        attRes.data.forEach(a => { ALL_ATTENDANCE[a.member_id+'_'+a.date_id] = a.status; });
         COACH_TAB_RENDERED[id] = false;
       }
     } catch(e) { console.warn('[sCoachTab refetch]', e); }
