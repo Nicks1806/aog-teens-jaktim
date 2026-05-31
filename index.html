@@ -585,6 +585,20 @@ function handleAttendanceChange(payload) {
 
   // Re-compute stats header (debounced)
   rtDebounce('att-stats', () => { try { computeStats(); } catch(e) {} }, 300);
+
+  // Coach Absensi: re-render % per row + avg hadir (debounced lebih lama supaya batch)
+  rtDebounce('coach-att-refresh', () => {
+    try {
+      if (document.getElementById('tab-c-absensi')?.classList.contains('active')) {
+        // Force re-render Coach Absensi supaya per-row % update
+        if (typeof renderCoachAbsensi === 'function') renderCoachAbsensi();
+      }
+      // Coach Overview tab — punya stats global
+      if (document.getElementById('tab-c-overview')?.classList.contains('active')) {
+        if (typeof renderCoachOverview === 'function') renderCoachOverview();
+      }
+    } catch(e) { console.warn('[realtime coach refresh]', e); }
+  }, 800);
 }
 
 // ── Members handler: re-fetch + re-render (debounced) ──
