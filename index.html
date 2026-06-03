@@ -420,7 +420,7 @@ thead th:first-child{position:sticky;left:0;z-index:3;background:#fafafa}
         <input id="coachSearch" type="text" placeholder="Cari nama member..." oninput="handleCoachSearch(this.value)" onblur="this.style.borderColor='#e4dcff';this.style.width='200px';setTimeout(()=>{document.getElementById('coachSearchResults').style.display='none'},200)" onfocus="this.style.borderColor='#6C5CE7';this.style.width='260px';if(this.value)handleCoachSearch(this.value)" style="padding:7px 14px 7px 32px;border:1.5px solid #e4dcff;border-radius:20px;font-size:11.5px;font-family:Inter,sans-serif;width:200px;outline:none;transition:all .2s;background:#fff url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236C5CE7' stroke-width='2.5' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E&quot;) no-repeat 10px center;background-size:14px">
         <div id="coachSearchResults" style="display:none;position:absolute;top:calc(100% + 4px);right:0;left:0;background:#fff;border:1px solid #e4dcff;border-radius:12px;box-shadow:0 12px 28px rgba(108,92,231,.15);max-height:360px;overflow-y:auto;z-index:100;min-width:280px"></div>
       </div>
-      <div style="display:flex;align-items:center;gap:6px"><span style="font-size:9px;color:var(--g4);font-weight:600;letter-spacing:.3px" title="App version">v22</span><span class="notif-bell" onclick="toggleNotif()" title="Notifikasi" style="cursor:pointer;font-size:14px;user-select:none">🔔</span><span class="live-dot"></span><span class="live-label" style="font-size:10px;color:var(--green);font-weight:600">Live</span></div>
+      <div style="display:flex;align-items:center;gap:6px"><span style="font-size:9px;color:var(--g4);font-weight:600;letter-spacing:.3px" title="App version">v23</span><span class="notif-bell" onclick="toggleNotif()" title="Notifikasi" style="cursor:pointer;font-size:14px;user-select:none">🔔</span><span class="live-dot"></span><span class="live-label" style="font-size:10px;color:var(--green);font-weight:600">Live</span></div>
     </div>
   </div>
   <div class="app-hero" id="coachHero"><div class="app-hero-tag">Januari &mdash; April 2026</div><div class="app-hero-h" id="coachHeroH">Semua<br><em>CG.</em></div><div class="app-hero-meta" id="coachMeta">Memuat...</div></div>
@@ -1777,6 +1777,11 @@ async function renderDetail() {
   });
 
   let html = '';
+  // Export buttons (CGL Detail tab)
+  html += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;justify-content:flex-end">';
+  html += '<button onclick="exportDetailCSV(\'cgl\')" style="padding:7px 13px;border-radius:9px;border:1.5px solid #16a34a;background:linear-gradient(135deg,#f0fdf4,#dcfce7);color:#16a34a;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.3px;box-shadow:0 2px 6px rgba(22,163,74,.1);transition:all .2s" onmouseover="this.style.transform=\'translateY(-1px)\'" onmouseout="this.style.transform=\'\'">📊 CSV</button>';
+  html += '<button onclick="exportDetailPDF(\'cgl\')" style="padding:7px 13px;border-radius:9px;border:1.5px solid #dc2626;background:linear-gradient(135deg,#fef2f2,#fee2e2);color:#dc2626;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.3px;box-shadow:0 2px 6px rgba(220,38,38,.1);transition:all .2s" onmouseover="this.style.transform=\'translateY(-1px)\'" onmouseout="this.style.transform=\'\'">📄 PDF</button>';
+  html += '</div>';
 
   sortedMembers.forEach(m => {
     const hadirCount = DATES.filter(d => ATTENDANCE[m.id+'_'+d.id]==='H').length;
@@ -3376,9 +3381,21 @@ async function renderCoachOverview() {
   document.getElementById('coachMeta').textContent = cgs.length + ' CG aktif \u00b7 ' + totalMbr + ' member \u00b7 ' + avgHadir + '% kehadiran';
 
   let html = '';
+  // Top bar: region toggle + Export Detail buttons
+  html += '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px;margin-top:4px">';
   if (coachRole !== 'tl') {
-    html += '<div class="region-toggle" style="display:inline-flex;margin-bottom:16px;margin-top:4px"><button class="region-btn '+(coachReg==='jaktim1'?'active':'')+'" onclick="coachReg=\'jaktim1\';renderCoachOverview();renderCoachAbsensi();renderCoachMilestone();renderCoachVisi()" style="padding:6px 18px;font-size:12px">JAKTIM 1</button><button class="region-btn '+(coachReg==='jaktim2'?'active':'')+'" onclick="coachReg=\'jaktim2\';renderCoachOverview();renderCoachAbsensi();renderCoachMilestone();renderCoachVisi()" style="padding:6px 18px;font-size:12px">JAKTIM 2</button></div>';
+    html += '<div class="region-toggle" style="display:inline-flex;margin:0"><button class="region-btn '+(coachReg==='jaktim1'?'active':'')+'" onclick="coachReg=\'jaktim1\';renderCoachOverview();renderCoachAbsensi();renderCoachMilestone();renderCoachVisi()" style="padding:6px 18px;font-size:12px">JAKTIM 1</button><button class="region-btn '+(coachReg==='jaktim2'?'active':'')+'" onclick="coachReg=\'jaktim2\';renderCoachOverview();renderCoachAbsensi();renderCoachMilestone();renderCoachVisi()" style="padding:6px 18px;font-size:12px">JAKTIM 2</button></div>';
+  } else {
+    html += '<div></div>';
   }
+  const detailScope = coachRole === 'tl' ? 'all' : coachReg;
+  const detailLabel = coachRole === 'tl' ? 'Semua' : (coachReg === 'jaktim1' ? 'Jaktim 1' : 'Jaktim 2');
+  html += '<div style="display:flex;gap:6px;align-items:center">';
+  html += '<span style="font-size:10px;color:var(--g4);font-weight:600;letter-spacing:.3px;text-transform:uppercase">Export Detail '+detailLabel+'</span>';
+  html += '<button onclick="exportDetailCSV(\''+detailScope+'\')" style="padding:6px 12px;border-radius:8px;border:1.5px solid #16a34a;background:linear-gradient(135deg,#f0fdf4,#dcfce7);color:#16a34a;font-size:10px;font-weight:700;cursor:pointer;letter-spacing:.3px;transition:all .15s" onmouseover="this.style.transform=\'translateY(-1px)\'" onmouseout="this.style.transform=\'\'">📊 CSV</button>';
+  html += '<button onclick="exportDetailPDF(\''+detailScope+'\')" style="padding:6px 12px;border-radius:8px;border:1.5px solid #dc2626;background:linear-gradient(135deg,#fef2f2,#fee2e2);color:#dc2626;font-size:10px;font-weight:700;cursor:pointer;letter-spacing:.3px;transition:all .15s" onmouseover="this.style.transform=\'translateY(-1px)\'" onmouseout="this.style.transform=\'\'">📄 PDF</button>';
+  html += '</div>';
+  html += '</div>';
 
   // Visi Coach per region (editable). Untuk TL, tampilkan dua kotak: Jaktim 1 + Jaktim 2
   const visiRegions = coachRole === 'tl' ? ['jaktim1','jaktim2'] : [coachReg];
@@ -3683,6 +3700,158 @@ function exportRegionAttendancePDF(scope) {
 
   body += '<div class="footer">Dicetak otomatis dari CG Dashboard · absenibadahjaktim.vercel.app</div>';
   openPrintWindow(title, body);
+}
+
+// ═══════════════════════════════════════════════════════════
+// EXPORT DETAIL CG — CSV & PDF (CGL / Coach / TL)
+// ═══════════════════════════════════════════════════════════
+// Resolve member list + label berdasarkan scope:
+// - 'cgl'  → MEMBERS (CG aktif)
+// - 'jaktim1' / 'jaktim2' → ALL_MEMBERS filter region
+// - 'all'  → ALL_MEMBERS (TL)
+async function getDetailExportData(scope) {
+  let mems, label, notesMap = {};
+  if (scope === 'cgl') {
+    mems = MEMBERS || [];
+    label = (typeof CUR_CG !== 'undefined' ? CUR_CG : 'Detail');
+    // Load notes batch
+    const ids = mems.map(m => m.id);
+    if (ids.length) {
+      const { data } = await supa.from('member_notes').select('member_id,cgl_note').in('member_id', ids);
+      (data||[]).forEach(n => { notesMap[n.member_id] = n.cgl_note || ''; });
+    }
+  } else if (scope === 'all') {
+    mems = ALL_MEMBERS || [];
+    label = 'Semua CG (Jaktim 1 & 2)';
+    const ids = mems.map(m => m.id);
+    // Pagination supaya tidak kena 1000 row cap
+    let allNotes = [];
+    for (let i = 0; i < ids.length; i += 500) {
+      const chunk = ids.slice(i, i + 500);
+      const { data } = await supa.from('member_notes').select('member_id,cgl_note').in('member_id', chunk);
+      if (data) allNotes = allNotes.concat(data);
+    }
+    allNotes.forEach(n => { notesMap[n.member_id] = n.cgl_note || ''; });
+  } else {
+    mems = (ALL_MEMBERS || []).filter(m => m.region === scope);
+    label = scope === 'jaktim1' ? 'Jaktim 1' : 'Jaktim 2';
+    const ids = mems.map(m => m.id);
+    let allNotes = [];
+    for (let i = 0; i < ids.length; i += 500) {
+      const chunk = ids.slice(i, i + 500);
+      const { data } = await supa.from('member_notes').select('member_id,cgl_note').in('member_id', chunk);
+      if (data) allNotes = allNotes.concat(data);
+    }
+    allNotes.forEach(n => { notesMap[n.member_id] = n.cgl_note || ''; });
+  }
+  // Sort: CG → role → nama
+  const ROLE_ORDER = {'cgl':0,'leader':0,'sponsor':1,'member':2,'simpatisan':3,'vip':4};
+  mems = mems.slice().sort((a, b) => {
+    const ca = (a.cg||'').localeCompare(b.cg||'');
+    if (ca !== 0) return ca;
+    const ra = ROLE_ORDER[(a.status||'member').toLowerCase().trim()] ?? 5;
+    const rb = ROLE_ORDER[(b.status||'member').toLowerCase().trim()] ?? 5;
+    if (ra !== rb) return ra - rb;
+    return (a.nama||'').localeCompare(b.nama||'');
+  });
+  return { mems, label, notesMap };
+}
+
+async function exportDetailCSV(scope) {
+  try {
+    toast('📊 Menyiapkan CSV...');
+    const { mems, label, notesMap } = await getDetailExportData(scope);
+    if (!mems.length) { toast('Tidak ada data untuk di-export','err'); return; }
+
+    const headers = ['CG','No','Nama','Status','Tgl Lahir','No HP','Sekolah','Kelas','Kelurahan','Kecamatan','MSJ 1','MSJ 2','MSJ 3','CGT 1','CGT 2','CGT 3','B.Air','B.Roh','Catatan CGL'];
+    const csvEsc = v => { const s = String(v==null?'':v); return /[",\n]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s; };
+    let csv = '﻿' + headers.join(',') + '\n';
+    let curCg = null, no = 0;
+    mems.forEach(m => {
+      if (m.cg !== curCg) { curCg = m.cg; no = 0; }
+      no++;
+      const row = [
+        m.cg||'', no, m.nama||'', m.status||'',
+        m.lahir||'', m.wa||'',
+        m.sekolah||'', m.kelas||'',
+        m.kelurahan||'', m.kecamatan||'',
+        m.msj1?'TRUE':'FALSE', m.msj2?'TRUE':'FALSE', m.msj3?'TRUE':'FALSE',
+        m.cgt1?'TRUE':'FALSE', m.cgt2?'TRUE':'FALSE', m.cgt3?'TRUE':'FALSE',
+        m.baptis_air?'TRUE':'FALSE', m.baptis_roh?'TRUE':'FALSE',
+        notesMap[m.id]||''
+      ];
+      csv += row.map(csvEsc).join(',') + '\n';
+    });
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const todayStr = new Date().toISOString().slice(0,10);
+    a.download = 'Detail_'+label.replace(/[^\w]/g,'_')+'_'+todayStr+'.csv';
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+    toast('✓ CSV ter-download');
+  } catch(e) {
+    toast('❌ Gagal export: '+(e.message||'unknown').slice(0,60),'err');
+    console.error('[exportDetailCSV]', e);
+  }
+}
+
+async function exportDetailPDF(scope) {
+  try {
+    toast('📄 Menyiapkan PDF...');
+    const { mems, label, notesMap } = await getDetailExportData(scope);
+    if (!mems.length) { toast('Tidak ada data untuk di-export','err'); return; }
+
+    const todayStr = new Date().toLocaleDateString('id-ID', {day:'numeric',month:'long',year:'numeric'});
+    const title = 'Detail Member ' + label;
+    let body = '<h1>Detail Member ' + esc(label) + '</h1>';
+    body += '<div class="sub">AOG Teens Jaktim · ' + todayStr + ' · ' + mems.length + ' member</div>';
+
+    // Group by CG
+    const byCg = {};
+    mems.forEach(m => { if (!byCg[m.cg]) byCg[m.cg] = []; byCg[m.cg].push(m); });
+    const cgList = Object.keys(byCg).sort();
+
+    const ms = (v) => v ? '✓' : '—';
+    cgList.forEach((cg, idx) => {
+      const list = byCg[cg];
+      const info = (ALL_CG_INFO||[]).find(c => c.cg === cg) || {};
+      body += (idx > 0 ? '<div class="page-break"></div>' : '');
+      body += '<div class="cg-header"><div><div class="cg-name">'+esc(cg)+'</div><div class="cg-meta">CGL: '+esc(info.leader||'-')+' · '+list.length+' member · '+esc(info.hari_jam||'')+' · '+esc(info.lokasi||'')+'</div></div></div>';
+      body += '<table class="att-table"><thead><tr>';
+      body += '<th>No</th><th style="text-align:left">Nama</th><th>Status</th><th>Lahir</th><th>No HP</th><th style="text-align:left">Sekolah/Kelas</th><th style="text-align:left">Alamat</th><th>MSJ1</th><th>MSJ2</th><th>MSJ3</th><th>CGT1</th><th>CGT2</th><th>CGT3</th><th>B.Air</th><th>B.Roh</th>';
+      body += '</tr></thead><tbody>';
+      list.forEach((m, i) => {
+        const alamat = [m.kelurahan, m.kecamatan].filter(Boolean).join(', ');
+        const sekolah = [m.sekolah, m.kelas].filter(Boolean).join(' · ');
+        body += '<tr>';
+        body += '<td>'+(i+1)+'</td>';
+        body += '<td style="text-align:left">'+esc(m.nama||'')+'</td>';
+        body += '<td>'+esc(m.status||'')+'</td>';
+        body += '<td>'+esc(m.lahir||'')+'</td>';
+        body += '<td>'+esc(m.wa||'')+'</td>';
+        body += '<td style="text-align:left;font-size:10px">'+esc(sekolah)+'</td>';
+        body += '<td style="text-align:left;font-size:10px">'+esc(alamat)+'</td>';
+        body += '<td>'+ms(m.msj1)+'</td><td>'+ms(m.msj2)+'</td><td>'+ms(m.msj3)+'</td>';
+        body += '<td>'+ms(m.cgt1)+'</td><td>'+ms(m.cgt2)+'</td><td>'+ms(m.cgt3)+'</td>';
+        body += '<td>'+ms(m.baptis_air)+'</td><td>'+ms(m.baptis_roh)+'</td>';
+        body += '</tr>';
+        // Catatan CGL row kalau ada
+        if (notesMap[m.id] && notesMap[m.id].trim()) {
+          body += '<tr><td colspan="15" style="text-align:left;font-size:10px;font-style:italic;color:#555;padding:4px 8px;background:#fafafa">📝 '+esc(notesMap[m.id])+'</td></tr>';
+        }
+      });
+      body += '</tbody></table>';
+    });
+
+    body += '<div class="footer">Dicetak otomatis dari CG Dashboard · absenibadahjaktim.vercel.app</div>';
+    openPrintWindow(title, body);
+    toast('✓ Membuka jendela print');
+  } catch(e) {
+    toast('❌ Gagal export: '+(e.message||'unknown').slice(0,60),'err');
+    console.error('[exportDetailPDF]', e);
+  }
 }
 
 function renderCoachAbsensi() {
