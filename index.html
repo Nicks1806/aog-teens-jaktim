@@ -420,7 +420,7 @@ thead th:first-child{position:sticky;left:0;z-index:3;background:#fafafa}
         <input id="coachSearch" type="text" placeholder="Cari nama member..." oninput="handleCoachSearch(this.value)" onblur="this.style.borderColor='#e4dcff';this.style.width='200px';setTimeout(()=>{document.getElementById('coachSearchResults').style.display='none'},200)" onfocus="this.style.borderColor='#6C5CE7';this.style.width='260px';if(this.value)handleCoachSearch(this.value)" style="padding:7px 14px 7px 32px;border:1.5px solid #e4dcff;border-radius:20px;font-size:11.5px;font-family:Inter,sans-serif;width:200px;outline:none;transition:all .2s;background:#fff url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236C5CE7' stroke-width='2.5' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E&quot;) no-repeat 10px center;background-size:14px">
         <div id="coachSearchResults" style="display:none;position:absolute;top:calc(100% + 4px);right:0;left:0;background:#fff;border:1px solid #e4dcff;border-radius:12px;box-shadow:0 12px 28px rgba(108,92,231,.15);max-height:360px;overflow-y:auto;z-index:100;min-width:280px"></div>
       </div>
-      <div style="display:flex;align-items:center;gap:6px"><span style="font-size:9px;color:var(--g4);font-weight:600;letter-spacing:.3px" title="App version">v26</span><span class="notif-bell" onclick="toggleNotif()" title="Notifikasi" style="cursor:pointer;font-size:14px;user-select:none">🔔</span><span class="live-dot"></span><span class="live-label" style="font-size:10px;color:var(--green);font-weight:600">Live</span></div>
+      <div style="display:flex;align-items:center;gap:6px"><span style="font-size:9px;color:var(--g4);font-weight:600;letter-spacing:.3px" title="App version">v27</span><span class="notif-bell" onclick="toggleNotif()" title="Notifikasi" style="cursor:pointer;font-size:14px;user-select:none">🔔</span><span class="live-dot"></span><span class="live-label" style="font-size:10px;color:var(--green);font-weight:600">Live</span></div>
     </div>
   </div>
   <div class="app-hero" id="coachHero"><div class="app-hero-tag">Januari &mdash; April 2026</div><div class="app-hero-h" id="coachHeroH">Semua<br><em>CG.</em></div><div class="app-hero-meta" id="coachMeta">Memuat...</div></div>
@@ -1332,8 +1332,8 @@ async function openCGDashboard(cg) {
   const dateIds = DATES.map(d => d.id);
   ATTENDANCE = {};
   if (memberIds.length && dateIds.length) {
-    const { data: att } = await supa.from('attendance').select('member_id,date_id,status').in('member_id', memberIds).in('date_id', dateIds).limit(100000);
-    (att || []).forEach(a => { ATTENDANCE[a.member_id + '_' + a.date_id] = a.status; });
+    const att = await fetchBoundedAttendance(memberIds, dateIds);
+    att.forEach(a => { ATTENDANCE[a.member_id + '_' + a.date_id] = a.status; });
   }
 
   // Update nav
@@ -1884,8 +1884,8 @@ async function deleteMember(memberId, memberName) {
     const dateIds = DATES.map(d => d.id);
     ATTENDANCE = {};
     if (memberIds.length && dateIds.length) {
-      const { data: att } = await supa.from('attendance').select('member_id,date_id,status').in('member_id', memberIds).in('date_id', dateIds).limit(100000);
-      (att || []).forEach(a => { ATTENDANCE[a.member_id + '_' + a.date_id] = a.status; });
+      const att = await fetchBoundedAttendance(memberIds, dateIds);
+      att.forEach(a => { ATTENDANCE[a.member_id + '_' + a.date_id] = a.status; });
     }
     const hC = document.getElementById('hC'); if (hC) hC.textContent = MEMBERS.length;
     computeStats();
@@ -1994,9 +1994,9 @@ async function saveNewMember() {
     const memberIds = MEMBERS.map(m => m.id);
     const dateIds = DATES.map(d => d.id);
     if (memberIds.length && dateIds.length) {
-      const { data: att } = await supa.from('attendance').select('member_id,date_id,status').in('member_id', memberIds).in('date_id', dateIds).limit(100000);
+      const att = await fetchBoundedAttendance(memberIds, dateIds);
       ATTENDANCE = {};
-      (att || []).forEach(a => { ATTENDANCE[a.member_id + '_' + a.date_id] = a.status; });
+      att.forEach(a => { ATTENDANCE[a.member_id + '_' + a.date_id] = a.status; });
     }
 
     // Update header counter
@@ -3228,13 +3228,51 @@ async function goBackCoach() {
 }
 
 // Fetch SEMUA attendance dengan pagination — work-around server max_rows cap (default 1000)
+// PENTING: pakai .order() supaya pagination konsisten (tanpa ORDER BY, PostgREST tidak
+// jamin urutan stabil antar page → bisa skip atau duplicate row)
 async function fetchAllAttendance() {
   const all = [];
   const pageSize = 1000;
   let from = 0;
   for (let i = 0; i < 50; i++) { // max 50 pages = 50k rows (safety guard)
-    const { data, error } = await supa.from('attendance').select('member_id,date_id,status').range(from, from + pageSize - 1);
+    const { data, error } = await supa.from('attendance')
+      .select('member_id,date_id,status')
+      .order('member_id', { ascending: true })
+      .order('date_id', { ascending: true })
+      .range(from, from + pageSize - 1);
     if (error) { console.error('[fetchAllAttendance page]', i, error); break; }
+    if (!data || data.length === 0) break;
+    all.push(...data);
+    if (data.length < pageSize) break;
+    from += pageSize;
+  }
+  return all;
+}
+
+// Fetch attendance bounded (member_ids + date_ids) dengan pagination supaya tidak kena 1000 cap
+async function fetchBoundedAttendance(memberIds, dateIds) {
+  if (!memberIds.length || !dateIds.length) return [];
+  // Kalau total kombinasi < 1000, single query cukup
+  if (memberIds.length * dateIds.length < 800) {
+    const { data } = await supa.from('attendance')
+      .select('member_id,date_id,status')
+      .in('member_id', memberIds)
+      .in('date_id', dateIds);
+    return data || [];
+  }
+  // Pagination untuk dataset besar
+  const all = [];
+  const pageSize = 1000;
+  let from = 0;
+  for (let i = 0; i < 50; i++) {
+    const { data, error } = await supa.from('attendance')
+      .select('member_id,date_id,status')
+      .in('member_id', memberIds)
+      .in('date_id', dateIds)
+      .order('member_id', { ascending: true })
+      .order('date_id', { ascending: true })
+      .range(from, from + pageSize - 1);
+    if (error) { console.error('[fetchBoundedAttendance page]', i, error); break; }
     if (!data || data.length === 0) break;
     all.push(...data);
     if (data.length < pageSize) break;
@@ -3962,13 +4000,27 @@ function renderCoachAbsensi() {
     ALL_DATES.forEach(d => {
       const k = (d.label||'').trim();
       if (!k) return;
+      const so = d.sort_order || 0;
       if (!dateMap.has(k)) {
-        dateMap.set(k, { id: d.id, ids: [d.id], label: d.label, sort_order: d.sort_order, region: 'all' });
+        dateMap.set(k, { id: d.id, ids: [d.id], label: d.label, sort_order: so, region: 'all' });
       } else {
-        dateMap.get(k).ids.push(d.id);
+        const entry = dateMap.get(k);
+        entry.ids.push(d.id);
+        // Pakai min sort_order antar region supaya urutan konsisten
+        if (so && so < entry.sort_order) entry.sort_order = so;
       }
     });
-    chartDates = Array.from(dateMap.values()).sort((a,b) => (a.sort_order||0) - (b.sort_order||0));
+    // Sort dulu by sort_order, fallback parse label kalau sort_order sama
+    chartDates = Array.from(dateMap.values()).sort((a,b) => {
+      if (a.sort_order !== b.sort_order) return (a.sort_order||0) - (b.sort_order||0);
+      // Fallback: parse "DD MMM" → bandingkan
+      const aDay = parseLabelToDay(a.label) || 0;
+      const bDay = parseLabelToDay(b.label) || 0;
+      const aMon = parseLabelToMonth(a.label) || 0;
+      const bMon = parseLabelToMonth(b.label) || 0;
+      if (aMon !== bMon) return aMon - bMon;
+      return aDay - bDay;
+    });
   } else {
     chartDates = ALL_DATES.filter(d => d.region === region);
   }

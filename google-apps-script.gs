@@ -80,7 +80,7 @@ function fullRebuildRegion(region) {
 
   var members = fetchSupabase('/rest/v1/members?select=*&region=eq.'+region);
   var dates = fetchSupabase('/rest/v1/dates?select=*&region=eq.'+region+'&order=sort_order');
-  var attendance = fetchSupabase('/rest/v1/attendance?select=member_id,date_id,status');
+  var attendance = fetchAllAttendance();
   if (!members || !dates) return;
 
   rebuildAbsensiSheet(cfg.sheetAbsensi, cfg.dateStartCol, members, dates, attendance||[]);
@@ -286,7 +286,7 @@ function syncAbsensi(region, sheetName, dateStartCol) {
 
   var members = fetchSupabase('/rest/v1/members?select=id,nama,cg,status&region=eq.'+region);
   var dates = fetchSupabase('/rest/v1/dates?select=id,label,month_code,sort_order&region=eq.'+region+'&order=sort_order');
-  var attendance = fetchSupabase('/rest/v1/attendance?select=member_id,date_id,status');
+  var attendance = fetchAllAttendance();
   if (!members || !dates || !attendance) return;
 
   // Cek apakah sheet kosong (belum ada data) — kalau ya, trigger full rebuild
@@ -713,6 +713,49 @@ function fetchSupabase(path) {
     if (r.getResponseCode()!==200) return null;
     return JSON.parse(r.getContentText());
   } catch(e) { return null; }
+}
+
+// Fetch SEMUA attendance dengan pagination — bypass server max_rows cap (default 1000)
+// Wajib pakai .order() supaya pagination konsisten antar page
+function fetchAllAttendance() {
+  var all = [];
+  var pageSize = 1000;
+  var maxPages = 50; // safety guard 50k row
+  for (var i = 0; i < maxPages; i++) {
+    var from = i * pageSize;
+    var to = from + pageSize - 1;
+    try {
+      var r = UrlFetchApp.fetch(
+        SUPABASE_URL + '/rest/v1/attendance?select=member_id,date_id,status&order=member_id.asc,date_id.asc',
+        {
+          method: 'GET',
+          headers: {
+            'apikey': SUPABASE_KEY,
+            'Authorization': 'Bearer ' + SUPABASE_KEY,
+            'Content-Type': 'application/json',
+            'Range-Unit': 'items',
+            'Range': from + '-' + to,
+            'Prefer': 'count=exact'
+          },
+          muteHttpExceptions: true
+        }
+      );
+      var code = r.getResponseCode();
+      if (code !== 200 && code !== 206) {
+        Logger.log('fetchAllAttendance page ' + i + ' HTTP ' + code);
+        break;
+      }
+      var page = JSON.parse(r.getContentText());
+      if (!page || page.length === 0) break;
+      for (var j = 0; j < page.length; j++) all.push(page[j]);
+      if (page.length < pageSize) break;
+    } catch(e) {
+      Logger.log('fetchAllAttendance error: ' + e.message);
+      break;
+    }
+  }
+  Logger.log('fetchAllAttendance total rows: ' + all.length);
+  return all;
 }
 
 function norm(s) { return String(s||'').trim().toLowerCase().replace(/\s+/g,' '); }
