@@ -420,7 +420,7 @@ thead th:first-child{position:sticky;left:0;z-index:3;background:#fafafa}
         <input id="coachSearch" type="text" placeholder="Cari nama member..." oninput="handleCoachSearch(this.value)" onblur="this.style.borderColor='#e4dcff';this.style.width='200px';setTimeout(()=>{document.getElementById('coachSearchResults').style.display='none'},200)" onfocus="this.style.borderColor='#6C5CE7';this.style.width='260px';if(this.value)handleCoachSearch(this.value)" style="padding:7px 14px 7px 32px;border:1.5px solid #e4dcff;border-radius:20px;font-size:11.5px;font-family:Inter,sans-serif;width:200px;outline:none;transition:all .2s;background:#fff url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236C5CE7' stroke-width='2.5' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E&quot;) no-repeat 10px center;background-size:14px">
         <div id="coachSearchResults" style="display:none;position:absolute;top:calc(100% + 4px);right:0;left:0;background:#fff;border:1px solid #e4dcff;border-radius:12px;box-shadow:0 12px 28px rgba(108,92,231,.15);max-height:360px;overflow-y:auto;z-index:100;min-width:280px"></div>
       </div>
-      <div style="display:flex;align-items:center;gap:6px"><span style="font-size:9px;color:var(--g4);font-weight:600;letter-spacing:.3px" title="App version">v24</span><span class="notif-bell" onclick="toggleNotif()" title="Notifikasi" style="cursor:pointer;font-size:14px;user-select:none">🔔</span><span class="live-dot"></span><span class="live-label" style="font-size:10px;color:var(--green);font-weight:600">Live</span></div>
+      <div style="display:flex;align-items:center;gap:6px"><span style="font-size:9px;color:var(--g4);font-weight:600;letter-spacing:.3px" title="App version">v25</span><span class="notif-bell" onclick="toggleNotif()" title="Notifikasi" style="cursor:pointer;font-size:14px;user-select:none">🔔</span><span class="live-dot"></span><span class="live-label" style="font-size:10px;color:var(--green);font-weight:600">Live</span></div>
     </div>
   </div>
   <div class="app-hero" id="coachHero"><div class="app-hero-tag">Januari &mdash; April 2026</div><div class="app-hero-h" id="coachHeroH">Semua<br><em>CG.</em></div><div class="app-hero-meta" id="coachMeta">Memuat...</div></div>
@@ -1413,19 +1413,39 @@ function computeStats() {
 // SVG line chart untuk % hadir per minggu/tanggal
 function buildAttendanceLineChart(members, dates, attMap) {
   if (!dates.length || !members.length) return '';
-  // Hitung % hadir untuk tiap tanggal
-  // Denominator = total member CG (bukan cuma yg ter-record). Member yang belum di-input
-  // dianggap tidak hadir supaya tidak salah tampil 100% padahal ada yg absen/belum diisi.
-  // Kalau tidak ada record sama sekali di tanggal itu (ibadah belum jalan) → pct=null.
+
+  // ── Hitung "tanggal join" tiap member berdasarkan record absensi terawal ──
+  // Member yang ditambahkan minggu ini TIDAK pull down % minggu lalu, karena
+  // mereka belum exist di periode lampau. Cara deteksi: cari tanggal paling awal
+  // (sort_order min) yang member ini punya record (H/I/S/A). Tanggal sebelum itu
+  // → member dianggap belum aktif → exclude dari denominator.
+  const sortedDates = [...dates].sort((a, b) => (a.sort_order||0) - (b.sort_order||0));
+  const dateIdx = {};
+  sortedDates.forEach((d, i) => { dateIdx[d.id] = i; });
+  const latestIdx = sortedDates.length - 1;
+
+  const memberJoinIdx = {};
+  members.forEach(m => {
+    let earliest = Infinity;
+    sortedDates.forEach((d, i) => {
+      if (attMap[m.id + '_' + d.id] && i < earliest) earliest = i;
+    });
+    // Kalau member belum pernah ada record sama sekali, anggap baru join (latest)
+    memberJoinIdx[m.id] = earliest === Infinity ? latestIdx : earliest;
+  });
+
+  // Hitung % hadir per tanggal — denominator hanya member yang sudah "aktif" pada tanggal itu
   const points = dates.map(d => {
-    let h = 0, anyRecord = false;
+    const dI = dateIdx[d.id];
+    let h = 0, t = 0, anyRecord = false;
     members.forEach(m => {
+      if (memberJoinIdx[m.id] > dI) return; // member belum aktif di tanggal ini
+      t++;
       const st = attMap[m.id+'_'+d.id];
       if (st) anyRecord = true;
       if (st === 'H') h++;
     });
-    const t = members.length;
-    const pct = anyRecord ? Math.round(h/t*100) : null;
+    const pct = anyRecord && t > 0 ? Math.round(h/t*100) : null;
     return { label: d.label||'', pct, hadir: h, total: t };
   });
   // Kalau semua null, jangan tampilin
