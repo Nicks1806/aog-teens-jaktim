@@ -549,4 +549,235 @@ Saat pertama kali bantu user:
 
 ---
 
+## 20. One-Time Supabase Setup (untuk Recreate / Kelapa Gading)
+
+Kalau setup dari nol atau untuk cabang Kelapa Gading:
+
+### 20.1 Enable Realtime Publication
+```sql
+ALTER PUBLICATION supabase_realtime ADD TABLE attendance;
+ALTER PUBLICATION supabase_realtime ADD TABLE members;
+ALTER PUBLICATION supabase_realtime ADD TABLE cg_pelayanan;
+ALTER PUBLICATION supabase_realtime ADD TABLE cg_events;
+ALTER PUBLICATION supabase_realtime ADD TABLE events;
+ALTER PUBLICATION supabase_realtime ADD TABLE cg_vision;
+ALTER PUBLICATION supabase_realtime ADD TABLE cg_dev_plans;
+ALTER PUBLICATION supabase_realtime ADD TABLE member_notes;
+ALTER PUBLICATION supabase_realtime ADD TABLE coach_notes;
+```
+
+### 20.2 Disable RLS di Semua Tabel
+```sql
+ALTER TABLE members DISABLE ROW LEVEL SECURITY;
+ALTER TABLE attendance DISABLE ROW LEVEL SECURITY;
+ALTER TABLE dates DISABLE ROW LEVEL SECURITY;
+ALTER TABLE cg_info DISABLE ROW LEVEL SECURITY;
+ALTER TABLE events DISABLE ROW LEVEL SECURITY;
+ALTER TABLE cg_events DISABLE ROW LEVEL SECURITY;
+ALTER TABLE cg_vision DISABLE ROW LEVEL SECURITY;
+ALTER TABLE cg_dev_plans DISABLE ROW LEVEL SECURITY;
+ALTER TABLE cg_pelayanan DISABLE ROW LEVEL SECURITY;
+ALTER TABLE cg_custom_roles DISABLE ROW LEVEL SECURITY;
+ALTER TABLE member_notes DISABLE ROW LEVEL SECURITY;
+ALTER TABLE coach_notes DISABLE ROW LEVEL SECURITY;
+```
+
+### 20.3 Verify Publication
+```sql
+SELECT tablename FROM pg_publication_tables 
+WHERE pubname = 'supabase_realtime'
+ORDER BY tablename;
+```
+
+Harus muncul minimal 6-7 tabel penting.
+
+---
+
+## 21. CG Constants Location (Untuk Tambah CG Baru di Code)
+
+Kalau tambah CG baru (misal `TEEN 25`), tidak wajib update code — CG akan otomatis muncul di dashboard karena diambil dari `getCGsForRegion()`. Tapi kalau mau custom color:
+
+**Lokasi constants di `index.html`:**
+- `CG_COLORS` — warna utama per CG (border, teks)
+- `CG_BG` — background gradient per CG
+- `CG_INIT` — short initial (untuk badge)
+
+Cari di file dengan `Grep pattern="CG_COLORS = {"`. Tambah entry:
+```javascript
+'TEEN 25': '#8b5cf6',  // di CG_COLORS
+'TEEN 25': '#f5f3ff',  // di CG_BG
+'TEEN 25': 'T25',      // di CG_INIT
+```
+
+Kalau tidak di-set, akan pakai default (`#7c3aed` purple, `#faf5ff` bg).
+
+---
+
+## 22. Google Apps Script Trigger Setup
+
+Kalau ini baru pertama kali setup:
+
+1. **Buka Google Sheets** target
+2. **Extensions → Apps Script**
+3. **Paste script** dari `google-apps-script.gs`
+4. **Save** (Ctrl+S)
+5. **Klik icon jam ⏰** (Triggers) di sidebar kiri
+6. **+ Add Trigger** (pojok kanan bawah)
+7. Configure:
+   - Function to run: **`runAutoSync`**
+   - Event source: **Time-driven**
+   - Type: **Minutes timer**
+   - Interval: **Every minute**
+   - Failure notification: **Immediately** (email kalau ada error)
+8. **Save**
+
+**Verify trigger aktif:**
+- Sidebar Triggers akan tampilkan 1 row aktif
+- Cek Executions history untuk pastikan runAutoSync jalan setiap menit
+
+**One-time manual run:**
+- Dropdown function pilih `fullRebuild` → **Run** ▶️ (sekali saja untuk populate awal)
+
+---
+
+## 23. Debug Tools & Console Commands
+
+Buka DevTools (F12) → tab Console di web app.
+
+### 23.1 Cek State Global
+```javascript
+// Cek member CG aktif (CGL scope)
+MEMBERS.length; MEMBERS.map(m => m.nama);
+
+// Cek attendance map size
+Object.keys(ATTENDANCE).length;
+
+// Coach scope
+ALL_MEMBERS.length;
+ALL_DATES.length;
+Object.keys(ALL_ATTENDANCE).length;
+```
+
+### 23.2 Cek Realtime Channel
+```javascript
+realtimeChannel?.state;  // "joined" = connected, "closed" = offline
+```
+
+### 23.3 Force Refetch
+```javascript
+// Force reload attendance dari Supabase (bypass cache)
+fetchAllAttendance().then(d => console.log('Total attendance rows:', d.length));
+
+// Manual trigger Coach refresh
+refreshCoachAttendance();
+```
+
+### 23.4 Cek Notification Permission
+```javascript
+Notification.permission;                  // 'granted' / 'denied' / 'default'
+notifEnabled();                           // true kalau bell ON
+navigator.serviceWorker.controller;       // null kalau SW belum aktif
+```
+
+### 23.5 Test Realtime Manual
+```javascript
+// Test broadcast (Coach kirim reminder ke CGL)
+realtimeChannel?.send({
+  type: 'broadcast',
+  event: 'cgl_reminder',
+  payload: { cg: 'TEEN 01', dates: ['16 Mei'] }
+});
+```
+
+### 23.6 Force Version Check
+```javascript
+// Cek SW cache version aktif
+caches.keys().then(k => console.log(k));
+```
+
+---
+
+## 24. User Memory & Preferences
+
+Claude Code memory ada di:
+```
+C:\Users\labba\.claude\projects\C--Penyimpanan-utama-Downloads-absen-ibadahh\memory\
+```
+
+Baca dulu `MEMORY.md` di sana untuk user profile & feedback history sebelum kerja.
+
+**Preferensi dokumentasi (dari memory):**
+- User owns multiple single-file vanilla JS + Supabase projects (deploys via Vercel/Netlify, no build step)
+- AOG project ini disini
+- TWS project (Trade With Suli CRM) di `C:\Penyimpanan utama\Downloads\files (8)` — project terpisah
+- User awam DB & git, kasih step-by-step
+
+---
+
+## 25. Backup / Restore Data
+
+### Backup Supabase (Manual)
+Supabase dashboard → **Database → Backups** — auto daily backup gratis di Supabase free tier.
+
+**Manual export via SQL:**
+```sql
+-- Export members ke CSV via Supabase SQL Editor
+COPY (SELECT * FROM members ORDER BY region, cg, nama) 
+TO STDOUT WITH CSV HEADER;
+-- Copy hasil dari terminal, paste ke file .csv
+```
+
+### Restore
+Kalau data corrupt/salah UPDATE:
+1. Supabase Dashboard → **Database → Backups**
+2. Pilih tanggal backup → **Restore**
+3. WARNING: restore = revert seluruh DB ke titik itu
+
+**Prevention:**
+- Selalu run SQL dengan `BEGIN; ... COMMIT;` — kalau ada error di tengah auto-rollback
+- Test dulu di 1 row sebelum bulk UPDATE
+
+---
+
+## 26. Vercel Deployment Details
+
+- **Framework preset:** Other (no framework detection)
+- **Build command:** kosong / `null`
+- **Output directory:** `.` (root)
+- **Install command:** kosong
+- **Root directory:** `./`
+- **Node version:** tidak matter (no Node)
+
+**Environment variables:** TIDAK ada — semua config di client JS.
+
+**Custom domain:** default `.vercel.app` — kalau mau custom domain, set di Vercel dashboard → Settings → Domains.
+
+**Vercel logs:** Dashboard → Deployments → klik commit → tab Logs (build log biasanya kosong karena no build).
+
+---
+
+## 27. Extra Rules dari Session Terakhir
+
+- User pakai "kamu" bukan "kamu/anda" formal
+- Emoji 🔴🟡🟢 boleh untuk status/priority indicators
+- Response singkat + bullet points > paragraph panjang
+- SQL selalu wrap dengan `BEGIN; ... COMMIT;`
+- Setelah SQL data changes, selalu remind user untuk run `fullRebuildJaktimX` di Apps Script
+
+---
+
+## 28. Session Log Reference
+
+File terakhir yang di-update sebelum handoff:
+- `HANDOFF.md` (this file)
+- Version terakhir: v28
+
+Untuk lihat history perubahan:
+```bash
+cd "C:/Penyimpanan utama/Downloads/absen ibadahh"
+git log --oneline -30
+```
+
+---
+
 Selamat melanjutkan project! Semua konteks + tools + best practices ada di file ini.
