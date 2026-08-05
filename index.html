@@ -420,7 +420,7 @@ thead th:first-child{position:sticky;left:0;z-index:3;background:#fafafa}
         <input id="coachSearch" type="text" placeholder="Cari nama member..." oninput="handleCoachSearch(this.value)" onblur="this.style.borderColor='#e4dcff';this.style.width='200px';setTimeout(()=>{document.getElementById('coachSearchResults').style.display='none'},200)" onfocus="this.style.borderColor='#6C5CE7';this.style.width='260px';if(this.value)handleCoachSearch(this.value)" style="padding:7px 14px 7px 32px;border:1.5px solid #e4dcff;border-radius:20px;font-size:11.5px;font-family:Inter,sans-serif;width:200px;outline:none;transition:all .2s;background:#fff url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236C5CE7' stroke-width='2.5' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E&quot;) no-repeat 10px center;background-size:14px">
         <div id="coachSearchResults" style="display:none;position:absolute;top:calc(100% + 4px);right:0;left:0;background:#fff;border:1px solid #e4dcff;border-radius:12px;box-shadow:0 12px 28px rgba(108,92,231,.15);max-height:360px;overflow-y:auto;z-index:100;min-width:280px"></div>
       </div>
-      <div style="display:flex;align-items:center;gap:6px"><span style="font-size:9px;color:var(--g4);font-weight:600;letter-spacing:.3px" title="App version">v28</span><span class="notif-bell" onclick="toggleNotif()" title="Notifikasi" style="cursor:pointer;font-size:14px;user-select:none">🔔</span><span class="live-dot"></span><span class="live-label" style="font-size:10px;color:var(--green);font-weight:600">Live</span></div>
+      <div style="display:flex;align-items:center;gap:6px"><span style="font-size:9px;color:var(--g4);font-weight:600;letter-spacing:.3px" title="App version">v29</span><span class="notif-bell" onclick="toggleNotif()" title="Notifikasi" style="cursor:pointer;font-size:14px;user-select:none">🔔</span><span class="live-dot"></span><span class="live-label" style="font-size:10px;color:var(--green);font-weight:600">Live</span></div>
     </div>
   </div>
   <div class="app-hero" id="coachHero"><div class="app-hero-tag">Januari &mdash; April 2026</div><div class="app-hero-h" id="coachHeroH">Semua<br><em>CG.</em></div><div class="app-hero-meta" id="coachMeta">Memuat...</div></div>
@@ -3519,7 +3519,178 @@ async function renderCoachOverview() {
   });
   html += '</div>';
 
+  // Distribusi Wilayah \u2014 filter chip kecamatan + kelurahan, list member per area
+  html += buildWilayahSection(region);
+
   el.innerHTML = html;
+}
+
+// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
+// DISTRIBUSI WILAYAH \u2014 filter chip kecamatan + kelurahan
+// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
+function normWilayah(s) {
+  return String(s||'').trim().toLowerCase().replace(/\s+/g,' ');
+}
+function titleCaseWilayah(s) {
+  return String(s||'').trim().toLowerCase().split(/\s+/).map(w => w.charAt(0).toUpperCase()+w.slice(1)).join(' ');
+}
+
+// Filter state
+window.__WILAYAH_KEC = window.__WILAYAH_KEC || 'all';
+window.__WILAYAH_KEL = window.__WILAYAH_KEL || 'all';
+
+function setWilayahKec(k) {
+  window.__WILAYAH_KEC = k;
+  // Reset kelurahan filter kalau ganti kecamatan
+  window.__WILAYAH_KEL = 'all';
+  const el = document.getElementById('wilayahSection');
+  if (el) {
+    const region = coachRole === 'tl' ? 'all' : coachReg;
+    el.outerHTML = buildWilayahSection(region);
+  }
+}
+function setWilayahKel(k) {
+  window.__WILAYAH_KEL = k;
+  const el = document.getElementById('wilayahSection');
+  if (el) {
+    const region = coachRole === 'tl' ? 'all' : coachReg;
+    el.outerHTML = buildWilayahSection(region);
+  }
+}
+
+function buildWilayahSection(region) {
+  const mems = region === 'all' ? ALL_MEMBERS : ALL_MEMBERS.filter(m => m.region === region);
+  const active = mems.filter(m => !isArchivedCg(m.cg));
+
+  // Count per kecamatan
+  const kecCount = {};
+  active.forEach(m => {
+    const kec = normWilayah(m.kecamatan);
+    if (!kec) return;
+    kecCount[kec] = (kecCount[kec]||0) + 1;
+  });
+  const kecList = Object.keys(kecCount).sort((a,b) => kecCount[b]-kecCount[a]);
+
+  // Count per kelurahan (di kecamatan aktif kalau dipilih)
+  const kelCount = {};
+  active.forEach(m => {
+    const kec = normWilayah(m.kecamatan);
+    if (window.__WILAYAH_KEC !== 'all' && kec !== window.__WILAYAH_KEC) return;
+    const kel = normWilayah(m.kelurahan);
+    if (!kel) return;
+    kelCount[kel] = (kelCount[kel]||0) + 1;
+  });
+  const kelList = Object.keys(kelCount).sort((a,b) => kelCount[b]-kelCount[a]);
+
+  // Filter member sesuai chip aktif
+  const filtered = active.filter(m => {
+    if (window.__WILAYAH_KEC !== 'all' && normWilayah(m.kecamatan) !== window.__WILAYAH_KEC) return false;
+    if (window.__WILAYAH_KEL !== 'all' && normWilayah(m.kelurahan) !== window.__WILAYAH_KEL) return false;
+    return true;
+  }).sort((a,b) => (a.cg||'').localeCompare(b.cg||'') || (a.nama||'').localeCompare(b.nama||''));
+
+  let html = '<div id="wilayahSection" class="section" style="margin-top:20px">';
+  html += '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px">';
+  html += '<div class="section-title" style="margin:0">\u{1F5FA}\ufe0f Distribusi Wilayah</div>';
+  html += '<button onclick="exportWilayahCSV()" style="padding:6px 12px;border-radius:8px;border:1.5px solid #16a34a;background:linear-gradient(135deg,#f0fdf4,#dcfce7);color:#16a34a;font-size:10px;font-weight:700;cursor:pointer;letter-spacing:.3px" title="Export list member area aktif">\u{1F4CA} Export CSV</button>';
+  html += '</div>';
+
+  // Info total + counter
+  const totalWithAddr = active.filter(m => m.kecamatan || m.kelurahan).length;
+  const totalNoAddr = active.length - totalWithAddr;
+  html += '<div style="font-size:11px;color:var(--g3);margin-bottom:12px">'+active.length+' member \u00b7 '+totalWithAddr+' punya alamat';
+  if (totalNoAddr > 0) html += ' \u00b7 <span style="color:#c2410c">'+totalNoAddr+' belum ada alamat</span>';
+  html += '</div>';
+
+  // Kecamatan chips
+  html += '<div style="font-size:10px;font-weight:700;color:var(--g3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Kecamatan</div>';
+  html += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">';
+  const kecActiveAll = window.__WILAYAH_KEC === 'all';
+  html += '<button onclick="setWilayahKec(\'all\')" style="padding:5px 12px;border-radius:20px;border:1.5px solid '+(kecActiveAll?'#6C5CE7':'var(--g5)')+';background:'+(kecActiveAll?'#6C5CE7':'#fff')+';color:'+(kecActiveAll?'#fff':'var(--g2)')+';font-size:11px;font-weight:600;cursor:pointer;transition:all .15s">Semua ('+active.length+')</button>';
+  kecList.forEach(kec => {
+    const isActive = window.__WILAYAH_KEC === kec;
+    const label = titleCaseWilayah(kec);
+    html += '<button onclick="setWilayahKec(\''+kec.replace(/\'/g,"\\\\'")+'\')" style="padding:5px 12px;border-radius:20px;border:1.5px solid '+(isActive?'#6C5CE7':'var(--g5)')+';background:'+(isActive?'#6C5CE7':'#fff')+';color:'+(isActive?'#fff':'var(--g2)')+';font-size:11px;font-weight:600;cursor:pointer;transition:all .15s">'+esc(label)+' ('+kecCount[kec]+')</button>';
+  });
+  html += '</div>';
+
+  // Kelurahan chips (kalau ada)
+  if (kelList.length > 0) {
+    html += '<div style="font-size:10px;font-weight:700;color:var(--g3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Kelurahan</div>';
+    html += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">';
+    const kelActiveAll = window.__WILAYAH_KEL === 'all';
+    const kelTotal = kelList.reduce((s,k) => s+kelCount[k], 0);
+    html += '<button onclick="setWilayahKel(\'all\')" style="padding:5px 12px;border-radius:20px;border:1.5px solid '+(kelActiveAll?'#a855f7':'var(--g5)')+';background:'+(kelActiveAll?'#a855f7':'#fff')+';color:'+(kelActiveAll?'#fff':'var(--g2)')+';font-size:11px;font-weight:600;cursor:pointer;transition:all .15s">Semua ('+kelTotal+')</button>';
+    kelList.forEach(kel => {
+      const isActive = window.__WILAYAH_KEL === kel;
+      const label = titleCaseWilayah(kel);
+      html += '<button onclick="setWilayahKel(\''+kel.replace(/\'/g,"\\\\'")+'\')" style="padding:5px 12px;border-radius:20px;border:1.5px solid '+(isActive?'#a855f7':'var(--g5)')+';background:'+(isActive?'#a855f7':'#fff')+';color:'+(isActive?'#fff':'var(--g2)')+';font-size:11px;font-weight:600;cursor:pointer;transition:all .15s">'+esc(label)+' ('+kelCount[kel]+')</button>';
+    });
+    html += '</div>';
+  }
+
+  // List member yang match filter
+  html += '<div style="font-size:11px;font-weight:700;color:var(--g2);margin-bottom:8px">'+filtered.length+' member ditemukan</div>';
+  if (filtered.length === 0) {
+    html += '<div style="padding:20px;text-align:center;color:var(--g4);font-size:12px;font-style:italic;background:#fafafa;border-radius:10px">Tidak ada member di area ini</div>';
+  } else {
+    html += '<div style="display:flex;flex-direction:column;gap:6px;max-height:400px;overflow-y:auto">';
+    filtered.forEach(m => {
+      const color = (typeof CG_COLORS !== 'undefined' && CG_COLORS[m.cg]) || '#6C5CE7';
+      const alamat = [m.kelurahan, m.kecamatan].filter(Boolean).map(titleCaseWilayah).join(', ') || '(alamat belum diisi)';
+      const wa = m.wa ? esc(m.wa) : '<span style="color:var(--g4);font-style:italic">no HP kosong</span>';
+      html += '<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:#fff;border:1px solid var(--g5);border-radius:8px;transition:all .15s" onmouseover="this.style.borderColor=\''+color+'55\'" onmouseout="this.style.borderColor=\'var(--g5)\'">';
+      html += '<div style="width:4px;height:32px;background:'+color+';border-radius:2px;flex-shrink:0"></div>';
+      html += '<div style="flex:1;min-width:0">';
+      html += '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap"><span style="font-weight:600;font-size:12px;color:var(--g1)">'+esc(m.nama||'')+'</span><span style="font-size:9px;color:'+color+';font-weight:700;background:'+color+'15;padding:1px 6px;border-radius:5px">'+esc(m.cg||'')+'</span><span style="font-size:9px;color:var(--g3)">'+esc(m.status||'')+'</span></div>';
+      html += '<div style="font-size:10px;color:var(--g3);margin-top:2px">\u{1F4CD} '+esc(alamat)+'</div>';
+      html += '</div>';
+      html += '<div style="font-size:10px;color:var(--g2);flex-shrink:0">'+wa+'</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+
+  html += '</div>';
+  return html;
+}
+
+// Export CSV list member sesuai filter wilayah aktif
+function exportWilayahCSV() {
+  try {
+    const region = coachRole === 'tl' ? 'all' : coachReg;
+    const mems = region === 'all' ? ALL_MEMBERS : ALL_MEMBERS.filter(m => m.region === region);
+    const active = mems.filter(m => !isArchivedCg(m.cg));
+    const filtered = active.filter(m => {
+      if (window.__WILAYAH_KEC !== 'all' && normWilayah(m.kecamatan) !== window.__WILAYAH_KEC) return false;
+      if (window.__WILAYAH_KEL !== 'all' && normWilayah(m.kelurahan) !== window.__WILAYAH_KEL) return false;
+      return true;
+    }).sort((a,b) => (a.cg||'').localeCompare(b.cg||'') || (a.nama||'').localeCompare(b.nama||''));
+
+    if (!filtered.length) { toast('Tidak ada data untuk di-export','err'); return; }
+
+    const headers = ['CG','Nama','Status','No HP','Kelurahan','Kecamatan','Region'];
+    const csvEsc = v => { const s = String(v==null?'':v); return /[",\n]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s; };
+    let csv = '\ufeff' + headers.join(',') + '\n';
+    filtered.forEach(m => {
+      csv += [m.cg||'', m.nama||'', m.status||'', m.wa||'', titleCaseWilayah(m.kelurahan||''), titleCaseWilayah(m.kecamatan||''), m.region||''].map(csvEsc).join(',') + '\n';
+    });
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const areaTag = window.__WILAYAH_KEC === 'all' ? 'semua' : window.__WILAYAH_KEC.replace(/\s+/g,'_');
+    const kelTag = window.__WILAYAH_KEL === 'all' ? '' : '_' + window.__WILAYAH_KEL.replace(/\s+/g,'_');
+    const todayStr = new Date().toISOString().slice(0,10);
+    a.download = 'Wilayah_'+areaTag+kelTag+'_'+todayStr+'.csv';
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+    toast('\u2713 CSV ter-download');
+  } catch(e) {
+    toast('\u274c Gagal export: '+(e.message||'unknown').slice(0,60),'err');
+    console.error('[exportWilayahCSV]', e);
+  }
 }
 
 // Auto-generate Sabtu: hitung bulan target berikutnya
