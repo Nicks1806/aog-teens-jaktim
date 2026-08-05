@@ -333,6 +333,34 @@ Fix duplikat tanggal di TL chart (merge by label + sort_order).
 ### v28 — Archive CG support
 CG dengan nama diawali `ARSIP` di-filter dari display aktif. Member historis tetap aman di DB.
 
+### v29 — Distribusi Wilayah
+Section baru di Coach/TL Overview tab (paling bawah):
+- Chip filter 2 tingkat: Kecamatan (purple) + Kelurahan (violet) — mirip pola milestone MSJ 1/2/3
+- Kelurahan chip auto-refilter sesuai kecamatan aktif
+- List member sesuai filter: nama + CG badge + status + alamat + No HP
+- Counter chip: `Pulogadung (5)`, `Cempaka Putih (3)`, dll
+- Info total member punya alamat vs belum
+- Export CSV per wilayah aktif
+- Auto-update via realtime `handleMembersChange` saat CGL edit alamat member
+- Skip archived CG dari perhitungan
+
+Functions kunci:
+- `buildWilayahSection(region)` — render section
+- `normWilayah(s)` — normalize string (lowercase + trim + collapse whitespace)
+- `titleCaseWilayah(s)` — untuk display label chip
+- `setWilayahKec(k)` / `setWilayahKel(k)` — filter setter, re-render via `outerHTML`
+- `exportWilayahCSV()` — CSV 7 kolom (CG, Nama, Status, No HP, Kelurahan, Kecamatan, Region)
+
+Global state:
+- `window.__WILAYAH_KEC` — filter kecamatan aktif (default `'all'`)
+- `window.__WILAYAH_KEL` — filter kelurahan aktif (default `'all'`)
+- Auto-reset ke `'all'` saat toggle region (jaktim1↔jaktim2) atau toggle role (COACH↔TL)
+
+### v30 — Wilayah filter hardening
+- Escape kecamatan/kelurahan (backslash + apostrophe) di onclick attribute — mencegah broken chip kalau data mengandung `'` atau `\`
+- `totalWithAddr` konsisten pakai `normWilayah` (bukan truthy check) — whitespace-only tidak dianggap punya alamat
+- Reset filter state saat toggle region/role — mencegah state stale (chip pilihan lama padahal region baru tidak punya kec itu)
+
 ---
 
 ## 12. SQL Patterns (Sering Dipakai)
