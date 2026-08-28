@@ -479,3 +479,64 @@ Ini starting point. Jangan tulis ulang dari 0.
 ## 🆘 Kalau Bingung
 
 Baca juga `CLAUDE.md` di repo Jaktim untuk detail RULES, DON'Ts, dan catatan arsitektur lebih dalam. Semua keputusan desain sudah didokumentasikan di sana.
+
+---
+
+## 📌 Update Log — Fitur Tambahan yang Perlu Di-adopt (per v30 Jaktim)
+
+Blueprint ini dibuat saat Jaktim masih di versi awal. Sejak itu, Jaktim sudah punya banyak fitur baru yang perlu ikut di-clone kalau Gading mau feature parity:
+
+### Fitur Baru (Wajib Ada)
+- ✅ **Attendance Pagination** (`fetchAllAttendance` + `fetchBoundedAttendance`) — bypass Supabase max_rows cap 1000. Jangan skip ini kalau attendance sudah > 1000 row.
+- ✅ **Coach dot clickable** (`cycleDotCoach`) — update `ALL_ATTENDANCE`
+- ✅ **Line chart accurate** — deteksi member join-date otomatis via record attendance terawal, denominator hanya count member yang sudah aktif per tanggal
+- ✅ **TL chart merge dates** — untuk region='all' merge duplikat by label
+- ✅ **Export Detail CSV/PDF** — 3 role (CGL/Coach/TL) dengan kolom lengkap
+- ✅ **Archive CG support** — CG dengan nama prefix `ARSIP` di-filter dari display
+- ✅ **Distribusi Wilayah** — filter kecamatan + kelurahan di Coach/TL Overview
+- ✅ **Coach triple sync** — realtime + polling 60s + tab-switch refetch + visibility focus + tombol Refresh manual
+- ✅ **Misi click-to-edit** — display formatted numbered list, click untuk edit textarea
+- ✅ **Role whitelist** (`roleCls`, `roleLabel`) — strip legacy "Target:" prefix
+- ✅ **Version indicator** "vXX" di header
+- ✅ **Service Worker network-first** untuk HTML (bukan stale-while-revalidate)
+- ✅ **PWA push notif** dengan iOS guard + own-write suppression
+- ✅ **Pending CGL reminder** + auto-broadcast
+
+### One-Time Setup Baru untuk Kelapa Gading
+
+**1. Enable Realtime Publication:**
+```sql
+ALTER PUBLICATION supabase_realtime ADD TABLE attendance;
+ALTER PUBLICATION supabase_realtime ADD TABLE members;
+ALTER PUBLICATION supabase_realtime ADD TABLE dates;
+ALTER PUBLICATION supabase_realtime ADD TABLE cg_info;
+ALTER PUBLICATION supabase_realtime ADD TABLE cg_pelayanan;
+ALTER PUBLICATION supabase_realtime ADD TABLE cg_events;
+ALTER PUBLICATION supabase_realtime ADD TABLE events;
+ALTER PUBLICATION supabase_realtime ADD TABLE cg_vision;
+ALTER PUBLICATION supabase_realtime ADD TABLE cg_dev_plans;
+ALTER PUBLICATION supabase_realtime ADD TABLE member_notes;
+ALTER PUBLICATION supabase_realtime ADD TABLE coach_notes;
+```
+
+**2. Disable RLS Semua Tabel:**
+```sql
+ALTER TABLE members DISABLE ROW LEVEL SECURITY;
+ALTER TABLE attendance DISABLE ROW LEVEL SECURITY;
+ALTER TABLE dates DISABLE ROW LEVEL SECURITY;
+ALTER TABLE cg_info DISABLE ROW LEVEL SECURITY;
+ALTER TABLE cg_events DISABLE ROW LEVEL SECURITY;
+ALTER TABLE cg_vision DISABLE ROW LEVEL SECURITY;
+ALTER TABLE cg_dev_plans DISABLE ROW LEVEL SECURITY;
+ALTER TABLE cg_pelayanan DISABLE ROW LEVEL SECURITY;
+ALTER TABLE cg_custom_roles DISABLE ROW LEVEL SECURITY;
+ALTER TABLE member_notes DISABLE ROW LEVEL SECURITY;
+ALTER TABLE coach_notes DISABLE ROW LEVEL SECURITY;
+```
+
+### Referensi File Terupdate
+- `CLAUDE.md` — sudah update ke v30, section per-fitur lengkap
+- `HANDOFF.md` — 28 section, semua konteks untuk Claude Code baru
+- `google-apps-script.gs` — sudah include `fetchAllAttendance()` HTTP Range pagination
+
+**Rekomendasi:** Kalau mulai Kelapa Gading sekarang, langsung copy versi v30 dari Jaktim (bukan versi lama). Baca `HANDOFF.md` di Jaktim sebagai konteks.
