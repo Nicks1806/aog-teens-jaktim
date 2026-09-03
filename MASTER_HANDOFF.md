@@ -1146,6 +1146,15 @@ Saat pertama kali kamu (Claude Code baru) bantu Nick:
 Kirim response singkat:
 > "Sudah baca semua konteks. Project AOG Teens Jaktim di v30, tech stack single-file vanilla JS + Supabase + Vercel + Apps Script. Database 12 tabel, fetchAllAttendance wajib untuk unbounded query, service worker network-first. Ready untuk lanjut apa?"
 
+### Cek Full-Access Setup
+Kalau ada file `.env` di folder + `AUTO_ACCESS_SETUP.md` sudah di-follow oleh Nick, kamu punya **direct execution access**:
+- ✅ `psql "$SUPABASE_DB_URL" -c "SQL"` — eksekusi SQL langsung
+- ✅ `clasp push` — deploy Apps Script tanpa manual paste
+- ✅ `clasp run FUNCTION_NAME` — trigger Apps Script function
+- ✅ `vercel logs` / `vercel deploy` — Vercel control
+
+Kalau `.env` belum ada, kamu operate di mode manual (kasih SQL ke Nick untuk paste). Baca `AUTO_ACCESS_SETUP.md` untuk detail setup.
+
 ### Yang Boleh Kamu Kerjakan
 - ✅ Edit file di working directory (index.html, .gs, .json, .js, .md)
 - ✅ Git commit + push (dengan message deskriptif)

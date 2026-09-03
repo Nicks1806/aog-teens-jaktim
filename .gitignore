@@ -1,0 +1,29 @@
+# Credentials — JANGAN COMMIT
+.env
+.env.local
+.env.production
+.env.*.local
+.pgpass
+.clasprc.json
+
+# Local-only config
+.clasp.json
+.vercel/
+
+# Dependencies
+node_modules/
+
+# Backup files
+*.backup
+*.bak
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/settings.json
+.idea/
+
+# Claude Code local settings
+.claude/settings.local.json
