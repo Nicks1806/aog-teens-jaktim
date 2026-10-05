@@ -420,7 +420,7 @@ thead th:first-child{position:sticky;left:0;z-index:3;background:#fafafa}
         <input id="coachSearch" type="text" placeholder="Cari nama member..." oninput="handleCoachSearch(this.value)" onblur="this.style.borderColor='#e4dcff';this.style.width='200px';setTimeout(()=>{document.getElementById('coachSearchResults').style.display='none'},200)" onfocus="this.style.borderColor='#6C5CE7';this.style.width='260px';if(this.value)handleCoachSearch(this.value)" style="padding:7px 14px 7px 32px;border:1.5px solid #e4dcff;border-radius:20px;font-size:11.5px;font-family:Inter,sans-serif;width:200px;outline:none;transition:all .2s;background:#fff url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236C5CE7' stroke-width='2.5' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E&quot;) no-repeat 10px center;background-size:14px">
         <div id="coachSearchResults" style="display:none;position:absolute;top:calc(100% + 4px);right:0;left:0;background:#fff;border:1px solid #e4dcff;border-radius:12px;box-shadow:0 12px 28px rgba(108,92,231,.15);max-height:360px;overflow-y:auto;z-index:100;min-width:280px"></div>
       </div>
-      <div style="display:flex;align-items:center;gap:6px"><span style="font-size:9px;color:var(--g4);font-weight:600;letter-spacing:.3px" title="App version">v30</span><span class="notif-bell" onclick="toggleNotif()" title="Notifikasi" style="cursor:pointer;font-size:14px;user-select:none">🔔</span><span class="live-dot"></span><span class="live-label" style="font-size:10px;color:var(--green);font-weight:600">Live</span></div>
+      <div style="display:flex;align-items:center;gap:6px"><span style="font-size:9px;color:var(--g4);font-weight:600;letter-spacing:.3px" title="App version">v31</span><span class="notif-bell" onclick="toggleNotif()" title="Notifikasi" style="cursor:pointer;font-size:14px;user-select:none">🔔</span><span class="live-dot"></span><span class="live-label" style="font-size:10px;color:var(--green);font-weight:600">Live</span></div>
     </div>
   </div>
   <div class="app-hero" id="coachHero"><div class="app-hero-tag">Januari &mdash; April 2026</div><div class="app-hero-h" id="coachHeroH">Semua<br><em>CG.</em></div><div class="app-hero-meta" id="coachMeta">Memuat...</div></div>
@@ -466,7 +466,9 @@ function rtDebounce(key, fn, ms) {
   _RT_DEBOUNCE[key] = setTimeout(fn, ms || 500);
 }
 
+let _rtReconnectTimer = null;
 function setupRealtime() {
+  if (_rtReconnectTimer) { clearTimeout(_rtReconnectTimer); _rtReconnectTimer = null; }
   if (realtimeChannel) { try { supa.removeChannel(realtimeChannel); } catch(e) {} }
   realtimeChannel = supa.channel('app-sync')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'attendance' }, handleAttendanceChange)
@@ -479,14 +481,14 @@ function setupRealtime() {
     .subscribe((status) => {
       const connected = status === 'SUBSCRIBED';
       updateLiveIndicator(connected);
-      // Auto-reconnect kalau disconnect (CHANNEL_ERROR / TIMED_OUT / CLOSED)
       if (!connected && (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED')) {
-        setTimeout(() => { if (navigator.onLine) setupRealtime(); }, 5000);
+        if (!_rtReconnectTimer) { _rtReconnectTimer = setTimeout(() => { _rtReconnectTimer = null; if (navigator.onLine) setupRealtime(); }, 5000); }
       }
     });
 }
-// Reconnect saat browser online setelah offline
-window.addEventListener('online', () => { setTimeout(setupRealtime, 1000); });
+window.addEventListener('online', () => {
+  if (!_rtReconnectTimer) { _rtReconnectTimer = setTimeout(() => { _rtReconnectTimer = null; setupRealtime(); }, 1000); }
+});
 
 // Auto-refresh Coach attendance saat window/PWA kembali ke foreground
 // (safety net kalau realtime miss event saat browser di background)
@@ -623,9 +625,12 @@ function handleAttendanceChange(payload) {
   // SKIP kalau user sedang save key ini (hindari race overwrite optimistic update)
   if (_DOT_SAVING[key]) return;
 
-  // Patch CGL state
-  if (eventType === 'DELETE') { delete ATTENDANCE[key]; }
-  else if (row && row.status) { ATTENDANCE[key] = row.status; }
+  // Patch CGL state — hanya kalau member ini milik CG aktif (hindari inflate stats)
+  const isMyCG = MEMBERS && MEMBERS.some(m => m.id === r.member_id);
+  if (isMyCG) {
+    if (eventType === 'DELETE') { delete ATTENDANCE[key]; }
+    else if (row && row.status) { ATTENDANCE[key] = row.status; }
+  }
 
   // Patch Coach state
   if (eventType === 'DELETE') { delete ALL_ATTENDANCE[key]; }
@@ -946,6 +951,23 @@ async function saveVision(cg, region, visi, misi) {
   }
 }
 
+async function saveVisionField(cg, region, field, value) {
+  try {
+    const { data: existing } = await supa.from('cg_vision').select('id').eq('cg', cg).eq('region', region).maybeSingle();
+    if (existing) {
+      const { error } = await supa.from('cg_vision').update({ [field]: value, updated_at: new Date().toISOString() }).eq('id', existing.id);
+      if (error) throw error;
+    } else {
+      const { error } = await supa.from('cg_vision').insert({ cg, region, [field]: value, updated_at: new Date().toISOString() });
+      if (error) throw error;
+    }
+    toast('✓ Disimpan');
+  } catch(e) {
+    console.error('[saveVisionField]', e);
+    toast('❌ Gagal simpan: ' + (e.message||'unknown'));
+  }
+}
+
 // Coach region vision — disimpan di cg_vision dengan cg='__COACH_<region>__'
 async function saveCoachVisiFromUI(region) {
   const v = document.getElementById('coachVisi_'+region)?.value || '';
@@ -1102,14 +1124,19 @@ async function cleanupPastEvents() {
   }
 }
 
-// Badge countdown "X hari lagi" untuk event
-function eventCountdownBadge(dateStart) {
+// Badge countdown "X hari lagi" untuk event (multi-day aware: pakai date_end kalau masih berlangsung)
+function eventCountdownBadge(dateStart, dateEnd) {
   if (!dateStart) return '';
-  const d = parseLocalDate(dateStart);
-  if (!d) return '';
-  d.setHours(0,0,0,0);
+  const dStart = parseLocalDate(dateStart);
+  if (!dStart) return '';
+  dStart.setHours(0,0,0,0);
   const today = new Date(); today.setHours(0,0,0,0);
-  const diff = Math.round((d - today) / 86400000);
+  const diffStart = Math.round((dStart - today) / 86400000);
+  let diff = diffStart;
+  if (dateEnd && diffStart < 0) {
+    const dEnd = parseLocalDate(dateEnd);
+    if (dEnd) { dEnd.setHours(0,0,0,0); const diffE = Math.round((dEnd - today) / 86400000); if (diffE >= 0) diff = 0; }
+  }
   let txt, bg, col;
   if (diff < 0)      { txt = Math.abs(diff)+' hari lalu'; bg='#f3f4f6'; col='#6b7280'; }
   else if (diff===0) { txt = 'HARI INI';                  bg='#fce7f3'; col='#be185d'; }
@@ -1135,15 +1162,18 @@ let coachReg = 'jaktim1';
 
 const CG_COLORS = {
   'TEEN 23':'#7c3aed','TEEN 01':'#1d4ed8','TEEN 09':'#c2410c','TEEN 06':'#be185d',
-  'TEEN 12':'#0f766e','TEEN 07':'#b45309','TEEN 17':'#0e7490','TEEN 20':'#be123c'
+  'TEEN 12':'#0f766e','TEEN 07':'#b45309','TEEN 17':'#0e7490','TEEN 20':'#be123c',
+  'TEEN 25':'#4f46e5'
 };
 const CG_BG = {
   'TEEN 23':'#faf5ff','TEEN 01':'#eff6ff','TEEN 09':'#fff7ed','TEEN 06':'#fdf2f8',
-  'TEEN 12':'#f0fdfa','TEEN 07':'#fffbeb','TEEN 17':'#ecfeff','TEEN 20':'#fff1f2'
+  'TEEN 12':'#f0fdfa','TEEN 07':'#fffbeb','TEEN 17':'#ecfeff','TEEN 20':'#fff1f2',
+  'TEEN 25':'#eef2ff'
 };
 const CG_INIT = {
   'TEEN 23':'T23','TEEN 01':'T01','TEEN 09':'T09','TEEN 06':'T06',
-  'TEEN 12':'T12','TEEN 07':'T07','TEEN 17':'T17','TEEN 20':'T20'
+  'TEEN 12':'T12','TEEN 07':'T07','TEEN 17':'T17','TEEN 20':'T20',
+  'TEEN 25':'T25'
 };
 
 const ROLE_ORDER = {CGL:0,Sponsor:1,Member:2,Simpatisan:3,VIP:4};
@@ -1172,7 +1202,8 @@ function closeModal(id) { document.getElementById(id).classList.remove('show'); 
 async function loadCGLDropdown() {
   // HARUS select('*') karena ALL_MEMBERS juga dipakai Coach dashboard
   // (milestone, birthday, dll butuh msj1-3, cgt1-3, baptis_air/roh, lahir)
-  const { data: members } = await supa.from('members').select('*').order('cg');
+  const { data: members, error: memErr } = await supa.from('members').select('*').order('cg');
+  if (memErr) { toast('❌ Gagal load data member — cek koneksi'); console.error('[loadCGLDropdown]', memErr); }
   if (!members) return;
   ALL_MEMBERS = members;
   popDD();
@@ -1323,6 +1354,11 @@ async function openCGDashboard(cg) {
     supa.from('dates').select('id,label,region,sort_order,month_code').eq('region', region).order('sort_order')
   ]);
 
+  if (cgInfoRes.error || memsRes.error || datesRes.error) {
+    const msg = [cgInfoRes.error, memsRes.error, datesRes.error].filter(Boolean).map(e => e.message).join('; ');
+    toast('❌ Gagal load data CG: '+msg);
+    console.error('[enterCG]', msg);
+  }
   CUR_CG_INFO = cgInfoRes.data && cgInfoRes.data[0] ? cgInfoRes.data[0] : {};
   MEMBERS = memsRes.data || [];
   MEMBERS.sort((a, b) => roleRankLC(a.status) - roleRankLC(b.status));
@@ -1695,8 +1731,11 @@ async function undoLastDot() {
   clearTimeout(_UNDO_TIMER);
   document.getElementById('toast').classList.remove('show');
 
-  // Revert state + UI
+  // Revert state + UI (CGL + Coach)
   if (prev) { ATTENDANCE[key] = prev; } else { delete ATTENDANCE[key]; }
+  if (typeof ALL_ATTENDANCE !== 'undefined') {
+    if (prev) { ALL_ATTENDANCE[key] = prev; } else { delete ALL_ATTENDANCE[key]; }
+  }
   // Re-query DOM untuk case dotEl sudah stale (tab re-render karena realtime)
   const freshDot = document.querySelector('.dot[data-mid="'+memberId+'"][data-did="'+dateId+'"]') || dotEl;
   if (freshDot) {
@@ -1706,15 +1745,20 @@ async function undoLastDot() {
 
   // Save revert ke DB
   try {
+    let undoErr;
     if (prev === null) {
-      await supa.from('attendance').delete().eq('member_id', memberId).eq('date_id', dateId);
+      const res = await supa.from('attendance').delete().eq('member_id', memberId).eq('date_id', dateId);
+      undoErr = res.error;
     } else {
-      await supa.from('attendance').upsert({ member_id: memberId, date_id: dateId, status: prev }, { onConflict: 'member_id,date_id' });
+      const res = await supa.from('attendance').upsert({ member_id: memberId, date_id: dateId, status: prev }, { onConflict: 'member_id,date_id' });
+      undoErr = res.error;
     }
+    if (undoErr) throw undoErr;
     computeStats();
     toast('\u2713 Undo berhasil');
   } catch(e) {
-    toast('\u274c Undo gagal');
+    toast('\u274c Undo gagal: '+(e.message||''));
+    console.error('[undoLastDot]', e);
   }
 }
 
@@ -1835,8 +1879,8 @@ async function renderDetail() {
     html += '<div class="dgrid">';
     html += '<span>\ud83d\udcf1 <input type="text" value="' + esc(m.wa||'') + '" data-mid="'+m.id+'" data-field="wa" style="border:none;background:transparent;font-size:11px;color:var(--g2);outline:none;border-bottom:1px dashed transparent;width:120px" onfocus="this.style.borderBottomColor=\'var(--purple)\'" onblur="this.style.borderBottomColor=\'transparent\';saveMemberField(this)"></span>';
     html += '<span>\ud83c\udf82 <input type="text" value="' + esc(m.lahir||'') + '" data-mid="'+m.id+'" data-field="lahir" style="border:none;background:transparent;font-size:11px;color:var(--g2);outline:none;border-bottom:1px dashed transparent;width:90px" onfocus="this.style.borderBottomColor=\'var(--purple)\'" onblur="this.style.borderBottomColor=\'transparent\';saveMemberField(this)"></span>';
-    html += '<span>\ud83c\udfeb <input type="text" value="' + esc((m.sekolah||'') + (m.kelas ? ' \u00b7 Kelas '+m.kelas : '')) + '" data-mid="'+m.id+'" data-field="sekolah" style="border:none;background:transparent;font-size:11px;color:var(--g2);outline:none;border-bottom:1px dashed transparent;flex:1;min-width:140px" onfocus="this.style.borderBottomColor=\'var(--purple)\'" onblur="this.style.borderBottomColor=\'transparent\';saveMemberField(this)"></span>';
-    html += '<span>\ud83d\udccd <input type="text" value="' + esc((m.kelurahan||'') + (m.kecamatan ? ', '+m.kecamatan : '')) + '" data-mid="'+m.id+'" data-field="kelurahan" style="border:none;background:transparent;font-size:11px;color:var(--g2);outline:none;border-bottom:1px dashed transparent;flex:1;min-width:140px" onfocus="this.style.borderBottomColor=\'var(--purple)\'" onblur="this.style.borderBottomColor=\'transparent\';saveMemberField(this)"></span>';
+    html += '<span>\ud83c\udfeb <input type="text" value="' + esc(m.sekolah||'') + '" data-mid="'+m.id+'" data-field="sekolah" placeholder="Sekolah" style="border:none;background:transparent;font-size:11px;color:var(--g2);outline:none;border-bottom:1px dashed transparent;min-width:80px;width:100px" onfocus="this.style.borderBottomColor=\'var(--purple)\'" onblur="this.style.borderBottomColor=\'transparent\';saveMemberField(this)"> <input type="text" value="' + esc(m.kelas||'') + '" data-mid="'+m.id+'" data-field="kelas" placeholder="Kelas" style="border:none;background:transparent;font-size:11px;color:var(--g2);outline:none;border-bottom:1px dashed transparent;width:50px" onfocus="this.style.borderBottomColor=\'var(--purple)\'" onblur="this.style.borderBottomColor=\'transparent\';saveMemberField(this)"></span>';
+    html += '<span>\ud83d\udccd <input type="text" value="' + esc(m.kelurahan||'') + '" data-mid="'+m.id+'" data-field="kelurahan" placeholder="Kelurahan" style="border:none;background:transparent;font-size:11px;color:var(--g2);outline:none;border-bottom:1px dashed transparent;min-width:80px;width:100px" onfocus="this.style.borderBottomColor=\'var(--purple)\'" onblur="this.style.borderBottomColor=\'transparent\';saveMemberField(this)"> <input type="text" value="' + esc(m.kecamatan||'') + '" data-mid="'+m.id+'" data-field="kecamatan" placeholder="Kecamatan" style="border:none;background:transparent;font-size:11px;color:var(--g2);outline:none;border-bottom:1px dashed transparent;min-width:80px;width:100px" onfocus="this.style.borderBottomColor=\'var(--purple)\'" onblur="this.style.borderBottomColor=\'transparent\';saveMemberField(this)"></span>';
     html += '</div>';
 
     if (atRisk) html += '<div style="font-size:11px;color:var(--red);font-weight:600;margin-bottom:6px">\u26a0\ufe0f Kehadiran '+pct+'% \u00b7 Perlu follow-up</div>';
@@ -1967,7 +2011,7 @@ async function pickRole(el, cls, label, memberId) {
 
 async function saveNewMember() {
   const nama = document.getElementById('newNama').value.trim();
-  if (!nama) return alert('Nama harus diisi');
+  if (!nama) { toast('❌ Nama harus diisi'); return; }
   const region = MEMBERS[0] ? MEMBERS[0].region : curReg;
   const obj = {
     nama, cg: CUR_CG, status: document.getElementById('newStatus').value,
@@ -1977,7 +2021,7 @@ async function saveNewMember() {
     region
   };
   const { error } = await supa.from('members').insert(obj);
-  if (error) { alert('Error: ' + error.message); return; }
+  if (error) { toast('❌ Gagal tambah member: '+(error.message||'').slice(0,60)); console.error('[saveNewMember]', error); return; }
 
   // Reset form
   ['newNama','newWa','newLahir','newSekolah','newKelas','newKelurahan','newKecamatan'].forEach(id => {
@@ -2130,18 +2174,15 @@ async function removeDevPlan(id) {
 }
 
 async function saveVisiCG(which) {
-  // Read-modify-write supaya tidak overwrite field lain (race condition kalau Coach edit bareng)
   const visiEl = document.getElementById('visiText');
   const misiEl = document.getElementById('misiText');
   if (!visiEl || !misiEl) return;
-  const existing = await loadVision(CUR_CG, CUR_REGION);
-  const visi = which === 'misi' ? (existing.visi || '') : visiEl.value;
-  const misi = which === 'visi' ? (existing.misi || '') : misiEl.value;
-  // Kalau which tidak di-specify, simpan keduanya (legacy fallback)
   if (!which) {
     await saveVision(CUR_CG, CUR_REGION, visiEl.value, misiEl.value);
-  } else {
-    await saveVision(CUR_CG, CUR_REGION, visi, misi);
+  } else if (which === 'visi') {
+    await saveVisionField(CUR_CG, CUR_REGION, 'visi', visiEl.value);
+  } else if (which === 'misi') {
+    await saveVisionField(CUR_CG, CUR_REGION, 'misi', misiEl.value);
   }
 }
 
@@ -2510,7 +2551,7 @@ async function addPelMonth() {
 async function addPelWeek() {
   const dateInput = document.getElementById('pelNewDate');
   if (!dateInput || !dateInput.value) { alert('Pilih tanggal dulu'); return; }
-  // Save a placeholder role to create the week in DB
+  // Save first role to create the week in DB (pakai role pertama supaya week muncul di pills)
   const roles = await getPelRolesAsync();
   if (roles.length) {
     await savePelayananCell(CUR_CG, CUR_REGION, CUR_PEL_MONTH, dateInput.value, roles[0].name, '');
@@ -2524,12 +2565,20 @@ async function editPelWeek(oldDate) {
   const newDate = await asyncPrompt('Edit tanggal (YYYY-MM-DD)', oldDate);
   if (!newDate || newDate === oldDate) return;
   // Get all rows for old date and re-insert with new date
-  const {data: rows} = await supa.from('cg_pelayanan').select('cg,region,month,week_date,role_name,member_name').eq('cg', CUR_CG).eq('region', CUR_REGION).eq('week_date', oldDate);
+  const {data: rows, error: fetchErr} = await supa.from('cg_pelayanan').select('cg,region,month,week_date,role_name,member_name').eq('cg', CUR_CG).eq('region', CUR_REGION).eq('week_date', oldDate);
+  if (fetchErr) { toast('❌ Gagal baca data minggu: '+fetchErr.message); return; }
   if (rows && rows.length) {
+    let insertOk = true;
     for (const r of rows) {
-      await savePelayananCell(CUR_CG, CUR_REGION, r.month, newDate, r.role_name, r.member_name);
+      const { error: insErr } = await supa.from('cg_pelayanan').upsert({cg: CUR_CG, region: CUR_REGION, month: r.month, week_date: newDate, role_name: r.role_name, member_name: r.member_name}, {onConflict: 'cg,week_date,role_name'});
+      if (insErr) { toast('\u274c Gagal pindah role '+r.role_name); console.error('[editPelWeek insert]', insErr); insertOk = false; }
     }
-    await supa.from('cg_pelayanan').delete().eq('cg', CUR_CG).eq('region', CUR_REGION).eq('week_date', oldDate);
+    if (insertOk) {
+      const { error: delErr } = await supa.from('cg_pelayanan').delete().eq('cg', CUR_CG).eq('region', CUR_REGION).eq('week_date', oldDate);
+      if (delErr) { toast('\u274c Gagal hapus tanggal lama \u2014 cek manual'); console.error('[editPelWeek delete]', delErr); }
+    } else {
+      toast('\u26a0\ufe0f Sebagian data gagal pindah \u2014 tanggal lama tidak dihapus');
+    }
   }
   if (CUR_PEL_WEEK === oldDate) CUR_PEL_WEEK = newDate;
   await renderPelayanan();
@@ -2591,7 +2640,8 @@ async function removePelAssignee(roleName, memberName) {
   const current = await _getCurrentAssignees(roleName);
   const next = current.filter(n => n !== memberName);
   if (next.length === 0) {
-    await supa.from('cg_pelayanan').delete().eq('cg', CUR_CG).eq('region', CUR_REGION).eq('week_date', CUR_PEL_WEEK).eq('role_name', roleName);
+    const { error: delErr } = await supa.from('cg_pelayanan').delete().eq('cg', CUR_CG).eq('region', CUR_REGION).eq('week_date', CUR_PEL_WEEK).eq('role_name', roleName);
+    if (delErr) { toast('\u274c Gagal hapus: '+delErr.message); console.error('[removePelAssignee]', delErr); return; }
     toast('\u2713 Disimpan');
   } else {
     await savePelayananCell(CUR_CG, CUR_REGION, CUR_PEL_MONTH, CUR_PEL_WEEK, roleName, next.join(', '));
@@ -2700,10 +2750,10 @@ function renderMilestone() {
     return { ...m, msDone: done, msPct: Math.round(done/8*100) };
   }).sort((a, b) => b.msPct - a.msPct);
 
-  // Apply filter
+  // Apply filter (progression-aware: hanya tampil member yg sudah prereq)
   if (MS_FILTER && MS_FILTER !== 'all' && MS_FIELDS.includes(MS_FILTER)) {
-    // Show only members who DON'T have this milestone yet (need to complete it)
-    memberProgress = memberProgress.filter(m => !m[MS_FILTER]);
+    const prereq = { msj2:'msj1', msj3:'msj2', cgt2:'cgt1', cgt3:'cgt2', baptis_roh:'baptis_air' };
+    memberProgress = memberProgress.filter(m => !m[MS_FILTER] && (!prereq[MS_FILTER] || m[prereq[MS_FILTER]]));
   }
 
   memberProgress.forEach(m => {
@@ -2739,7 +2789,8 @@ async function renderEvents(forceRefetch) {
 
   // Fetch data hanya kalau belum ada cache atau forceRefetch
   if (forceRefetch || !_CACHED_CG_EVENTS) {
-    const { data: events } = await supa.from('events').select('id,name,date_start,date_end,cat,note,image').order('date_start');
+    const { data: events, error: evErr } = await supa.from('events').select('id,name,date_start,date_end,cat,note,image').order('date_start');
+    if (evErr) { toast('❌ Gagal load events'); console.error('[renderEvents]', evErr); }
     ALL_EVENTS = events || [];
     _CACHED_CG_EVENTS = await loadCGEventsForCG(CUR_CG, CUR_REGION);
   }
@@ -2806,7 +2857,7 @@ async function renderEvents(forceRefetch) {
     let cardHtml = '<div class="ev-card" style="border-left-color:'+cColor+';padding:14px;margin-bottom:12px" id="ev_'+evId+'">';
     cardHtml += '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px">';
     const dateRange = ev.date_start && ev.date_end && ev.date_end !== ev.date_start ? esc(ev.date_start)+' → '+esc(ev.date_end) : esc(ev.date_start || ev.date_end || 'Tanpa tanggal');
-    cardHtml += '<div style="flex:1"><div style="display:flex;align-items:center;flex-wrap:wrap"><span class="ev-date">'+dateRange+'</span>'+eventCountdownBadge(ev.date_start || ev.date_end)+'</div><div class="ev-name">'+esc(ev.name||'')+'</div></div>';
+    cardHtml += '<div style="flex:1"><div style="display:flex;align-items:center;flex-wrap:wrap"><span class="ev-date">'+dateRange+'</span>'+eventCountdownBadge(ev.date_start || ev.date_end, ev.date_end)+'</div><div class="ev-name">'+esc(ev.name||'')+'</div></div>';
     cardHtml += '<div style="display:flex;gap:4px">';
     cardHtml += '<button onclick="copyEventText(\''+evId+'\')" title="Copy text" class="ev-btn ev-btn-copy"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>';
     cardHtml += '<button onclick="broadcastEvent(\''+evId+'\')" title="Broadcast WhatsApp" class="ev-btn ev-btn-wa"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413"/></svg></button>';
@@ -2905,12 +2956,15 @@ async function deleteEventCard(evId) {
   const ev = window.__eventCache?.[evId];
   if (!ev) return;
   const isShared = evId.startsWith('shared_');
-  if (isShared) {
-    await supa.from('events').delete().eq('id', ev.id);
-  } else {
-    await deleteCGEvent(ev.id);
-  }
-  toast('✓ Event dihapus');
+  try {
+    if (isShared) {
+      const { error } = await supa.from('events').delete().eq('id', ev.id);
+      if (error) throw error;
+    } else {
+      await deleteCGEvent(ev.id);
+    }
+    toast('✓ Event dihapus');
+  } catch(e) { toast('❌ Gagal hapus event: '+(e.message||'')); console.error('[deleteEvent]', e); return; }
   const pageC = document.getElementById('pageC');
   if (pageC && pageC.style.display === 'block') { await renderCoachEvents(true); }
   else { await renderEvents(true); }
@@ -2957,11 +3011,15 @@ async function saveCGEvent() {
     // EDIT mode
     const cached = window.__eventCache?.[editingId];
     const isShared = editingId.startsWith('shared_');
+    let editErr;
     if (isShared) {
-      await supa.from('events').update(evData).eq('id', cached.id);
+      const res = await supa.from('events').update(evData).eq('id', cached.id);
+      editErr = res.error;
     } else {
-      await supa.from('cg_events').update(evData).eq('id', cached.id);
+      const res = await supa.from('cg_events').update(evData).eq('id', cached.id);
+      editErr = res.error;
     }
+    if (editErr) { toast('❌ Gagal update event: '+editErr.message); console.error('[editEvent]', editErr); return; }
     toast('✓ Event diupdate');
   } else {
     // ADD mode
@@ -3212,6 +3270,7 @@ function showMemberDetail(memberId) {
 }
 
 async function goBackCoach() {
+  if (_COACH_POLL_TIMER) { clearInterval(_COACH_POLL_TIMER); _COACH_POLL_TIMER = null; }
   document.getElementById('pageC').style.display = 'none';
   document.getElementById('pageL').style.display = 'flex';
   window.scrollTo(0, 0);
@@ -3241,7 +3300,7 @@ async function fetchAllAttendance() {
       .order('member_id', { ascending: true })
       .order('date_id', { ascending: true })
       .range(from, from + pageSize - 1);
-    if (error) { console.error('[fetchAllAttendance page]', i, error); break; }
+    if (error) { console.error('[fetchAllAttendance page]', i, error); toast('❌ Gagal fetch attendance halaman '+(i+1)); break; }
     if (!data || data.length === 0) break;
     all.push(...data);
     if (data.length < pageSize) break;
@@ -3255,10 +3314,11 @@ async function fetchBoundedAttendance(memberIds, dateIds) {
   if (!memberIds.length || !dateIds.length) return [];
   // Kalau total kombinasi < 1000, single query cukup
   if (memberIds.length * dateIds.length < 800) {
-    const { data } = await supa.from('attendance')
+    const { data, error } = await supa.from('attendance')
       .select('member_id,date_id,status')
       .in('member_id', memberIds)
       .in('date_id', dateIds);
+    if (error) { console.error('[fetchBoundedAttendance]', error); toast('❌ Gagal fetch attendance'); }
     return data || [];
   }
   // Pagination untuk dataset besar
@@ -3489,10 +3549,10 @@ async function renderCoachOverview() {
     // Body — Visi
     html += '<div style="padding:16px 18px">';
     html += '<div style="margin-bottom:14px"><div style="font-size:10px;font-weight:700;letter-spacing:1px;color:var(--purple);text-transform:uppercase;margin-bottom:6px">Visi</div>';
-    html += '<textarea id="coachVisi_'+r+'" placeholder="Contoh: Loving God Loving People" onblur="saveCoachVisiFromUI(\''+r+'\')" style="width:100%;min-height:56px;padding:12px 14px;border:1.5px solid #e4dcff;border-radius:12px;font-family:\'Instrument Serif\',serif;font-size:16px;color:var(--g1);background:linear-gradient(135deg,#fdfaff,#fff);resize:vertical;line-height:1.4;transition:border-color .2s;font-style:italic" onfocus="this.style.borderColor=\'#6C5CE7\'" onblur="this.style.borderColor=\'#e4dcff\';saveCoachVisiFromUI(\''+r+'\')">'+esc(cv.visi||'')+'</textarea></div>';
+    html += '<textarea id="coachVisi_'+r+'" placeholder="Contoh: Loving God Loving People" style="width:100%;min-height:56px;padding:12px 14px;border:1.5px solid #e4dcff;border-radius:12px;font-family:\'Instrument Serif\',serif;font-size:16px;color:var(--g1);background:linear-gradient(135deg,#fdfaff,#fff);resize:vertical;line-height:1.4;transition:border-color .2s;font-style:italic" onfocus="this.style.borderColor=\'#6C5CE7\'" onblur="this.style.borderColor=\'#e4dcff\';saveCoachVisiFromUI(\''+r+'\')">'+esc(cv.visi||'')+'</textarea></div>';
     // Body — Misi
     html += '<div><div style="font-size:10px;font-weight:700;letter-spacing:1px;color:var(--g3);text-transform:uppercase;margin-bottom:6px">Misi <span style="font-weight:500;letter-spacing:0;text-transform:none;color:var(--g4)">(opsional)</span></div>';
-    html += '<textarea id="coachMisi_'+r+'" placeholder="Langkah konkret untuk mencapai visi..." onblur="saveCoachVisiFromUI(\''+r+'\')" style="width:100%;min-height:48px;padding:10px 14px;border:1.5px solid var(--g5);border-radius:12px;font-family:Inter,sans-serif;font-size:12px;color:var(--g2);background:#fafafa;resize:vertical;line-height:1.5;transition:border-color .2s" onfocus="this.style.borderColor=\'#6C5CE7\';this.style.background=\'#fff\'" onblur="this.style.borderColor=\'var(--g5)\';this.style.background=\'#fafafa\';saveCoachVisiFromUI(\''+r+'\')">'+esc(cv.misi||'')+'</textarea></div>';
+    html += '<textarea id="coachMisi_'+r+'" placeholder="Langkah konkret untuk mencapai visi..." style="width:100%;min-height:48px;padding:10px 14px;border:1.5px solid var(--g5);border-radius:12px;font-family:Inter,sans-serif;font-size:12px;color:var(--g2);background:#fafafa;resize:vertical;line-height:1.5;transition:border-color .2s" onfocus="this.style.borderColor=\'#6C5CE7\';this.style.background=\'#fff\'" onblur="this.style.borderColor=\'var(--g5)\';this.style.background=\'#fafafa\';saveCoachVisiFromUI(\''+r+'\')">'+esc(cv.misi||'')+'</textarea></div>';
     html += '</div></div>';
   });
 
@@ -3502,7 +3562,7 @@ async function renderCoachOverview() {
   allStats.forEach(c => {
     const color = CG_COLORS[c.cg] || '#7c3aed';
     const dash = Math.round(c.pct * 97.4 / 100);
-    html += '<div class="coach-card" style="border-left:4px solid '+color+'" onclick="enterFromCoach(\''+c.cg+'\')">';
+    html += '<div class="coach-card" style="border-left:4px solid '+color+'" onclick="enterFromCoach(\''+jsEsc(c.cg)+'\')">';
     html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><div style="font-weight:800;font-size:15px">'+esc(c.cg)+'</div>';
     html += '<div style="position:relative;width:40px;height:40px"><svg viewBox="0 0 36 36" style="transform:rotate(-90deg)"><circle cx="18" cy="18" r="15.5" fill="none" stroke="#e5e7eb" stroke-width="3"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="'+color+'" stroke-width="3" stroke-dasharray="'+dash+' 97.4" stroke-linecap="round"/></svg><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700">'+c.pct+'%</div></div></div>';
     html += '<div style="font-size:11px;color:var(--g3);margin-bottom:8px">CGL: '+esc(c.leader)+'</div>';
@@ -3751,7 +3811,8 @@ async function generateSabtuBulan(scope, year, month) {
     const normLbl = (s) => String(s||'').trim().toLowerCase().replace(/^0+(\d)/,'$1');
     for (const reg of regions) {
       // Ambil existing sort_order max + labels utk skip duplikat
-      const { data: existing } = await supa.from('dates').select('label,sort_order').eq('region', reg);
+      const { data: existing, error: existErr } = await supa.from('dates').select('label,sort_order').eq('region', reg);
+      if (existErr) { alert('Gagal baca tanggal existing '+reg+': '+existErr.message); continue; }
       const existingLabels = new Set((existing||[]).map(d => normLbl(d.label)));
       let maxSort = 0;
       (existing||[]).forEach(d => { if (d.sort_order > maxSort) maxSort = d.sort_order; });
@@ -3786,7 +3847,7 @@ async function generateSabtuBulan(scope, year, month) {
 function openPrintWindow(title, bodyHtml) {
   const w = window.open('', '_blank', 'width=1100,height=800');
   if (!w) { alert('Izinkan popup untuk export PDF'); return; }
-  w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${title}</title>
+  w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${esc(title)}</title>
   <style>
     * { box-sizing: border-box }
     body { font-family: 'Inter', Arial, sans-serif; padding: 24px; color: #1a1a1a; font-size: 11px }
@@ -3821,13 +3882,13 @@ function openPrintWindow(title, bodyHtml) {
 function buildAttendanceTable(members, dates, attMap) {
   if (!members.length) return '<div style="color:#999;padding:12px">Tidak ada member</div>';
   let html = '<table><thead><tr><th style="min-width:140px">Nama</th>';
-  dates.forEach(d => { html += '<th>'+(d.label||'')+'</th>'; });
+  dates.forEach(d => { html += '<th>'+esc(d.label||'')+'</th>'; });
   html += '<th>% Hadir</th></tr></thead><tbody>';
   let totalH=0, totalT=0;
   const sorted = [...members].sort((a,b) => roleRankLC(a.status) - roleRankLC(b.status));
   sorted.forEach(m => {
     let h=0, t=0;
-    html += '<tr><td>'+(m.nama||'')+'<span class="role">'+(m.status||'')+'</span></td>';
+    html += '<tr><td>'+esc(m.nama||'')+'<span class="role">'+esc(m.status||'')+'</span></td>';
     dates.forEach(d => {
       const st = attMap[m.id+'_'+d.id] || '';
       if (st) { t++; if (st==='H') h++; }
@@ -3911,7 +3972,7 @@ function exportCGAttendancePDF() {
   const todayStr = new Date().toLocaleDateString('id-ID', {day:'numeric',month:'long',year:'numeric'});
   let body = '<h1>Rekap Absensi CG</h1>';
   body += '<div class="sub">AOG Teens Jaktim · '+todayStr+'</div>';
-  body += '<div class="cg-header"><div><div class="cg-name">'+CUR_CG+'</div><div class="cg-meta">CGL: '+(CUR_CG_INFO.leader||'-')+' · '+MEMBERS.length+' member · '+(CUR_CG_INFO.hari_jam||'')+' · '+(CUR_CG_INFO.lokasi||'')+'</div></div></div>';
+  body += '<div class="cg-header"><div><div class="cg-name">'+esc(CUR_CG)+'</div><div class="cg-meta">CGL: '+esc(CUR_CG_INFO.leader||'-')+' · '+MEMBERS.length+' member · '+esc(CUR_CG_INFO.hari_jam||'')+' · '+esc(CUR_CG_INFO.lokasi||'')+'</div></div></div>';
   body += buildAttendanceTable(MEMBERS, DATES, ATTENDANCE);
   body += '<div class="footer">Dicetak otomatis dari CG Dashboard · absenibadahjaktim.vercel.app</div>';
   openPrintWindow(title, body);
@@ -3962,7 +4023,8 @@ async function getDetailExportData(scope) {
     // Load notes batch
     const ids = mems.map(m => m.id);
     if (ids.length) {
-      const { data } = await supa.from('member_notes').select('member_id,cgl_note').in('member_id', ids);
+      const { data, error: nErr } = await supa.from('member_notes').select('member_id,cgl_note').in('member_id', ids);
+      if (nErr) console.warn('[getDetailExportData notes]', nErr);
       (data||[]).forEach(n => { notesMap[n.member_id] = n.cgl_note || ''; });
     }
   } else if (scope === 'all') {
@@ -4557,7 +4619,7 @@ async function renderCoachVisi() {
 
     // ── Clickable header (always visible) ──
     const isExpanded = _VISI_EXPANDED.has(cg);
-    const cgEsc = cg.replace(/'/g,"\\'");
+    const cgEsc = jsEsc(cg);
     html += '<div onclick="toggleVisiAccordion(this,\''+cgEsc+'\')" style="padding:14px 18px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;background:linear-gradient(135deg,'+bg+' 0%,#fff 100%);border-left:4px solid '+color+';transition:background .15s" onmouseover="this.style.background=\''+bg+'\'" onmouseout="this.style.background=\'linear-gradient(135deg,'+bg+' 0%,#fff 100%)\'">';
 
     // Left: badge + info
@@ -4737,7 +4799,7 @@ async function renderCoachEvents(forceRefetch) {
     h += '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px">';
     const dateRange = ev.date_start && ev.date_end && ev.date_end !== ev.date_start ? esc(ev.date_start)+' → '+esc(ev.date_end) : esc(ev.date_start || ev.date_end || 'Tanpa tanggal');
     // Countdown pakai date_start kalau ada, fallback ke date_end (supaya event tanpa date_start tetap punya countdown)
-    h += '<div style="flex:1"><div style="display:flex;align-items:center;flex-wrap:wrap"><span class="ev-date">'+dateRange+'</span>'+eventCountdownBadge(ev.date_start || ev.date_end)+'</div><div class="ev-name">'+esc(ev.name||'')+'</div></div>';
+    h += '<div style="flex:1"><div style="display:flex;align-items:center;flex-wrap:wrap"><span class="ev-date">'+dateRange+'</span>'+eventCountdownBadge(ev.date_start || ev.date_end, ev.date_end)+'</div><div class="ev-name">'+esc(ev.name||'')+'</div></div>';
     h += '<div style="display:flex;gap:4px">';
     h += '<button onclick="copyEventText(\''+evId+'\')" title="Copy text" class="ev-btn ev-btn-copy"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>';
     h += '<button onclick="broadcastEvent(\''+evId+'\')" title="Broadcast WhatsApp" class="ev-btn ev-btn-wa"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413"/></svg></button>';
@@ -4854,19 +4916,20 @@ async function saveCoachEvent() {
   const cat = document.getElementById('coachEvCat').value;
   const note = document.getElementById('coachEvNote').value;
 
+  let result;
   if (target === 'all') {
-    // Save as shared event
-    await addCGEvent({
+    result = await addCGEvent({
       cg: 'ALL', region: 'all', is_shared: true,
       name, date_start: dateVal, cat, note
     });
   } else {
     const cgRegion = (ALL_MEMBERS.find(m => m.cg === target) || {}).region || 'jaktim1';
-    await addCGEvent({
+    result = await addCGEvent({
       cg: target, region: cgRegion, is_shared: false,
       name, date_start: dateVal, cat, note
     });
   }
+  if (!result) return;
   await renderCoachEvents(true);
 }
 
@@ -4891,7 +4954,8 @@ async function switchRole(role) {
     label.textContent = 'Coach';
     heroH.innerHTML = 'Semua<br><em>CG.</em>';
   }
-  _CACHED_ALL_CG_EVENTS = null; // Reset coach event cache saat switch role
+  _CACHED_ALL_CG_EVENTS = null;
+  COACH_TAB_RENDERED = {};
   renderCoachOverview();
   renderCoachAbsensi();
   renderCoachMilestone();
