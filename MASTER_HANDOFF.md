@@ -1,4 +1,4 @@
-# AOG Teens Jaktim — MASTER HANDOFF (v30)
+# AOG Teens Jaktim — MASTER HANDOFF (v31)
 
 > **📢 Untuk Claude Code baru:** Ini adalah master document tunggal berisi SEMUA yang perlu kamu tahu untuk bantu user melanjutkan project ini. Baca berurutan dari atas sampai bawah. Setelah selesai baca, kamu akan punya konteks setara dengan Claude yang sebelumnya kerja di project ini.
 >
@@ -48,7 +48,8 @@
    git log --oneline -10
    git status
    ```
-5. Verify production live: `https://absenibadahjaktim.vercel.app` — harus tampil "v30" di pojok kanan atas
+5. Verify production live: `https://absenibadahjaktim.vercel.app` — harus tampil "v31" (atau lebih baru) di pojok kanan atas
+6. Baca `V31_CHANGELOG.md` — 27 bug fix terakhir
 
 ### Prompt Startup yang Bagus:
 ```
@@ -58,7 +59,7 @@ Setelah baca, konfirmasi kamu paham dengan menyebut:
 1. Tech stack + rules struktur file
 2. Berapa tabel di database + tabel paling sering di-update
 3. Cara kerja fetchAllAttendance dan kenapa penting
-4. Fitur v29 dan v30 tentang apa
+4. Fitur v29, v30, dan v31 tentang apa
 ```
 
 ---
@@ -629,6 +630,7 @@ Detail per version — read git log untuk changelog per commit:
 | v28 | Archive CG support | User feature |
 | v29 | **Distribusi Wilayah** | User feature (major) |
 | v30 | Wilayah hardening (escape + reset state + count consistency) | Post-audit fix |
+| v31 | **27 bug fixes** — stats inflate, sekolah/kelas split, XSS PDF, 21 Supabase error checks, TEEN 25 color, reconnect guard, undo sync, milestone prereq, visi per-field save | Full audit (4 agent paralel) — detail di `V31_CHANGELOG.md` |
 
 **Cache version di service-worker.js selalu match dengan header version di index.html.**
 
@@ -831,10 +833,10 @@ const val = await asyncPrompt('Enter name:', 'default value');
 ### 12.8 DO — Version Bump Setiap Push UI Change
 ```javascript
 // index.html — cari & ganti:
-App version">v30  →  App version">v31
+App version">v31  →  App version">v32
 
 // service-worker.js:
-const CACHE_NAME = 'aog-absensi-v30' → 'aog-absensi-v31'
+const CACHE_NAME = 'aog-absensi-v31' → 'aog-absensi-v32'
 ```
 
 ---
@@ -979,8 +981,8 @@ cd "C:/Penyimpanan utama/Downloads/absen ibadahh"
 # ... edit index.html, dll
 
 # 2. Bump version DI 2 TEMPAT:
-# - index.html: App version">v30  →  v31
-# - service-worker.js: 'aog-absensi-v30' → 'v31'
+# - index.html: App version">v31  →  v32
+# - service-worker.js: 'aog-absensi-v31' → 'aog-absensi-v32'
 
 # 3. Commit
 git add index.html service-worker.js
@@ -1139,12 +1141,12 @@ Saat pertama kali kamu (Claude Code baru) bantu Nick:
 
 ### Verify
 - [ ] `git status` — pastikan clean, di branch `main`
-- [ ] `git log --oneline -5` — cek commit terbaru = `19d31a6` atau lebih baru
-- [ ] Buka `https://absenibadahjaktim.vercel.app` di browser — cek "v30" (atau versi lebih baru) di pojok kanan atas
+- [ ] `git log --oneline -5` — cek commit terbaru = `3acca2f` (v31) atau lebih baru
+- [ ] Buka `https://absenibadahjaktim.vercel.app` di browser — cek "v31" (atau versi lebih baru) di pojok kanan atas
 
 ### Setelah Ready, Confirm ke Nick
 Kirim response singkat:
-> "Sudah baca semua konteks. Project AOG Teens Jaktim di v30, tech stack single-file vanilla JS + Supabase + Vercel + Apps Script. Database 12 tabel, fetchAllAttendance wajib untuk unbounded query, service worker network-first. Ready untuk lanjut apa?"
+> "Sudah baca semua konteks. Project AOG Teens Jaktim di v31, tech stack single-file vanilla JS + Supabase + Vercel + Apps Script. Database 12 tabel, fetchAllAttendance wajib untuk unbounded query, service worker network-first. Ready untuk lanjut apa?"
 
 ### Cek Full-Access Setup
 Kalau ada file `.env` di folder + `AUTO_ACCESS_SETUP.md` sudah di-follow oleh Nick, kamu punya **direct execution access**:
@@ -1183,11 +1185,17 @@ Kalau `.env` belum ada, kamu operate di mode manual (kasih SQL ke Nick untuk pas
 ## 🎯 Final Notes
 
 **Kondisi saat handoff (session sebelumnya berakhir):**
-- Version production: **v30**
-- Semua audit findings sudah di-fix
-- Documentation lengkap (CLAUDE.md, HANDOFF.md, MASTER_HANDOFF.md, KELAPA_GADING_SETUP.md)
-- Codebase stable & tested manual di production
-- Fitur besar terakhir: Distribusi Wilayah (v29) + hardening (v30)
+- Version production: **v31** (commit `3acca2f`, Oktober 2026)
+- Full audit v31: 27 bug fix (detail `V31_CHANGELOG.md`)
+- Documentation lengkap (CLAUDE.md, HANDOFF.md, MASTER_HANDOFF.md, V31_CHANGELOG.md, CURRENT_DESIGN.md, KELAPA_GADING_SETUP.md)
+- Fitur besar terakhir: Distribusi Wilayah (v29) + hardening (v30) + bug-fix sweep (v31)
+
+**Sisa backlog (belum dikerjakan, sengaja di-skip di v31):**
+- `confirm()`/`alert()` masih dipakai ~17 tempat — block main thread, bisa bikin WebSocket timeout. Perlu `asyncConfirm()` mirip `asyncPrompt()`
+- `getCGStats` loop `ALL_DATES` semua region per member — boros, bisa filter per region
+- Custom pelayanan role tidak bisa dihapus dari UI
+- Data lama: kolom `sekolah` / `kelurahan` mungkin masih berisi string gabungan (`"SMA 1 · Kelas 12"`, `"Cakung, Pulogadung"`) dari bug sebelum v31 — cek via SQL sebelum cleanup, jangan auto-split
+- Redesign UI (Nick sedang eksplor di Claude Design — referensi `CURRENT_DESIGN.md`)
 
 **Nick's typical next steps yang mungkin:**
 1. Fitur baru (integrations, dll)
@@ -1206,4 +1214,4 @@ Kalau `.env` belum ada, kamu operate di mode manual (kasih SQL ke Nick untuk pas
 
 **Selamat melanjutkan project. Nick adalah user yang friendly dan responsif — enjoy the collaboration!**
 
-— Signed, Claude Opus 4.7 (previous instance)
+— Signed, Claude Opus 4.7 (previous instance) · updated v31 oleh Claude Opus (Oktober 2026)

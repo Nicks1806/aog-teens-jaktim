@@ -12,7 +12,7 @@
 **AOG Teens Jaktim** — Web app absensi + management CG (Cell Group) gereja AOG Teens Jakarta Timur. Dipakai ~54 member, 9 CGL, 2 Coach, 1 TL setiap Minggu.
 
 **Production:** https://absenibadahjaktim.vercel.app
-**Version:** v30 (per commit `19d31a6` atau lebih baru)
+**Version:** v31 (per commit `3acca2f` atau lebih baru)
 **Repo:** https://github.com/Nicks1806/aog-teens-jaktim
 
 ---
@@ -29,7 +29,7 @@ ls -la
 
 Yang harus kamu lihat:
 - Branch `main`, clean working tree
-- Commit terbaru: dokumentasi + versi v30
+- Commit terbaru: dokumentasi v31 (atau lebih baru)
 - File-file: `index.html`, `service-worker.js`, `google-apps-script.gs`, dan file `.md` documentation
 
 ### Step 2: Baca Dokumen Konteks (URUT!)
@@ -37,9 +37,11 @@ Yang harus kamu lihat:
 Baca berurutan:
 
 1. **`MASTER_HANDOFF.md`** (10 menit) — **WAJIB.** Single source of truth. 1200 baris, 20 section, semua konteks + progress chronology (section 9: Session Narrative).
-2. **`AUTO_ACCESS_SETUP.md`** (2 menit) — Cek apakah full-access CLI setup sudah dilakukan user.
-3. **`CLAUDE.md`** (skim, 3 menit) — Project docs core.
-4. **`HANDOFF.md`** (optional reference) — Extended docs, komplementer.
+2. **`V31_CHANGELOG.md`** (3 menit) — **WAJIB.** 27 bug fix terakhir (Oktober 2026) — apa yang diubah & kenapa.
+3. **`AUTO_ACCESS_SETUP.md`** (2 menit) — Cek apakah full-access CLI setup sudah dilakukan user.
+4. **`CLAUDE.md`** (skim, 3 menit) — Project docs core.
+5. **`HANDOFF.md`** (optional reference) — Extended docs, komplementer.
+6. **`CURRENT_DESIGN.md`** (optional) — UI/UX reference kalau ada kerjaan desain.
 
 ### Step 3: Cek Full-Access Status
 
@@ -65,15 +67,16 @@ Kirim response singkat:
 Sudah baca semua konteks project AOG Teens Jaktim.
 
 📊 State saat ini:
-- Version: v30
+- Version: v31
 - Tech: single-file vanilla JS + Supabase + Vercel + Apps Script  
 - Database: 12 tabel (attendance 1188+ rows — WAJIB fetchAllAttendance)
 - Region: jaktim1 (5 CG) + jaktim2 (4 CG) + ARSIP support
 - PWA: Service Worker network-first, push notif iOS-safe
 
-🔧 Fitur terakhir:
+🔧 Update terakhir:
 - v29: Distribusi Wilayah (chip kecamatan + kelurahan)
 - v30: Wilayah hardening (escape + reset state + count consistency)
+- v31: 27 bug fix (stats inflate, sekolah/kelas split, XSS PDF, error handling, TEEN 25 color, dll)
 
 🔑 Akses saya:
 - ✅ Edit semua file di folder
@@ -91,7 +94,7 @@ Ganti `[✅/⚠️]` sesuai hasil Step 3.
 ## 📚 File Map (What's Where)
 
 ### Code Files (jangan edit tanpa konteks)
-- `index.html` — main app (single file, ~9000+ baris)
+- `index.html` — main app (single file, ~5000+ baris)
 - `service-worker.js` — PWA SW (network-first)
 - `manifest.json` — PWA manifest
 - `icon.jpg` — PWA icon 2000x2000
@@ -99,8 +102,11 @@ Ganti `[✅/⚠️]` sesuai hasil Step 3.
 
 ### Documentation Files (Claude reference)
 - **`START_HERE.md`** — file ini, entrypoint
-- **`PROGRESS_LOG.md`** — chronology session
+- **`PROMPT_CLAUDE_CODE.md`** — prompt siap-copy untuk buka Claude Code baru
 - **`MASTER_HANDOFF.md`** — single source of truth (1200 baris)
+- **`V31_CHANGELOG.md`** — detail 27 bug fix v31
+- **`CURRENT_DESIGN.md`** — UI/UX design reference (CSS tokens, komponen)
+- **`SQL_COOKBOOK.md`** — kumpulan SQL siap pakai
 - **`AUTO_ACCESS_SETUP.md`** — setup CLI tools untuk full-access
 - **`CLAUDE.md`** — project docs core (concise version)
 - **`HANDOFF.md`** — extended docs (28 section, complementary to MASTER)
@@ -142,7 +148,8 @@ Detail rules ada di `MASTER_HANDOFF.md` section 12 (Code Patterns).
 - Prefer bahasa Indonesia santai
 - Prefer response singkat + bullet points + SQL siap-copy
 - Prefer ship fast (working > perfect)
-- Prefer version indicator visible ("v30" di pojok kanan) untuk self-verify
+- Prefer version indicator visible ("vXX" di pojok kanan) untuk self-verify
+- Sangat peduli keamanan data: "jangan sampai ada data yang hilang atau rusak" — selalu verifikasi sebelum push
 
 Detail preferences: `MASTER_HANDOFF.md` section 17.
 

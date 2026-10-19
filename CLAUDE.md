@@ -1,6 +1,6 @@
 # AOG Teens Jaktim — CG Dashboard (Absensi + Management)
 
-**Current version:** v30 · **Last updated:** August 2026
+**Current version:** v31 · **Last updated:** October 2026
 
 ## Project Overview
 Single-file web app untuk tracking attendance, pelayanan, milestone, events, visi, dan distribusi wilayah CG untuk AOG Teens Jakarta Timur. Dipakai oleh ~54 member, 9 CG Leaders, 2 Coach, dan 1 Team Leader secara bersamaan saat ibadah hari Minggu.
@@ -18,7 +18,7 @@ Untuk konteks handoff lengkap ke Claude Code baru, baca `HANDOFF.md`.
 - **Deployment:** GitHub → Vercel (auto-deploy on push to main)
 - **Sheets Sync:** Google Apps Script (auto-sync per 1 menit dari Supabase → Google Sheets)
 - **PWA:** Service Worker network-first + manifest + `/icon.jpg`
-- **File structure:** **SINGLE FILE** — `index.html` (semua HTML/CSS/JS dalam 1 file, ~9000+ baris)
+- **File structure:** **SINGLE FILE** — `index.html` (semua HTML/CSS/JS dalam 1 file, ~5000+ baris)
 
 ## GitHub Repo
 - **Repo:** https://github.com/Nicks1806/aog-teens-jaktim
@@ -276,8 +276,8 @@ Edit index.html locally (+ file lain kalau perlu)
 ```
 
 **Version bump pattern setiap push code:**
-1. `index.html` — cari `App version">v30` → naikkan
-2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v30'` → naikkan sama
+1. `index.html` — cari `App version">v31` → naikkan
+2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v31'` → naikkan sama
 
 ---
 
@@ -369,13 +369,17 @@ Edit index.html locally (+ file lain kalau perlu)
 | v28 | Archive CG support (nama prefix `ARSIP`) |
 | v29 | **Distribusi Wilayah** — filter kecamatan + kelurahan di Coach/TL Overview |
 | v30 | Wilayah filter hardening (escape + reset state + count consistency) |
+| v31 | **27 bug fixes** — attendance stats inflate, data corruption (sekolah/kelas split), XSS (PDF export), error handling (21 Supabase ops), TEEN 25 color map, reconnect race guard, undo sync, milestone prereq, visi TOCTOU fix |
 
 Detail changelog per version ada di git log (`git log --oneline`).
+Detail v31 ada di `V31_CHANGELOG.md`.
 
 ---
 
 ## Related Files
 - `HANDOFF.md` — comprehensive handoff untuk Claude Code baru (28 section, semua konteks)
+- `V31_CHANGELOG.md` — detail 27 bug fixes di v31 (Oktober 2026)
+- `CURRENT_DESIGN.md` — UI/UX design reference (CSS tokens, komponen, layout)
 - `KELAPA_GADING_SETUP.md` — blueprint untuk cabang Kelapa Gading (belum di-deploy)
 - `google-apps-script.gs` — Apps Script Google Sheets sync
 - `service-worker.js` — PWA SW network-first
