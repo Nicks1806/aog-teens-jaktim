@@ -1,6 +1,6 @@
 # AOG Teens Jaktim — CG Dashboard (Absensi + Management)
 
-**Current version:** v51 · **Last updated:** 27 Oktober 2026
+**Current version:** v52 · **Last updated:** 27 Oktober 2026
 
 ## Project Overview
 Single-file web app untuk tracking attendance, pelayanan, milestone, events, visi, dan distribusi wilayah CG untuk AOG Teens Jakarta Timur. Dipakai oleh ~54 member, 9 CG Leaders, 2 Coach, dan 1 Team Leader secara bersamaan saat ibadah hari Minggu.
@@ -278,8 +278,8 @@ Edit index.html locally (+ file lain kalau perlu)
 ```
 
 **Version bump pattern setiap push code:**
-1. `index.html` — cari `App version">v51` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
-2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v51'` → naikkan sama
+1. `index.html` — cari `App version">v52` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
+2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v52'` → naikkan sama
 
 ---
 
@@ -394,6 +394,7 @@ Edit index.html locally (+ file lain kalau perlu)
 | v29 | **Distribusi Wilayah** — filter kecamatan + kelurahan di Coach/TL Overview |
 | v30 | Wilayah filter hardening (escape + reset state + count consistency) |
 | v31 | **27 bug fixes** — attendance stats inflate, data corruption (sekolah/kelas split), XSS (PDF export), error handling (21 Supabase ops), TEEN 25 color map, reconnect race guard, undo sync, milestone prereq, visi TOCTOU fix |
+| v52 | Saran pertanyaan CGL "Ide sharing & game" → "Ide game & ice breaking" (aturan Training AI: materi sharing/SM → cek CGSM di aplikasi GMS) |
 | v51 | **Ubah data anak lewat chat** (Coach/TL & CGL): AI menulis ```ubah {perubahan:[{id,nama,data:{…}}]}``` → kartu → modal `aiUbahModal` (centang per kolom, bisa diedit) → `ubSave()`: hanya kolom `AI_UBAH_FIELDS` (milestone true/null, status CGL/Sponsor/Member/Simpatisan/VIP, sekolah, kelas, kelurahan/kecamatan via `canonWilayah`, wa, lahir YYYY-MM-DD); baca ulang dari DB dulu → kolom yang sudah diubah orang lain dilewati; nama tidak bisa diubah; peringatan urutan milestone (`UB_PREREQ`). **Ulang tahun terdekat** (30 hari, `upcomingBirthdays`/`birthdaySectionHTML`) di Overview Coach/TL & tab Detail CG + **Ucapan WA** buatan AI (`aiBday`, modal `aiBdayModal`) |
 | v50 | Tombol **Training AI** (dulu "Pengetahuan AI", label tetap tampil di HP) + kolom cepat "Ajarkan hal baru" (`aiTeachAdd` → poin baru di akhir, tersimpan setelah Simpan). HP: baris tombol atas chat turun ke baris kedua; teks tips isi absensi tidak terpecah |
 | v49 | **Bagan struktur** di jawaban AI: blok ```struktur {judul, node:{nama, peran, anak:[…]}}``` → pohon kartu (`aiStrukturHTML`, warna per tingkat, maks 80 kotak), "Simpan gambar" (`aiOrgCanvas`), Salin/WA jadi daftar teks (`aiStrukturText`). Nama yang tidak diketahui ditulis "(belum diisi)" |
@@ -419,7 +420,7 @@ Edit index.html locally (+ file lain kalau perlu)
 Detail changelog per version ada di git log (`git log --oneline`).
 
 ### Pengetahuan AI (27 Okt 2026)
-- Baris `cg_vision` id 55 (`__AI_NOTES__`/`all`) diisi riset GMS (situs resmi gms.church, berita; medsos tidak terbaca tanpa login) + info pemimpin (TL Bro Justin Seravian, Gembala Lokal Ko Mike Budiman, Gembala Lokal AOG KG Ko Amos, Gembala Regional Ko Fuji Harsono, Gembala Sinode Ko Philip, Coach Jaktim 1 Nickcllauss, Coach Jaktim 2 Maritza) atas permintaan Nick. Cadangan sebelum diubah: `C:\Penyimpanan utama\Downloads\backup_ai_notes_2026-10-27.json` `..._tahap2.json`, `..._tahap3.json`. Edit selanjutnya lewat tombol "Training AI" di tab Tanya AI Coach/TL
+- Baris `cg_vision` id 55 (`__AI_NOTES__`/`all`) diisi riset GMS (situs resmi gms.church, berita; medsos tidak terbaca tanpa login) + info pemimpin (TL Bro Justin Seravian, Gembala Lokal Ko Mike Budiman, Gembala Lokal AOG KG Ko Amos, Gembala Regional Ko Fuji Harsono, Gembala Sinode Ko Philip, Coach Jaktim 1 Nickcllauss, Coach Jaktim 2 Maritza) atas permintaan Nick. Cadangan sebelum diubah: `C:\Penyimpanan utama\Downloads\backup_ai_notes_2026-10-27.json` `..._tahap2.json`, `..._tahap3.json`, `..._tahap4.json`. Aturan jawaban: pertanyaan sharing/SM → arahkan ke CGSM di aplikasi GMS Church (tidak mengarang materi). Edit selanjutnya lewat tombol "Training AI" di tab Tanya AI Coach/TL
 
 ### Pembersihan data (27 Okt 2026, langsung di Supabase, cadangan di `C:\Penyimpanan utama\Downloads\backup_*_2026-10-27*.json`)
 - 21 member: teks "· Kelas X" (bug input gabungan pra-v31) dihapus dari kolom `sekolah`; kelas diisi/dinaikkan ke angka tertinggi (aturan dari Nick)
