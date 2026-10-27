@@ -290,8 +290,9 @@ Edit index.html locally (+ file lain kalau perlu)
 - **JANGAN buat file README.md atau dokumentasi baru** kecuali diminta
 
 ### Desain (v32 — redesign)
-- **Token warna** di `:root` (`--bg`, `--card`, `--line`, `--ink`, `--muted`, `--side`, `--accent`, `--gold`, `--H/--I/--S/--A/--X` + `b`/`br`). Alias lama (`--purple`, `--g1`…) **sudah dihapus** — jangan dipakai lagi
-- Font: **Bricolage Grotesque** (`var(--display)`, judul/angka) + **Inter** (teks). Minimal 11px
+- **Tata letak baru (sidebar + bottom nav), tema/warna/font tetap seperti v31 live.** Token warna di `:root` (`--bg`, `--card`, `--line`, `--ink`, `--muted`, `--accent` #6C5CE7, `--grad` ungu, `--H/--I/--S/--A/--X` + `b`/`br`) memakai palet v31. Override tema ada di blok CSS `TEMA v31 (live)`
+- **Landing page (`#pageL`) = persis v31** — HTML, CSS `/* Landing */`, dan JS `selReg`…sebelum `enterDash` disalin dari v31. Alias lama (`--purple`, `--g1`…) hanya di-scope ke `#pageL`; jangan diubah tanpa diminta
+- Font: **Instrument Serif** (`var(--display)`, judul besar/angka, weight 400) + **Inter** (teks, judul kartu). Minimal 11px
 - Ikon: pakai `icon(name, size)` (SVG inline, daftar di `ICON_PATHS`). **Jangan pakai emoji di UI**; emoji boleh hanya di isi pesan WA/broadcast/notifikasi push. `toast()` otomatis mengubah awalan ❌/✓/🔔/⚠ jadi ikon
 - Komponen: `.card`, `.chead`, `.btn` (`.primary/.sm/.big/.ghost/.danger`), `.iconbtn`, `.seg`, `.chip` (`.on` = filter aktif), `.pill`, `.kpi`(`.hero`), `.lrow`, `.prog`, `.empty`, `.acc`(`.acc-h`/`.acc-b`), `.evcard` (pakai `evCardHTML()`), `.mcard`, `.visi-box`
 - Semua yang bisa diklik = `<button type="button">` / `<a>`; tombol ikon wajib `aria-label`
@@ -381,7 +382,7 @@ Edit index.html locally (+ file lain kalau perlu)
 | v29 | **Distribusi Wilayah** — filter kecamatan + kelurahan di Coach/TL Overview |
 | v30 | Wilayah filter hardening (escape + reset state + count consistency) |
 | v31 | **27 bug fixes** — attendance stats inflate, data corruption (sekolah/kelas split), XSS (PDF export), error handling (21 Supabase ops), TEEN 25 color map, reconnect race guard, undo sync, milestone prereq, visi TOCTOU fix |
-| v32 | **Redesign UI** (branch `redesign`) — sidebar + bottom nav, token warna baru, Bricolage Grotesque, ikon SVG pengganti emoji, kartu KPI, accordion Coach, heatmap milestone, modal berlabel. Logika data/Supabase tidak diubah. Fix: tombol Undo toast bisa diklik |
+| v32 | **Redesign UI** (branch `redesign`) — sidebar + bottom nav, tema & warna tetap v31 (Instrument Serif + Inter), landing page persis v31, ikon SVG pengganti emoji, kartu KPI, accordion Coach, heatmap milestone, modal berlabel. Logika data/Supabase tidak diubah. Fix: tombol Undo toast bisa diklik |
 
 Detail changelog per version ada di git log (`git log --oneline`).
 Detail v31 ada di `V31_CHANGELOG.md`.
