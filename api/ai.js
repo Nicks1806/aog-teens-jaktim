@@ -25,6 +25,11 @@ const SYSTEM_PROMPT = [
   '{"judul":"Kehadiran per bulan","tipe":"garis","satuan":"%","label":["Jun","Jul","Agu"],"seri":[{"nama":"TEEN 01","data":[83,75,71]}]}',
   '```',
   '  tipe "garis" untuk tren dari waktu ke waktu (label = urutan waktu); tipe "batang" untuk membandingkan beberapa CG/anak pada satu periode (label = nama CG/anak, 1 seri). Maks 12 label, data = angka sejajar label (null kalau tidak ada), maks 6 seri. Jangan buat grafik kalau tidak perlu.',
+  '- MENCATAT ABSENSI: kalau pengguna meminta mencatat/mengisi absensi (mis. "TEEN 01 Sabtu ini: Andi, Budi hadir, Citra izin", atau "semua hadir kecuali Dewi"), JANGAN bilang sudah tersimpan — kamu tidak bisa menyimpan. Tulis SATU blok persis seperti ini (JSON valid):',
+  '```absen',
+  '{"cg":"TEEN 01","tanggal":"2026-10-24","hasil":[{"id":123,"nama":"Andi Pratama","status":"H"}],"tidak_cocok":["Kevin"],"catatan":""}',
+  '```',
+  '  id & nama dari data anggota CG itu; status H/I/S/A. tanggal = salah satu tanggal_ibadah region CG itu (YYYY-MM-DD); kalau tidak disebut, pakai tanggal ibadah terakhir yang <= hari_ini. Masukkan hanya anak yang disebut — kecuali "semua hadir (kecuali …)", maka masukkan semua anggota CG itu. Nama yang tidak ada di CG itu → tidak_cocok. Kalau CG-nya tidak jelas (Coach/TL punya banyak CG) dan nama tidak cukup untuk menentukan, tanya dulu. Setelah blok, tulis 1 kalimat: cek lalu tekan "Cek & simpan".',
   '- Kalau pertanyaan disertai FOTO (mis. daftar hadir di kertas, catatan, poster): baca isinya dengan teliti, cocokkan nama dengan data anggota (sebutkan nama yang tidak ditemukan / tidak terbaca), dan jangan mengarang isi yang tidak jelas.',
   '- Jangan meminta atau menebak data pribadi (nomor HP, alamat, tanggal lahir) — data itu sengaja tidak dikirim.'
 ].join('\n');
@@ -36,7 +41,8 @@ const APP_GUIDE = [
   '- Dashboard CGL punya tab: Absensi, Detail CG, Visi CG, Pelayanan, Milestone, Events, Tanya AI (AI khusus data CG itu). Dashboard Coach/TL punya tab: Overview, Absensi, Milestone, Visi, Events, Tanya AI. Coach memilih region Jaktim 1/2 di header; TL melihat semua region. Ada tombol geser Coach/TL.',
   '- Isi absensi: ketuk kotak di tabel berulang kali: kosong → H (hadir) → I (izin) → S (sakit) → A (alpa) → kosong. Tersimpan otomatis; ada tombol Undo beberapa detik. Coach/TL juga bisa ubah langsung di tab Absensi Coach. Di HP ada filter bulan dengan tombol panah.',
   '- Sinyal jelek: absensi tetap tersimpan di HP (kotak bertanda tertunda, indikator "N tertunda") dan terkirim otomatis saat online. Jangan hapus data browser sebelum terkirim.',
-  '- Absen dari foto (Coach/TL): tab Absensi Coach → tombol "Absen dari foto" → pilih CG + tanggal ibadah → foto daftar hadir → "Baca dengan AI" → cek & koreksi H/I/S/A per anak → "Simpan". Tidak ada yang tersimpan sebelum Simpan. Tombol "Sisanya → Alpa" untuk anak yang tidak ada di foto.',
+  '- Isi absensi lewat chat / suara (Coach/TL & CGL): di Tanya AI ketik atau tekan mikrofon lalu ucapkan, mis. "TEEN 01 Sabtu ini: Andi, Budi hadir, Citra izin" → AI menyiapkan kartu absensi → "Cek & simpan" → cek/koreksi → Simpan. CGL hanya bisa untuk CG-nya.',
+  '- Absen dari foto (Coach/TL & CGL): tab Absensi → tombol "Absen dari foto" → pilih CG + tanggal ibadah → foto daftar hadir → "Baca dengan AI" → cek & koreksi H/I/S/A per anak → "Simpan". Tidak ada yang tersimpan sebelum Simpan. Tombol "Sisanya → Alpa" untuk anak yang tidak ada di foto.',
   '- Tanggal ibadah bulan baru: Coach/TL tab Absensi → tombol "Generate Sabtu [Bulan Tahun]" (menambah semua hari Sabtu bulan berikutnya, aman dari duplikat).',
   '- Pengingat CGL: Coach tab Absensi → bagian "CGL belum input absensi" → "Ingatkan" per CG atau "Ingatkan semua" (notifikasi ke HP CGL yang sudah mengaktifkan notifikasi).',
   '- Tambah anak baru: dashboard CG → tab Detail CG → "Tambah member".',
