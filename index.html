@@ -881,6 +881,9 @@ html.vt .tab-content.active{animation:none}
 .ai-chart{margin:10px 0 12px;background:#fafaf8;max-width:720px}
 .ai-img-btn{display:inline-flex;align-items:center;gap:5px;margin-top:8px;font:inherit;font-size:12px;color:#6C5CE7;background:#fff;border:1px solid #e4dcff;border-radius:9px;padding:4px 10px;cursor:pointer}
 .ai-img-btn:hover{border-color:#6C5CE7}
+.ai-prov{font:inherit;font-size:13px;font-weight:600;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:10px;padding:6px 8px;cursor:pointer;flex:none}
+.ai-prov:focus{outline:none;border-color:var(--accent)}
+.ai-by{margin-left:auto;font-size:11px;color:var(--muted);align-self:center}
 .ab-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
 .ab-drop{width:100%;display:flex;flex-direction:column;align-items:center;gap:6px;padding:26px 16px;border:2px dashed #cfc6ff;border-radius:16px;background:#faf8ff;color:var(--accent);font:inherit;cursor:pointer;text-align:center}
 .ab-drop:hover{border-color:var(--accent)}
@@ -977,7 +980,7 @@ html.vt .tab-content.active{animation:none}
   .mtop small{font-size:11px}
   .mtop button{width:38px;height:38px;border-radius:10px}
   .mnav{padding:4px 4px calc(4px + env(safe-area-inset-bottom))}
-  .mnav button{min-height:44px;gap:2px}
+  .mnav button{min-height:44px;gap:2px;min-width:44px}
   .mnav button svg{width:20px;height:20px}
   .phead{gap:12px}
   .phead h1{font-size:30px;margin:4px 0}
@@ -1172,6 +1175,18 @@ html.vt .tab-content.active{animation:none}
   </div>
 </div>
 
+<!-- Pengetahuan AI ("training"): diisi Coach/TL, selalu diikuti AI Coach/TL/CGL -->
+<div class="modal-overlay" id="aiNotesModal">
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="aiNotesTitle" style="max-width:680px">
+    <div class="modal-title" id="aiNotesTitle">Pengetahuan AI</div>
+    <p class="ab-hint" style="margin:0 0 12px">Tulis hal yang harus selalu diingat AI: info gereja &amp; AOG Teens, jadwal, aturan follow-up, istilah, target tahun ini, gaya bahasa pesan WA. Berlaku untuk AI Coach, TL, dan CGL. Jangan tulis data pribadi (no HP, alamat).</p>
+    <label class="sr" for="aiNotesText">Pengetahuan AI</label>
+    <textarea class="textarea" id="aiNotesText" rows="14" maxlength="20000" oninput="aiNotesCount()"></textarea>
+    <div class="ab-hint" id="aiNotesCount" style="text-align:right;margin-top:6px"></div>
+    <div class="mfoot"><button type="button" class="btn" onclick="closeModal('aiNotesModal')">Batal</button><button type="button" class="btn primary" id="aiNotesSave" onclick="saveAINotes()">Simpan</button></div>
+  </div>
+</div>
+
 <!-- LANDING -->
 <div class="landing" id="pageL">
   <div style="font-size:13px;letter-spacing:3px;color:var(--g3);text-transform:uppercase;margin-bottom:6px;font-weight:600" id="ltKicker">THE YEAR OF</div>
@@ -1197,9 +1212,9 @@ html.vt .tab-content.active{animation:none}
   <aside class="side" aria-label="Navigasi utama">
     <div class="brand"><div class="logo" aria-hidden="true">A</div><div><b>AOG Teens</b><small id="dSideSub">CG</small></div></div>
     <button type="button" class="backcoach" id="dBackCoach" onclick="goBack()" style="display:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Kembali ke Coach</button>
-    <nav class="navlist" aria-label="Tab CG"><button type="button" class="nav app-tab on" data-tab="absensi" aria-current="page" onclick="sTab('absensi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M9 15l2 2 4-4"/></svg><span>Absensi</span></button><button type="button" class="nav app-tab" data-tab="detail" onclick="sTab('detail',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c1.9.7 3.1 2.4 3.5 5.2"/></svg><span>Detail CG</span></button><button type="button" class="nav app-tab" data-tab="visi" onclick="sTab('visi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span>Visi CG</span></button><button type="button" class="nav app-tab" data-tab="pelayanan" onclick="sTab('pelayanan',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"/></svg><span>Pelayanan</span></button><button type="button" class="nav app-tab" data-tab="milestone" onclick="sTab('milestone',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4h11l-2 4 2 4H5"/></svg><span>Milestone</span></button><button type="button" class="nav app-tab" data-tab="events" onclick="sTab('events',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4z"/><path d="M14 7v10"/></svg><span>Events</span></button></nav>
+    <nav class="navlist" aria-label="Tab CG"><button type="button" class="nav app-tab on" data-tab="absensi" aria-current="page" onclick="sTab('absensi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M9 15l2 2 4-4"/></svg><span>Absensi</span></button><button type="button" class="nav app-tab" data-tab="detail" onclick="sTab('detail',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c1.9.7 3.1 2.4 3.5 5.2"/></svg><span>Detail CG</span></button><button type="button" class="nav app-tab" data-tab="visi" onclick="sTab('visi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span>Visi CG</span></button><button type="button" class="nav app-tab" data-tab="pelayanan" onclick="sTab('pelayanan',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"/></svg><span>Pelayanan</span></button><button type="button" class="nav app-tab" data-tab="milestone" onclick="sTab('milestone',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4h11l-2 4 2 4H5"/></svg><span>Milestone</span></button><button type="button" class="nav app-tab" data-tab="events" onclick="sTab('events',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4z"/><path d="M14 7v10"/></svg><span>Events</span></button><button type="button" class="nav app-tab ai-nav" data-tab="ai" onclick="sTab('ai',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg><span>Tanya AI</span></button></nav>
     <div class="sidetheme"><small>The year of</small><b>Unity</b><span>&amp; Open Heavens</span></div>
-    <div class="profile"><span class="ava" id="dAva" aria-hidden="true">A</span><div style="flex:1;min-width:0"><b id="nN"></b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v46</span></span></span></div><button type="button" class="exit" onclick="goBack()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
+    <div class="profile"><span class="ava" id="dAva" aria-hidden="true">A</span><div style="flex:1;min-width:0"><b id="nN"></b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v47</span></span></span></div><button type="button" class="exit" onclick="goBack()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
   </aside>
   <div class="main">
     <header class="mtop">
@@ -1228,9 +1243,10 @@ html.vt .tab-content.active{animation:none}
     <div class="tab-content" id="tab-pelayanan"><div class="loading-msg">Memuat...</div></div>
     <div class="tab-content" id="tab-milestone"><div class="loading-msg">Memuat...</div></div>
     <div class="tab-content" id="tab-events"><div class="loading-msg">Memuat...</div></div>
+    <div class="tab-content" id="tab-ai"><div class="loading-msg">Memuat...</div></div>
     </main>
   </div>
-  <nav class="mnav" aria-label="Navigasi"><button type="button" class="app-tab on" data-tab="absensi" aria-current="page" onclick="sTab('absensi',this)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M9 15l2 2 4-4"/></svg><span>Absensi</span></button><button type="button" class="app-tab" data-tab="detail" onclick="sTab('detail',this)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c1.9.7 3.1 2.4 3.5 5.2"/></svg><span>Detail</span></button><button type="button" class="app-tab" data-tab="visi" onclick="sTab('visi',this)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span>Visi</span></button><button type="button" class="app-tab" data-tab="pelayanan" onclick="sTab('pelayanan',this)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"/></svg><span>Pelayanan</span></button><button type="button" class="app-tab" data-tab="milestone" onclick="sTab('milestone',this)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4h11l-2 4 2 4H5"/></svg><span>Milestone</span></button><button type="button" class="app-tab" data-tab="events" onclick="sTab('events',this)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4z"/><path d="M14 7v10"/></svg><span>Events</span></button></nav>
+  <nav class="mnav" aria-label="Navigasi"><button type="button" class="app-tab on" data-tab="absensi" aria-current="page" onclick="sTab('absensi',this)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M9 15l2 2 4-4"/></svg><span>Absensi</span></button><button type="button" class="app-tab" data-tab="detail" onclick="sTab('detail',this)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c1.9.7 3.1 2.4 3.5 5.2"/></svg><span>Detail</span></button><button type="button" class="app-tab" data-tab="visi" onclick="sTab('visi',this)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span>Visi</span></button><button type="button" class="app-tab" data-tab="pelayanan" onclick="sTab('pelayanan',this)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"/></svg><span>Pelayanan</span></button><button type="button" class="app-tab" data-tab="milestone" onclick="sTab('milestone',this)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4h11l-2 4 2 4H5"/></svg><span>Milestone</span></button><button type="button" class="app-tab" data-tab="events" onclick="sTab('events',this)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4z"/><path d="M14 7v10"/></svg><span>Events</span></button><button type="button" class="app-tab" data-tab="ai" onclick="sTab('ai',this)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg><span>AI</span></button></nav>
  </div>
 </div>
 
@@ -1242,7 +1258,7 @@ html.vt .tab-content.active{animation:none}
     <div class="rolesw" role="group" aria-label="Peran"><button type="button" id="roleCoachBtn" class="on" aria-pressed="true" onclick="switchRole('coach')">Coach</button><button type="button" id="roleTLBtn" aria-pressed="false" onclick="switchRole('tl')">TL</button></div>
     <nav class="navlist" id="coachTabs" aria-label="Tab Coach"><button type="button" class="nav app-tab on" data-tab="c-overview" aria-current="page" onclick="sCoachTab('c-overview',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"/></svg><span>Overview</span></button><button type="button" class="nav app-tab" data-tab="c-absensi" onclick="sCoachTab('c-absensi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M9 15l2 2 4-4"/></svg><span>Absensi</span></button><button type="button" class="nav app-tab" data-tab="c-milestone" onclick="sCoachTab('c-milestone',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4h11l-2 4 2 4H5"/></svg><span>Milestone</span></button><button type="button" class="nav app-tab" data-tab="c-visi" onclick="sCoachTab('c-visi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span>Visi</span></button><button type="button" class="nav app-tab" data-tab="c-events" onclick="sCoachTab('c-events',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4z"/><path d="M14 7v10"/></svg><span>Events</span></button><button type="button" class="nav app-tab ai-nav" data-tab="c-ai" onclick="sCoachTab('c-ai',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg><span>Tanya AI</span></button></nav>
     <button type="button" class="sidetheme editable" onclick="openThemeEdit()" aria-label="Edit tema tahun ini" title="Klik untuk edit tema"><small>The year of</small><b>Unity</b><span>&amp; Open Heavens</span><i class="st-edit" aria-hidden="true">Edit</i></button>
-    <div class="profile"><span class="ava" id="cAva" aria-hidden="true">C</span><div style="flex:1;min-width:0"><b id="cWho">Coach</b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v46</span></span></span></div><button type="button" class="exit" onclick="goBackCoach()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
+    <div class="profile"><span class="ava" id="cAva" aria-hidden="true">C</span><div style="flex:1;min-width:0"><b id="cWho">Coach</b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v47</span></span></span></div><button type="button" class="exit" onclick="goBackCoach()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
   </aside>
   <div class="main">
     <header class="mtop">
@@ -1615,6 +1631,7 @@ function handleVisionChange(payload) {
     if (payload.new && payload.new.visi) { try { applyTheme(JSON.parse(payload.new.visi)); } catch(e) {} }
     return;
   }
+  if (row.cg === '__AI_NOTES__') { if (typeof _AI_CACHE !== 'undefined') _AI_CACHE.t = 0; return; }
   rtDebounce('vision', async () => {
     try {
       // CGL banner
@@ -2507,6 +2524,7 @@ async function ensureTabRendered(id) {
     else if (id === 'pelayanan') await renderPelayanan();
     else if (id === 'milestone') renderMilestone();
     else if (id === 'events') await renderEvents();
+    else if (id === 'ai') renderCGLAI();
   } catch(e) {
     TAB_RENDERED[id] = false; // allow retry
     console.error('[tab '+id+' render error]', e);
@@ -4454,7 +4472,7 @@ function goBack() {
   window.scrollTo(0, 0);
 }
 
-const CGL_TAB_TITLES = {absensi:'Rekap Absensi',detail:'Detail CG',visi:'Visi CG',pelayanan:'Jadwal Pelayanan',milestone:'Milestone',events:'Events'};
+const CGL_TAB_TITLES = {absensi:'Rekap Absensi',detail:'Detail CG',visi:'Visi CG',pelayanan:'Jadwal Pelayanan',milestone:'Milestone',events:'Events',ai:'Tanya AI'};
 function setDTabUI(id) {
   document.querySelectorAll('#pageD .app-tab').forEach(t => {
     const on = t.dataset.tab === id;
@@ -4770,7 +4788,7 @@ async function sCoachTab(id, b) {
 // Tiap pertanyaan: refetch absensi + tanggal, lalu kirim ringkasan data TERBARU.
 // Data pribadi (no HP, alamat, tgl lahir, sekolah, catatan) TIDAK dikirim.
 // ═══════════════════════════════════════════════════════════
-const _AI = { msgs: [], busy: false, needPin: false }; // needPin: hanya kalau server minta (AI_PIN diisi di Vercel)
+const _AI = { msgs: [], busy: false, needPin: false, mode: 'coach', scope: '' }; // mode: 'coach' (Coach/TL) | 'cgl' (dashboard CG) // needPin: hanya kalau server minta (AI_PIN diisi di Vercel)
 const AI_PIN_KEY = 'aog_ai_pin';
 const AI_SUGGEST = [
   'Rangkum kehadiran bulan ini per CG',
@@ -4782,7 +4800,17 @@ const AI_SUGGEST = [
 ];
 function aiGetPin() { try { return localStorage.getItem(AI_PIN_KEY) || ''; } catch(e) { return ''; } }
 function aiSetPin(v) { try { if (v) localStorage.setItem(AI_PIN_KEY, v); else localStorage.removeItem(AI_PIN_KEY); } catch(e) {} }
-function aiScopeLabel() { return coachRole === 'tl' ? 'semua region' : (coachReg === 'jaktim2' ? 'Jaktim 2' : 'Jaktim 1'); }
+const AI_SUGGEST_CGL = [
+  'Rangkum kehadiran CG-ku bulan ini',
+  'Siapa yang perlu aku follow-up minggu ini?',
+  'Siapa yang siap lanjut ke milestone berikutnya?',
+  'Ide sharing & game untuk CG minggu ini',
+  'Bantu susun jadwal pelayanan bulan depan yang adil',
+  'Tuliskan pesan WA untuk anak yang lama tidak datang'
+];
+function aiIsCGL() { return _AI.mode === 'cgl'; }
+function aiSuggestList() { return aiIsCGL() ? AI_SUGGEST_CGL : AI_SUGGEST; }
+function aiScopeLabel() { if (aiIsCGL()) return CUR_CG || 'CG'; return coachRole === 'tl' ? 'semua region' : (coachReg === 'jaktim2' ? 'Jaktim 2' : 'Jaktim 1'); }
 
 // Label tanggal ibadah ("3 Jan" / "24 Okt 26") → 'YYYY-MM-DD'
 function aiLabelISO(label) {
@@ -4818,15 +4846,18 @@ async function aiRefreshData(force) {
 async function aiFetchFresh() {
   const from = new Date(); from.setMonth(from.getMonth() - 4);
   const fromISO = from.toISOString().slice(0, 10);
-  const [attData, datesRes, evRes, pel, devRes, visRes] = await Promise.all([
-    fetchAllAttendance(),
-    supa.from('dates').select('id,label,region,sort_order,month_code').order('sort_order'),
+  // CGL: absensi & tanggal sudah ada di dashboard CG (ATTENDANCE/DATES, realtime) → tidak perlu ambil semua
+  const cgl = aiIsCGL(), cg = CUR_CG;
+  const [attData, datesRes, evRes, pel, devRes, visRes, noteRes] = await Promise.all([
+    cgl ? null : fetchAllAttendance(),
+    cgl ? null : supa.from('dates').select('id,label,region,sort_order,month_code').order('sort_order'),
     supa.from('cg_events').select('cg,region,is_shared,name,date_start,date_end,cat'),
-    aiFetchAll(() => supa.from('cg_pelayanan').select('cg,region,week_date,role_name,member_name').gte('week_date', fromISO).order('week_date').order('cg').order('role_name')),
-    supa.from('cg_dev_plans').select('cg,region,member_name,current_status,target_status,deadline'),
-    supa.from('cg_vision').select('cg,region,visi,misi')
+    aiFetchAll(() => { const q = supa.from('cg_pelayanan').select('cg,region,week_date,role_name,member_name').gte('week_date', fromISO); return (cgl ? q.eq('cg', cg) : q).order('week_date').order('cg').order('role_name'); }),
+    cgl ? supa.from('cg_dev_plans').select('cg,region,member_name,current_status,target_status,deadline').eq('cg', cg) : supa.from('cg_dev_plans').select('cg,region,member_name,current_status,target_status,deadline'),
+    supa.from('cg_vision').select('cg,region,visi,misi'),
+    cgl ? supa.from('member_notes').select('member_id,cgl_note').in('member_id', (MEMBERS || []).map(m => m.id)) : supa.from('member_notes').select('member_id,cgl_note')
   ]);
-  if (!datesRes.error && datesRes.data) ALL_DATES = datesRes.data;
+  if (datesRes && !datesRes.error && datesRes.data) ALL_DATES = datesRes.data;
   if (attData && attData.length) {
     ALL_ATTENDANCE = {};
     attData.forEach(a => { ALL_ATTENDANCE[a.member_id + '_' + a.date_id] = a.status; });
@@ -4835,7 +4866,9 @@ async function aiFetchFresh() {
     events: evRes.error ? [] : (evRes.data || []),
     pelayanan: pel || [],
     rencana: devRes.error ? [] : (devRes.data || []),
-    visi: visRes.error ? [] : (visRes.data || [])
+    visi: visRes.error ? [] : (visRes.data || []),
+    notes: visRes.error ? '' : (((visRes.data || []).find(v => v.cg === AI_NOTES_CG) || {}).visi || ''),
+    cglNotes: (noteRes && !noteRes.error && noteRes.data) ? noteRes.data : []
   };
 }
 
@@ -4847,13 +4880,14 @@ function aiNextMilestones(m) {
 }
 
 // Hitung semua angka untuk sekumpulan CG (AI kurang andal menghitung sendiri dari string)
-function aiData(cgs, extra, scopeRegion) {
+function aiData(cgs, extra, scopeRegion, src) {
   extra = extra || {};
+  src = src || { members: ALL_MEMBERS, dates: ALL_DATES, att: ALL_ATTENDANCE, info: ALL_CG_INFO };
   const todayISO = new Date().toISOString().slice(0, 10);
-  const mems = ALL_MEMBERS.filter(m => cgs.includes(m.cg));
+  const mems = src.members.filter(m => cgs.includes(m.cg));
   const regs = [...new Set(mems.map(m => m.region).filter(Boolean))].sort();
   const datesBy = {};
-  regs.forEach(r => { datesBy[r] = ALL_DATES.filter(d => d.region === r).slice().sort((x, y) => (x.sort_order || 0) - (y.sort_order || 0)); });
+  regs.forEach(r => { datesBy[r] = src.dates.filter(d => d.region === r).slice().sort((x, y) => (x.sort_order || 0) - (y.sort_order || 0)); });
   const pctOf = o => o.t ? Math.round(o.h / o.t * 100) : null;
   const pel = (extra.pelayanan || []).filter(p => cgs.includes(p.cg) && p.role_name !== '__init__' && String(p.member_name || '').trim());
   const pelKey = (cg, n) => cg + '|' + String(n || '').trim().toLowerCase();
@@ -4863,7 +4897,7 @@ function aiData(cgs, extra, scopeRegion) {
     let h = 0, i = 0, s2 = 0, a = 0, lastH = null;
     const perBulan = {}, recent = [], recSt = [];
     const str = (datesBy[m.region] || []).map(d => {
-      const st = attShown(ALL_ATTENDANCE, m.id + '_' + d.id);
+      const st = attShown(src.att, m.id + '_' + d.id);
       const iso = aiLabelISO(d.label);
       if (st === 'H') h++; else if (st === 'I') i++; else if (st === 'S') s2++; else if (st === 'A') a++;
       if (st) {
@@ -4879,13 +4913,13 @@ function aiData(cgs, extra, scopeRegion) {
     return { nama: m.nama, cg: m.cg, region: aiRegLbl(m.region), status: roleLabel(m.status), absensi: str, hadir: h, izin: i, sakit: s2, alpa: a, persen_hadir: rec ? Math.round(h / rec * 100) : null, persen_hadir_per_bulan: pb, tiga_ibadah_terakhir: recent.slice(-3), terakhir_hadir: lastH, alpa_beruntun: (() => { let n = 0; for (let k = recSt.length - 1; k >= 0 && recSt[k] === 'A'; k--) n++; return n; })(), milestone_selesai: MS_FIELDS.map((f, k) => m[f] ? AI_MSL[k] : null).filter(Boolean), milestone_berikutnya: aiNextMilestones(m), jumlah_pelayanan_4_bulan: pelCount[pelKey(m.cg, m.nama)] || 0 };
   });
   const cg = cgs.map(c => {
-    const info = ALL_CG_INFO.find(x => x.cg === c) || {};
+    const info = src.info.find(x => x.cg === c) || {};
     const list = anggota.filter(x => x.cg === c);
     let h = 0, t = 0; list.forEach(x => { h += x.hadir; t += x.hadir + x.izin + x.sakit + x.alpa; });
     const mm = mems.find(m => m.cg === c);
     const pb = {};
     mems.filter(m => m.cg === c).forEach(m => (datesBy[m.region] || []).forEach(d => {
-      const st = attShown(ALL_ATTENDANCE, m.id + '_' + d.id); if (!st) return;
+      const st = attShown(src.att, m.id + '_' + d.id); if (!st) return;
       const k = aiLabelISO(d.label).slice(0, 7); (pb[k] = pb[k] || { h: 0, t: 0 }).t++; if (st === 'H') pb[k].h++;
     }));
     const pbPct = {}; Object.keys(pb).sort().forEach(k => { pbPct[k] = pctOf(pb[k]); });
@@ -4904,7 +4938,62 @@ function aiData(cgs, extra, scopeRegion) {
 
 const AI_KET = 'String "absensi" tiap anggota sejajar dengan tanggal_ibadah region-nya. H=Hadir I=Izin S=Sakit A=Alpa -=kosong/belum bergabung/mendatang. Angka persen_hadir, persen_hadir_per_bulan (kunci YYYY-MM), tiga_ibadah_terakhir, terakhir_hadir, alpa_beruntun (jumlah Alpa berturut-turut terakhir; Izin & Sakit dilewati karena berhalangan dengan kabar), milestone_berikutnya, jumlah_pelayanan_4_bulan SUDAH dihitung — pakai angka itu.';
 
+// Pilihan AI (disimpan di HP ini): auto = Claude lalu Gemini cadangan, claude / gemini = hanya itu
+const AI_PROV_KEY = 'aog_ai_provider';
+function aiGetProv() { try { const v = localStorage.getItem(AI_PROV_KEY); return v === 'claude' || v === 'gemini' ? v : 'auto'; } catch(e) { return 'auto'; } }
+function aiSetProv(v) {
+  try { localStorage.setItem(AI_PROV_KEY, v); } catch(e) {}
+  toast(v === 'gemini' ? 'AI: Gemini — data pribadi anak tidak dikirim' : v === 'claude' ? 'AI: Claude saja' : 'AI: Auto (Claude, cadangan Gemini)');
+}
+function aiProvSelectHTML() {
+  const v = aiGetProv();
+  return '<label class="sr" for="aiProv">Pilih AI</label><select id="aiProv" class="ai-prov" onchange="aiSetProv(this.value)" title="Pilih AI yang menjawab">' +
+    [['auto', 'Auto'], ['claude', 'Claude'], ['gemini', 'Gemini']].map(o => '<option value="' + o[0] + '"' + (o[0] === v ? ' selected' : '') + '>' + o[1] + '</option>').join('') + '</select>';
+}
+function aiModelName(m) { m = String(m || ''); return /claude/i.test(m) ? 'Claude' : /gemini/i.test(m) ? 'Gemini' : ''; }
+
+// Data pribadi anak untuk AI — server HANYA meneruskannya ke Claude (tidak ke Gemini cadangan)
+function buildAIPrivate(extra) {
+  const mems = aiIsCGL() ? (MEMBERS || []) : ALL_MEMBERS.filter(m => getCGsForRegion(coachRole === 'tl' ? 'all' : coachReg).includes(m.cg));
+  const notes = {};
+  ((extra && extra.cglNotes) || []).forEach(n => { if (n && n.cgl_note) notes[n.member_id] = String(n.cgl_note).slice(0, 600); });
+  return JSON.stringify(mems.map(m => {
+    const bd = parseLahir(m.lahir);
+    return {
+      nama: m.nama, cg: m.cg,
+      no_hp: String(m.wa || '').trim() || null,
+      tanggal_lahir: bd ? bd.year + '-' + String(bd.month).padStart(2, '0') + '-' + String(bd.day).padStart(2, '0') : (String(m.lahir || '').trim() || null),
+      sekolah: String(m.sekolah || '').trim() || null,
+      kelas: String(m.kelas || '').trim() || null,
+      kelurahan: titleCaseWilayah(m.kelurahan || '') || null,
+      kecamatan: titleCaseWilayah(m.kecamatan || '') || null,
+      catatan_cgl: notes[m.id] || null
+    };
+  }));
+}
+
+// Dashboard CG: hanya anak-anak CG ini (pakai data yang sudah termuat & realtime di dashboard CGL)
+function buildCGLAIContext(extra) {
+  const src = {
+    members: (MEMBERS || []).map(m => m.region ? m : Object.assign({}, m, { region: CUR_REGION })),
+    dates: DATES || [], att: ATTENDANCE || {},
+    info: [Object.assign({ cg: CUR_CG }, CUR_CG_INFO || {})]
+  };
+  const d = aiData([CUR_CG], extra, CUR_REGION, src);
+  return JSON.stringify({
+    hari_ini: d.todayISO,
+    bulan_ini: d.todayISO.slice(0, 7),
+    cakupan: 'CG ' + CUR_CG + ' (dashboard CG Leader — hanya data CG ini)',
+    keterangan_absensi: AI_KET,
+    regions: d.regs.map(r => ({ region: aiRegLbl(r), tanggal_ibadah: d.datesBy[r].map(x => aiLabelISO(x.label)) })),
+    cg: d.cg, anggota: d.anggota,
+    pelayanan_4_bulan: d.pelayanan,
+    rencana_pengembangan: d.rencana,
+    events_mendatang: d.events
+  });
+}
 function buildAIContext(extra) {
+  if (aiIsCGL()) return buildCGLAIContext(extra);
   const region = coachRole === 'tl' ? 'all' : coachReg;
   const d = aiData(getCGsForRegion(region), extra, region);
   return JSON.stringify({
@@ -5262,7 +5351,7 @@ async function abRead() {
     'Jawab HANYA JSON valid: {"hasil":[{"id":123,"nama_di_foto":"...","status":"H","yakin":true}],"tidak_cocok":["..."],"catatan":"maks 1 kalimat, mis. bagian foto yang tidak terbaca"}';
   try {
     const r = await fetch('/api/ai', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ pin: aiGetPin(), question: q, context: ctx, history: [], json: true, image: { mimeType: _AB.img.mimeType, data: _AB.img.data } }) });
+      body: JSON.stringify({ pin: aiGetPin(), question: q, context: ctx, history: [], json: true, provider: aiGetProv(), image: { mimeType: _AB.img.mimeType, data: _AB.img.data } }) });
     let data = {};
     try { data = await r.json(); } catch(e) {}
     if (!r.ok) throw new Error(r.status === 401 ? 'AI memakai kode akses — masukkan dulu di tab Tanya AI.' : (data.error || ('HTTP ' + r.status)));
@@ -5370,6 +5459,46 @@ function driftFollowUp(id) {
   setTimeout(() => { const b = document.getElementById('aiMemOut_' + id); if (b) b.scrollIntoView({ block: 'center', behavior: 'smooth' }); }, 150);
 }
 
+// ═══════════════════════════════════════════════════════════
+// "TRAINING" AI — Pengetahuan tambahan dari Coach/TL (cg_vision cg='__AI_NOTES__', region='all')
+// Dikirim ke server tiap bertanya → masuk system prompt (selalu diikuti AI Coach/TL/CGL)
+// ═══════════════════════════════════════════════════════════
+const AI_NOTES_CG = '__AI_NOTES__';
+const AI_NOTES_PH = 'Contoh:\n- Ibadah AOG Teens Jaktim tiap Sabtu jam ... di ...\n- Anak yang 2x alpa: CGL wajib telepon / kunjungi, bukan cuma chat\n- Target 2026: tiap CG punya minimal 2 anak lulus CGT 1\n- Pesan WA pakai bahasa santai, sapa "kak" untuk CGL';
+async function openAINotes() {
+  const ta = document.getElementById('aiNotesText');
+  if (!ta) return;
+  ta.value = ''; ta.disabled = true; ta.placeholder = 'Memuat…'; aiNotesCount();
+  openModal('aiNotesModal');
+  const { data, error } = await supa.from('cg_vision').select('visi').eq('cg', AI_NOTES_CG).eq('region', 'all').maybeSingle();
+  if (error) {
+    // Jangan biarkan mengedit dari kotak kosong → bisa menimpa catatan yang ada
+    toast('❌ Gagal memuat Pengetahuan AI — cek koneksi'); console.error('[openAINotes]', error);
+    closeModal('aiNotesModal'); return;
+  }
+  ta.disabled = false; ta.placeholder = AI_NOTES_PH;
+  ta.value = (data && data.visi) || ''; ta.dataset.orig = ta.value;
+  aiNotesCount(); ta.focus();
+}
+function aiNotesCount() {
+  const ta = document.getElementById('aiNotesText'), c = document.getElementById('aiNotesCount');
+  if (ta && c) c.textContent = ta.value.length.toLocaleString('id-ID') + ' / 20.000 karakter';
+}
+async function saveAINotes() {
+  const ta = document.getElementById('aiNotesText'), btn = document.getElementById('aiNotesSave');
+  if (!ta || ta.disabled || (btn && btn.disabled)) return;
+  const v = ta.value.trim();
+  if (v === String(ta.dataset.orig || '').trim()) { closeModal('aiNotesModal'); return; }
+  btn.disabled = true;
+  const { error } = await supa.from('cg_vision').upsert({ cg: AI_NOTES_CG, region: 'all', visi: v, updated_at: new Date().toISOString() }, { onConflict: 'cg,region' });
+  btn.disabled = false;
+  if (error) { toast('❌ Gagal simpan: ' + String(error.message || 'cek koneksi').slice(0, 80)); console.error('[saveAINotes]', error); return; }
+  ta.dataset.orig = v;
+  _AI_CACHE.t = 0;
+  closeModal('aiNotesModal');
+  toast('✓ Pengetahuan AI disimpan — langsung dipakai di pertanyaan berikutnya');
+}
+
 // Markdown ringan → HTML aman (teks di-escape dulu)
 function aiFormat(text) {
   // Blok grafik diproses dulu (JSON mentah), sisanya markdown biasa
@@ -5418,15 +5547,27 @@ function aiFormatText(text) {
   return html;
 }
 
-function renderCoachAI() {
-  const el = document.getElementById('tab-c-ai');
+function renderCoachAI() { aiMountChat('coach'); }
+function renderCGLAI() { aiMountChat('cgl'); }
+function aiMountChat(mode) {
+  const el = document.getElementById(mode === 'cgl' ? 'tab-ai' : 'tab-c-ai');
   if (!el) return;
+  // Hanya 1 layar chat di halaman (id elemen dipakai bersama) → kosongkan yang lain
+  const other = document.getElementById(mode === 'cgl' ? 'tab-c-ai' : 'tab-ai');
+  if (other && other.querySelector('#aiMsgs')) {
+    other.innerHTML = '<div class="loading-msg">Memuat...</div>';
+    if (mode === 'cgl') COACH_TAB_RENDERED['c-ai'] = false; else TAB_RENDERED['ai'] = false;
+  }
+  _AI.mode = mode;
+  if (_AI.scope !== aiScopeKey()) { _AI.scope = aiScopeKey(); _AI.msgs = []; _AI.img = null; _AI_CACHE = { t: 0, data: null, p: null }; }
+  const cgl = mode === 'cgl';
   el.innerHTML =
     '<section class="ai-wrap">' +
       '<div class="ai-chat card">' +
         '<div class="ai-top"><span class="ai-badge" aria-hidden="true">' + icon('spark', 22) + '</span>' +
           '<div class="grow"><b>Asisten data AOG Teens</b><small id="aiMeta"></small></div>' +
-          '<button type="button" class="btn sm ghost" onclick="openAbsenFoto()" title="Isi absensi dari foto daftar hadir" aria-label="Absen dari foto">' + icon('image', 16) + '<span class="ai-hide-sm">Absen dari foto</span></button>' +
+          aiProvSelectHTML() +
+          (cgl ? '' : '<button type="button" class="btn sm ghost" onclick="openAINotes()" title="Pengetahuan tambahan yang selalu diikuti AI" aria-label="Pengetahuan AI">' + icon('book', 16) + '<span class="ai-hide-sm">Pengetahuan AI</span></button>') +
           '<button type="button" class="btn sm ghost" onclick="aiReset()" title="Mulai percakapan baru">' + icon('refresh', 16) + '<span class="ai-hide-sm">Percakapan baru</span></button></div>' +
         '<div class="ai-msgs" id="aiMsgs" aria-live="polite"></div>' +
         '<div class="ai-attach" id="aiAttach" hidden></div>' +
@@ -5438,7 +5579,7 @@ function renderCoachAI() {
           (aiMicSupported() ? '<button type="button" class="ai-mic" id="aiMic" onclick="aiMic()" aria-label="Tanya pakai suara" title="Tanya pakai suara">' + icon('mic', 20) + '</button>' : '') +
           '<button type="submit" class="ai-send" id="aiSend" aria-label="Kirim pertanyaan">' + icon('right', 20) + '</button>' +
         '</form>' +
-        '<div class="ai-note">Dikirim ke AI setiap bertanya: nama, CG, status, riwayat absensi, milestone, pelayanan, rencana pengembangan, visi/misi & event terbaru. <b>Tidak</b> dikirim: no HP, alamat, tanggal lahir, sekolah, catatan. Foto yang kamu kirim juga dibaca AI. Riwayat chat tersimpan di HP ini.</div>' +
+        '<div class="ai-note">Dikirim ke AI setiap bertanya: ' + (cgl ? 'data anak-anak ' + esc(CUR_CG || '') + ' saja (nama, status, riwayat absensi, milestone, pelayanan, rencana), visi/misi & event' : 'nama, CG, status, riwayat absensi, milestone, pelayanan, rencana pengembangan, visi/misi & event terbaru') + '. Data pribadi (no HP, alamat, tanggal lahir, sekolah, catatan CGL) hanya dikirim ke Claude — tidak ke Gemini. Foto yang kamu kirim juga dibaca AI. Riwayat chat tersimpan di HP ini.</div>' +
       '</div>' +
     '</section>';
   if (!_AI.msgs.length) aiLoadChat();
@@ -5459,17 +5600,17 @@ function aiRender() {
     return;
   }
   if (!_AI.msgs.length && !_AI.busy) {
-    const who = coachRole === 'tl' ? 'Team Leader' : 'Coach';
+    const who = aiIsCGL() ? 'CG Leader' : (coachRole === 'tl' ? 'Team Leader' : 'Coach');
     box.innerHTML = '<div class="ai-welcome"><span class="ai-badge big" aria-hidden="true">' + icon('spark', 26) + '</span>' +
       '<h3>Halo, ' + who + '!</h3><p>Tanya apa saja tentang data ' + esc(aiScopeLabel()) + ' — absensi dari dulu sampai hari ini, tren, milestone, event, sampai draft pesan WA.</p>' +
-      '<div class="ai-sugg">' + AI_SUGGEST.map((q, i) => '<button type="button" onclick="aiAsk(AI_SUGGEST[' + i + '])">' + esc(q) + '</button>').join('') + '</div></div>';
+      '<div class="ai-sugg">' + aiSuggestList().map((q, i) => '<button type="button" onclick="aiAsk(aiSuggestList()[' + i + '])">' + esc(q) + '</button>').join('') + '</div></div>';
     return;
   }
   box.innerHTML = _AI.msgs.map((m, i) => {
     if (m.role === 'user') return '<div class="ai-m user"><div class="ai-b">' + (m.img && /^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(m.img) ? '<img class="ai-thumb" src="' + m.img + '" alt="Foto">' : (m.foto ? '<span class="ai-foto">' + icon('image', 13) + 'foto</span>' : '')) + esc(m.text).replace(/\n/g, '<br>') + '</div></div>';
     if (m.live) return '<div class="ai-m bot live"><span class="ai-av" aria-hidden="true">' + icon('spark', 16) + '</span><div class="grow" style="min-width:0"><div class="ai-b">' + aiLiveHTML(m.text) + '</div></div></div>';
     return '<div class="ai-m bot' + (m.err ? ' err' : '') + '"><span class="ai-av" aria-hidden="true">' + icon('spark', 16) + '</span><div class="grow" style="min-width:0"><div class="ai-b">' + aiFormat(m.text) + '</div>' +
-      (m.err ? '' : '<div class="ai-acts"><button type="button" onclick="aiCopy(' + i + ')">' + icon('copy', 13) + 'Salin</button><button type="button" onclick="aiWA(' + i + ')">' + icon('wa', 13) + 'Kirim WA</button></div>') + '</div></div>';
+      (m.err ? '' : '<div class="ai-acts"><button type="button" onclick="aiCopy(' + i + ')">' + icon('copy', 13) + 'Salin</button><button type="button" onclick="aiWA(' + i + ')">' + icon('wa', 13) + 'Kirim WA</button>' + (aiModelName(m.model) ? '<span class="ai-by">dijawab ' + aiModelName(m.model) + '</span>' : '') + '</div>') + '</div></div>';
   }).join('') + (_AI.busy && !(_AI.msgs.length && _AI.msgs[_AI.msgs.length - 1].live) ? '<div class="ai-m bot"><span class="ai-av" aria-hidden="true">' + icon('spark', 16) + '</span><div class="ai-b"><span class="ai-dots" aria-label="AI sedang menjawab"><span></span><span></span><span></span></span></div></div>' : '');
   box.scrollTop = box.scrollHeight;
 }
@@ -5486,7 +5627,7 @@ function aiReset() { if (_AI.busy) return; _AI.msgs = []; aiSaveChat(); aiRender
 
 // Riwayat chat disimpan di HP ini, terpisah per cakupan (Coach Jaktim 1 / Jaktim 2 / TL)
 const AI_CHAT_KEY = 'aog_ai_chat_v1';
-function aiScopeKey() { return coachRole === 'tl' ? 'tl' : 'coach:' + coachReg; }
+function aiScopeKey() { if (aiIsCGL()) return 'cgl:' + (CUR_CG || ''); return coachRole === 'tl' ? 'tl' : 'coach:' + coachReg; }
 function aiSaveChat() {
   try {
     const all = JSON.parse(localStorage.getItem(AI_CHAT_KEY) || '{}') || {};
@@ -5538,7 +5679,7 @@ async function aiSummarizeMember(id) {
   try {
     const extra = await aiRefreshData();
     const context = buildMemberContext(m, extra);
-    const r = await fetch('/api/ai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ pin: aiGetPin(), question: q, context, history: [] }) });
+    const r = await fetch('/api/ai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ pin: aiGetPin(), question: q, context, history: [], notes: extra.notes || '', provider: aiGetProv() }) });
     let data = {};
     try { data = await r.json(); } catch(e) {}
     if (!r.ok) throw new Error(r.status === 401 ? 'AI memakai kode akses — masukkan dulu di tab Tanya AI.' : (data.error || ('HTTP ' + r.status)));
@@ -5576,7 +5717,11 @@ function aiMemSendWA(id) {
   window.open((waLinkOf(m.wa) || 'https://wa.me/') + '?text=' + encodeURIComponent(t), '_blank', 'noopener');
 }
 // Ganti Coach/TL atau region → sapaan & cakupan data AI ikut berubah; percakapan lama direset supaya tidak tercampur
-function aiScopeChanged() { if (!_AI.busy) aiLoadChat(); aiRender(); }
+function aiScopeChanged() {
+  if (aiIsCGL()) return; // layar chat sedang dipakai dashboard CG
+  if (!_AI.busy) { _AI.scope = aiScopeKey(); aiLoadChat(); }
+  aiRender();
+}
 function aiGrow(t) { t.style.height = 'auto'; t.style.height = Math.min(t.scrollHeight, 160) + 'px'; }
 function aiKey(e) { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); aiAsk(); } }
 function aiPlain(t) { return String(t || '').replace(/```chart[\s\S]*?```/gi, '').replace(/\*\*(.+?)\*\*/g, '$1').replace(/^#{1,4}\s+/gm, '').replace(/^[ \t]*>[ \t]?/gm, '').replace(/\n{3,}/g, '\n\n').trim(); }
@@ -5629,6 +5774,7 @@ async function aiReadStream(r) {
     }
   } catch(e) { console.error('[aiReadStream]', e); err = err || 'Koneksi terputus — coba tanya lagi.'; }
   delete msg.live;
+  if (fin && fin.model) msg.model = fin.model;
   if (!fin && !err) err = 'Jawaban terputus — coba tanya lagi.';
   if (fin && fin.finish === 'MAX_TOKENS') msg.text += '\n\n*(Jawaban terpotong — ketik "lanjutkan" untuk meneruskan.)*';
   if (err) { if (msg.text.trim()) msg.text += '\n\n*(' + err + ')*'; else { msg.text = err; msg.err = true; } }
@@ -5650,7 +5796,7 @@ async function aiAsk(qOverride) {
   try {
     const extra = await aiRefreshData();
     const context = buildAIContext(extra);
-    const r = await fetch('/api/ai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.assign({ pin, question: q, context, history, stream: true }, img ? { image: { mimeType: img.mimeType, data: img.data } } : {})) });
+    const r = await fetch('/api/ai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.assign({ pin, question: q, context, history, stream: true, notes: extra.notes || '', provider: aiGetProv() }, aiGetProv() === 'gemini' ? {} : { private: buildAIPrivate(extra) }, img ? { image: { mimeType: img.mimeType, data: img.data } } : {})) });
     // Server mengalirkan jawaban (NDJSON) → tampil sambil diketik. Error / server lama → JSON biasa.
     const streaming = r.ok && /ndjson/i.test(r.headers.get('content-type') || '') && r.body && r.body.getReader;
     let data = {};
@@ -5659,7 +5805,7 @@ async function aiAsk(qOverride) {
     if (streaming) {}
     else if (r.status === 401) { aiSetPin(''); _AI.needPin = true; _AI.msgs.push({ role: 'model', text: 'AI ini memakai kode akses. Masukkan kode yang benar ya.', err: true }); }
     else if (!r.ok) _AI.msgs.push({ role: 'model', text: data.error || ('AI belum bisa dipakai (HTTP ' + r.status + ').'), err: true });
-    else _AI.msgs.push({ role: 'model', text: (data.text || '(jawaban kosong)') + (data.finish === 'MAX_TOKENS' ? '\n\n*(Jawaban terpotong — ketik "lanjutkan" untuk meneruskan.)*' : '') });
+    else _AI.msgs.push({ role: 'model', model: data.model || '', text: (data.text || '(jawaban kosong)') + (data.finish === 'MAX_TOKENS' ? '\n\n*(Jawaban terpotong — ketik "lanjutkan" untuk meneruskan.)*' : '') });
   } catch(e) {
     console.error('[aiAsk]', e);
     _AI.msgs.push({ role: 'model', text: 'Tidak bisa terhubung ke AI — cek koneksi lalu coba lagi.', err: true });

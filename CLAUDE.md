@@ -1,6 +1,6 @@
 # AOG Teens Jaktim — CG Dashboard (Absensi + Management)
 
-**Current version:** v46 · **Last updated:** 27 Oktober 2026
+**Current version:** v47 · **Last updated:** 27 Oktober 2026
 
 ## Project Overview
 Single-file web app untuk tracking attendance, pelayanan, milestone, events, visi, dan distribusi wilayah CG untuk AOG Teens Jakarta Timur. Dipakai oleh ~54 member, 9 CG Leaders, 2 Coach, dan 1 Team Leader secara bersamaan saat ibadah hari Minggu.
@@ -278,8 +278,8 @@ Edit index.html locally (+ file lain kalau perlu)
 ```
 
 **Version bump pattern setiap push code:**
-1. `index.html` — cari `App version">v46` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
-2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v46'` → naikkan sama
+1. `index.html` — cari `App version">v47` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
+2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v47'` → naikkan sama
 
 ---
 
@@ -394,6 +394,7 @@ Edit index.html locally (+ file lain kalau perlu)
 | v29 | **Distribusi Wilayah** — filter kecamatan + kelurahan di Coach/TL Overview |
 | v30 | Wilayah filter hardening (escape + reset state + count consistency) |
 | v31 | **27 bug fixes** — attendance stats inflate, data corruption (sekolah/kelas split), XSS (PDF export), error handling (21 Supabase ops), TEEN 25 color map, reconnect race guard, undo sync, milestone prereq, visi TOCTOU fix |
+| v47 | **Tanya AI untuk CGL** (tab `ai` di dashboard CG, `renderCGLAI` → `aiMountChat('cgl')`; konteks `buildCGLAIContext` dari `MEMBERS/DATES/ATTENDANCE` — hanya CG itu; layar chat 1 di DOM, `_AI.mode/_AI.scope`). **Pengetahuan AI ("training")**: Coach/TL isi teks di modal `aiNotesModal` → `cg_vision` `cg='__AI_NOTES__'`, `region='all'` (maks 20.000 karakter) → dikirim sebagai `notes` → masuk system prompt. **Data pribadi anak** (no HP, tgl lahir, sekolah, kelas, kelurahan/kecamatan, catatan CGL) dikirim sebagai `private` → server HANYA meneruskan ke Claude, tidak ke Gemini (keputusan Nick 27 Okt 2026). **Pilihan AI** Auto/Claude/Gemini (`localStorage aog_ai_provider`, body `provider`), label "dijawab Claude/Gemini". Tombol Absen dari foto dihapus dari tab Tanya AI (tetap di tab Absensi) |
 | v46 | **Tanya AI mengalir (streaming)**: `aiAsk` kirim `stream: true` → server balas NDJSON (`{"t"}`… `{"done"}` / `{"error"}`) dari Claude SSE atau Gemini `streamGenerateContent?alt=sse`; fallback ke Gemini hanya kalau Claude gagal **sebelum** ada teks. Client `aiReadStream`/`aiPaintLive` (timer 60 ms, bukan rAF), grafik ditahan sampai blok ```chart lengkap. Absen dari foto & ringkasan anak tetap non-stream. Fix: kutipan `>` dirender sebagai kotak (`.ai-quote`) |
 | v45+ | `api/ai.js`: **Claude Sonnet 5.5 utama, Gemini cadangan otomatis** (aktif setelah `ANTHROPIC_API_KEY` diisi di Vercel; tanpa key tetap Gemini). Diagnosa `{"action":"models"}` menampilkan `claude.aktif` |
 | v45 | "Perlu perhatian" & AI: **hanya Alpa yang dihitung** (aturan Nick: Sakit = Izin = berhalangan dengan kabar, dilewati). Kriteria: 3x berturut Alpa (I/S dilewati, tidak memutus), atau % Hadir dari H+A turun ≥40 poin dari ≥60%. Field konteks AI jadi `alpa_beruntun` |

@@ -7,7 +7,7 @@
 // Kalau Google menolak model dan menyarankan model lain ("use models/xxx"), otomatis dicoba ulang sekali.
 
 const SYSTEM_PROMPT = [
-  'Kamu adalah asisten data untuk Coach dan Team Leader AOG Teens (pelayanan remaja gereja, Jakarta Timur). Kamu juga paham cara memakai web dashboard ini (lihat PANDUAN APLIKASI di bawah).',
+  'Kamu adalah asisten data untuk Coach, Team Leader, dan CG Leader (CGL) AOG Teens (pelayanan remaja gereja, Jakarta Timur). Field "cakupan" di data menunjukkan siapa penggunanya; CGL hanya menerima data CG-nya sendiri. Kamu juga paham cara memakai web dashboard ini (lihat PANDUAN APLIKASI di bawah).',
   'Kamu menerima DATA JSON terbaru dari dashboard: tanggal ibadah per region, info CG (termasuk visi/misi & persen per bulan), anggota (status, string absensi, angka kehadiran, milestone selesai & berikutnya, jumlah pelayanan 4 bulan), jadwal pelayanan 4 bulan terakhir (petugas bisa lebih dari 1, dipisah koma), rencana pengembangan, dan event. Untuk ringkasan 1 anak, datanya ada di anak_ini, cg_anak, teman_satu_cg, pelayanan_anak, rencana_anak.',
   'Aturan:',
   '- Jawab dalam bahasa Indonesia yang santai, ringkas, dan jelas. Pakai bullet / angka kalau membantu. Boleh pakai **tebal** untuk poin penting.',
@@ -33,10 +33,10 @@ const SYSTEM_PROMPT = [
 const APP_GUIDE = [
   'PANDUAN APLIKASI (dashboard absensi AOG Teens Jaktim). Kalau ditanya cara memakai web, jawab langkah demi langkah sesuai panduan ini. Kalau fiturnya tidak ada di panduan, bilang belum ada (jangan mengarang menu/tombol).',
   '- Alamat: CGL buka dashboard CG-nya (mis. /teen-01) atau dari halaman awal pilih JAKTIM 1/2 → pilih CG Leader → Masuk Dashboard. Coach buka /coach, Team Leader buka /tl. Tidak ada login, jadi link jangan dibagikan ke publik.',
-  '- Dashboard CGL punya tab: Absensi, Detail CG, Visi CG, Pelayanan, Milestone, Events. Dashboard Coach/TL punya tab: Overview, Absensi, Milestone, Visi, Events, Tanya AI. Coach memilih region Jaktim 1/2 di header; TL melihat semua region. Ada tombol geser Coach/TL.',
+  '- Dashboard CGL punya tab: Absensi, Detail CG, Visi CG, Pelayanan, Milestone, Events, Tanya AI (AI khusus data CG itu). Dashboard Coach/TL punya tab: Overview, Absensi, Milestone, Visi, Events, Tanya AI. Coach memilih region Jaktim 1/2 di header; TL melihat semua region. Ada tombol geser Coach/TL.',
   '- Isi absensi: ketuk kotak di tabel berulang kali: kosong → H (hadir) → I (izin) → S (sakit) → A (alpa) → kosong. Tersimpan otomatis; ada tombol Undo beberapa detik. Coach/TL juga bisa ubah langsung di tab Absensi Coach. Di HP ada filter bulan dengan tombol panah.',
   '- Sinyal jelek: absensi tetap tersimpan di HP (kotak bertanda tertunda, indikator "N tertunda") dan terkirim otomatis saat online. Jangan hapus data browser sebelum terkirim.',
-  '- Absen dari foto (Coach/TL): tab Absensi Coach atau tab Tanya AI → tombol "Absen dari foto" → pilih CG + tanggal ibadah → foto daftar hadir → "Baca dengan AI" → cek & koreksi H/I/S/A per anak → "Simpan". Tidak ada yang tersimpan sebelum Simpan. Tombol "Sisanya → Alpa" untuk anak yang tidak ada di foto.',
+  '- Absen dari foto (Coach/TL): tab Absensi Coach → tombol "Absen dari foto" → pilih CG + tanggal ibadah → foto daftar hadir → "Baca dengan AI" → cek & koreksi H/I/S/A per anak → "Simpan". Tidak ada yang tersimpan sebelum Simpan. Tombol "Sisanya → Alpa" untuk anak yang tidak ada di foto.',
   '- Tanggal ibadah bulan baru: Coach/TL tab Absensi → tombol "Generate Sabtu [Bulan Tahun]" (menambah semua hari Sabtu bulan berikutnya, aman dari duplikat).',
   '- Pengingat CGL: Coach tab Absensi → bagian "CGL belum input absensi" → "Ingatkan" per CG atau "Ingatkan semua" (notifikasi ke HP CGL yang sudah mengaktifkan notifikasi).',
   '- Tambah anak baru: dashboard CG → tab Detail CG → "Tambah member".',
@@ -49,7 +49,7 @@ const APP_GUIDE = [
   '- Events: tombol tambah event; Coach/TL bisa pilih cakupan Global / Region / per-CG. Ada hitung mundur, filter kategori, salin teks, broadcast WA, edit, hapus. Event yang sudah lewat 7 hari dihapus otomatis (kecuali event bersama).',
   '- Export: Absensi CSV/PDF (tab Absensi), Detail CSV/PDF (tab Detail CG atau Overview Coach), Wilayah CSV (Overview → Distribusi Wilayah).',
   '- Overview Coach/TL: KPI, Visi Coach, "Perlu perhatian" (anak 3x berturut Alpa atau kehadirannya turun tajam; Izin & Sakit tidak dihitung karena berhalangan dengan kabar; tombol "Saran & WA"), kartu tiap CG (klik untuk buka dashboard CG), dan Distribusi Wilayah (filter kecamatan/kelurahan).',
-  '- Tanya AI: tanya bebas soal data; grafik/tabel bisa "Simpan gambar" (di HP langsung bagikan ke WA); tombol foto untuk mengirim gambar; tombol mikrofon untuk bertanya pakai suara; "Percakapan baru" untuk mulai ulang; riwayat chat tersimpan di HP itu. Di detail anak (Coach) ada "Ringkas anak ini + draft pesan WA".',
+  '- Tanya AI: tanya bebas soal data; grafik/tabel bisa "Simpan gambar" (di HP langsung bagikan ke WA); tombol foto untuk mengirim gambar; tombol mikrofon untuk bertanya pakai suara; "Percakapan baru" untuk mulai ulang; riwayat chat tersimpan di HP itu. Di detail anak (Coach) ada "Ringkas anak ini + draft pesan WA". Coach/TL bisa mengisi "Pengetahuan AI" (tombol di tab Tanya AI) berisi info & aturan tambahan yang selalu diikuti AI.',
   '- Notifikasi: ketuk ikon lonceng di header untuk mengaktifkan. iPhone harus "Add to Home Screen" dulu (iOS 16.4+). Web bisa dipasang seperti aplikasi lewat menu browser → Add to Home Screen / Install.',
   '- Tema tahun (tulisan THE YEAR OF ...): Coach/TL klik blok tema di sidebar untuk mengubah.',
   '- Versi: tulisan vXX di pojok; kalau muncul "Versi baru tersedia · Muat ulang", ketuk untuk memperbarui. Perubahan data muncul langsung di HP lain (indikator Live/Offline, tombol Refresh). Data juga tersalin otomatis ke Google Sheets tiap 1 menit (satu arah, dari web ke Sheets).'
@@ -134,6 +134,14 @@ module.exports = async function handler(req, res) {
   if (!question) return send(res, 400, { error: 'Pertanyaan kosong.' });
   const context = typeof body.context === 'string' ? body.context.slice(0, 400000) : JSON.stringify(body.context || {}).slice(0, 400000);
   const history = Array.isArray(body.history) ? body.history.slice(-10) : [];
+  // "Training": pengetahuan tambahan dari Coach/TL (disimpan di dashboard) → bagian dari system prompt
+  const notes = typeof body.notes === 'string' ? body.notes.trim().slice(0, 20000) : '';
+  // Data pribadi anak (no HP, alamat, tgl lahir, sekolah, catatan) → HANYA dikirim ke Claude, tidak pernah ke Gemini
+  const priv = typeof body.private === 'string' ? body.private.slice(0, 200000) : '';
+  const SYSTEM_BASE = SYSTEM_PROMPT + '\n\n' + APP_GUIDE + (notes ? '\n\nPENGETAHUAN TAMBAHAN DARI COACH/TL (selalu ikuti; kalau bertentangan dengan DATA dashboard, yang benar DATA):\n' + notes : '');
+  const SYSTEM_TEXT = SYSTEM_BASE; // Gemini: tanpa data pribadi
+  const SYSTEM_CLAUDE = priv ? SYSTEM_BASE.replace('- Jangan meminta atau menebak data pribadi (nomor HP, alamat, tanggal lahir) — data itu sengaja tidak dikirim.',
+    '- DATA PRIBADI ANAK (no_hp, tanggal_lahir, sekolah, kelas, kelurahan, kecamatan, catatan_cgl) ada di blok DATA PRIBADI. Gunakan hanya untuk pelayanan: kontak follow-up, kunjungan, ulang tahun, kelompok wilayah/sekolah. Tampilkan no HP hanya kalau diminta; jangan menebak data yang kosong.') : SYSTEM_BASE;
 
   const contents = [
     { role: 'user', parts: [{ text: 'DATA DASHBOARD TERBARU (JSON):\n' + context }] },
@@ -156,9 +164,14 @@ module.exports = async function handler(req, res) {
   contents.push({ role: 'user', parts });
   const hasImage = parts.length > 1;
   const wantJSON = body.json === true; // mis. Absen dari foto → jawaban JSON murni
+  // Pilihan pengguna: auto = Claude lalu Gemini cadangan; claude / gemini = hanya itu
+  const prov = ['claude', 'gemini'].includes(body.provider) ? body.provider : 'auto';
+  const useClaude = !!CLAUDE_KEY && prov !== 'gemini';
+  const useGemini = !!KEY && prov !== 'claude';
+  const noAI = note => send(res, 502, Object.assign({ error: prov === 'claude' ? (CLAUDE_KEY ? 'Claude sedang tidak bisa menjawab. Coba lagi, atau pilih AI "Auto".' : 'Claude belum aktif. Pilih AI "Auto" atau "Gemini".') : (prov === 'gemini' && !KEY ? 'Gemini belum aktif. Pilih AI "Auto".' : 'AI tidak bisa dihubungi. Coba lagi sebentar lagi.') }, note ? { note } : {}));
 
   const geminiBody = think => JSON.stringify({
-    systemInstruction: { parts: [{ text: SYSTEM_PROMPT + '\n\n' + APP_GUIDE }] },
+    systemInstruction: { parts: [{ text: SYSTEM_TEXT }] },
     contents,
     generationConfig: Object.assign({ temperature: 0.3, maxOutputTokens: 8192 }, think ? { thinkingConfig: { thinkingLevel: 'low' } } : {}, wantJSON ? { responseMimeType: 'application/json' } : {})
   });
@@ -187,7 +200,7 @@ module.exports = async function handler(req, res) {
       if (last && last.role === role) last.content.push(...blocks); else msgs.push({ role, content: blocks });
     };
     // Data dashboard di-cache (prompt caching) → pertanyaan lanjutan lebih murah & cepat
-    push('user', [{ type: 'text', text: 'DATA DASHBOARD TERBARU (JSON):\n' + context, cache_control: { type: 'ephemeral' } }]);
+    push('user', [{ type: 'text', text: 'DATA DASHBOARD TERBARU (JSON):\n' + context + (priv ? '\n\nDATA PRIBADI ANAK (JSON, hanya untuk pelayanan):\n' + priv : ''), cache_control: { type: 'ephemeral' } }]);
     push('assistant', [{ type: 'text', text: 'Siap, data sudah saya baca. Silakan bertanya.' }]);
     history.forEach(h => {
       const text = String((h && h.text) || '').slice(0, 4000);
@@ -203,7 +216,7 @@ module.exports = async function handler(req, res) {
       model: CLAUDE_MODEL,
       max_tokens: 12000,
       stream: !!stream,
-      system: [{ type: 'text', text: SYSTEM_PROMPT + '\n\n' + APP_GUIDE, cache_control: { type: 'ephemeral' } }],
+      system: [{ type: 'text', text: SYSTEM_CLAUDE, cache_control: { type: 'ephemeral' } }],
       messages: msgs,
       output_config
     });
@@ -307,14 +320,14 @@ module.exports = async function handler(req, res) {
       res.write(JSON.stringify(obj) + '\n');
     };
     const text = t => emit({ t });
-    if (CLAUDE_KEY) {
+    if (useClaude) {
       const c = await streamClaude(text);
       if (c.ok) { emit({ done: true, model: c.model, finish: c.finish }); return res.end(); }
       if (started) { emit({ error: 'Jawaban terputus — coba tanya lagi.' }); return res.end(); }
       note = 'Claude: ' + c.err; // belum ada teks terkirim → aman pindah ke Gemini
       console.warn('[api/ai] claude stream gagal, pakai Gemini', note);
     }
-    if (!KEY) return send(res, 502, { error: 'AI tidak bisa dihubungi. Coba lagi sebentar lagi.', note });
+    if (!useGemini) return noAI(note);
     const queue = [MODEL].concat(FALLBACK_MODELS), tried = [];
     let lastErr = 'AI tidak bisa dihubungi.';
     while (queue.length && Date.now() - t0 < 55000) {
@@ -336,14 +349,14 @@ module.exports = async function handler(req, res) {
   if (body.stream === true && !wantJSON) return streamAnswer();
 
   let claudeNote = '';
-  if (CLAUDE_KEY) {
+  if (useClaude) {
     let c = await callClaude(wantJSON);
     if (!c.text && wantJSON && c.status === 400) c = await callClaude(false); // format JSON ditolak → prompt saja
     if (c.text) return send(res, 200, { text: c.text, model: c.model, finish: c.finish });
     claudeNote = 'Claude: ' + String(c.err || '');
     console.warn('[api/ai] claude gagal, pakai Gemini', claudeNote);
   }
-  if (!KEY) return send(res, 502, { error: 'AI tidak bisa dihubungi. Coba lagi sebentar lagi.', note: claudeNote });
+  if (!useGemini) return noAI(claudeNote);
 
   // Gemini (cadangan): model utama, lalu cadangan kalau sibuk / dipensiunkan / timeout (maks ±55 dtk total sejak request masuk)
   const queue = [MODEL].concat(FALLBACK_MODELS);
