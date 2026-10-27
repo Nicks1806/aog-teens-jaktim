@@ -395,7 +395,7 @@ Edit index.html locally (+ file lain kalau perlu)
 
 Detail changelog per version ada di git log (`git log --oneline`).
 
-### Pembersihan data (27 Okt 2026, langsung di Supabase, cadangan di `C:\Penyimpanan utama\Downloadsackup_*_2026-10-27*.json`)
+### Pembersihan data (27 Okt 2026, langsung di Supabase, cadangan di `C:\Penyimpanan utama\Downloads\backup_*_2026-10-27*.json`)
 - 21 member: teks "· Kelas X" (bug input gabungan pra-v31) dihapus dari kolom `sekolah`; kelas diisi/dinaikkan ke angka tertinggi (aturan dari Nick)
 - 6 member: kolom `kelurahan` berisi "Kelurahan, Kecamatan" dipisah ke kolomnya (Jonathan → Cakung Timur/Cakung, Glenn → Cipinang Muara/Jatinegara)
 - Masih perlu diisi CGL: alamat jalan di kolom kelurahan (Aiko TEEN 25, Carissa TEEN 17), tgl lahir tanpa tahun (Aiko, Justin & Grace TEEN 17)
