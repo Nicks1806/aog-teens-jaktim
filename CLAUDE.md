@@ -1,6 +1,6 @@
 # AOG Teens Jaktim — CG Dashboard (Absensi + Management)
 
-**Current version:** v53 · **Last updated:** 27 Oktober 2026
+**Current version:** v54 · **Last updated:** 27 Oktober 2026
 
 ## Project Overview
 Single-file web app untuk tracking attendance, pelayanan, milestone, events, visi, dan distribusi wilayah CG untuk AOG Teens Jakarta Timur. Dipakai oleh ~54 member, 9 CG Leaders, 2 Coach, dan 1 Team Leader secara bersamaan saat ibadah hari Minggu.
@@ -278,8 +278,8 @@ Edit index.html locally (+ file lain kalau perlu)
 ```
 
 **Version bump pattern setiap push code:**
-1. `index.html` — cari `App version">v53` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
-2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v53'` → naikkan sama
+1. `index.html` — cari `App version">v54` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
+2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v54'` → naikkan sama
 
 ---
 
@@ -394,6 +394,7 @@ Edit index.html locally (+ file lain kalau perlu)
 | v29 | **Distribusi Wilayah** — filter kecamatan + kelurahan di Coach/TL Overview |
 | v30 | Wilayah filter hardening (escape + reset state + count consistency) |
 | v31 | **27 bug fixes** — attendance stats inflate, data corruption (sekolah/kelas split), XSS (PDF export), error handling (21 Supabase ops), TEEN 25 color map, reconnect race guard, undo sync, milestone prereq, visi TOCTOU fix |
+| v54 | Dashboard CGL: pilihan AI (Auto/Claude/Gemini) disembunyikan, selalu **Auto** (`aiOnCGLPage()` di `aiGetProv`); pilihan tetap untuk Coach/TL |
 | v53 | **Daftar lagu PAW** di jawaban AI: blok ```lagu {judul, lagu:[{judul, artis, tipe P/W/S}]}``` → kartu (`aiLaguHTML`) dengan tombol **Lirik** (link pencarian YouTube "judul artis lyrics") & **Spotify** (pencarian) — sengaja link pencarian, bukan URL video (tidak rusak / tidak dikarang AI); lirik tidak ditulis (hak cipta). Salin/WA ikut link lirik (`aiLaguText`) |
 | v52 | Saran pertanyaan CGL "Ide sharing & game" → "Ide game & ice breaking" (aturan Training AI: materi sharing/SM → cek CGSM di aplikasi GMS) |
 | v51 | **Ubah data anak lewat chat** (Coach/TL & CGL): AI menulis ```ubah {perubahan:[{id,nama,data:{…}}]}``` → kartu → modal `aiUbahModal` (centang per kolom, bisa diedit) → `ubSave()`: hanya kolom `AI_UBAH_FIELDS` (milestone true/null, status CGL/Sponsor/Member/Simpatisan/VIP, sekolah, kelas, kelurahan/kecamatan via `canonWilayah`, wa, lahir YYYY-MM-DD); baca ulang dari DB dulu → kolom yang sudah diubah orang lain dilewati; nama tidak bisa diubah; peringatan urutan milestone (`UB_PREREQ`). **Ulang tahun terdekat** (30 hari, `upcomingBirthdays`/`birthdaySectionHTML`) di Overview Coach/TL & tab Detail CG + **Ucapan WA** buatan AI (`aiBday`, modal `aiBdayModal`) |
