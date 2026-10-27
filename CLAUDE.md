@@ -1,6 +1,6 @@
 # AOG Teens Jaktim — CG Dashboard (Absensi + Management)
 
-**Current version:** v44 · **Last updated:** 27 Oktober 2026
+**Current version:** v45 · **Last updated:** 27 Oktober 2026
 
 ## Project Overview
 Single-file web app untuk tracking attendance, pelayanan, milestone, events, visi, dan distribusi wilayah CG untuk AOG Teens Jakarta Timur. Dipakai oleh ~54 member, 9 CG Leaders, 2 Coach, dan 1 Team Leader secara bersamaan saat ibadah hari Minggu.
@@ -278,8 +278,8 @@ Edit index.html locally (+ file lain kalau perlu)
 ```
 
 **Version bump pattern setiap push code:**
-1. `index.html` — cari `App version">v44` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
-2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v44'` → naikkan sama
+1. `index.html` — cari `App version">v45` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
+2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v45'` → naikkan sama
 
 ---
 
@@ -394,6 +394,7 @@ Edit index.html locally (+ file lain kalau perlu)
 | v29 | **Distribusi Wilayah** — filter kecamatan + kelurahan di Coach/TL Overview |
 | v30 | Wilayah filter hardening (escape + reset state + count consistency) |
 | v31 | **27 bug fixes** — attendance stats inflate, data corruption (sekolah/kelas split), XSS (PDF export), error handling (21 Supabase ops), TEEN 25 color map, reconnect race guard, undo sync, milestone prereq, visi TOCTOU fix |
+| v45 | "Perlu perhatian" & AI: **hanya Alpa yang dihitung** (aturan Nick: Sakit = Izin = berhalangan dengan kabar, dilewati). Kriteria: 3x berturut Alpa (I/S dilewati, tidak memutus), atau % Hadir dari H+A turun ≥40 poin dari ≥60%. Field konteks AI jadi `alpa_beruntun` |
 | v44 | **Absen dari foto** Coach/TL (`openAbsenFoto`, modal `aiAbsenModal`; tombol di tab Absensi Coach & Tanya AI): pilih CG + tanggal → foto → AI (mode `json: true` → Gemini `responseMimeType` JSON) mengusulkan H/I/S/A per `id` anggota → layar cek & koreksi → `abSave()` lewat `saveAttendance()` + `_DOT_SAVING`; tidak ada yang tersimpan sebelum Simpan, "Sisanya → Alpa" hanya manual. **Perlu perhatian** di Overview (`computeDriftAlerts`/`buildDriftSection`: 3+ ibadah berturut tanpa H, atau turun ≥40 poin dari ≥60%; tanpa AI) + "Saran & WA" (`driftFollowUp`). **AI paham cara pakai web**: `APP_GUIDE` di `api/ai.js` (update kalau fitur/menu berubah). Konteks AI + `tidak_hadir_beruntun`; baca foto timeout 35 dtk |
 | v43 | Tanya AI: **simpan grafik/tabel jadi PNG** (`aiSaveImage` → canvas; HP = menu bagikan/WA, laptop = unduh), **grafik batang** (`"tipe":"batang"` di blok chart), **kirim foto ke AI** (`aiPickImage`/`aiResizeImage` maks 1400px JPEG, dikirim sebagai `image` → Gemini `inlineData`; server cek mime jpeg/png/webp + maks ~3.5MB; foto tidak disimpan di riwayat, hanya tanda "foto") |
 | v42 | Tanya AI: data + pelayanan 4 bulan, rencana pengembangan, visi/misi, milestone berikutnya (`aiData`); **Ringkasan AI per anak** + draft WA (`aiSummarizeMember`, di modal detail anak Coach & pencarian member; nomor WA hanya dipakai lokal); **grafik garis** dari blok ```chart JSON``` (`aiChartHTML`); riwayat chat per cakupan (`localStorage aog_ai_chat_v1`); input suara (`aiMic`); cache data 90 dtk + prefetch; server `thinkingLevel: low` (fallback tanpa); tulisan "Gemini" dihapus dari UI |
