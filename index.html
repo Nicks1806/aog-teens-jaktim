@@ -879,6 +879,49 @@ html.vt .tab-content.active{animation:none}
 .ai-chart{margin:10px 0 12px;background:#fafaf8;max-width:720px}
 .ai-img-btn{display:inline-flex;align-items:center;gap:5px;margin-top:8px;font:inherit;font-size:12px;color:#6C5CE7;background:#fff;border:1px solid #e4dcff;border-radius:9px;padding:4px 10px;cursor:pointer}
 .ai-img-btn:hover{border-color:#6C5CE7}
+.ab-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.ab-drop{width:100%;display:flex;flex-direction:column;align-items:center;gap:6px;padding:26px 16px;border:2px dashed #cfc6ff;border-radius:16px;background:#faf8ff;color:var(--accent);font:inherit;cursor:pointer;text-align:center}
+.ab-drop:hover{border-color:var(--accent)}
+.ab-drop b{color:var(--ink);font-size:15px}
+.ab-drop small{color:var(--muted);font-size:12.5px}
+.ab-photo{display:flex;align-items:center;gap:12px;padding:10px;border:1px solid var(--line);border-radius:14px}
+.ab-photo img{width:72px;height:72px;object-fit:cover;border-radius:10px;flex:none}
+.ab-photo .grow{flex:1;min-width:0}
+.ab-photo b{display:block;font-size:14px}
+.ab-photo small{font-size:12px;color:var(--muted)}
+.ab-hint{font-size:12px;color:var(--muted);margin:10px 0 0;line-height:1.5}
+.ab-load{display:flex;flex-direction:column;align-items:center;gap:8px;padding:40px 10px;color:var(--muted);font-size:13px}
+.ab-load b{color:var(--ink);font-size:15px}
+.ab-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:6px;margin-bottom:10px;font-size:14px}
+.ab-list{display:flex;flex-direction:column;gap:6px}
+.ab-row{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:12px;background:#FAF9FC;border:1px solid transparent}
+.ab-row.chg{background:#f6f3ff;border-color:#e0d8ff}
+.ab-row .grow{flex:1;min-width:0}
+.ab-row b{display:block;font-size:14px;font-weight:600}
+.ab-row small{font-size:12px;color:var(--muted)}
+.ab-warn{color:#b45309;font-weight:600}
+.ab-seg{display:flex;gap:3px;flex:none}
+.ab-seg button{width:34px;height:34px;border-radius:9px;border:1px solid var(--line);background:#fff;font:inherit;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;touch-action:manipulation}
+.ab-seg button.on.H{background:var(--H);border-color:var(--H);color:#fff}
+.ab-seg button.on.I{background:var(--I);border-color:var(--I);color:#fff}
+.ab-seg button.on.S{background:var(--S);border-color:var(--S);color:#fff}
+.ab-seg button.on.A{background:var(--A);border-color:var(--A);color:#fff}
+.ab-seg button.on.X{background:#8a8a8a;border-color:#8a8a8a;color:#fff}
+.ab-unm{margin-top:12px;padding:10px 12px;border-radius:12px;background:#fff7ed;font-size:13px;line-height:1.5}
+.ab-unm small{display:block;color:var(--muted);font-size:12px;margin-top:4px}
+.ab-foot{position:sticky;bottom:-28px;background:var(--card);padding:12px 0 4px;margin-bottom:-4px;flex-wrap:wrap}
+.drift-tail{display:flex;gap:3px;margin-top:5px}
+.drift-tail i{font-style:normal;width:18px;height:18px;border-radius:5px;font-size:11px;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
+.drift-tail i.H{background:var(--Hb);color:var(--H)}
+.drift-tail i.I{background:var(--Ib);color:var(--I)}
+.drift-tail i.S{background:var(--Sb);color:var(--S)}
+.drift-tail i.A{background:var(--Ab);color:var(--A)}
+@media (max-width:600px){
+  .ab-grid{grid-template-columns:1fr}
+  .ab-row{flex-wrap:wrap}
+  .ab-seg{width:100%}
+  .ab-seg button{flex:1;height:38px}
+}
 .ai-tblw .ai-img-btn{margin-top:6px}
 .ai-bars{display:flex;align-items:flex-end;gap:10px;height:200px;padding-top:22px}
 .ai-bcol{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;height:100%}
@@ -1119,6 +1162,14 @@ html.vt .tab-content.active{animation:none}
   </div>
 </div>
 
+<!-- Absen dari foto (Coach/TL): AI membaca daftar hadir → dicek dulu → baru disimpan -->
+<div class="modal-overlay" id="aiAbsenModal">
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="abTitle" style="max-width:620px">
+    <div class="modal-title" id="abTitle">Absen dari foto</div>
+    <div id="abBody"></div>
+  </div>
+</div>
+
 <!-- LANDING -->
 <div class="landing" id="pageL">
   <div style="font-size:13px;letter-spacing:3px;color:var(--g3);text-transform:uppercase;margin-bottom:6px;font-weight:600" id="ltKicker">THE YEAR OF</div>
@@ -1146,7 +1197,7 @@ html.vt .tab-content.active{animation:none}
     <button type="button" class="backcoach" id="dBackCoach" onclick="goBack()" style="display:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Kembali ke Coach</button>
     <nav class="navlist" aria-label="Tab CG"><button type="button" class="nav app-tab on" data-tab="absensi" aria-current="page" onclick="sTab('absensi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M9 15l2 2 4-4"/></svg><span>Absensi</span></button><button type="button" class="nav app-tab" data-tab="detail" onclick="sTab('detail',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c1.9.7 3.1 2.4 3.5 5.2"/></svg><span>Detail CG</span></button><button type="button" class="nav app-tab" data-tab="visi" onclick="sTab('visi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span>Visi CG</span></button><button type="button" class="nav app-tab" data-tab="pelayanan" onclick="sTab('pelayanan',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"/></svg><span>Pelayanan</span></button><button type="button" class="nav app-tab" data-tab="milestone" onclick="sTab('milestone',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4h11l-2 4 2 4H5"/></svg><span>Milestone</span></button><button type="button" class="nav app-tab" data-tab="events" onclick="sTab('events',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4z"/><path d="M14 7v10"/></svg><span>Events</span></button></nav>
     <div class="sidetheme"><small>The year of</small><b>Unity</b><span>&amp; Open Heavens</span></div>
-    <div class="profile"><span class="ava" id="dAva" aria-hidden="true">A</span><div style="flex:1;min-width:0"><b id="nN"></b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v43</span></span></span></div><button type="button" class="exit" onclick="goBack()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
+    <div class="profile"><span class="ava" id="dAva" aria-hidden="true">A</span><div style="flex:1;min-width:0"><b id="nN"></b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v44</span></span></span></div><button type="button" class="exit" onclick="goBack()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
   </aside>
   <div class="main">
     <header class="mtop">
@@ -1189,7 +1240,7 @@ html.vt .tab-content.active{animation:none}
     <div class="rolesw" role="group" aria-label="Peran"><button type="button" id="roleCoachBtn" class="on" aria-pressed="true" onclick="switchRole('coach')">Coach</button><button type="button" id="roleTLBtn" aria-pressed="false" onclick="switchRole('tl')">TL</button></div>
     <nav class="navlist" id="coachTabs" aria-label="Tab Coach"><button type="button" class="nav app-tab on" data-tab="c-overview" aria-current="page" onclick="sCoachTab('c-overview',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"/></svg><span>Overview</span></button><button type="button" class="nav app-tab" data-tab="c-absensi" onclick="sCoachTab('c-absensi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M9 15l2 2 4-4"/></svg><span>Absensi</span></button><button type="button" class="nav app-tab" data-tab="c-milestone" onclick="sCoachTab('c-milestone',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4h11l-2 4 2 4H5"/></svg><span>Milestone</span></button><button type="button" class="nav app-tab" data-tab="c-visi" onclick="sCoachTab('c-visi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span>Visi</span></button><button type="button" class="nav app-tab" data-tab="c-events" onclick="sCoachTab('c-events',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4z"/><path d="M14 7v10"/></svg><span>Events</span></button><button type="button" class="nav app-tab ai-nav" data-tab="c-ai" onclick="sCoachTab('c-ai',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg><span>Tanya AI</span></button></nav>
     <button type="button" class="sidetheme editable" onclick="openThemeEdit()" aria-label="Edit tema tahun ini" title="Klik untuk edit tema"><small>The year of</small><b>Unity</b><span>&amp; Open Heavens</span><i class="st-edit" aria-hidden="true">Edit</i></button>
-    <div class="profile"><span class="ava" id="cAva" aria-hidden="true">C</span><div style="flex:1;min-width:0"><b id="cWho">Coach</b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v43</span></span></span></div><button type="button" class="exit" onclick="goBackCoach()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
+    <div class="profile"><span class="ava" id="cAva" aria-hidden="true">C</span><div style="flex:1;min-width:0"><b id="cWho">Coach</b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v44</span></span></span></div><button type="button" class="exit" onclick="goBackCoach()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
   </aside>
   <div class="main">
     <header class="mtop">
@@ -4721,7 +4772,7 @@ const _AI = { msgs: [], busy: false, needPin: false }; // needPin: hanya kalau s
 const AI_PIN_KEY = 'aog_ai_pin';
 const AI_SUGGEST = [
   'Rangkum kehadiran bulan ini per CG',
-  'Siapa yang 3 ibadah terakhir tidak hadir?',
+  'Cara memindahkan anak ke CG lain gimana?',
   'CG mana yang trennya turun? Kenapa kira-kira?',
   'Siapa yang siap lanjut ke milestone berikutnya?',
   'Buatkan rekap singkat untuk rapat Coach minggu ini',
@@ -4808,7 +4859,7 @@ function aiData(cgs, extra, scopeRegion) {
   pel.forEach(p => String(p.member_name).split(',').map(x => x.trim()).filter(Boolean).forEach(n => { pelCount[pelKey(p.cg, n)] = (pelCount[pelKey(p.cg, n)] || 0) + 1; }));
   const anggota = mems.map(m => {
     let h = 0, i = 0, s2 = 0, a = 0, lastH = null;
-    const perBulan = {}, recent = [];
+    const perBulan = {}, recent = [], recSt = [];
     const str = (datesBy[m.region] || []).map(d => {
       const st = attShown(ALL_ATTENDANCE, m.id + '_' + d.id);
       const iso = aiLabelISO(d.label);
@@ -4818,11 +4869,12 @@ function aiData(cgs, extra, scopeRegion) {
         if (st === 'H') lastH = iso;
       }
       if (iso <= todayISO) recent.push(iso + ':' + (st || '-'));
+      if (st && iso <= todayISO) recSt.push(st);
       return st || '-';
     }).join('');
     const rec = h + i + s2 + a;
     const pb = {}; Object.keys(perBulan).forEach(k => { pb[k] = pctOf(perBulan[k]); });
-    return { nama: m.nama, cg: m.cg, region: aiRegLbl(m.region), status: roleLabel(m.status), absensi: str, hadir: h, izin: i, sakit: s2, alpa: a, persen_hadir: rec ? Math.round(h / rec * 100) : null, persen_hadir_per_bulan: pb, tiga_ibadah_terakhir: recent.slice(-3), terakhir_hadir: lastH, milestone_selesai: MS_FIELDS.map((f, k) => m[f] ? AI_MSL[k] : null).filter(Boolean), milestone_berikutnya: aiNextMilestones(m), jumlah_pelayanan_4_bulan: pelCount[pelKey(m.cg, m.nama)] || 0 };
+    return { nama: m.nama, cg: m.cg, region: aiRegLbl(m.region), status: roleLabel(m.status), absensi: str, hadir: h, izin: i, sakit: s2, alpa: a, persen_hadir: rec ? Math.round(h / rec * 100) : null, persen_hadir_per_bulan: pb, tiga_ibadah_terakhir: recent.slice(-3), terakhir_hadir: lastH, tidak_hadir_beruntun: (() => { let n = 0; for (let k = recSt.length - 1; k >= 0 && recSt[k] !== 'H'; k--) n++; return n; })(), milestone_selesai: MS_FIELDS.map((f, k) => m[f] ? AI_MSL[k] : null).filter(Boolean), milestone_berikutnya: aiNextMilestones(m), jumlah_pelayanan_4_bulan: pelCount[pelKey(m.cg, m.nama)] || 0 };
   });
   const cg = cgs.map(c => {
     const info = ALL_CG_INFO.find(x => x.cg === c) || {};
@@ -4848,7 +4900,7 @@ function aiData(cgs, extra, scopeRegion) {
   return { todayISO, mems, regs, datesBy, anggota, cg, events: ev, pelayanan, rencana };
 }
 
-const AI_KET = 'String "absensi" tiap anggota sejajar dengan tanggal_ibadah region-nya. H=Hadir I=Izin S=Sakit A=Alpa -=kosong/belum bergabung/mendatang. Angka persen_hadir, persen_hadir_per_bulan (kunci YYYY-MM), tiga_ibadah_terakhir, terakhir_hadir, milestone_berikutnya, jumlah_pelayanan_4_bulan SUDAH dihitung — pakai angka itu.';
+const AI_KET = 'String "absensi" tiap anggota sejajar dengan tanggal_ibadah region-nya. H=Hadir I=Izin S=Sakit A=Alpa -=kosong/belum bergabung/mendatang. Angka persen_hadir, persen_hadir_per_bulan (kunci YYYY-MM), tiga_ibadah_terakhir, terakhir_hadir, tidak_hadir_beruntun (jumlah ibadah terakhir berturut-turut tanpa H), milestone_berikutnya, jumlah_pelayanan_4_bulan SUDAH dihitung — pakai angka itu.';
 
 function buildAIContext(extra) {
   const region = coachRole === 'tl' ? 'all' : coachReg;
@@ -5081,6 +5133,238 @@ function aiShowAttach() {
   box.innerHTML = '<img src="' + _AI.img.thumb + '" alt="Foto yang akan dikirim"><span>Foto siap dikirim — tulis pertanyaan atau langsung kirim</span><button type="button" class="iconbtn" aria-label="Hapus foto" onclick="_AI.img=null;aiShowAttach()">' + icon('x', 16) + '</button>';
 }
 
+// ═══════════════════════════════════════════════════════════
+// ABSEN DARI FOTO (Coach/TL) — AI hanya MENGUSULKAN; tidak ada yang tersimpan sebelum tombol Simpan
+// ═══════════════════════════════════════════════════════════
+const _AB = { cg: '', dateId: null, img: null, res: null, sel: {}, busy: false, saving: false };
+function abCGs() { return getCGsForRegion(coachRole === 'tl' ? 'all' : coachReg); }
+function abRegionOf(cg) { const m = ALL_MEMBERS.find(x => x.cg === cg && x.region); return m ? m.region : (coachRole === 'tl' ? 'jaktim1' : coachReg); }
+function abDates(cg) {
+  const reg = abRegionOf(cg), lim = new Date(Date.now() + 7 * 864e5).toISOString().slice(0, 10);
+  return ALL_DATES.filter(d => d.region === reg && aiLabelISO(d.label) <= lim).sort((a, b) => (b.sort_order || 0) - (a.sort_order || 0)).slice(0, 16);
+}
+function abDefaultDate(cg) {
+  const t = new Date().toISOString().slice(0, 10), ds = abDates(cg);
+  const d = ds.find(x => aiLabelISO(x.label) <= t) || ds[0];
+  return d ? d.id : null;
+}
+function abDate() { return ALL_DATES.find(d => String(d.id) === String(_AB.dateId)) || null; }
+function abMembers() { return ALL_MEMBERS.filter(m => m.cg === _AB.cg).sort((a, b) => String(a.nama || '').localeCompare(String(b.nama || ''))); }
+function abCur(m) { return attShown(ALL_ATTENDANCE, m.id + '_' + _AB.dateId) || null; }
+function abVal(m) { return _AB.sel[m.id] === undefined ? abCur(m) : _AB.sel[m.id]; }
+function abChanges() { return abMembers().map(m => ({ m, from: abCur(m), to: abVal(m) || null })).filter(c => c.from !== c.to); }
+
+function openAbsenFoto(cg) {
+  const cgs = abCGs();
+  if (!cgs.length) { toast('Belum ada CG di cakupan ini'); return; }
+  if (_AB.busy || _AB.saving) { openModal('aiAbsenModal'); return; }
+  _AB.cg = cg && cgs.includes(cg) ? cg : (cgs.includes(_AB.cg) ? _AB.cg : cgs[0]);
+  _AB.dateId = abDefaultDate(_AB.cg);
+  _AB.img = null; _AB.res = null; _AB.sel = {};
+  abRender();
+  openModal('aiAbsenModal');
+}
+function abSetCG(v) { _AB.cg = v; _AB.dateId = abDefaultDate(v); _AB.res = null; _AB.sel = {}; abRender(); }
+function abSetDate(v) { const d = ALL_DATES.find(x => String(x.id) === String(v)); _AB.dateId = d ? d.id : null; _AB.res = null; _AB.sel = {}; abRender(); }
+async function abPick(input) {
+  const f = input.files && input.files[0]; input.value = '';
+  if (!f) return;
+  if (!/^image\//.test(f.type || 'image/')) { toast('❌ Pilih file gambar'); return; }
+  try { _AB.img = await aiResizeImage(f); abRender(); }
+  catch(e) { toast('❌ ' + (e.message || 'Foto tidak bisa dibaca')); }
+}
+function abSet(id, st) { _AB.sel[id] = st; abRender(); }
+// Anak yang tidak ada di foto & belum diisi → Alpa (hanya kalau Coach menekan tombolnya)
+function abRestA() {
+  abMembers().forEach(m => { if (!_AB.res.byId[m.id] && !abCur(m) && _AB.sel[m.id] === undefined) _AB.sel[m.id] = 'A'; });
+  abRender();
+}
+function abBack() { _AB.res = null; _AB.sel = {}; abRender(); }
+
+function abRender() {
+  const box = document.getElementById('abBody');
+  if (!box) return;
+  if (_AB.busy) {
+    box.innerHTML = '<div class="ab-load"><span class="ai-dots" aria-hidden="true"><span></span><span></span><span></span></span><b>AI sedang membaca foto…</b><small>Biasanya 5–20 detik</small></div>';
+    return;
+  }
+  const d = abDate();
+  if (!_AB.res) {
+    const cgs = abCGs(), dates = abDates(_AB.cg);
+    box.innerHTML =
+      '<div class="ab-grid">' +
+        '<label class="field"><span class="flabel">CG</span><select class="select" id="abCg" onchange="abSetCG(this.value)">' + cgs.map(c => '<option value="' + esc(c) + '"' + (c === _AB.cg ? ' selected' : '') + '>' + esc(c) + '</option>').join('') + '</select></label>' +
+        '<label class="field"><span class="flabel">Tanggal ibadah</span><select class="select" id="abDate" onchange="abSetDate(this.value)">' +
+          (dates.length ? dates.map(x => '<option value="' + esc(String(x.id)) + '"' + (String(x.id) === String(_AB.dateId) ? ' selected' : '') + '>' + esc(x.label) + '</option>').join('') : '<option value="">Belum ada tanggal ibadah</option>') +
+        '</select></label>' +
+      '</div>' +
+      '<input type="file" id="abFile" accept="image/*" hidden onchange="abPick(this)">' +
+      (_AB.img
+        ? '<div class="ab-photo"><img src="' + _AB.img.thumb + '" alt="Foto daftar hadir"><div class="grow"><b>Foto siap dibaca</b><small>AI hanya mengusulkan — kamu cek & koreksi dulu sebelum disimpan.</small></div><button type="button" class="btn sm" onclick="document.getElementById(\'abFile\').click()">Ganti</button></div>'
+        : '<button type="button" class="ab-drop" onclick="document.getElementById(\'abFile\').click()">' + icon('image', 26) + '<b>Pilih / foto daftar hadir</b><small>Kertas absen, catatan, atau screenshot chat berisi nama yang hadir</small></button>') +
+      '<p class="ab-hint">Foto & nama anggota ' + esc(_AB.cg) + ' dikirim ke AI untuk dibaca. Tidak ada yang tersimpan sebelum kamu tekan Simpan.</p>' +
+      '<div class="mfoot"><button type="button" class="btn" onclick="closeModal(\'aiAbsenModal\')">Batal</button>' +
+        '<button type="button" class="btn primary" onclick="abRead()"' + (_AB.img && _AB.dateId ? '' : ' disabled') + '>' + icon('spark', 16) + 'Baca dengan AI</button></div>';
+    return;
+  }
+  const mems = abMembers(), res = _AB.res, changes = abChanges();
+  const found = mems.filter(m => res.byId[m.id]).length;
+  const restEmpty = mems.filter(m => !res.byId[m.id] && !abCur(m) && _AB.sel[m.id] === undefined).length;
+  let h = '<div class="ab-head"><div><b>' + esc(_AB.cg) + '</b> · ' + esc(d ? d.label : '') + '</div><span class="sub" style="margin:0">' + found + ' dari ' + mems.length + ' anak dikenali di foto</span></div>';
+  if (res.note) h += '<p class="ab-hint" style="margin:0 0 10px">' + icon('spark', 13) + ' ' + esc(res.note) + '</p>';
+  h += '<div class="ab-list">' + mems.map(m => {
+    const cur = abCur(m), v = abVal(m) || null, ai = res.byId[m.id], chg = cur !== v;
+    const info = (ai ? 'Di foto: “' + esc(ai.nama || m.nama) + '”' + (ai.yakin ? '' : ' · <span class="ab-warn">cek lagi</span>') : 'Tidak ada di foto') +
+      (cur ? ' · tersimpan: ' + cur : '') + (chg && cur ? ' · <span class="ab-warn">akan diganti</span>' : '');
+    return '<div class="ab-row' + (chg ? ' chg' : '') + '"><div class="grow"><b>' + esc(m.nama) + '</b><small>' + info + '</small></div>' +
+      '<div class="ab-seg" role="group" aria-label="Status ' + esc(m.nama) + '">' + ['H', 'I', 'S', 'A', null].map(st =>
+        '<button type="button" class="' + (st || 'X') + (v === st ? ' on' : '') + '" aria-pressed="' + (v === st) + '" title="' + (st ? ({ H: 'Hadir', I: 'Izin', S: 'Sakit', A: 'Alpa' })[st] : 'Kosongkan') + '" onclick="abSet(' + m.id + ',' + (st ? '\'' + st + '\'' : 'null') + ')">' + (st || '–') + '</button>').join('') +
+      '</div></div>';
+  }).join('') + '</div>';
+  if (res.unmatched.length) h += '<div class="ab-unm"><b>Nama di foto yang tidak cocok dengan anggota ' + esc(_AB.cg) + ':</b> ' + res.unmatched.map(esc).join(', ') + '<small>Kalau anak baru, tambahkan dulu lewat dashboard CG → Detail CG → Tambah member, lalu ulangi.</small></div>';
+  h += '<div class="mfoot ab-foot">' +
+    (restEmpty ? '<button type="button" class="btn sm ghost" style="margin-right:auto" onclick="abRestA()">Sisanya (' + restEmpty + ') → Alpa</button>' : '') +
+    '<button type="button" class="btn" onclick="abBack()"' + (_AB.saving ? ' disabled' : '') + '>Kembali</button>' +
+    '<button type="button" class="btn primary" onclick="abSave()"' + (changes.length && !_AB.saving ? '' : ' disabled') + '>' + (_AB.saving ? 'Menyimpan…' : 'Simpan ' + changes.length + ' perubahan') + '</button></div>';
+  box.innerHTML = h;
+}
+
+function abParse(text, mems) {
+  const raw = String(text || '').replace(/^\s*```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim();
+  let j = null;
+  try { j = JSON.parse(raw); } catch(e) { try { const mm = raw.match(/\{[\s\S]*\}/); j = mm ? JSON.parse(mm[0]) : null; } catch(e2) { j = null; } }
+  if (!j || typeof j !== 'object') throw new Error('Jawaban AI tidak terbaca — coba foto yang lebih jelas');
+  const ids = new Set(mems.map(m => m.id)), byId = {}, ST = ['H', 'I', 'S', 'A'];
+  (Array.isArray(j.hasil) ? j.hasil : []).forEach(x => {
+    if (!x) return;
+    const id = mems.find(m => String(m.id) === String(x.id)) ? mems.find(m => String(m.id) === String(x.id)).id : null;
+    const st = String(x.status || '').toUpperCase().trim().charAt(0);
+    if (id === null || !ids.has(id) || !ST.includes(st) || byId[id]) return;
+    byId[id] = { status: st, nama: String(x.nama_di_foto || '').slice(0, 60), yakin: x.yakin !== false };
+  });
+  const unmatched = (Array.isArray(j.tidak_cocok) ? j.tidak_cocok : []).map(x => typeof x === 'string' ? x : (x && x.nama_di_foto)).filter(Boolean).map(x => String(x).slice(0, 60)).slice(0, 30);
+  return { byId, unmatched, note: String(j.catatan || '').slice(0, 300) };
+}
+
+async function abRead() {
+  if (_AB.busy || !_AB.img || !_AB.dateId) return;
+  const mems = abMembers(), d = abDate();
+  if (!mems.length) { toast('CG ini belum punya anggota'); return; }
+  _AB.busy = true; abRender();
+  const ctx = JSON.stringify({ cg: _AB.cg, tanggal_ibadah: d ? aiLabelISO(d.label) : '', anggota: mems.map(m => ({ id: m.id, nama: m.nama })) });
+  const q = 'TUGAS KHUSUS: foto ini adalah daftar hadir / absensi CG ' + _AB.cg + ' untuk ibadah ' + (d ? d.label : '') + '. ' +
+    'Baca setiap nama di foto beserta tanda kehadirannya, lalu cocokkan dengan daftar "anggota" (pakai field id). ' +
+    'Status: H = hadir (centang, tanda hadir, tulisan H/hadir, atau nama tercantum di daftar hadir tanpa keterangan lain), I = izin, S = sakit, A = alpa / tidak hadir (silang, tulisan A/alpa). ' +
+    'Kalau foto hanya berisi daftar nama yang hadir, semua nama itu H. Nama panggilan / ejaan sedikit beda boleh dicocokkan kalau jelas orangnya; kalau ragu isi "yakin": false. ' +
+    'Anggota yang tidak ada di foto JANGAN dimasukkan ke hasil. Nama di foto yang tidak cocok dengan anggota mana pun masukkan ke tidak_cocok. ' +
+    'Jawab HANYA JSON valid: {"hasil":[{"id":123,"nama_di_foto":"...","status":"H","yakin":true}],"tidak_cocok":["..."],"catatan":"maks 1 kalimat, mis. bagian foto yang tidak terbaca"}';
+  try {
+    const r = await fetch('/api/ai', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pin: aiGetPin(), question: q, context: ctx, history: [], json: true, image: { mimeType: _AB.img.mimeType, data: _AB.img.data } }) });
+    let data = {};
+    try { data = await r.json(); } catch(e) {}
+    if (!r.ok) throw new Error(r.status === 401 ? 'AI memakai kode akses — masukkan dulu di tab Tanya AI.' : (data.error || ('HTTP ' + r.status)));
+    const res = abParse(data.text, mems);
+    _AB.res = res; _AB.sel = {};
+    Object.keys(res.byId).forEach(id => { _AB.sel[id] = res.byId[id].status; });
+    if (!Object.keys(res.byId).length) toast('⚠ AI tidak menemukan nama anggota di foto — isi manual atau coba foto lain');
+  } catch(e) {
+    console.error('[abRead]', e);
+    toast('❌ ' + (e.message || 'Gagal membaca foto'));
+  }
+  _AB.busy = false; abRender();
+}
+
+async function abSave() {
+  if (_AB.saving || !_AB.res) return;
+  const list = abChanges(), did = _AB.dateId;
+  if (!list.length) return;
+  _AB.saving = true; abRender();
+  let ok = 0, queued = 0, fail = 0;
+  for (const c of list) {
+    const key = c.m.id + '_' + did;
+    if (_DOT_SAVING[key]) { fail++; continue; }
+    _DOT_SAVING[key] = true;
+    try {
+      const r = await saveAttendance(c.m.id, did, c.to);
+      if (c.to === null) delete ALL_ATTENDANCE[key]; else ALL_ATTENDANCE[key] = c.to;
+      document.querySelectorAll('.dot[data-mid="' + c.m.id + '"][data-did="' + did + '"]').forEach(dot => {
+        dot.className = 'dot ' + (c.to || 'X') + (r === 'queued' ? ' pend' : '');
+        dot.textContent = c.to || '-';
+      });
+      if (r === 'queued') queued++; else ok++;
+    } catch(e) {
+      fail++; console.error('[abSave]', key, e);
+    } finally {
+      delete _DOT_SAVING[key];
+    }
+  }
+  _AB.saving = false;
+  _AI_CACHE.t = 0;
+  COACH_TAB_RENDERED['c-overview'] = false;
+  if (document.getElementById('tab-c-absensi')?.classList.contains('active')) { try { renderCoachAbsensi(); } catch(e) {} }
+  const n = ok + queued;
+  if (fail) {
+    toast('❌ ' + fail + ' absensi gagal disimpan' + (n ? ' (' + n + ' lainnya tersimpan)' : '') + ' — cek lalu Simpan lagi', 'err');
+    abRender();
+  } else {
+    closeModal('aiAbsenModal');
+    toast('✓ ' + n + ' absensi ' + esc(_AB.cg) + ' tersimpan' + (queued ? ' (' + queued + ' menunggu sinyal)' : ''));
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// PERINGATAN DINI (Overview Coach/TL): anak yang mulai menjauh — dihitung di HP, tanpa AI
+// ═══════════════════════════════════════════════════════════
+function computeDriftAlerts(region) {
+  const cgs = getCGsForRegion(region), todayISO = new Date().toISOString().slice(0, 10);
+  const datesBy = {}, out = [];
+  ALL_MEMBERS.filter(m => cgs.includes(m.cg) && roleCls(m.status) !== 'cgl').forEach(m => {
+    const reg = m.region || abRegionOf(m.cg);
+    const ds = datesBy[reg] || (datesBy[reg] = ALL_DATES.filter(d => d.region === reg && aiLabelISO(d.label) <= todayISO).sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0)));
+    const recs = [];
+    ds.forEach(d => { const st = attShown(ALL_ATTENDANCE, m.id + '_' + d.id); if (st) recs.push({ st, label: d.label }); });
+    if (recs.length < 3) return;
+    let streak = 0;
+    for (let i = recs.length - 1; i >= 0 && recs[i].st !== 'H'; i--) streak++;
+    const lastH = recs.slice().reverse().find(r => r.st === 'H');
+    const pctOf = arr => arr.length ? Math.round(arr.filter(r => r.st === 'H').length / arr.length * 100) : 0;
+    if (streak >= 3) {
+      out.push({ m, kind: 'streak', streak, tail: recs.slice(-Math.min(streak, 6)).map(r => r.st), lastH: lastH ? lastH.label : null, score: 1000 + streak * 10 + recs.slice(-streak).filter(r => r.st === 'A').length });
+      return;
+    }
+    if (recs.length >= 8) {
+      const recent = recs.slice(-4), prev = recs.slice(-12, -4), pr = pctOf(prev), rc = pctOf(recent);
+      if (pr >= 60 && pr - rc >= 40) out.push({ m, kind: 'turun', from: pr, to: rc, tail: recent.map(r => r.st), lastH: lastH ? lastH.label : null, score: pr - rc });
+    }
+  });
+  return out.sort((a, b) => b.score - a.score);
+}
+function buildDriftSection(region) {
+  const list = computeDriftAlerts(region), all = !!window.__DRIFT_ALL, shown = all ? list : list.slice(0, 6);
+  let h = '<section class="card drift" id="driftSection" style="margin-top:24px"><div class="chead" style="margin-bottom:4px"><div><h2>Perlu perhatian</h2><div class="sub">' +
+    (list.length ? list.length + ' anak mulai menjauh · 3+ ibadah berturut tidak hadir atau kehadiran turun tajam' : 'Anak yang 3+ ibadah berturut tidak hadir atau kehadirannya turun tajam') + '</div></div></div>';
+  if (!list.length) return h + '<div class="empty" style="padding:16px;margin-top:10px">Semua anak masih rutin hadir. Puji Tuhan!</div></section>';
+  shown.forEach(a => {
+    const m = a.m, color = CG_COLORS[m.cg] || '#6C5CE7', bg = CG_BG[m.cg] || '#faf5ff';
+    const why = a.kind === 'streak' ? a.streak + ' ibadah terakhir tidak hadir' : 'turun ' + a.from + '% → ' + a.to + '%';
+    h += '<div class="lrow"><span class="cgnum" style="width:36px;height:36px;font-size:12px;background:' + bg + ';color:' + color + '">' + esc(String(m.cg).replace(/\D/g, '').slice(-2)) + '</span>' +
+      '<div class="grow"><b>' + esc(m.nama) + ' <span class="pill" style="' + (a.kind === 'streak' ? 'background:var(--Ab);color:var(--A)' : 'background:var(--Sb);color:var(--S)') + '">' + esc(why) + '</span></b>' +
+      '<small>' + esc(m.cg) + ' · ' + (a.lastH ? 'terakhir hadir ' + esc(a.lastH) : 'belum ada catatan hadir') + '</small>' +
+      '<span class="drift-tail" aria-label="Absensi terakhir: ' + a.tail.join(' ') + '">' + a.tail.map(st => '<i class="' + st + '">' + st + '</i>').join('') + '</span></div>' +
+      '<button type="button" class="btn sm" onclick="driftFollowUp(' + m.id + ')" aria-label="Saran dan draft WA untuk ' + esc(m.nama) + '">' + icon('spark', 16) + '<span class="ai-hide-sm">Saran & WA</span></button></div>';
+  });
+  if (list.length > 6) h += '<button type="button" class="btn sm ghost" style="margin-top:10px" onclick="window.__DRIFT_ALL=!window.__DRIFT_ALL;driftRerender()">' + (all ? 'Tampilkan lebih sedikit' : 'Lihat semua (' + list.length + ')') + '</button>';
+  return h + '</section>';
+}
+function driftRerender() { const el = document.getElementById('driftSection'); if (el) el.outerHTML = buildDriftSection(coachRole === 'tl' ? 'all' : coachReg); }
+// Buka detail anak + langsung minta ringkasan AI & draft WA
+function driftFollowUp(id) {
+  showMemberDetail(id);
+  if (!(_AI_MEM[id] && (_AI_MEM[id].text || _AI_MEM[id].busy))) aiSummarizeMember(id);
+  setTimeout(() => { const b = document.getElementById('aiMemOut_' + id); if (b) b.scrollIntoView({ block: 'center', behavior: 'smooth' }); }, 150);
+}
+
 // Markdown ringan → HTML aman (teks di-escape dulu)
 function aiFormat(text) {
   // Blok grafik diproses dulu (JSON mentah), sisanya markdown biasa
@@ -5125,6 +5409,7 @@ function renderCoachAI() {
       '<div class="ai-chat card">' +
         '<div class="ai-top"><span class="ai-badge" aria-hidden="true">' + icon('spark', 22) + '</span>' +
           '<div class="grow"><b>Asisten data AOG Teens</b><small id="aiMeta"></small></div>' +
+          '<button type="button" class="btn sm ghost" onclick="openAbsenFoto()" title="Isi absensi dari foto daftar hadir" aria-label="Absen dari foto">' + icon('image', 16) + '<span class="ai-hide-sm">Absen dari foto</span></button>' +
           '<button type="button" class="btn sm ghost" onclick="aiReset()" title="Mulai percakapan baru">' + icon('refresh', 16) + '<span class="ai-hide-sm">Percakapan baru</span></button></div>' +
         '<div class="ai-msgs" id="aiMsgs" aria-live="polite"></div>' +
         '<div class="ai-attach" id="aiAttach" hidden></div>' +
@@ -5497,6 +5782,9 @@ async function renderCoachOverview() {
     html += '</section>';
   });
   html += '</div>';
+
+  // Peringatan dini: anak yang mulai menjauh
+  html += buildDriftSection(region);
 
   // CG Cards Grid — urut dari kehadiran terendah
   html += '<section><div class="chead" style="margin-top:24px"><div><h2 style="font-size:22px">CG kamu</h2><div class="sub">Urut dari kehadiran terendah · klik kartu untuk buka dashboard CG</div></div></div><div class="cggrid">';
@@ -6150,6 +6438,7 @@ function renderCoachAbsensi() {
   const scope = coachRole === 'tl' ? 'all' : coachReg;
   let html = '<div class="tabbar"><div class="sub" style="margin:0">Klik kotak untuk ubah absensi langsung dari Coach</div><div class="actions">';
   html += '<button type="button" class="btn sm" onclick="refreshCoachAttendance()" title="Ambil data absensi terbaru">'+icon('refresh',16)+'Refresh</button>';
+  html += '<button type="button" class="btn sm" onclick="openAbsenFoto()" title="Isi absensi dari foto daftar hadir (dibaca AI, dicek dulu sebelum disimpan)">'+icon('image',16)+'Absen dari foto</button>';
   html += '<button type="button" class="btn sm" onclick="exportRegionAttendanceCSV(\''+scope+'\')">'+icon('down',16)+'Absensi CSV</button>';
   html += '<button type="button" class="btn sm" onclick="exportRegionAttendancePDF(\''+scope+'\')">'+icon('down',16)+'Absensi PDF</button>';
   html += '<button type="button" class="btn sm primary" onclick="generateSabtuBulan(\''+scope+'\','+nextMonthInfo.year+','+nextMonthInfo.month+')">'+icon('plus',16)+esc(genLabel)+'</button>';
