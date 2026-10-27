@@ -418,7 +418,7 @@ Edit index.html locally (+ file lain kalau perlu)
 Detail changelog per version ada di git log (`git log --oneline`).
 
 ### Pengetahuan AI (27 Okt 2026)
-- Baris `cg_vision` id 55 (`__AI_NOTES__`/`all`) diisi riset GMS (situs resmi gms.church, berita; medsos tidak terbaca tanpa login) + info pemimpin (TL Bro Justin Seravian, Gembala Lokal Ko Mike Budiman, Gembala Lokal AOG KG Ko Amos, Gembala Regional Ko Fuji Harsono, Gembala Sinode Ko Philip) atas permintaan Nick. Cadangan sebelum diubah: `C:\Penyimpanan utama\Downloads\backup_ai_notes_2026-10-27.json` dan `..._tahap2.json`. Edit selanjutnya lewat tombol "Training AI" di tab Tanya AI Coach/TL
+- Baris `cg_vision` id 55 (`__AI_NOTES__`/`all`) diisi riset GMS (situs resmi gms.church, berita; medsos tidak terbaca tanpa login) + info pemimpin (TL Bro Justin Seravian, Gembala Lokal Ko Mike Budiman, Gembala Lokal AOG KG Ko Amos, Gembala Regional Ko Fuji Harsono, Gembala Sinode Ko Philip, Coach Jaktim 1 Nickcllauss, Coach Jaktim 2 Maritza) atas permintaan Nick. Cadangan sebelum diubah: `C:\Penyimpanan utama\Downloads\backup_ai_notes_2026-10-27.json` `..._tahap2.json`, `..._tahap3.json`. Edit selanjutnya lewat tombol "Training AI" di tab Tanya AI Coach/TL
 
 ### Pembersihan data (27 Okt 2026, langsung di Supabase, cadangan di `C:\Penyimpanan utama\Downloads\backup_*_2026-10-27*.json`)
 - 21 member: teks "· Kelas X" (bug input gabungan pra-v31) dihapus dari kolom `sekolah`; kelas diisi/dinaikkan ke angka tertinggi (aturan dari Nick)
