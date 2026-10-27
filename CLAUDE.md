@@ -1,6 +1,6 @@
 # AOG Teens Jaktim — CG Dashboard (Absensi + Management)
 
-**Current version:** v31 · **Last updated:** October 2026
+**Current version:** v32 (redesign UI) · **Last updated:** October 2026
 
 ## Project Overview
 Single-file web app untuk tracking attendance, pelayanan, milestone, events, visi, dan distribusi wilayah CG untuk AOG Teens Jakarta Timur. Dipakai oleh ~54 member, 9 CG Leaders, 2 Coach, dan 1 Team Leader secara bersamaan saat ibadah hari Minggu.
@@ -276,8 +276,8 @@ Edit index.html locally (+ file lain kalau perlu)
 ```
 
 **Version bump pattern setiap push code:**
-1. `index.html` — cari `App version">v31` → naikkan
-2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v31'` → naikkan sama
+1. `index.html` — cari `App version">v32` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
+2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v32'` → naikkan sama
 
 ---
 
@@ -288,6 +288,18 @@ Edit index.html locally (+ file lain kalau perlu)
 - **JANGAN tambah build step** — Vercel publish dir `.` (root), no build command
 - **JANGAN pakai npm/node** — pure vanilla JS
 - **JANGAN buat file README.md atau dokumentasi baru** kecuali diminta
+
+### Desain (v32 — redesign)
+- **Token warna** di `:root` (`--bg`, `--card`, `--line`, `--ink`, `--muted`, `--side`, `--accent`, `--gold`, `--H/--I/--S/--A/--X` + `b`/`br`). Alias lama (`--purple`, `--g1`…) **sudah dihapus** — jangan dipakai lagi
+- Font: **Bricolage Grotesque** (`var(--display)`, judul/angka) + **Inter** (teks). Minimal 11px
+- Ikon: pakai `icon(name, size)` (SVG inline, daftar di `ICON_PATHS`). **Jangan pakai emoji di UI**; emoji boleh hanya di isi pesan WA/broadcast/notifikasi push. `toast()` otomatis mengubah awalan ❌/✓/🔔/⚠ jadi ikon
+- Komponen: `.card`, `.chead`, `.btn` (`.primary/.sm/.big/.ghost/.danger`), `.iconbtn`, `.seg`, `.chip` (`.on` = filter aktif), `.pill`, `.kpi`(`.hero`), `.lrow`, `.prog`, `.empty`, `.acc`(`.acc-h`/`.acc-b`), `.evcard` (pakai `evCardHTML()`), `.mcard`, `.visi-box`
+- Semua yang bisa diklik = `<button type="button">` / `<a>`; tombol ikon wajib `aria-label`
+- Tab CGL/Coach: item nav punya class `.app-tab` + `data-tab`; `sTab()`/`sCoachTab()` menandai lewat `data-tab` (sidebar & bottom nav sinkron) — jangan pakai index
+- Kotak absensi = `<button class="dot H|I|S|A|X" data-mid data-did>` (class & atribut tetap wajib)
+- Accordion Absensi Coach: tabel tetap dirender saat tertutup (pakai `hidden`), supaya patch realtime per-dot jalan. State buka: `_CABS_OPEN`, Visi: `_VISI_EXPANDED`
+- Toggle region Coach ada di header (`#cRegSeg` → `coachSetRegion()`), bukan per tab
+- KPI + banner visi CGL (`#dTop`) hanya tampil di tab Absensi; KPI Coach (`#cTop`) hanya di Overview
 
 ### Code Safety
 - **JANGAN pakai `prompt()`** — block main thread. Pakai `asyncPrompt()`
@@ -329,13 +341,12 @@ Edit index.html locally (+ file lain kalau perlu)
 - Resize debounce: 150ms mobile/desktop switch
 - Smooth transitions: fade-in 0.2s pada tab switch
 
-### Mobile (≤600px)
-- Viewport: `maximum-scale=1, user-scalable=no` (prevent iOS zoom)
-- Dot touch targets: 36px
-- `touch-action: manipulation` pada dots
-- Sticky name column
-- Month filter: hanya bulan berjalan + ‹ › nav
-- Coach search bar: icon-only, expand pada focus
+### Mobile (≤880px layout HP, ≤600px filter bulan)
+- Viewport: zoom diizinkan (v32). Input dipaksa 16px di HP supaya iOS tidak auto-zoom
+- Sidebar disembunyikan → top bar ungu + bottom nav (`.mtop`, `.mnav`)
+- Dot touch targets: 44px, `touch-action: manipulation`
+- Sticky name column (avatar disembunyikan ≤600px)
+- Month filter: hanya bulan berjalan + tombol panah (≤600px)
 
 ### Security (Current State)
 - Supabase anon key exposed di client JS — acceptable internal church app
@@ -370,6 +381,7 @@ Edit index.html locally (+ file lain kalau perlu)
 | v29 | **Distribusi Wilayah** — filter kecamatan + kelurahan di Coach/TL Overview |
 | v30 | Wilayah filter hardening (escape + reset state + count consistency) |
 | v31 | **27 bug fixes** — attendance stats inflate, data corruption (sekolah/kelas split), XSS (PDF export), error handling (21 Supabase ops), TEEN 25 color map, reconnect race guard, undo sync, milestone prereq, visi TOCTOU fix |
+| v32 | **Redesign UI** (branch `redesign`) — sidebar + bottom nav, token warna baru, Bricolage Grotesque, ikon SVG pengganti emoji, kartu KPI, accordion Coach, heatmap milestone, modal berlabel. Logika data/Supabase tidak diubah. Fix: tombol Undo toast bisa diklik |
 
 Detail changelog per version ada di git log (`git log --oneline`).
 Detail v31 ada di `V31_CHANGELOG.md`.
@@ -379,7 +391,8 @@ Detail v31 ada di `V31_CHANGELOG.md`.
 ## Related Files
 - `HANDOFF.md` — comprehensive handoff untuk Claude Code baru (28 section, semua konteks)
 - `V31_CHANGELOG.md` — detail 27 bug fixes di v31 (Oktober 2026)
-- `CURRENT_DESIGN.md` — UI/UX design reference (CSS tokens, komponen, layout)
+- `CURRENT_DESIGN.md` — referensi desain **lama (v31)**, sebelum redesign v32
+- Paket redesign v32: `C:\Penyimpanan utama\Downloads\aog-redesign-handoff.zip` (spec, migration map, QA checklist, prototype) — sengaja **tidak** disalin ke repo karena Vercel mem-publish root
 - `KELAPA_GADING_SETUP.md` — blueprint untuk cabang Kelapa Gading (belum di-deploy)
 - `google-apps-script.gs` — Apps Script Google Sheets sync
 - `service-worker.js` — PWA SW network-first
