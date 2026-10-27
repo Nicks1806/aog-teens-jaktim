@@ -8,7 +8,7 @@
 
 const SYSTEM_PROMPT = [
   'Kamu adalah asisten data untuk Coach dan Team Leader AOG Teens (pelayanan remaja gereja, Jakarta Timur).',
-  'Kamu menerima DATA JSON terbaru dari dashboard absensi: daftar tanggal ibadah per region, info CG, anggota (status, string absensi, milestone), dan event.',
+  'Kamu menerima DATA JSON terbaru dari dashboard: tanggal ibadah per region, info CG (termasuk visi/misi & persen per bulan), anggota (status, string absensi, angka kehadiran, milestone selesai & berikutnya, jumlah pelayanan 4 bulan), jadwal pelayanan 4 bulan terakhir (petugas bisa lebih dari 1, dipisah koma), rencana pengembangan, dan event. Untuk ringkasan 1 anak, datanya ada di anak_ini, cg_anak, teman_satu_cg, pelayanan_anak, rencana_anak.',
   'Aturan:',
   '- Jawab dalam bahasa Indonesia yang santai, ringkas, dan jelas. Pakai bullet / angka kalau membantu. Boleh pakai **tebal** untuk poin penting.',
   '- HANYA gunakan data yang diberikan. Kalau datanya tidak ada atau tidak cukup, katakan terus terang — jangan mengarang nama, angka, atau tanggal.',
@@ -19,6 +19,11 @@ const SYSTEM_PROMPT = [
   '- Kalau diminta pesan WhatsApp, tulis hangat, sopan, cocok untuk remaja, tanpa menyebut angka persentase yang bisa mempermalukan.',
   '- Fokus membantu pelayanan: siapa yang perlu didoakan / di-follow-up, tren, perbandingan CG, rekap, dan ide tindak lanjut.',
   '- Default jawaban RINGKAS (maksimal ±250 kata, utamakan tabel atau poin). Jawaban panjang/detail hanya kalau diminta.',
+  '- Kalau jawaban membahas tren angka dari waktu ke waktu (mis. persen hadir per bulan) atau membandingkan beberapa CG/anak dari waktu ke waktu, sertakan SATU grafik garis dengan blok kode persis seperti ini (JSON valid, tanpa komentar):',
+  '```chart',
+  '{"judul":"Kehadiran per bulan","satuan":"%","label":["Jun","Jul","Agu"],"seri":[{"nama":"TEEN 01","data":[83,75,71]}]}',
+  '```',
+  '  label = sumbu X urut waktu (maks 12), data = angka sejajar label (null kalau tidak ada), maks 6 seri. Nama seri = nama CG/anak. Jangan buat grafik kalau tidak perlu.',
   '- Jangan meminta atau menebak data pribadi (nomor HP, alamat, tanggal lahir) — data itu sengaja tidak dikirim.'
 ].join('\n');
 
@@ -96,7 +101,7 @@ module.exports = async function handler(req, res) {
   });
   contents.push({ role: 'user', parts: [{ text: question }] });
 
-  const callGemini = async (model) => {
+  const callGemini = async (model, think) => {
     // Batas 20 dtk per panggilan supaya tidak menggantung sampai Vercel timeout
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 20000);
@@ -108,7 +113,7 @@ module.exports = async function handler(req, res) {
         body: JSON.stringify({
           systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
           contents,
-          generationConfig: { temperature: 0.3, maxOutputTokens: 8192 }
+          generationConfig: Object.assign({ temperature: 0.3, maxOutputTokens: 8192 }, think ? { thinkingConfig: { thinkingLevel: 'low' } } : {})
         })
       });
       const data = await r.json().catch(() => ({}));
@@ -120,26 +125,30 @@ module.exports = async function handler(req, res) {
   const queue = [MODEL].concat(FALLBACK_MODELS);
   const tried = [];
   const started = Date.now();
-  let lastErr = 'Gemini tidak bisa dihubungi.', lastStatus = 502;
+  let lastErr = 'AI tidak bisa dihubungi.', lastStatus = 502;
   while (queue.length && Date.now() - started < 55000) {
     const model = queue.shift();
     if (!model || tried.includes(model)) continue;
     tried.push(model);
     let out;
-    try { out = await callGemini(model); }
+    try {
+      out = await callGemini(model, true); // berpikir ringkas → jauh lebih cepat
+      // Model yang tidak kenal thinkingLevel → ulangi tanpa
+      if (!out.r.ok && out.r.status === 400 && /thinking/i.test(out.msg)) out = await callGemini(model, false);
+    }
     catch (e) {
-      if (e && e.name === 'AbortError') { lastErr = 'Gemini terlalu lama menjawab.'; lastStatus = 504; console.warn('[api/ai] timeout', model); continue; }
-      console.error('[api/ai] fetch failed', model, e); lastErr = 'Gagal menghubungi Gemini.'; continue;
+      if (e && e.name === 'AbortError') { lastErr = 'AI terlalu lama menjawab.'; lastStatus = 504; console.warn('[api/ai] timeout', model); continue; }
+      console.error('[api/ai] fetch failed', model, e); lastErr = 'Gagal menghubungi AI.'; continue;
     }
     const { r, data, msg } = out;
     if (r.ok) {
       const cand = data.candidates && data.candidates[0];
       const text = cand && cand.content && Array.isArray(cand.content.parts) ? cand.content.parts.map(p => p.text || '').join('') : '';
       if (text) return send(res, 200, { text, model, finish: cand.finishReason || '' });
-      return send(res, 502, { error: 'Gemini tidak memberi jawaban' + (cand && cand.finishReason ? ' (' + cand.finishReason + ')' : '') + '.' });
+      return send(res, 502, { error: 'AI tidak memberi jawaban' + (cand && cand.finishReason ? ' (' + cand.finishReason + ')' : '') + '.' });
     }
     console.warn('[api/ai] gemini error', model, r.status, msg);
-    lastErr = 'Gemini menolak permintaan: ' + msg.slice(0, 200); lastStatus = 502;
+    lastErr = 'AI menolak permintaan: ' + msg.slice(0, 200); lastStatus = 502;
     // Google menyarankan model pengganti → coba itu dulu
     const sug = /use (?:models\/)?([a-z0-9][a-z0-9.\-]*)/i.exec(msg);
     if (sug && sug[1]) queue.unshift(sug[1]);

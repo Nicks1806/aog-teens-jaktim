@@ -873,6 +873,30 @@ html.vt .tab-content.active{animation:none}
 .ai-send:disabled{opacity:.45;cursor:default;box-shadow:none}
 .ai-note{font-size:11px;color:#9a9a9a;padding:0 16px 12px;background:#fff;line-height:1.4}
 .nav.ai-nav svg{color:#6C5CE7;opacity:1}
+.ai-m.bot>.grow{flex:1;min-width:0}
+.ai-m.bot .ai-b{width:fit-content;max-width:100%}
+.ai-m.bot .ai-b:has(.ai-chart),.ai-m.bot .ai-b:has(.ai-tblw){width:100%}
+.ai-chart{margin:10px 0 12px;background:#fafaf8;max-width:720px}
+.ai-chart .trend-plot{height:190px}
+.ai-chart .ln{stroke-width:2.5}
+.ai-chart-t{font-size:12.5px;font-weight:700;margin:-8px 0 12px}
+.ai-leg{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px;font-size:12px;color:var(--muted)}
+.ai-leg span{display:inline-flex;align-items:center;gap:6px}
+.ai-leg i{width:10px;height:10px;border-radius:3px;display:inline-block}
+.ai-mic{width:46px;height:46px;border-radius:14px;border:1px solid var(--line);background:#fff;color:#6C5CE7;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;flex:none}
+.ai-mic.on{background:#fee2e2;border-color:#fca5a5;color:var(--A);animation:aiPulse 1.2s infinite}
+@keyframes aiPulse{0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,.35)}50%{box-shadow:0 0 0 6px rgba(220,38,38,0)}}
+.ai-mem{border:1px solid #e4dcff;background:linear-gradient(135deg,#faf8ff,#fff);border-radius:14px;padding:12px 14px}
+.ai-mem-btn{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:12px;padding:10px 14px;background:var(--grad);color:#fff;font:inherit;font-size:13.5px;font-weight:600;cursor:pointer;box-shadow:0 4px 12px rgba(108,92,231,.25)}
+.ai-mem-load{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted);padding:6px 0}
+.ai-mem-err{font-size:13px;color:var(--A);margin-bottom:8px}
+.ai-mem-b{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px}
+.ai-wa{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:10px 12px}
+.ai-wa-h{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:#15803d;margin-bottom:6px}
+.ai-wa-h small{font-weight:500;color:#4d7c5a}
+.ai-wa-t{width:100%;border:1px solid #bbf7d0;border-radius:10px;padding:9px 11px;font:inherit;font-size:13.5px;line-height:1.5;resize:vertical;background:#fff;outline:none}
+.ai-wa-t:focus{border-color:#16a34a}
+.ai-acts button.wa{color:#15803d;border-color:#bbf7d0}
 @media (max-width:600px){
   .ai-top{padding:10px 12px}
   .ai-msgs{height:calc(100vh - 450px);height:calc(100dvh - 450px);min-height:260px;padding:14px;gap:12px}
@@ -1107,7 +1131,7 @@ html.vt .tab-content.active{animation:none}
     <button type="button" class="backcoach" id="dBackCoach" onclick="goBack()" style="display:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Kembali ke Coach</button>
     <nav class="navlist" aria-label="Tab CG"><button type="button" class="nav app-tab on" data-tab="absensi" aria-current="page" onclick="sTab('absensi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M9 15l2 2 4-4"/></svg><span>Absensi</span></button><button type="button" class="nav app-tab" data-tab="detail" onclick="sTab('detail',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c1.9.7 3.1 2.4 3.5 5.2"/></svg><span>Detail CG</span></button><button type="button" class="nav app-tab" data-tab="visi" onclick="sTab('visi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span>Visi CG</span></button><button type="button" class="nav app-tab" data-tab="pelayanan" onclick="sTab('pelayanan',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"/></svg><span>Pelayanan</span></button><button type="button" class="nav app-tab" data-tab="milestone" onclick="sTab('milestone',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4h11l-2 4 2 4H5"/></svg><span>Milestone</span></button><button type="button" class="nav app-tab" data-tab="events" onclick="sTab('events',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4z"/><path d="M14 7v10"/></svg><span>Events</span></button></nav>
     <div class="sidetheme"><small>The year of</small><b>Unity</b><span>&amp; Open Heavens</span></div>
-    <div class="profile"><span class="ava" id="dAva" aria-hidden="true">A</span><div style="flex:1;min-width:0"><b id="nN"></b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v41</span></span></span></div><button type="button" class="exit" onclick="goBack()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
+    <div class="profile"><span class="ava" id="dAva" aria-hidden="true">A</span><div style="flex:1;min-width:0"><b id="nN"></b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v42</span></span></span></div><button type="button" class="exit" onclick="goBack()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
   </aside>
   <div class="main">
     <header class="mtop">
@@ -1150,7 +1174,7 @@ html.vt .tab-content.active{animation:none}
     <div class="rolesw" role="group" aria-label="Peran"><button type="button" id="roleCoachBtn" class="on" aria-pressed="true" onclick="switchRole('coach')">Coach</button><button type="button" id="roleTLBtn" aria-pressed="false" onclick="switchRole('tl')">TL</button></div>
     <nav class="navlist" id="coachTabs" aria-label="Tab Coach"><button type="button" class="nav app-tab on" data-tab="c-overview" aria-current="page" onclick="sCoachTab('c-overview',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"/></svg><span>Overview</span></button><button type="button" class="nav app-tab" data-tab="c-absensi" onclick="sCoachTab('c-absensi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M9 15l2 2 4-4"/></svg><span>Absensi</span></button><button type="button" class="nav app-tab" data-tab="c-milestone" onclick="sCoachTab('c-milestone',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4h11l-2 4 2 4H5"/></svg><span>Milestone</span></button><button type="button" class="nav app-tab" data-tab="c-visi" onclick="sCoachTab('c-visi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span>Visi</span></button><button type="button" class="nav app-tab" data-tab="c-events" onclick="sCoachTab('c-events',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4z"/><path d="M14 7v10"/></svg><span>Events</span></button><button type="button" class="nav app-tab ai-nav" data-tab="c-ai" onclick="sCoachTab('c-ai',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg><span>Tanya AI</span></button></nav>
     <button type="button" class="sidetheme editable" onclick="openThemeEdit()" aria-label="Edit tema tahun ini" title="Klik untuk edit tema"><small>The year of</small><b>Unity</b><span>&amp; Open Heavens</span><i class="st-edit" aria-hidden="true">Edit</i></button>
-    <div class="profile"><span class="ava" id="cAva" aria-hidden="true">C</span><div style="flex:1;min-width:0"><b id="cWho">Coach</b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v41</span></span></span></div><button type="button" class="exit" onclick="goBackCoach()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
+    <div class="profile"><span class="ava" id="cAva" aria-hidden="true">C</span><div style="flex:1;min-width:0"><b id="cWho">Coach</b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v42</span></span></span></div><button type="button" class="exit" onclick="goBackCoach()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
   </aside>
   <div class="main">
     <header class="mtop">
@@ -2087,6 +2111,7 @@ const MS_LABELS = ['MSJ 1','MSJ 2','MSJ 3','CGT 1','CGT 2','CGT 3','B.Air','B.Ro
 // ========== TOAST ==========
 // ========== ICONS (SVG stroke, pengganti emoji di UI) ==========
 const ICON_PATHS = {
+  mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3M9 21h6"/>',
   archive:'<rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8M10 12h4"/>',
   cal:'<rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M9 15l2 2 4-4"/>',
   users:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c1.9.7 3.1 2.4 3.5 5.2"/>',
@@ -3166,6 +3191,7 @@ function openCGLMember(memberId) {
   });
   html += '</div>';
 
+  if (fromCoach) html += aiMemberSectionHTML(m.id);
   html += '<div class="md-sec"><div class="mhead"><span class="flabel">Tren kehadiran per bulan</span><span class="mhint">% hadir dari '+st.rec+' absensi tercatat</span></div>'+memberTrendHTML(m)+'</div>';
   if (st.hist.length) {
     html += '<div class="md-sec"><div class="mhead"><span class="flabel">Absensi terakhir</span></div><div class="lastatt">';
@@ -3198,6 +3224,7 @@ function openCGLMember(memberId) {
   html += '</div><button type="button" class="btn" onclick="closeModal(\'cglMemberModal\')">Tutup</button></div>';
 
   document.getElementById('cglMemberBody').innerHTML = html;
+  if (fromCoach && _AI_MEM[m.id] && _AI_MEM[m.id].text) aiRenderMember(m.id);
   fillWilayahLists(m.kecamatan || '');
   const ov = document.getElementById('cglMemberModal');
   ov.classList.add('show');
@@ -4512,8 +4539,10 @@ function showMemberDetail(memberId) {
     html += '</div></div>';
   }
 
+  html += aiMemberSectionHTML(m.id);
   html += moveCgControlHTML(m);
   document.getElementById('memberDetailBody').innerHTML = html;
+  if (_AI_MEM[m.id] && _AI_MEM[m.id].text) aiRenderMember(m.id);
   openModal('memberDetailModal');
 }
 
@@ -4697,39 +4726,78 @@ function aiLabelISO(label) {
 }
 
 // Data terbaru dari server sebelum bertanya (absensi + tanggal + event)
-async function aiRefreshData() {
-  const [attData, datesRes, evRes] = await Promise.all([
+// Ambil semua baris dengan pagination (Supabase cap 1000 baris/query)
+async function aiFetchAll(build) {
+  const out = [];
+  for (let i = 0; i < 20; i++) {
+    const { data, error } = await build().range(i * 1000, i * 1000 + 999);
+    if (error) { console.warn('[aiFetchAll]', error); break; }
+    if (!data || !data.length) break;
+    out.push(...data);
+    if (data.length < 1000) break;
+  }
+  return out;
+}
+
+// Data terbaru dari server sebelum bertanya (absensi, tanggal, event, pelayanan 4 bulan, rencana, visi)
+let _AI_CACHE = { t: 0, data: null, p: null };
+async function aiRefreshData(force) {
+  if (!force && _AI_CACHE.data && Date.now() - _AI_CACHE.t < 90000) return _AI_CACHE.data;
+  if (_AI_CACHE.p) return _AI_CACHE.p; // sedang diambil → tunggu yang sama
+  _AI_CACHE.p = aiFetchFresh().then(d => { _AI_CACHE = { t: Date.now(), data: d, p: null }; return d; }, e => { _AI_CACHE.p = null; throw e; });
+  return _AI_CACHE.p;
+}
+async function aiFetchFresh() {
+  const from = new Date(); from.setMonth(from.getMonth() - 4);
+  const fromISO = from.toISOString().slice(0, 10);
+  const [attData, datesRes, evRes, pel, devRes, visRes] = await Promise.all([
     fetchAllAttendance(),
     supa.from('dates').select('id,label,region,sort_order,month_code').order('sort_order'),
-    supa.from('cg_events').select('cg,region,is_shared,name,date_start,date_end,cat')
+    supa.from('cg_events').select('cg,region,is_shared,name,date_start,date_end,cat'),
+    aiFetchAll(() => supa.from('cg_pelayanan').select('cg,region,week_date,role_name,member_name').gte('week_date', fromISO).order('week_date').order('cg').order('role_name')),
+    supa.from('cg_dev_plans').select('cg,region,member_name,current_status,target_status,deadline'),
+    supa.from('cg_vision').select('cg,region,visi,misi')
   ]);
   if (!datesRes.error && datesRes.data) ALL_DATES = datesRes.data;
   if (attData && attData.length) {
     ALL_ATTENDANCE = {};
     attData.forEach(a => { ALL_ATTENDANCE[a.member_id + '_' + a.date_id] = a.status; });
   }
-  return evRes.error ? [] : (evRes.data || []);
+  return {
+    events: evRes.error ? [] : (evRes.data || []),
+    pelayanan: pel || [],
+    rencana: devRes.error ? [] : (devRes.data || []),
+    visi: visRes.error ? [] : (visRes.data || [])
+  };
 }
 
-function buildAIContext(events) {
-  const region = coachRole === 'tl' ? 'all' : coachReg;
-  const regLbl = r => r === 'jaktim2' ? 'Jaktim 2' : 'Jaktim 1';
+const AI_MSL = ['MSJ 1', 'MSJ 2', 'MSJ 3', 'CGT 1', 'CGT 2', 'CGT 3', 'Baptis Air', 'Baptis Roh'];
+const aiRegLbl = r => r === 'jaktim2' ? 'Jaktim 2' : 'Jaktim 1';
+// Milestone berikutnya per jalur (MSJ, CGT, Baptis Air, Baptis Roh)
+function aiNextMilestones(m) {
+  return [[0, 1, 2], [3, 4, 5], [6], [7]].map(t => t.find(i => !m[MS_FIELDS[i]])).filter(i => i !== undefined).map(i => AI_MSL[i]);
+}
+
+// Hitung semua angka untuk sekumpulan CG (AI kurang andal menghitung sendiri dari string)
+function aiData(cgs, extra, scopeRegion) {
+  extra = extra || {};
   const todayISO = new Date().toISOString().slice(0, 10);
-  const cgs = getCGsForRegion(region);
   const mems = ALL_MEMBERS.filter(m => cgs.includes(m.cg));
   const regs = [...new Set(mems.map(m => m.region).filter(Boolean))].sort();
   const datesBy = {};
-  regs.forEach(r => { datesBy[r] = ALL_DATES.filter(d => d.region === r).slice().sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0)); });
-  const MSL = ['MSJ 1', 'MSJ 2', 'MSJ 3', 'CGT 1', 'CGT 2', 'CGT 3', 'Baptis Air', 'Baptis Roh'];
-  // Angka dihitung app (AI kurang andal menghitung sendiri dari string)
+  regs.forEach(r => { datesBy[r] = ALL_DATES.filter(d => d.region === r).slice().sort((x, y) => (x.sort_order || 0) - (y.sort_order || 0)); });
   const pctOf = o => o.t ? Math.round(o.h / o.t * 100) : null;
+  const pel = (extra.pelayanan || []).filter(p => cgs.includes(p.cg) && p.role_name !== '__init__' && String(p.member_name || '').trim());
+  const pelKey = (cg, n) => cg + '|' + String(n || '').trim().toLowerCase();
+  const pelCount = {};
+  pel.forEach(p => String(p.member_name).split(',').map(x => x.trim()).filter(Boolean).forEach(n => { pelCount[pelKey(p.cg, n)] = (pelCount[pelKey(p.cg, n)] || 0) + 1; }));
   const anggota = mems.map(m => {
-    let h = 0, i = 0, s = 0, a = 0, lastH = null;
+    let h = 0, i = 0, s2 = 0, a = 0, lastH = null;
     const perBulan = {}, recent = [];
     const str = (datesBy[m.region] || []).map(d => {
       const st = attShown(ALL_ATTENDANCE, m.id + '_' + d.id);
       const iso = aiLabelISO(d.label);
-      if (st === 'H') h++; else if (st === 'I') i++; else if (st === 'S') s++; else if (st === 'A') a++;
+      if (st === 'H') h++; else if (st === 'I') i++; else if (st === 'S') s2++; else if (st === 'A') a++;
       if (st) {
         const k = iso.slice(0, 7); (perBulan[k] = perBulan[k] || { h: 0, t: 0 }).t++; if (st === 'H') perBulan[k].h++;
         if (st === 'H') lastH = iso;
@@ -4737,9 +4805,9 @@ function buildAIContext(events) {
       if (iso <= todayISO) recent.push(iso + ':' + (st || '-'));
       return st || '-';
     }).join('');
-    const rec = h + i + s + a;
+    const rec = h + i + s2 + a;
     const pb = {}; Object.keys(perBulan).forEach(k => { pb[k] = pctOf(perBulan[k]); });
-    return { nama: m.nama, cg: m.cg, region: regLbl(m.region), status: roleLabel(m.status), absensi: str, hadir: h, izin: i, sakit: s, alpa: a, persen_hadir: rec ? Math.round(h / rec * 100) : null, persen_hadir_per_bulan: pb, tiga_ibadah_terakhir: recent.slice(-3), terakhir_hadir: lastH, milestone_selesai: MS_FIELDS.map((f, k) => m[f] ? MSL[k] : null).filter(Boolean) };
+    return { nama: m.nama, cg: m.cg, region: aiRegLbl(m.region), status: roleLabel(m.status), absensi: str, hadir: h, izin: i, sakit: s2, alpa: a, persen_hadir: rec ? Math.round(h / rec * 100) : null, persen_hadir_per_bulan: pb, tiga_ibadah_terakhir: recent.slice(-3), terakhir_hadir: lastH, milestone_selesai: MS_FIELDS.map((f, k) => m[f] ? AI_MSL[k] : null).filter(Boolean), milestone_berikutnya: aiNextMilestones(m), jumlah_pelayanan_4_bulan: pelCount[pelKey(m.cg, m.nama)] || 0 };
   });
   const cg = cgs.map(c => {
     const info = ALL_CG_INFO.find(x => x.cg === c) || {};
@@ -4747,32 +4815,112 @@ function buildAIContext(events) {
     let h = 0, t = 0; list.forEach(x => { h += x.hadir; t += x.hadir + x.izin + x.sakit + x.alpa; });
     const mm = mems.find(m => m.cg === c);
     const pb = {};
-    list.forEach(x => Object.keys(x.persen_hadir_per_bulan).forEach(k => { pb[k] = pb[k] || { h: 0, t: 0 }; }));
     mems.filter(m => m.cg === c).forEach(m => (datesBy[m.region] || []).forEach(d => {
       const st = attShown(ALL_ATTENDANCE, m.id + '_' + d.id); if (!st) return;
       const k = aiLabelISO(d.label).slice(0, 7); (pb[k] = pb[k] || { h: 0, t: 0 }).t++; if (st === 'H') pb[k].h++;
     }));
     const pbPct = {}; Object.keys(pb).sort().forEach(k => { pbPct[k] = pctOf(pb[k]); });
-    return { cg: c, region: mm ? regLbl(mm.region) : '', cgl: info.leader || '', jadwal: info.hari_jam || '', lokasi: info.lokasi || '', jumlah_anggota: list.length, persen_hadir: t ? Math.round(h / t * 100) : null, persen_hadir_per_bulan: pbPct };
+    const v = (extra.visi || []).find(x => x.cg === c && (!mm || x.region === mm.region)) || (extra.visi || []).find(x => x.cg === c) || {};
+    return { cg: c, region: mm ? aiRegLbl(mm.region) : '', cgl: info.leader || '', jadwal: info.hari_jam || '', lokasi: info.lokasi || '', jumlah_anggota: list.length, persen_hadir: t ? Math.round(h / t * 100) : null, persen_hadir_per_bulan: pbPct, visi: v.visi || '', misi: v.misi || '' };
   });
-  const ev = (events || []).filter(e => (e.date_end || e.date_start || '') >= todayISO)
-    .filter(e => e.is_shared ? (e.region === 'all' || region === 'all' || e.region === region) : cgs.includes(e.cg))
+  const ev = (extra.events || []).filter(e => (e.date_end || e.date_start || '') >= todayISO)
+    .filter(e => e.is_shared ? (e.region === 'all' || scopeRegion === 'all' || e.region === scopeRegion) : cgs.includes(e.cg))
     .sort((x, y) => String(x.date_start || '').localeCompare(String(y.date_start || '')))
     .slice(0, 40)
-    .map(e => ({ nama: e.name, mulai: e.date_start || null, selesai: e.date_end || null, kategori: catText(e.cat), untuk: e.is_shared ? (e.region === 'all' ? 'Semua CG' : 'Region ' + regLbl(e.region)) : e.cg }));
+    .map(e => ({ nama: e.name, mulai: e.date_start || null, selesai: e.date_end || null, kategori: catText(e.cat), untuk: e.is_shared ? (e.region === 'all' ? 'Semua CG' : 'Region ' + aiRegLbl(e.region)) : e.cg }));
+  const pelayanan = pel.map(p => ({ cg: p.cg, tanggal: p.week_date, tugas: p.role_name, petugas: p.member_name })).slice(-800);
+  const rencana = (extra.rencana || []).filter(r => cgs.includes(r.cg)).map(r => ({ cg: r.cg, nama: r.member_name, dari: r.current_status, target: r.target_status, deadline: r.deadline || null }));
+  return { todayISO, mems, regs, datesBy, anggota, cg, events: ev, pelayanan, rencana };
+}
+
+const AI_KET = 'String "absensi" tiap anggota sejajar dengan tanggal_ibadah region-nya. H=Hadir I=Izin S=Sakit A=Alpa -=kosong/belum bergabung/mendatang. Angka persen_hadir, persen_hadir_per_bulan (kunci YYYY-MM), tiga_ibadah_terakhir, terakhir_hadir, milestone_berikutnya, jumlah_pelayanan_4_bulan SUDAH dihitung — pakai angka itu.';
+
+function buildAIContext(extra) {
+  const region = coachRole === 'tl' ? 'all' : coachReg;
+  const d = aiData(getCGsForRegion(region), extra, region);
   return JSON.stringify({
-    hari_ini: todayISO,
-    cakupan: region === 'all' ? 'Semua region (Team Leader)' : regLbl(region) + ' (Coach)',
-    keterangan_absensi: 'String "absensi" tiap anggota sejajar dengan tanggal_ibadah region-nya. H=Hadir I=Izin S=Sakit A=Alpa -=kosong/belum bergabung/mendatang. Angka persen_hadir, persen_hadir_per_bulan (kunci YYYY-MM), tiga_ibadah_terakhir, terakhir_hadir SUDAH dihitung — pakai angka itu.',
-    bulan_ini: todayISO.slice(0, 7),
-    regions: regs.map(r => ({ region: regLbl(r), tanggal_ibadah: datesBy[r].map(d => aiLabelISO(d.label)) })),
-    cg, anggota, events_mendatang: ev,
+    hari_ini: d.todayISO,
+    bulan_ini: d.todayISO.slice(0, 7),
+    cakupan: region === 'all' ? 'Semua region (Team Leader)' : aiRegLbl(region) + ' (Coach)',
+    keterangan_absensi: AI_KET,
+    regions: d.regs.map(r => ({ region: aiRegLbl(r), tanggal_ibadah: d.datesBy[r].map(x => aiLabelISO(x.label)) })),
+    cg: d.cg, anggota: d.anggota,
+    pelayanan_4_bulan: d.pelayanan,
+    rencana_pengembangan: d.rencana,
+    events_mendatang: d.events,
     jumlah_member_arsip: ALL_MEMBERS.filter(m => isArchivedCg(m.cg)).length
   });
 }
 
+// Konteks 1 anak (untuk "Ringkas anak ini")
+function buildMemberContext(m, extra) {
+  const d = aiData([m.cg], extra, m.region);
+  const idx = d.mems.findIndex(x => x.id === m.id);
+  const anak = d.anggota[idx];
+  const nm = String(m.nama || '').trim().toLowerCase();
+  return JSON.stringify({
+    hari_ini: d.todayISO,
+    bulan_ini: d.todayISO.slice(0, 7),
+    keterangan_absensi: AI_KET,
+    tanggal_ibadah: (d.datesBy[m.region] || []).map(x => aiLabelISO(x.label)),
+    anak_ini: anak,
+    cg_anak: d.cg[0],
+    teman_satu_cg: d.anggota.filter((x, i) => i !== idx).map(x => ({ nama: x.nama, status: x.status, persen_hadir: x.persen_hadir })),
+    pelayanan_anak: d.pelayanan.filter(p => String(p.petugas).split(',').map(x => x.trim().toLowerCase()).includes(nm)),
+    rencana_anak: d.rencana.filter(r => String(r.nama || '').trim().toLowerCase() === nm),
+    events_mendatang: d.events.slice(0, 10)
+  });
+}
+
+
+// Grafik garis di jawaban AI: AI menulis blok ```chart {json}```, app yang menggambar
+const AI_CHART_COLORS = ['#6C5CE7', '#16a34a', '#d97706', '#2563eb', '#dc2626', '#0e7490'];
+function aiChartHTML(raw) {
+  let spec;
+  try { spec = JSON.parse(raw); } catch(e) { return ''; }
+  const labels = Array.isArray(spec.label) ? spec.label.slice(0, 12).map(String) : [];
+  const series = (Array.isArray(spec.seri) ? spec.seri : []).slice(0, 6)
+    .map(x => ({ nama: String(x.nama || ''), data: labels.map((_, i) => { const v = Array.isArray(x.data) ? x.data[i] : null; return typeof v === 'number' && isFinite(v) ? v : null; }) }))
+    .filter(x => x.data.some(v => v !== null));
+  if (labels.length < 2 || !series.length) return '';
+  const unit = String(spec.satuan || '');
+  const all = series.flatMap(x => x.data.filter(v => v !== null));
+  const maxV = unit === '%' ? 100 : Math.max(1, Math.ceil(Math.max(...all) * 1.1));
+  const X0 = 10, X1 = 96, Y0 = 8, Y1 = 90;
+  const xs = labels.map((_, i) => X0 + i * (X1 - X0) / (labels.length - 1));
+  const yOf = v => Y1 - (Math.max(0, Math.min(v, maxV)) / maxV) * (Y1 - Y0);
+  const col = (x, i) => (typeof CG_COLORS !== 'undefined' && CG_COLORS[x.nama]) || AI_CHART_COLORS[i % AI_CHART_COLORS.length];
+  let svg = '<svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">';
+  [0, 0.5, 1].forEach(f => { const y = Y1 - f * (Y1 - Y0); svg += '<line class="gl" x1="' + X0 + '" x2="100" y1="' + y + '" y2="' + y + '"/>'; });
+  series.forEach((x, si) => {
+    let d = '', pen = false;
+    x.data.forEach((v, i) => { if (v === null) { pen = false; return; } d += (pen ? 'L' : 'M') + xs[i].toFixed(2) + ' ' + yOf(v).toFixed(2) + ' '; pen = true; });
+    svg += '<path class="ln" style="stroke:' + col(x, si) + '" d="' + d + '"/>';
+  });
+  svg += '</svg>';
+  let pts = '';
+  const showVal = series.length === 1 && labels.length <= 10;
+  series.forEach((x, si) => x.data.forEach((v, i) => {
+    if (v === null) return;
+    pts += '<span class="tp" style="left:' + xs[i] + '%;top:' + yOf(v) + '%;--c:' + col(x, si) + '" title="' + esc(x.nama + ' · ' + labels[i] + ': ' + v + unit) + '">' + (showVal ? '<b>' + esc(String(v)) + esc(unit) + '</b>' : '') + '</span>';
+  }));
+  const yl = [1, 0.5, 0].map(f => '<span class="ty" style="top:' + (Y1 - f * (Y1 - Y0)) + '%">' + Math.round(f * maxV) + esc(unit) + '</span>').join('');
+  const xl = labels.map((l, i) => '<span style="left:' + xs[i] + '%">' + esc(l) + '</span>').join('');
+  const leg = series.length > 1 ? '<div class="ai-leg">' + series.map((x, si) => '<span><i style="background:' + col(x, si) + '"></i>' + esc(x.nama) + '</span>').join('') + '</div>' : '';
+  return '<div class="ai-chart trend">' + (spec.judul ? '<div class="ai-chart-t">' + esc(String(spec.judul)) + '</div>' : '') +
+    '<div class="trend-plot">' + svg + yl + pts + '</div><div class="trend-x">' + xl + '</div>' + leg + '</div>';
+}
+
 // Markdown ringan → HTML aman (teks di-escape dulu)
 function aiFormat(text) {
+  // Blok grafik diproses dulu (JSON mentah), sisanya markdown biasa
+  const src = String(text || '');
+  if (/```chart/i.test(src)) {
+    return src.split(/```chart\s*([\s\S]*?)```/i).map((part, i) => i % 2 ? aiChartHTML(part) : aiFormatText(part)).join('');
+  }
+  return aiFormatText(src);
+}
+function aiFormatText(text) {
   const inline = t => t.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/(^|[\s(])\*(?!\s)([^*]+?)\*(?=[\s).,:;!?]|$)/g, '$1<i>$2</i>').replace(/`([^`]+)`/g, '<code>$1</code>');
   const lines = esc(String(text || '')).split('\n');
   let html = '', list = null, tbl = [];
@@ -4811,19 +4959,22 @@ function renderCoachAI() {
         '<form class="ai-input" onsubmit="event.preventDefault();aiAsk()">' +
           '<label class="sr" for="aiQ">Pertanyaan</label>' +
           '<textarea id="aiQ" rows="1" placeholder="Tanya apa saja tentang absensi, CG, milestone, event…" onkeydown="aiKey(event)" oninput="aiGrow(this)"></textarea>' +
+          (aiMicSupported() ? '<button type="button" class="ai-mic" id="aiMic" onclick="aiMic()" aria-label="Tanya pakai suara" title="Tanya pakai suara">' + icon('mic', 20) + '</button>' : '') +
           '<button type="submit" class="ai-send" id="aiSend" aria-label="Kirim pertanyaan">' + icon('right', 20) + '</button>' +
         '</form>' +
-        '<div class="ai-note">Dikirim ke Gemini setiap bertanya: nama, CG, status, riwayat absensi, milestone & event terbaru. <b>Tidak</b> dikirim: no HP, alamat, tanggal lahir, sekolah, catatan.</div>' +
+        '<div class="ai-note">Dikirim ke AI setiap bertanya: nama, CG, status, riwayat absensi, milestone, pelayanan, rencana pengembangan, visi/misi & event terbaru. <b>Tidak</b> dikirim: no HP, alamat, tanggal lahir, sekolah, catatan. Riwayat chat tersimpan di HP ini.</div>' +
       '</div>' +
     '</section>';
+  if (!_AI.msgs.length) aiLoadChat();
   aiRender();
+  aiRefreshData().catch(() => {}); // siapkan data duluan supaya pertanyaan pertama lebih cepat
 }
 
 function aiRender() {
   const box = document.getElementById('aiMsgs');
   if (!box) return;
   const meta = document.getElementById('aiMeta');
-  if (meta) meta.textContent = 'Gemini · data ' + aiScopeLabel() + ' · selalu pakai data terbaru';
+  if (meta) meta.textContent = 'Data ' + aiScopeLabel() + ' · selalu pakai data terbaru';
   const send = document.getElementById('aiSend'); if (send) send.disabled = _AI.busy;
   if (_AI.needPin && !aiGetPin()) {
     box.innerHTML = '<div class="ai-gate"><span class="ai-badge big" aria-hidden="true">' + icon('spark', 26) + '</span>' +
@@ -4854,12 +5005,104 @@ function aiSavePin() {
   aiRender();
   setTimeout(() => { const q = document.getElementById('aiQ'); if (q) q.focus(); }, 50);
 }
-function aiReset() { if (_AI.busy) return; _AI.msgs = []; aiRender(); }
+function aiReset() { if (_AI.busy) return; _AI.msgs = []; aiSaveChat(); aiRender(); }
+
+// Riwayat chat disimpan di HP ini, terpisah per cakupan (Coach Jaktim 1 / Jaktim 2 / TL)
+const AI_CHAT_KEY = 'aog_ai_chat_v1';
+function aiScopeKey() { return coachRole === 'tl' ? 'tl' : 'coach:' + coachReg; }
+function aiSaveChat() {
+  try {
+    const all = JSON.parse(localStorage.getItem(AI_CHAT_KEY) || '{}') || {};
+    all[aiScopeKey()] = _AI.msgs.filter(m => !m.err).slice(-30);
+    localStorage.setItem(AI_CHAT_KEY, JSON.stringify(all));
+  } catch(e) {}
+}
+function aiLoadChat() {
+  try {
+    const all = JSON.parse(localStorage.getItem(AI_CHAT_KEY) || '{}') || {};
+    const list = all[aiScopeKey()];
+    _AI.msgs = Array.isArray(list) ? list.filter(m => m && (m.role === 'user' || m.role === 'model') && typeof m.text === 'string') : [];
+  } catch(e) { _AI.msgs = []; }
+}
+
+// Tanya pakai suara (Web Speech API — Chrome/Android/Edge; Safari sebagian)
+let _AI_REC = null;
+function aiMicSupported() { return !!(window.SpeechRecognition || window.webkitSpeechRecognition); }
+function aiMic() {
+  const btn = document.getElementById('aiMic');
+  if (_AI_REC) { try { _AI_REC.stop(); } catch(e) {} return; }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { toast('Browser ini belum mendukung input suara'); return; }
+  const ta = document.getElementById('aiQ'); if (!ta) return;
+  const rec = new SR();
+  rec.lang = 'id-ID'; rec.interimResults = true; rec.continuous = false;
+  const base = ta.value ? ta.value.replace(/\s*$/, ' ') : '';
+  rec.onresult = e => { let t = ''; for (let i = 0; i < e.results.length; i++) t += e.results[i][0].transcript; ta.value = base + t; aiGrow(ta); };
+  rec.onerror = e => { if (e.error !== 'aborted' && e.error !== 'no-speech') toast('❌ Mikrofon: ' + (e.error === 'not-allowed' ? 'izin mikrofon ditolak' : e.error)); };
+  rec.onend = () => { _AI_REC = null; if (btn) btn.classList.remove('on'); ta.focus(); };
+  try { rec.start(); _AI_REC = rec; if (btn) btn.classList.add('on'); } catch(e) { toast('❌ Mikrofon tidak bisa dipakai'); }
+}
+
+// ── AI per anak (detail anak, Coach/TL): ringkasan + draft WA personal ──
+const _AI_MEM = {};
+function aiMemberSectionHTML(id) {
+  return '<div class="md-sec ai-mem"><div class="mhead"><span class="flabel">Ringkasan AI</span><span class="mhint">tanpa data pribadi</span></div>' +
+    '<div id="aiMemOut_' + id + '"><button type="button" class="ai-mem-btn" onclick="aiSummarizeMember(' + id + ')">' + icon('spark', 16) + '<span>Ringkas anak ini + draft pesan WA</span></button></div></div>';
+}
+function aiMemberById(id) { return (ALL_MEMBERS || []).find(x => x.id === id) || (MEMBERS || []).find(x => x.id === id); }
+async function aiSummarizeMember(id) {
+  const box = document.getElementById('aiMemOut_' + id);
+  const m = aiMemberById(id);
+  if (!box || !m || (_AI_MEM[id] && _AI_MEM[id].busy)) return;
+  _AI_MEM[id] = { busy: true };
+  const first = esc(String(m.nama || '').trim().split(/\s+/)[0]);
+  box.innerHTML = '<div class="ai-mem-load"><span class="ai-dots" aria-hidden="true"><span></span><span></span><span></span></span>AI sedang membaca data ' + first + '…</div>';
+  const q = 'Ringkas kondisi anak "' + m.nama + '" (field anak_ini) untuk Coach/CGL. Format tepat:\n### Ringkasan\n2-3 kalimat.\n### Kehadiran\nTren per bulan, pola 3 ibadah terakhir, bandingkan dengan rata-rata CG.\n### Pertumbuhan\nMilestone selesai & berikutnya, pelayanan, rencana pengembangan (kalau ada).\n### Saran tindak lanjut\n2-3 poin konkret.\nTerakhir tulis baris "PESAN WA:" lalu draft pesan WhatsApp singkat (maks 4 kalimat) yang hangat untuk anak ini, sapa dengan nama depan, tanpa menyebut angka/persentase.';
+  try {
+    const extra = await aiRefreshData();
+    const context = buildMemberContext(m, extra);
+    const r = await fetch('/api/ai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ pin: aiGetPin(), question: q, context, history: [] }) });
+    let data = {};
+    try { data = await r.json(); } catch(e) {}
+    if (!r.ok) throw new Error(r.status === 401 ? 'AI memakai kode akses — masukkan dulu di tab Tanya AI.' : (data.error || ('HTTP ' + r.status)));
+    _AI_MEM[id] = { busy: false, text: data.text || '' };
+    aiRenderMember(id);
+  } catch(e) {
+    console.error('[aiSummarizeMember]', e);
+    _AI_MEM[id] = { busy: false };
+    const b2 = document.getElementById('aiMemOut_' + id);
+    if (b2) b2.innerHTML = '<div class="ai-mem-err">' + esc(e.message || 'Gagal menghubungi AI') + '</div><button type="button" class="ai-mem-btn" onclick="aiSummarizeMember(' + id + ')">' + icon('refresh', 16) + '<span>Coba lagi</span></button>';
+  }
+}
+function aiRenderMember(id) {
+  const box = document.getElementById('aiMemOut_' + id);
+  const st = _AI_MEM[id], m = aiMemberById(id);
+  if (!box || !st || !st.text || !m) return;
+  const parts = String(st.text).split(/\n?[ \t]*\**PESAN WA:?\**[ \t]*/i);
+  const summary = parts[0], wa = (parts.slice(1).join('\n') || '').trim();
+  const first = esc(String(m.nama || '').trim().split(/\s+/)[0]);
+  box.innerHTML = '<div class="ai-b ai-mem-b">' + aiFormat(summary) + '</div>' +
+    (wa ? '<div class="ai-wa"><div class="ai-wa-h">' + icon('wa', 14) + 'Draft pesan WA <small>— bisa diedit dulu</small></div>' +
+      '<label class="sr" for="aiWaT_' + id + '">Draft pesan WA</label><textarea class="ai-wa-t" id="aiWaT_' + id + '" rows="4">' + esc(aiPlain(wa)) + '</textarea>' +
+      '<div class="ai-acts"><button type="button" onclick="aiMemCopy(' + id + ')">' + icon('copy', 13) + 'Salin</button>' +
+      '<button type="button" class="wa" onclick="aiMemSendWA(' + id + ')">' + icon('wa', 13) + (waLinkOf(m.wa) ? 'Kirim ke WA ' + first : 'Buka WhatsApp') + '</button>' +
+      '<button type="button" onclick="aiSummarizeMember(' + id + ')">' + icon('refresh', 13) + 'Ulangi</button></div></div>' : '');
+}
+async function aiMemCopy(id) {
+  const t = (document.getElementById('aiWaT_' + id) || {}).value || '';
+  try { await navigator.clipboard.writeText(t); toast('✓ Pesan disalin'); } catch(e) { toast('❌ Gagal menyalin'); }
+}
+function aiMemSendWA(id) {
+  const m = aiMemberById(id); if (!m) return;
+  const t = (document.getElementById('aiWaT_' + id) || {}).value || '';
+  // Nomor WA hanya dipakai di HP ini untuk membuka WhatsApp — tidak pernah dikirim ke AI
+  window.open((waLinkOf(m.wa) || 'https://wa.me/') + '?text=' + encodeURIComponent(t), '_blank', 'noopener');
+}
 // Ganti Coach/TL atau region → sapaan & cakupan data AI ikut berubah; percakapan lama direset supaya tidak tercampur
-function aiScopeChanged() { if (!_AI.busy) _AI.msgs = []; aiRender(); }
+function aiScopeChanged() { if (!_AI.busy) aiLoadChat(); aiRender(); }
 function aiGrow(t) { t.style.height = 'auto'; t.style.height = Math.min(t.scrollHeight, 160) + 'px'; }
 function aiKey(e) { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); aiAsk(); } }
-function aiPlain(t) { return String(t || '').replace(/\*\*(.+?)\*\*/g, '$1').replace(/^#{1,4}\s+/gm, ''); }
+function aiPlain(t) { return String(t || '').replace(/```chart[\s\S]*?```/gi, '').replace(/\*\*(.+?)\*\*/g, '$1').replace(/^#{1,4}\s+/gm, '').replace(/\n{3,}/g, '\n\n').trim(); }
 async function aiCopy(i) {
   const m = _AI.msgs[i]; if (!m) return;
   try { await navigator.clipboard.writeText(aiPlain(m.text)); toast('✓ Jawaban disalin'); } catch(e) { toast('❌ Gagal menyalin'); }
@@ -4880,8 +5123,8 @@ async function aiAsk(qOverride) {
   _AI.msgs.push({ role: 'user', text: q });
   _AI.busy = true; aiRender();
   try {
-    const events = await aiRefreshData();
-    const context = buildAIContext(events);
+    const extra = await aiRefreshData();
+    const context = buildAIContext(extra);
     const r = await fetch('/api/ai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ pin, question: q, context, history }) });
     let data = {};
     try { data = await r.json(); } catch(e) {}
@@ -4893,6 +5136,7 @@ async function aiAsk(qOverride) {
     _AI.msgs.push({ role: 'model', text: 'Tidak bisa terhubung ke AI — cek koneksi lalu coba lagi.', err: true });
   }
   _AI.busy = false;
+  aiSaveChat();
   aiRender();
   if (_AI.needPin && !aiGetPin()) setTimeout(aiRender, 1800);
 }
