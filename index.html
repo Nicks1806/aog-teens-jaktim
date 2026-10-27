@@ -67,6 +67,18 @@ html:has(#pageL:not([style*="none"])) body{background:var(--side)}
 .ddopt .ddico{width:40px;height:40px;border-radius:11px}
 .ddopt .ok{color:var(--accent);display:flex}
 .ddempty{padding:20px;text-align:center;font-size:13px;color:var(--muted)}
+/* Dropdown CG di landing: terbuka di dalam kartu (in-flow), bukan melayang keluar kartu */
+#cgDD .ddpanel{position:static;margin-top:10px;max-height:none;overflow:visible;padding:6px;background:#F7F6FB;border:1px solid var(--line2);border-radius:18px;box-shadow:none;animation:ddOpen .18s ease}
+@keyframes ddOpen{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+#cgDD .ddhead{display:flex;justify-content:space-between;padding:8px 10px 6px}
+#cgDD .ddopt{min-height:60px;padding:8px 12px 8px 8px;border:1px solid transparent;border-radius:14px;transition:background .12s,border-color .12s,box-shadow .12s}
+#cgDD .ddopt+.ddopt{margin-top:2px}
+#cgDD .ddopt:hover,#cgDD .ddopt:focus-visible{background:#fff;border-color:var(--line);box-shadow:0 4px 14px rgba(36,28,92,.06)}
+#cgDD .ddopt[aria-selected=true]{background:#fff;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+#cgDD .ddopt .ddico{width:44px;height:44px;border-radius:12px;font-size:15px}
+#cgDD .ddopt .ddgo{color:var(--muted);display:flex;opacity:0;transform:translateX(-4px);transition:opacity .12s,transform .12s}
+#cgDD .ddopt:hover .ddgo,#cgDD .ddopt:focus-visible .ddgo{opacity:1;transform:none}
+#cgDD .ddopt[aria-selected=true] .ddgo{display:none}
 .region-toggle{display:flex;gap:4px;padding:4px;background:var(--faint);border-radius:14px}
 .region-btn{flex:1;white-space:nowrap;min-height:40px;padding:0 16px;border:0;border-radius:10px;background:transparent;font-weight:600;font-size:14px;color:var(--muted);cursor:pointer}
 .region-btn:hover:not(.active){color:var(--ink)}
@@ -988,9 +1000,11 @@ function handleMembersChange(payload) {
         MEMBERS.sort((a, b) => roleRankLC(a.status) - roleRankLC(b.status));
         // Re-render tab aktif
         const activeTab = document.querySelector('#pageD .tab-content.active');
+        // Semua tab ditandai perlu render ulang (bukan cuma tab aktif) supaya member baru/terhapus
+        // ikut ter-update saat pindah tab — termasuk tab Absensi
+        TAB_RENDERED = {};
         if (activeTab) {
           const id = activeTab.id.replace('tab-', '');
-          TAB_RENDERED[id] = false;
           await ensureTabRendered(id);
         }
         computeStats();
@@ -1717,14 +1731,14 @@ function popDD() {
     opt.dataset.cgInit = cgInit;
     opt.dataset.cgColor = cgColor;
     opt.dataset.cgBg = cgBg;
-    opt.innerHTML = ddBody(m.cg, shortName, cgInit, cgColor, cgBg);
+    opt.innerHTML = ddBody(m.cg, shortName, cgInit, cgColor, cgBg) + '<span class="ddgo" aria-hidden="true">'+icon('right',18)+'</span>';
     opt.onclick = (e) => { e.stopPropagation(); selectCGOption(m.cg, shortName, cgInit, cgColor, cgBg); };
     panel.appendChild(opt);
   });
 
   if (seen.size) {
     const regLabel = String(curReg||'').toLowerCase() === 'jaktim2' ? 'Jaktim 2' : 'Jaktim 1';
-    panel.insertAdjacentHTML('afterbegin', '<div class="ddhead">'+regLabel+' · '+seen.size+' CG</div>');
+    panel.insertAdjacentHTML('afterbegin', '<div class="ddhead"><span>Pilih CG</span><span>'+regLabel+' · '+seen.size+' CG</span></div>');
   } else {
     panel.innerHTML = '<div class="ddempty">Tidak ada CG Leader untuk region ini</div>';
   }
@@ -1803,7 +1817,7 @@ async function enterFromCoach(cg) {
 }
 
 function regionVisiBannerHTML(cv) {
-  let inner = '<small>Visi Coach region</small><div style="white-space:pre-wrap">'+esc(cv.visi)+'</div>';
+  let inner = '<div style="white-space:pre-wrap">'+esc(cv.visi)+'</div>';
   if (cv.misi) inner += '<div class="vb-misi">'+esc(cv.misi)+'</div>';
   return inner;
 }
@@ -1924,7 +1938,8 @@ async function ensureTabRendered(id) {
   if (TAB_RENDERED[id]) return;
   TAB_RENDERED[id] = true;
   try {
-    if (id === 'detail') await renderDetail();
+    if (id === 'absensi') renderAbsensi();
+    else if (id === 'detail') await renderDetail();
     else if (id === 'visi') await renderVisiCG();
     else if (id === 'pelayanan') await renderPelayanan();
     else if (id === 'milestone') renderMilestone();
