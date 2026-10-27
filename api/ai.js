@@ -55,6 +55,17 @@ const APP_GUIDE = [
   '- Versi: tulisan vXX di pojok; kalau muncul "Versi baru tersedia · Muat ulang", ketuk untuk memperbarui. Perubahan data muncul langsung di HP lain (indikator Live/Offline, tombol Refresh). Data juga tersalin otomatis ke Google Sheets tiap 1 menit (satu arah, dari web ke Sheets).'
 ].join('\n');
 
+// Format jawaban "Absen dari foto" (structured output Claude)
+const ABSEN_SCHEMA = {
+  type: 'object', additionalProperties: false, required: ['hasil', 'tidak_cocok', 'catatan'],
+  properties: {
+    hasil: { type: 'array', items: { type: 'object', additionalProperties: false, required: ['id', 'nama_di_foto', 'status', 'yakin'],
+      properties: { id: { type: 'integer' }, nama_di_foto: { type: 'string' }, status: { type: 'string', enum: ['H', 'I', 'S', 'A'] }, yakin: { type: 'boolean' } } } },
+    tidak_cocok: { type: 'array', items: { type: 'string' } },
+    catatan: { type: 'string' }
+  }
+};
+
 // Model cadangan kalau model utama sibuk ("high demand") / dipensiunkan / timeout
 const FALLBACK_MODELS = ['gemini-flash-latest', 'gemini-3.8-flash', 'gemini-flash-lite-latest'];
 
@@ -87,10 +98,13 @@ async function readBody(req) {
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return send(res, 405, { error: 'Gunakan POST' });
 
-  const KEY = process.env.GEMINI_API_KEY;
+  const t0 = Date.now();
+  const KEY = process.env.GEMINI_API_KEY;               // Gemini = cadangan
+  const CLAUDE_KEY = process.env.ANTHROPIC_API_KEY;     // Claude = utama (kalau diisi)
+  const CLAUDE_MODEL = process.env.CLAUDE_MODEL || 'claude-sonnet-5-5';
   const PIN = process.env.AI_PIN;
   const MODEL = process.env.GEMINI_MODEL || 'gemini-3.5-flash';
-  if (!KEY) return send(res, 503, { error: 'AI belum aktif: GEMINI_API_KEY belum diisi di Vercel.' });
+  if (!KEY && !CLAUDE_KEY) return send(res, 503, { error: 'AI belum aktif: ANTHROPIC_API_KEY / GEMINI_API_KEY belum diisi di Vercel.' });
 
   const ip = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'unknown';
   if (rateLimited(ip)) return send(res, 429, { error: 'Terlalu banyak pertanyaan. Tunggu 1 menit ya.' });
@@ -102,6 +116,7 @@ module.exports = async function handler(req, res) {
 
   // Diagnosa: daftar model yang tersedia untuk key ini (hanya nama model, tanpa data rahasia)
   if (body.action === 'models') {
+    if (!KEY) return send(res, 200, { claude: { aktif: !!CLAUDE_KEY, model: CLAUDE_MODEL }, current: null, models: [] });
     try {
       const ctrl = new AbortController(); const timer = setTimeout(() => ctrl.abort(), 15000);
       const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=200', { headers: { 'x-goog-api-key': KEY }, signal: ctrl.signal });
@@ -109,7 +124,7 @@ module.exports = async function handler(req, res) {
       const data = await r.json().catch(() => ({}));
       if (!r.ok) return send(res, 502, { error: (data.error && data.error.message) || ('HTTP ' + r.status) });
       const models = (data.models || []).filter(m => (m.supportedGenerationMethods || []).includes('generateContent')).map(m => String(m.name || '').replace(/^models\//, ''));
-      return send(res, 200, { current: MODEL, models });
+      return send(res, 200, { claude: { aktif: !!CLAUDE_KEY, model: CLAUDE_MODEL }, current: MODEL, models });
     } catch (e) { return send(res, 502, { error: 'Gagal mengambil daftar model.' }); }
   }
 
@@ -160,12 +175,68 @@ module.exports = async function handler(req, res) {
     } finally { clearTimeout(timer); }
   };
 
-  // Coba model utama, lalu cadangan kalau sibuk / dipensiunkan / timeout (maks ±55 dtk total)
+  // ── Claude (utama): Messages API lewat fetch (proyek tanpa npm). Gagal apa pun → lanjut ke Gemini ──
+  const imgData = hasImage ? parts[1].inlineData : null;
+  const callClaude = async (useFormat) => {
+    const msgs = [];
+    const push = (role, blocks) => {
+      const last = msgs[msgs.length - 1];
+      if (last && last.role === role) last.content.push(...blocks); else msgs.push({ role, content: blocks });
+    };
+    // Data dashboard di-cache (prompt caching) → pertanyaan lanjutan lebih murah & cepat
+    push('user', [{ type: 'text', text: 'DATA DASHBOARD TERBARU (JSON):\n' + context, cache_control: { type: 'ephemeral' } }]);
+    push('assistant', [{ type: 'text', text: 'Siap, data sudah saya baca. Silakan bertanya.' }]);
+    history.forEach(h => {
+      const text = String((h && h.text) || '').slice(0, 4000);
+      if (text) push(h && h.role === 'model' ? 'assistant' : 'user', [{ type: 'text', text }]);
+    });
+    const lastBlocks = [];
+    if (imgData) lastBlocks.push({ type: 'image', source: { type: 'base64', media_type: imgData.mimeType, data: imgData.data } });
+    lastBlocks.push({ type: 'text', text: question });
+    push('user', lastBlocks);
+    const output_config = { effort: 'low' }; // chat & ekstraksi: low = cepat, tetap teliti
+    if (useFormat) output_config.format = { type: 'json_schema', schema: ABSEN_SCHEMA };
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), hasImage ? 35000 : 25000);
+    try {
+      const r = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        signal: ctrl.signal,
+        headers: { 'Content-Type': 'application/json', 'x-api-key': CLAUDE_KEY, 'anthropic-version': '2026-10-21' },
+        body: JSON.stringify({
+          model: CLAUDE_MODEL,
+          max_tokens: 12000,
+          system: [{ type: 'text', text: SYSTEM_PROMPT + '\n\n' + APP_GUIDE, cache_control: { type: 'ephemeral' } }],
+          messages: msgs,
+          output_config
+        })
+      });
+      const data = await r.json().catch(() => ({}));
+      if (!r.ok) return { status: r.status, err: 'HTTP ' + r.status + ' ' + String((data.error && data.error.message) || '').slice(0, 160) };
+      if (data.stop_reason === 'refusal') return { err: 'refusal' };
+      // Baca blok berdasarkan type (blok thinking bisa ada di depan)
+      const text = (data.content || []).filter(b => b && b.type === 'text').map(b => b.text || '').join('').trim();
+      if (!text) return { err: 'jawaban kosong (' + (data.stop_reason || '-') + ')' };
+      return { text, model: data.model || CLAUDE_MODEL, finish: data.stop_reason === 'max_tokens' ? 'MAX_TOKENS' : 'STOP' };
+    } catch (e) {
+      return { err: e && e.name === 'AbortError' ? 'timeout' : 'gagal terhubung' };
+    } finally { clearTimeout(timer); }
+  };
+  let claudeNote = '';
+  if (CLAUDE_KEY) {
+    let c = await callClaude(wantJSON);
+    if (!c.text && wantJSON && c.status === 400) c = await callClaude(false); // format JSON ditolak → prompt saja
+    if (c.text) return send(res, 200, { text: c.text, model: c.model, finish: c.finish });
+    claudeNote = 'Claude: ' + String(c.err || '');
+    console.warn('[api/ai] claude gagal, pakai Gemini', claudeNote);
+  }
+  if (!KEY) return send(res, 502, { error: 'AI tidak bisa dihubungi. Coba lagi sebentar lagi.', note: claudeNote });
+
+  // Gemini (cadangan): model utama, lalu cadangan kalau sibuk / dipensiunkan / timeout (maks ±55 dtk total sejak request masuk)
   const queue = [MODEL].concat(FALLBACK_MODELS);
   const tried = [];
-  const started = Date.now();
   let lastErr = 'AI tidak bisa dihubungi.', lastStatus = 502;
-  while (queue.length && Date.now() - started < 55000) {
+  while (queue.length && Date.now() - t0 < 55000) {
     const model = queue.shift();
     if (!model || tried.includes(model)) continue;
     tried.push(model);
@@ -183,7 +254,7 @@ module.exports = async function handler(req, res) {
     if (r.ok) {
       const cand = data.candidates && data.candidates[0];
       const text = cand && cand.content && Array.isArray(cand.content.parts) ? cand.content.parts.map(p => p.text || '').join('') : '';
-      if (text) return send(res, 200, { text, model, finish: cand.finishReason || '' });
+      if (text) return send(res, 200, Object.assign({ text, model, finish: cand.finishReason || '' }, claudeNote ? { note: claudeNote } : {}));
       return send(res, 502, { error: 'AI tidak memberi jawaban' + (cand && cand.finishReason ? ' (' + cand.finishReason + ')' : '') + '.' });
     }
     console.warn('[api/ai] gemini error', model, r.status, msg);
@@ -194,5 +265,5 @@ module.exports = async function handler(req, res) {
     const retriable = [404, 429, 500, 503].includes(r.status) || /high demand|overloaded|unavailable|no longer available|not found|try again/i.test(msg);
     if (!retriable) break; // mis. key salah → tidak perlu coba model lain
   }
-  return send(res, lastStatus, { error: lastErr.replace(/[.\s]*$/, '.') + ' Coba lagi sebentar lagi.', tried });
+  return send(res, lastStatus, Object.assign({ error: lastErr.replace(/[.\s]*$/, '.') + ' Coba lagi sebentar lagi.', tried }, claudeNote ? { note: claudeNote } : {}));
 };
