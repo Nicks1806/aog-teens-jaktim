@@ -1,6 +1,6 @@
 # AOG Teens Jaktim — CG Dashboard (Absensi + Management)
 
-**Current version:** v32 (redesign UI) · **Last updated:** October 2026
+**Current version:** v36 · **Last updated:** 27 Oktober 2026
 
 ## Project Overview
 Single-file web app untuk tracking attendance, pelayanan, milestone, events, visi, dan distribusi wilayah CG untuk AOG Teens Jakarta Timur. Dipakai oleh ~54 member, 9 CG Leaders, 2 Coach, dan 1 Team Leader secara bersamaan saat ibadah hari Minggu.
@@ -277,8 +277,8 @@ Edit index.html locally (+ file lain kalau perlu)
 ```
 
 **Version bump pattern setiap push code:**
-1. `index.html` — cari `App version">v32` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
-2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v32'` → naikkan sama
+1. `index.html` — cari `App version">v36` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
+2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v36'` → naikkan sama
 
 ---
 
@@ -347,8 +347,8 @@ Edit index.html locally (+ file lain kalau perlu)
 - Smooth transitions: fade-in 0.2s pada tab switch
 
 ### Mobile (≤880px layout HP, ≤600px filter bulan)
-- Viewport: zoom diizinkan (v32). Input dipaksa 16px di HP supaya iOS tidak auto-zoom
-- Sidebar disembunyikan → top bar ungu + bottom nav (`.mtop`, `.mnav`)
+- Viewport: zoom diizinkan (v32). Input 16px di iOS (anti auto-zoom), 14px di Android (v33)
+- Sidebar disembunyikan → top bar putih + bottom nav (`.mtop`, `.mnav`); logo kotak "A" disembunyikan (v33)
 - Dot touch targets: 44px, `touch-action: manipulation`
 - Sticky name column (avatar disembunyikan ≤600px)
 - Month filter: hanya bulan berjalan + tombol panah (≤600px)
@@ -363,7 +363,8 @@ Edit index.html locally (+ file lain kalau perlu)
 - Google Sheets sync 1-arah (Supabase → Sheets)
 - Pelayanan multi-assignee: comma-separated di 1 kolom (tidak normalized)
 - Event auto-cleanup permanent delete (tidak ada soft-delete)
-- Browser back button basic (pushState pada CG enter)
+- Browser back button: pushState `/teen-NN` saat masuk CG; `goBack()` kembali ke alamat sebelumnya (`_URL_BEFORE_CG`)
+- **Tidak ada login** — `/coach` & `/tl` mudah ditebak; siapa pun yang tahu alamatnya bisa edit data semua CG. Rencana: PIN Coach/TL
 - Reminder broadcast tidak persistent — kalau CGL offline saat dikirim, notif hilang. Future: pakai tabel `cgl_reminders` untuk persistence.
 - Member pindah CG: attendance history tetap ke-link via `member_id`, tapi tampilan CG lama tidak menampilkan member itu (desain ambiguous)
 - iOS PWA push notif: hanya jalan kalau install ke Home Screen + iOS 16.4+
@@ -386,9 +387,18 @@ Edit index.html locally (+ file lain kalau perlu)
 | v29 | **Distribusi Wilayah** — filter kecamatan + kelurahan di Coach/TL Overview |
 | v30 | Wilayah filter hardening (escape + reset state + count consistency) |
 | v31 | **27 bug fixes** — attendance stats inflate, data corruption (sekolah/kelas split), XSS (PDF export), error handling (21 Supabase ops), TEEN 25 color map, reconnect race guard, undo sync, milestone prereq, visi TOCTOU fix |
+| v36 | Detail CG: ringkasan CG (rata-rata hadir + tren, follow-up, milestone, data belum lengkap) + info sekolah di kartu anak |
+| v35 | Pengaman transisi tab tanpa error console; cek versi pakai `fetch('/')` (cegah cache SW membengkak) |
+| v34 | Tabel absensi desktop lebih lega; banner "Versi baru tersedia · Muat ulang" (`checkNewVersion`) |
+| v33 | HP mode rapat (≤600px), chart garis di kartu anak, URL `/teen-NN`, pindah tab crossfade (`smoothSwap`), toggle Coach/TL slider, konten lebar penuh, Distribusi wilayah rapi + normalisasi chip, Detail kartu anak + modal, `/coach` & `/tl`, tema tahun bisa diedit, pengingat CGL manual saja |
 | v32 | **Redesign UI** (branch `redesign`) — sidebar + bottom nav, tema & warna tetap v31 (Instrument Serif + Inter), landing page persis v31, ikon SVG pengganti emoji, kartu KPI, accordion Coach, heatmap milestone, modal berlabel. Logika data/Supabase tidak diubah. Fix: tombol Undo toast bisa diklik |
 
 Detail changelog per version ada di git log (`git log --oneline`).
+
+### Pembersihan data (27 Okt 2026, langsung di Supabase, cadangan di `C:\Penyimpanan utama\Downloadsackup_*_2026-10-27*.json`)
+- 21 member: teks "· Kelas X" (bug input gabungan pra-v31) dihapus dari kolom `sekolah`; kelas diisi/dinaikkan ke angka tertinggi (aturan dari Nick)
+- 6 member: kolom `kelurahan` berisi "Kelurahan, Kecamatan" dipisah ke kolomnya (Jonathan → Cakung Timur/Cakung, Glenn → Cipinang Muara/Jatinegara)
+- Masih perlu diisi CGL: alamat jalan di kolom kelurahan (Aiko TEEN 25, Carissa TEEN 17), tgl lahir tanpa tahun (Aiko, Justin & Grace TEEN 17)
 Detail v31 ada di `V31_CHANGELOG.md`.
 
 ---
