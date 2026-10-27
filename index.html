@@ -379,6 +379,15 @@ table.att .tlabel{font-size:12px;color:var(--muted);font-weight:600}
 .kc-info svg{flex:none;opacity:.6}
 .kc-info span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .kc-info.none{color:#bbb}
+.dot.pend{position:relative}
+.dot.pend::after{content:'';position:absolute;top:3px;right:3px;width:7px;height:7px;border-radius:50%;background:var(--S);box-shadow:0 0 0 2px #fff}
+.qbadge{color:var(--S);font-weight:600}
+.md-foot-l{display:flex;gap:4px;flex-wrap:wrap}
+.md-foot{align-items:center}
+.mvrow{display:flex;gap:8px;align-items:center}
+.mvrow .select{flex:1;min-width:0;min-height:38px}
+.lahir-warn{display:block;margin-top:4px;font-size:11px;color:var(--S);text-transform:none;letter-spacing:0;font-weight:500}
+.info input[type=date]{font-family:inherit}
 @media (max-width:1100px){.dsum{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .kgrid .addcard{min-height:150px}
 .kcard{position:relative;display:flex;flex-direction:column;gap:14px;text-align:left;background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;cursor:pointer;min-width:0;font:inherit;color:inherit;box-shadow:0 1px 3px rgba(0,0,0,.03);transition:border-color .15s,box-shadow .15s,transform .15s}
@@ -892,8 +901,8 @@ html.vt .tab-content.active{animation:none}
         <label class="field"><span class="flabel">Kelas</span><input class="modal-input" id="newKelas" placeholder="Kelas"></label>
       </div>
       <div class="mrow">
-        <label class="field"><span class="flabel">Kelurahan</span><input class="modal-input" id="newKelurahan" placeholder="Kelurahan"></label>
-        <label class="field"><span class="flabel">Kecamatan</span><input class="modal-input" id="newKecamatan" placeholder="Kecamatan"></label>
+        <label class="field"><span class="flabel">Kelurahan</span><input class="modal-input" id="newKelurahan" placeholder="Pilih / ketik" list="dlKel" autocomplete="off" onfocus="fillWilayahLists(document.getElementById('newKecamatan').value)"></label>
+        <label class="field"><span class="flabel">Kecamatan</span><input class="modal-input" id="newKecamatan" placeholder="Pilih / ketik" list="dlKec" autocomplete="off" onfocus="fillWilayahLists(this.value)" oninput="fillWilayahLists(this.value)"></label>
       </div>
     </div>
     <div class="mfoot">
@@ -1034,7 +1043,7 @@ html.vt .tab-content.active{animation:none}
     <button type="button" class="backcoach" id="dBackCoach" onclick="goBack()" style="display:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Kembali ke Coach</button>
     <nav class="navlist" aria-label="Tab CG"><button type="button" class="nav app-tab on" data-tab="absensi" aria-current="page" onclick="sTab('absensi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M9 15l2 2 4-4"/></svg><span>Absensi</span></button><button type="button" class="nav app-tab" data-tab="detail" onclick="sTab('detail',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c1.9.7 3.1 2.4 3.5 5.2"/></svg><span>Detail CG</span></button><button type="button" class="nav app-tab" data-tab="visi" onclick="sTab('visi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span>Visi CG</span></button><button type="button" class="nav app-tab" data-tab="pelayanan" onclick="sTab('pelayanan',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"/></svg><span>Pelayanan</span></button><button type="button" class="nav app-tab" data-tab="milestone" onclick="sTab('milestone',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4h11l-2 4 2 4H5"/></svg><span>Milestone</span></button><button type="button" class="nav app-tab" data-tab="events" onclick="sTab('events',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4z"/><path d="M14 7v10"/></svg><span>Events</span></button></nav>
     <div class="sidetheme"><small>The year of</small><b>Unity</b><span>&amp; Open Heavens</span></div>
-    <div class="profile"><span class="ava" id="dAva" aria-hidden="true">A</span><div style="flex:1;min-width:0"><b id="nN"></b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v36</span></span></span></div><button type="button" class="exit" onclick="goBack()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
+    <div class="profile"><span class="ava" id="dAva" aria-hidden="true">A</span><div style="flex:1;min-width:0"><b id="nN"></b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v37</span></span></span></div><button type="button" class="exit" onclick="goBack()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
   </aside>
   <div class="main">
     <header class="mtop">
@@ -1077,7 +1086,7 @@ html.vt .tab-content.active{animation:none}
     <div class="rolesw" role="group" aria-label="Peran"><button type="button" id="roleCoachBtn" class="on" aria-pressed="true" onclick="switchRole('coach')">Coach</button><button type="button" id="roleTLBtn" aria-pressed="false" onclick="switchRole('tl')">TL</button></div>
     <nav class="navlist" id="coachTabs" aria-label="Tab Coach"><button type="button" class="nav app-tab on" data-tab="c-overview" aria-current="page" onclick="sCoachTab('c-overview',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"/></svg><span>Overview</span></button><button type="button" class="nav app-tab" data-tab="c-absensi" onclick="sCoachTab('c-absensi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M9 15l2 2 4-4"/></svg><span>Absensi</span></button><button type="button" class="nav app-tab" data-tab="c-milestone" onclick="sCoachTab('c-milestone',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4h11l-2 4 2 4H5"/></svg><span>Milestone</span></button><button type="button" class="nav app-tab" data-tab="c-visi" onclick="sCoachTab('c-visi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span>Visi</span></button><button type="button" class="nav app-tab" data-tab="c-events" onclick="sCoachTab('c-events',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4z"/><path d="M14 7v10"/></svg><span>Events</span></button></nav>
     <button type="button" class="sidetheme editable" onclick="openThemeEdit()" aria-label="Edit tema tahun ini" title="Klik untuk edit tema"><small>The year of</small><b>Unity</b><span>&amp; Open Heavens</span><i class="st-edit" aria-hidden="true">Edit</i></button>
-    <div class="profile"><span class="ava" id="cAva" aria-hidden="true">C</span><div style="flex:1;min-width:0"><b id="cWho">Coach</b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v36</span></span></span></div><button type="button" class="exit" onclick="goBackCoach()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
+    <div class="profile"><span class="ava" id="cAva" aria-hidden="true">C</span><div style="flex:1;min-width:0"><b id="cWho">Coach</b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v37</span></span></span></div><button type="button" class="exit" onclick="goBackCoach()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
   </aside>
   <div class="main">
     <header class="mtop">
@@ -1313,6 +1322,7 @@ function handleAttendanceChange(payload) {
 
   // SKIP kalau user sedang save key ini (hindari race overwrite optimistic update)
   if (_DOT_SAVING[key]) return;
+  if (_ATT_Q[key]) return; // ketukan di HP ini belum terkirim & lebih baru
 
   // Patch CGL state — hanya kalau member ini milik CG aktif (hindari inflate stats)
   const isMyCG = MEMBERS && MEMBERS.some(m => m.id === r.member_id);
@@ -2012,6 +2022,7 @@ const MS_LABELS = ['MSJ 1','MSJ 2','MSJ 3','CGT 1','CGT 2','CGT 3','B.Air','B.Ro
 // ========== TOAST ==========
 // ========== ICONS (SVG stroke, pengganti emoji di UI) ==========
 const ICON_PATHS = {
+  archive:'<rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8M10 12h4"/>',
   cal:'<rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M9 15l2 2 4-4"/>',
   users:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c1.9.7 3.1 2.4 3.5 5.2"/>',
   target:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',
@@ -2575,8 +2586,8 @@ function renderAbsensi() {
       const atRisk = pct < 50 && totalDates > 1;
       t += '<tr><td class="name-cell"><div class="mem"><span class="ava'+(atRisk?' risk':'')+'" aria-hidden="true">'+initialOf(m.nama)+'</span><div><b'+(atRisk?' style="color:var(--A)"':'')+'>'+esc(m.nama)+'</b>'+rolePill(m.status)+'</div></div></td>';
       datesView.forEach(d => {
-        const st = ATTENDANCE[m.id+'_'+d.id] || null;
-        t += '<td><button type="button" class="dot ' + (st || 'X') + '" data-mid="'+m.id+'" data-did="'+d.id+'" onclick="cycleDot(this,' + m.id + ',\'' + d.id + '\')">' + (st || '-') + '</button></td>';
+        const st = attShown(ATTENDANCE, m.id+'_'+d.id);
+        t += '<td><button type="button" class="dot ' + (st || 'X') + (attIsPending(m.id+'_'+d.id) ? ' pend' : '') + '" data-mid="'+m.id+'" data-did="'+d.id+'" onclick="cycleDot(this,' + m.id + ',\'' + d.id + '\')">' + (st || '-') + '</button></td>';
       });
       t += '<td class="pctcol"><span class="pct" style="color:'+pctColorOf(pct)+'">'+pct+'%</span><small class="pctsub">'+hadirCount+'/'+totalDates+'</small></td></tr>';
     });
@@ -2683,22 +2694,92 @@ async function undoLastDot() {
 
   // Save revert ke DB
   try {
-    let undoErr;
-    if (prev === null) {
-      const res = await supa.from('attendance').delete().eq('member_id', memberId).eq('date_id', dateId);
-      undoErr = res.error;
-    } else {
-      const res = await supa.from('attendance').upsert({ member_id: memberId, date_id: dateId, status: prev }, { onConflict: 'member_id,date_id' });
-      undoErr = res.error;
-    }
-    if (undoErr) throw undoErr;
+    const r = await saveAttendance(memberId, dateId, prev);
     computeStats();
-    toast('\u2713 Undo berhasil');
+    toast(r === 'queued' ? '\u26a0 Undo disimpan di HP — dikirim saat online' : '\u2713 Undo berhasil');
   } catch(e) {
     toast('\u274c Undo gagal: '+(e.message||''));
     console.error('[undoLastDot]', e);
   }
 }
+
+// ── Absensi saat sinyal jelek: antrean di HP (localStorage), dikirim otomatis saat online lagi ──
+const _ATT_Q_KEY = 'aog_att_queue_v1';
+let _ATT_Q = (() => { try { return JSON.parse(localStorage.getItem(_ATT_Q_KEY) || '{}') || {}; } catch(e) { return {}; } })();
+let _ATT_FLUSHING = false;
+function attQueueSave() { try { localStorage.setItem(_ATT_Q_KEY, JSON.stringify(_ATT_Q)); } catch(e) {} updateQueueBadge(); }
+function attIsPending(key) { return !!_ATT_Q[key]; }
+// Nilai yang ditampilkan: ketukan yang belum terkirim menang atas data server
+function attShown(map, key) { return _ATT_Q[key] ? _ATT_Q[key].s : (map[key] || null); }
+function isNetworkError(err) {
+  if (!navigator.onLine) return true;
+  if (!err) return false;
+  if (err.code && /^[0-9A-Z]{5}$/.test(String(err.code))) return false; // error Postgres (mis. 23503) = bukan masalah sinyal
+  return /fetch|network|load failed|timeout|aborted|offline/i.test(String(err.message || err));
+}
+function attWrite(memberId, dateId, status) {
+  if (status === null) return supa.from('attendance').delete().eq('member_id', memberId).eq('date_id', dateId);
+  return supa.from('attendance').upsert({ member_id: memberId, date_id: dateId, status }, { onConflict: 'member_id,date_id' });
+}
+function markDotPending(key, on) {
+  const i = key.indexOf('_'), mid = key.slice(0, i), did = key.slice(i + 1);
+  document.querySelectorAll('.dot[data-mid="'+mid+'"][data-did="'+did+'"]').forEach(d => d.classList.toggle('pend', on));
+}
+// Simpan 1 absensi → 'ok' (terkirim) | 'queued' (disimpan di HP, dikirim nanti). Error database tetap di-throw.
+async function saveAttendance(memberId, dateId, status) {
+  const key = memberId + '_' + dateId;
+  if (navigator.onLine) {
+    let res;
+    try { res = await attWrite(memberId, dateId, status); } catch(e) { res = { error: e }; }
+    if (!res.error) {
+      if (_ATT_Q[key]) { delete _ATT_Q[key]; attQueueSave(); }
+      markDotPending(key, false);
+      return 'ok';
+    }
+    if (!isNetworkError(res.error)) throw res.error;
+  }
+  _ATT_Q[key] = { m: memberId, d: dateId, s: status, ts: Date.now() };
+  attQueueSave();
+  markDotPending(key, true);
+  return 'queued';
+}
+async function flushAttQueue() {
+  if (_ATT_FLUSHING || !navigator.onLine) return;
+  const keys = Object.keys(_ATT_Q);
+  if (!keys.length) return;
+  _ATT_FLUSHING = true;
+  let sent = 0, failed = 0;
+  try {
+    for (const key of keys) {
+      const op = _ATT_Q[key];
+      if (!op || _DOT_SAVING[key]) continue;
+      let res;
+      try { res = await attWrite(op.m, op.d, op.s); } catch(e) { res = { error: e }; }
+      if (res.error && isNetworkError(res.error)) break; // sinyal masih jelek → coba lagi nanti
+      if (res.error) { failed++; console.error('[flushAttQueue]', key, res.error); }
+      else sent++;
+      // Hapus dari antrean hanya kalau belum ada ketukan baru untuk kotak yang sama
+      if (_ATT_Q[key] && _ATT_Q[key].ts === op.ts) { delete _ATT_Q[key]; markDotPending(key, false); }
+    }
+  } finally {
+    _ATT_FLUSHING = false;
+    attQueueSave();
+  }
+  if (sent) { try { computeStats(); } catch(e) {} toast('✓ ' + sent + ' absensi tertunda berhasil terkirim'); }
+  if (failed) toast('❌ ' + failed + ' absensi tertunda ditolak server — cek lagi', 'err');
+}
+function updateQueueBadge() {
+  const n = Object.keys(_ATT_Q).length;
+  document.querySelectorAll('.live').forEach(el => {
+    let b = el.querySelector('.qbadge');
+    if (!n) { if (b) b.remove(); return; }
+    if (!b) { b = document.createElement('span'); b.className = 'qbadge'; el.appendChild(b); }
+    b.textContent = ' · ' + n + ' tertunda';
+  });
+}
+window.addEventListener('online', () => setTimeout(flushAttQueue, 1500));
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') flushAttQueue(); });
+setInterval(() => { if (Object.keys(_ATT_Q).length) flushAttQueue(); }, 15000);
 
 async function cycleDot(dotEl, memberId, dateId) {
   const key = memberId + '_' + dateId;
@@ -2715,17 +2796,16 @@ async function cycleDot(dotEl, memberId, dateId) {
   dotEl.textContent = next || '-';
 
   try {
-    let error;
-    if (next === null) {
-      ({error} = await supa.from('attendance').delete().eq('member_id', memberId).eq('date_id', dateId));
-    } else {
-      ({error} = await supa.from('attendance').upsert({ member_id: memberId, date_id: dateId, status: next }, { onConflict: 'member_id,date_id' }));
-    }
-    if (error) throw error;
+    const r = await saveAttendance(memberId, dateId, next);
     computeStats();
-    // Simpan data undo + tampil toast dengan tombol Undo
-    _UNDO_DATA = { memberId, dateId, prev, dotEl };
-    showUndoToast();
+    if (r === 'queued') {
+      _UNDO_DATA = null;
+      toast('\u26a0 Sinyal lemah — disimpan di HP, dikirim otomatis saat online');
+    } else {
+      // Simpan data undo + tampil toast dengan tombol Undo
+      _UNDO_DATA = { memberId, dateId, prev, dotEl };
+      showUndoToast();
+    }
   } catch(e) {
     if (prev) { ATTENDANCE[key] = prev; } else { delete ATTENDANCE[key]; }
     dotEl.className = 'dot ' + (prev || 'X');
@@ -2751,13 +2831,8 @@ async function cycleDotCoach(dotEl, memberId, dateId) {
   dotEl.className = 'dot ' + (next || 'X');
   dotEl.textContent = next || '-';
   try {
-    let error;
-    if (next === null) {
-      ({error} = await supa.from('attendance').delete().eq('member_id', memberId).eq('date_id', dateId));
-    } else {
-      ({error} = await supa.from('attendance').upsert({ member_id: memberId, date_id: dateId, status: next }, { onConflict: 'member_id,date_id' }));
-    }
-    if (error) throw error;
+    const r = await saveAttendance(memberId, dateId, next);
+    if (r === 'queued') toast('\u26a0 Sinyal lemah — disimpan di HP, dikirim otomatis saat online');
   } catch(e) {
     if (typeof ALL_ATTENDANCE !== 'undefined') {
       if (prev) ALL_ATTENDANCE[key] = prev; else delete ALL_ATTENDANCE[key];
@@ -2939,12 +3014,74 @@ function memberTrendHTML(m) {
 }
 
 // Modal detail anak CG: info + persentase + chart + edit (fungsi simpan sama seperti sebelumnya)
+// ── Isian terarah: pemilih tanggal lahir + saran kecamatan/kelurahan (tetap boleh ketik bebas) ──
+const WILAYAH_MAP = {
+  'Cakung': ['Cakung Barat','Cakung Timur','Jatinegara','Penggilingan','Pulo Gebang','Rawa Terate','Ujung Menteng'],
+  'Cipayung': ['Bambu Apus','Ceger','Cilangkap','Cipayung','Lubang Buaya','Munjul','Pondok Ranggon','Setu'],
+  'Ciracas': ['Cibubur','Ciracas','Kelapa Dua Wetan','Rambutan','Susukan'],
+  'Duren Sawit': ['Duren Sawit','Klender','Malaka Jaya','Malaka Sari','Pondok Bambu','Pondok Kelapa','Pondok Kopi'],
+  'Jatinegara': ['Bali Mester','Bidara Cina','Cipinang Besar Selatan','Cipinang Besar Utara','Cipinang Cempedak','Cipinang Muara','Kampung Melayu','Rawa Bunga'],
+  'Kramat Jati': ['Balekambang','Batu Ampar','Cawang','Cililitan','Dukuh','Kampung Tengah','Kramat Jati'],
+  'Makasar': ['Cipinang Melayu','Halim Perdana Kusuma','Kebon Pala','Makasar','Pinang Ranti'],
+  'Matraman': ['Kayu Manis','Kebon Manggis','Pal Meriam','Pisangan Baru','Utan Kayu Selatan','Utan Kayu Utara'],
+  'Pasar Rebo': ['Baru','Cijantung','Gedong','Kalisari','Pekayon'],
+  'Pulo Gadung': ['Cipinang','Jati','Jatinegara Kaum','Kayu Putih','Pisangan Timur','Pulo Gadung','Rawamangun']
+};
+const _wkey = v => String(v || '').toLowerCase().replace(/\s+/g, '');
+function wilayahKecList() {
+  const set = new Map();
+  Object.keys(WILAYAH_MAP).forEach(k => set.set(_wkey(k), k));
+  (ALL_MEMBERS || []).concat(MEMBERS || []).forEach(m => { const k = String(m.kecamatan || '').trim(); if (k && !/,/.test(k) && !set.has(_wkey(k))) set.set(_wkey(k), titleCaseWilayah(k)); });
+  return [...set.values()].sort();
+}
+function wilayahKelList(kec) {
+  const nk = _wkey(kec), set = new Map();
+  Object.entries(WILAYAH_MAP).forEach(([k, list]) => { if (!nk || _wkey(k) === nk) list.forEach(x => set.set(_wkey(x), x)); });
+  (ALL_MEMBERS || []).concat(MEMBERS || []).forEach(m => {
+    if (nk && _wkey(m.kecamatan) !== nk) return;
+    const k = String(m.kelurahan || '').trim();
+    if (k && !/,|jl\.|jalan|blok|no\./i.test(k) && !set.has(_wkey(k))) set.set(_wkey(k), titleCaseWilayah(k));
+  });
+  return [...set.values()].sort();
+}
+function fillWilayahLists(kec) {
+  ['dlKec', 'dlKel'].forEach(id => { if (!document.getElementById(id)) { const d = document.createElement('datalist'); d.id = id; document.body.appendChild(d); } });
+  document.getElementById('dlKec').innerHTML = wilayahKecList().map(x => '<option value="' + esc(x) + '">').join('');
+  document.getElementById('dlKel').innerHTML = wilayahKelList(kec).map(x => '<option value="' + esc(x) + '">').join('');
+}
+// Samakan penulisan dengan daftar (mis. "kramat jati" → "Kramat Jati")
+function canonWilayah(field, v) {
+  v = String(v || '').trim();
+  if (!v) return v;
+  const list = field === 'kecamatan' ? wilayahKecList() : wilayahKelList('');
+  return list.find(x => _wkey(x) === _wkey(v)) || v;
+}
+function parseLahir(s) {
+  s = String(s || '').trim();
+  let m = s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})$/), r = null;
+  if (m) { let y = +m[3]; if (y < 100) y = y <= 30 ? 2000 + y : 1900 + y; r = { day: +m[1], month: +m[2], year: y }; }
+  else if ((m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/))) r = { year: +m[1], month: +m[2], day: +m[3] };
+  if (!r) return null;
+  // Harus tanggal yang benar-benar ada (31/02 ditolak) — kalau tidak, data lama ditampilkan sebagai peringatan, bukan dihapus
+  const dt = new Date(r.year, r.month - 1, r.day);
+  if (dt.getFullYear() !== r.year || dt.getMonth() !== r.month - 1 || dt.getDate() !== r.day) return null;
+  return r;
+}
+function lahirInputHTML(m) {
+  const raw = String(m.lahir || '').trim(), bd = parseLahir(raw);
+  const pad = n => String(n).padStart(2, '0');
+  const iso = bd ? bd.year + '-' + pad(bd.month) + '-' + pad(bd.day) : '';
+  const today = new Date().toISOString().slice(0, 10);
+  return '<label class="c2">Tanggal lahir<input type="date" value="' + iso + '" max="' + today + '" data-mid="' + m.id + '" data-field="lahir" data-orig="' + iso + '" onchange="saveMemberField(this)" onblur="saveMemberField(this)">' +
+    (raw && !bd ? '<small class="lahir-warn">Tersimpan "' + esc(raw) + '" — pilih tanggal lengkap</small>' : '') + '</label>';
+}
+
 function openCGLMember(memberId) {
   const m = MEMBERS.find(x => x.id === memberId);
   if (!m) return;
   const st = memberAttStats(m);
   const msDone = MS_FIELDS.filter(f => m[f]).length;
-  const fieldInput = (field, label, ph, span) => '<label class="c'+(span||2)+'">'+label+'<input type="text" value="' + esc(m[field]||'') + '" data-mid="'+m.id+'" data-field="'+field+'" placeholder="'+(ph||'Belum diisi')+'" onblur="saveMemberField(this)"></label>';
+  const fieldInput = (field, label, ph, span, extra) => '<label class="c'+(span||2)+'">'+label+'<input type="text" value="' + esc(m[field]||'') + '" data-mid="'+m.id+'" data-field="'+field+'" data-orig="' + esc(m[field]||'') + '" placeholder="'+(ph||'Belum diisi')+'" onblur="saveMemberField(this)"'+(extra||'')+'></label>';
 
   let html = '<div class="md-head"><span class="ava'+(st.atRisk?' risk':'')+'" style="width:56px;height:56px;font-size:20px" aria-hidden="true">'+initialOf(m.nama)+'</span>';
   html += '<div style="flex:1;min-width:0"><input type="text" value="' + esc(m.nama) + '" class="mname md-name" aria-label="Nama" data-mid="'+m.id+'" data-field="nama" onblur="saveMemberField(this)">';
@@ -2972,12 +3109,12 @@ function openCGLMember(memberId) {
   }
 
   html += '<div class="md-sec"><div class="mhead"><span class="flabel">Data diri</span><span class="mhint">tersimpan otomatis</span></div><div class="info">';
-  html += fieldInput('wa','WhatsApp','08xxx');
-  html += fieldInput('lahir','Tanggal lahir','DD/MM/YYYY');
+  html += fieldInput('wa','WhatsApp','08xxx',2,' inputmode="tel"');
+  html += lahirInputHTML(m);
   html += fieldInput('sekolah','Sekolah',null,3);
   html += fieldInput('kelas','Kelas','–',1);
-  html += fieldInput('kelurahan','Kelurahan');
-  html += fieldInput('kecamatan','Kecamatan');
+  html += fieldInput('kecamatan','Kecamatan','Pilih / ketik',2,' list="dlKec" autocomplete="off" oninput="fillWilayahLists(this.value)"');
+  html += fieldInput('kelurahan','Kelurahan','Pilih / ketik',2,' list="dlKel" autocomplete="off"');
   html += '</div></div>';
 
   html += '<div class="md-sec"><div class="mhead"><span class="flabel">Milestone</span><span class="mhint">klik untuk ubah</span></div><div class="msgrid">';
@@ -2990,13 +3127,84 @@ function openCGLMember(memberId) {
   html += '</div></div>';
 
   html += '<label class="field md-sec"><span class="flabel">Catatan CGL</span><textarea class="textarea mnote" placeholder="Tulis catatan…" data-mid="'+m.id+'" onblur="saveMemberNotes(this)">' + esc(_DETAIL_NOTES[m.id]||'') + '</textarea></label>';
-  html += '<div class="mfoot md-foot"><button type="button" class="btn sm ghost danger" onclick="deleteMember('+m.id+',\''+jsEsc(m.nama)+'\')">'+icon('trash',16)+'Hapus member</button>';
-  html += '<button type="button" class="btn" onclick="closeModal(\'cglMemberModal\')">Tutup</button></div>';
+  if (fromCoach) html += moveCgControlHTML(m);
+  html += '<div class="mfoot md-foot"><div class="md-foot-l"><button type="button" class="btn sm ghost" onclick="archiveMember('+m.id+',\''+jsEsc(m.nama)+'\')" title="Pindah ke CG arsip — riwayat tetap aman">'+icon('archive',16)+'Arsipkan</button>';
+  if (fromCoach) html += '<button type="button" class="btn sm ghost danger" onclick="deleteMember('+m.id+',\''+jsEsc(m.nama)+'\')" title="Hapus permanen beserta semua absensinya">'+icon('trash',16)+'Hapus permanen</button>';
+  html += '</div><button type="button" class="btn" onclick="closeModal(\'cglMemberModal\')">Tutup</button></div>';
 
   document.getElementById('cglMemberBody').innerHTML = html;
+  fillWilayahLists(m.kecamatan || '');
   const ov = document.getElementById('cglMemberModal');
   ov.classList.add('show');
   const box = ov.querySelector('.modal-box'); if (box) box.scrollTop = 0;
+}
+
+// ── Arsip & pindah CG (riwayat absensi/milestone/catatan ikut karena terhubung lewat member_id) ──
+function archiveCgFor(region) { return region === 'jaktim2' ? 'ARSIP JAKTIM 2' : 'ARSIP JAKTIM 1'; }
+function cgRegionOf(cg) {
+  if (isArchivedCg(cg)) return /2\s*$/.test(cg) ? 'jaktim2' : 'jaktim1';
+  const info = (ALL_CG_INFO || []).find(c => c.cg === cg);
+  if (info && info.region) return info.region;
+  const mm = (ALL_MEMBERS || []).find(x => x.cg === cg && x.region);
+  return mm ? mm.region : null;
+}
+// Muat ulang member CG aktif + absensinya (setelah arsip / pindah CG)
+async function reloadCGLMembers() {
+  const { data: mems, error } = await supa.from('members').select('*').eq('cg', CUR_CG).order('nama');
+  if (error) { toast('❌ Gagal muat ulang member — refresh halaman'); console.error('[reloadCGLMembers]', error); return; }
+  MEMBERS = mems || [];
+  MEMBERS.sort((a, b) => roleRankLC(a.status) - roleRankLC(b.status));
+  const memberIds = MEMBERS.map(m => m.id), dateIds = DATES.map(d => d.id);
+  ATTENDANCE = {};
+  if (memberIds.length && dateIds.length) {
+    const att = await fetchBoundedAttendance(memberIds, dateIds);
+    att.forEach(a => { ATTENDANCE[a.member_id + '_' + a.date_id] = a.status; });
+  }
+  const hC = document.getElementById('hC'); if (hC) hC.textContent = MEMBERS.length;
+  computeStats();
+  TAB_RENDERED = {};
+  const activeTab = document.querySelector('#pageD .tab-content.active');
+  if (activeTab) await ensureTabRendered(activeTab.id.replace('tab-', ''));
+  try { await loadCGLDropdown(); } catch(e) {}
+}
+async function archiveMember(memberId, memberName) {
+  const m = (MEMBERS || []).find(x => x.id === memberId) || (ALL_MEMBERS || []).find(x => x.id === memberId);
+  if (!m) return;
+  const target = archiveCgFor(m.region || CUR_REGION);
+  if (!confirm('Arsipkan "' + memberName + '"?\n\nMember dipindah ke ' + target + ' dan tidak tampil lagi di CG ini.\nRiwayat absensi, milestone & catatan TETAP tersimpan.\nBisa dikembalikan oleh Coach/TL lewat pencarian member → Pindah CG.')) return;
+  const { data, error } = await supa.from('members').update({ cg: target }).eq('id', memberId).eq('cg', m.cg).select('id');
+  if (error || !data || !data.length) { toast('❌ Gagal arsipkan: ' + ((error && error.message) || 'data sudah berubah, refresh dulu')); console.error('[archiveMember]', error); return; }
+  closeModal('cglMemberModal');
+  await reloadCGLMembers();
+  toast('✓ ' + memberName + ' diarsipkan');
+}
+function moveCgControlHTML(m) {
+  const active = [...new Set((ALL_MEMBERS || []).map(x => x.cg).concat((ALL_CG_INFO || []).map(c => c.cg)))].filter(c => c && !isArchivedCg(c)).sort();
+  const opts = active.concat(['ARSIP JAKTIM 1', 'ARSIP JAKTIM 2']);
+  if (m.cg && !opts.includes(m.cg)) opts.push(m.cg);
+  return '<div class="md-sec"><div class="mhead"><span class="flabel">Pindah CG</span><span class="mhint">khusus Coach/TL · riwayat ikut pindah</span></div>' +
+    '<div class="mvrow"><label class="sr" for="mvcg_' + m.id + '">CG tujuan</label><select class="select sm" id="mvcg_' + m.id + '">' +
+    opts.map(c => '<option value="' + esc(c) + '"' + (c === m.cg ? ' selected' : '') + '>' + esc(c) + (isArchivedCg(c) ? ' (arsip)' : '') + '</option>').join('') +
+    '</select><button type="button" class="btn sm" onclick="moveMemberCG(' + m.id + ')">' + icon('right', 16) + 'Pindahkan</button></div></div>';
+}
+async function moveMemberCG(memberId) {
+  const sel = document.getElementById('mvcg_' + memberId);
+  const m = (ALL_MEMBERS || []).find(x => x.id === memberId) || (MEMBERS || []).find(x => x.id === memberId);
+  if (!sel || !m) return;
+  const target = sel.value;
+  if (!target || target === m.cg) { toast('Pilih CG tujuan yang berbeda'); return; }
+  const oldRegion = m.region || cgRegionOf(m.cg);
+  const newRegion = cgRegionOf(target) || oldRegion;
+  const rl = r => r === 'jaktim2' ? 'Jaktim 2' : 'Jaktim 1';
+  const regionNote = newRegion !== oldRegion ? '\n\nPindah region (' + rl(oldRegion) + ' → ' + rl(newRegion) + '): absensi lama tetap tersimpan, tapi tanggal ibadah ' + rl(oldRegion) + ' tidak tampil di CG baru.' : '';
+  if (!confirm('Pindahkan "' + m.nama + '" dari ' + m.cg + ' ke ' + target + '?\n\nRiwayat absensi, milestone & catatan ikut pindah.' + regionNote)) return;
+  const { data, error } = await supa.from('members').update({ cg: target, region: newRegion }).eq('id', memberId).eq('cg', m.cg).select('id');
+  if (error || !data || !data.length) { toast('❌ Gagal pindah CG: ' + ((error && error.message) || 'data sudah berubah, refresh dulu')); console.error('[moveMemberCG]', error); return; }
+  const am = (ALL_MEMBERS || []).find(x => x.id === memberId); if (am) { am.cg = target; am.region = newRegion; }
+  closeModal('cglMemberModal'); closeModal('memberDetailModal');
+  if (document.getElementById('pageD').style.display === 'block' && CUR_CG) await reloadCGLMembers();
+  if (document.getElementById('pageC').style.display === 'block') { COACH_TAB_RENDERED = {}; await ensureCoachTabRendered(currentCoachTab()); }
+  toast('✓ ' + m.nama + ' dipindah ke ' + target);
 }
 
 async function deleteMember(memberId, memberName) {
@@ -3049,9 +3257,14 @@ async function deleteMember(memberId, memberName) {
 async function saveMemberField(input) {
   const mid = parseInt(input.dataset.mid);
   const field = input.dataset.field;
-  const val = input.value.trim();
+  let val = input.value.trim();
+  if (field === 'kecamatan' || field === 'kelurahan') { val = canonWilayah(field, val); if (val !== input.value) input.value = val; }
+  // Tidak berubah → tidak perlu simpan (juga mencegah tgl lahir lama yang tidak lengkap terhapus)
+  if (input.dataset.orig !== undefined && val === input.dataset.orig) return;
+  const prevOrig = input.dataset.orig;
+  if (prevOrig !== undefined) input.dataset.orig = val; // cegah simpan dobel (change + blur)
   const { error } = await supa.from('members').update({ [field]: val }).eq('id', mid);
-  if (error) { toast('\u274c Gagal simpan — cek koneksi'); console.error('[saveMemberField]', error); return; }
+  if (error) { if (prevOrig !== undefined) input.dataset.orig = prevOrig; /* gagal → bisa dicoba lagi */ toast('\u274c Gagal simpan — cek koneksi'); console.error('[saveMemberField]', error); return; }
   const m = MEMBERS.find(x => x.id === mid);
   if (m) m[field] = val;
   refreshDetailGrid();
@@ -3120,7 +3333,7 @@ async function saveNewMember() {
     nama, cg: CUR_CG, status: document.getElementById('newStatus').value,
     wa: document.getElementById('newWa').value, lahir: document.getElementById('newLahir').value || null,
     sekolah: document.getElementById('newSekolah').value, kelas: document.getElementById('newKelas').value,
-    kelurahan: document.getElementById('newKelurahan').value, kecamatan: document.getElementById('newKecamatan').value,
+    kelurahan: canonWilayah('kelurahan', document.getElementById('newKelurahan').value), kecamatan: canonWilayah('kecamatan', document.getElementById('newKecamatan').value),
     region
   };
   const { error } = await supa.from('members').insert(obj);
@@ -4234,6 +4447,7 @@ function showMemberDetail(memberId) {
     html += '</div></div>';
   }
 
+  html += moveCgControlHTML(m);
   document.getElementById('memberDetailBody').innerHTML = html;
   openModal('memberDetailModal');
 }
@@ -5337,8 +5551,8 @@ function renderCoachAbsensi() {
         const atRisk = tCount>1 && pct<50;
         html += '<tr><td class="name-cell"><div class="mem"><span class="ava'+(atRisk?' risk':'')+'" aria-hidden="true">'+initialOf(m.nama)+'</span><div><b'+(atRisk?' style="color:var(--A)"':'')+'>'+esc(m.nama)+'</b>'+rolePill(m.status)+'</div></div></td>';
         cgDates.forEach(d => {
-          const st = ALL_ATTENDANCE[m.id+'_'+d.id] || null;
-          html += '<td><button type="button" class="dot '+(st||'X')+'" data-mid="'+m.id+'" data-did="'+d.id+'" onclick="cycleDotCoach(this,'+m.id+',\''+d.id+'\')">'+(st||'-')+'</button></td>';
+          const st = attShown(ALL_ATTENDANCE, m.id+'_'+d.id);
+          html += '<td><button type="button" class="dot '+(st||'X')+(attIsPending(m.id+'_'+d.id)?' pend':'')+'" data-mid="'+m.id+'" data-did="'+d.id+'" onclick="cycleDotCoach(this,'+m.id+',\''+d.id+'\')">'+(st||'-')+'</button></td>';
         });
         html += '<td class="pctcol"><span class="pct" style="color:'+pctColorOf(pct)+'">'+pct+'%</span><small class="pctsub">'+hCount+'/'+tCount+'</small></td></tr>';
       });
@@ -5886,6 +6100,8 @@ document.querySelectorAll('.modal-overlay').forEach(m => {
 
 // ========== INIT ==========
 (async function() {
+  updateQueueBadge();
+  try { await flushAttQueue(); } catch(e) { console.warn('[flushAttQueue init]', e); }
   applyTheme(CUR_THEME);
   loadTheme();
   const p = new URLSearchParams(location.search);
