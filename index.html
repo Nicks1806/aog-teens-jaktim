@@ -503,6 +503,71 @@ table.att .tlabel{font-size:12px;color:var(--muted);font-weight:600}
 .evbtns .wa{color:var(--H);border-color:var(--Hbr);background:var(--Hb)}
 .evbtns .del:hover{color:var(--A);border-color:var(--Abr);background:var(--Ab)}
 .formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+/* Coach Overview */
+.cvisi-wrap{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}
+.cvisi{margin-bottom:0}
+.cvisi textarea{font-size:22px}
+.cvisi .autosave{font-size:11px;color:#CFC9F2}
+.cmisi{display:flex;flex-direction:column;gap:6px;margin-top:14px}
+.cmisi span{font-size:12px;font-weight:600;color:#CFC9F2}
+.cmisi textarea{font-family:Inter,sans-serif;font-weight:500;font-size:14px;line-height:1.5;color:#EEEBFF;border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:10px 12px;min-height:56px;margin:0;background:rgba(255,255,255,.04)}
+.cmisi textarea:focus{border-color:var(--gold)}
+.cggrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.cgcard{text-align:left;background:#fff;border:1px solid var(--line);border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:16px;transition:transform .2s,box-shadow .2s,border-color .2s;width:100%;cursor:pointer;color:var(--ink)}
+.cgcard:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(36,28,92,.08);border-color:#CFCAE3}
+.cg-top{display:flex;align-items:center;gap:12px;width:100%}
+.cg-top b{display:block;font-size:16px;font-family:var(--display)}
+.cgnum{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;flex:none}
+.cg-mid{display:flex;align-items:flex-end;justify-content:space-between;width:100%;gap:12px}
+.cg-pct{font-family:var(--display);font-weight:800;font-size:32px;line-height:1}
+.cg-foot{display:flex;gap:8px;flex-wrap:wrap}
+.spark{display:flex;align-items:flex-end;gap:4px;height:40px}
+.spark i{width:8px;border-radius:3px;display:block}
+.mini{font-size:12px;padding:4px 10px;border-radius:8px;background:#FAF9FC;color:var(--muted)}
+.chip.kel.on{background:var(--accent);border-color:var(--accent)}
+.wlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:8px;max-height:460px;overflow-y:auto}
+.wlist .lrow b .pill{vertical-align:middle;margin-left:4px}
+/* Accordion (Coach Absensi & Visi) */
+.acc{background:#fff;border:1px solid var(--line);border-radius:18px;margin-bottom:12px;overflow:hidden}
+.acc-h{width:100%;display:flex;align-items:center;gap:14px;padding:16px 18px;border:0;background:transparent;text-align:left;cursor:pointer;color:var(--ink)}
+.acc-h:hover{background:#FAF9FC}
+.acc-h .grow{flex:1;min-width:0}
+.acc-h .grow>b{display:block;font-size:15px}
+.acc .chev{transition:transform .2s;color:var(--muted);display:flex}
+.acc.open .chev{transform:rotate(180deg)}
+.acc-b{padding:0 18px 18px}
+.acc-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.hbar{height:8px;border-radius:8px;background:#F0EEF6;overflow:hidden;width:140px;flex:none}
+.hbar i{display:block;height:100%;border-radius:8px}
+.card.pending{margin-bottom:24px;border-color:var(--Sbr);background:linear-gradient(180deg,#FFFBF2,#fff 60%)}
+.chartcard{margin-bottom:24px}
+#tab-absensi .chartcard{margin:24px 0 0}
+@media (max-width:640px){.hbar{display:none}.acc-h{gap:10px;padding:14px}}
+/* Coach Milestone */
+.heat{border-collapse:separate;border-spacing:4px;width:100%;min-width:520px}
+.heat th{font-size:12px;color:var(--muted);font-weight:600;padding:4px}
+.heat td{height:44px;border-radius:10px;text-align:center;font-size:13px;font-weight:700}
+.heat th[scope=row]{text-align:left;color:var(--ink);font-size:13px;white-space:nowrap}
+.fu{border-top:1px solid var(--line2)}
+.fu:first-of-type{border-top:0}
+.fu-h{width:100%;display:flex;align-items:center;gap:10px;min-height:52px;padding:0 4px;border:0;background:transparent;text-align:left;cursor:pointer;color:var(--ink)}
+.fu-h:disabled{cursor:default}
+.fu-h b{flex:1;font-size:14px}
+.fu-h .chev{color:var(--muted);display:flex;transition:transform .2s}
+.fu.open .fu-h .chev{transform:rotate(180deg)}
+.fu-dot{width:10px;height:10px;border-radius:50%;flex:none}
+.fu-b{padding:0 4px 14px}
+.fu-row{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-top:1px dashed var(--line2)}
+.fu-names{flex:1;font-size:13px;line-height:1.6}
+.fu-sep{color:var(--muted);margin:0 6px}
+.mstable td{text-align:center}
+/* Coach Visi */
+.accpills{display:flex;gap:4px;flex:none}
+.cv-body{display:flex;flex-direction:column;gap:16px}
+.cv-visi{font-family:var(--display);font-weight:700;font-size:18px;min-height:64px}
+@media (max-width:640px){.accpills{display:none}}
+.msok{display:inline-flex;width:28px;height:28px;border-radius:8px;align-items:center;justify-content:center;background:var(--Hb);color:var(--H)}
+.msno{display:inline-flex;width:28px;height:28px;border-radius:8px;align-items:center;justify-content:center;background:var(--Ab);color:var(--A)}
 @media (max-width:520px){.formgrid{grid-template-columns:1fr}.evbtns{width:100%;justify-content:flex-end}}
 .rbadge{font-size:11px;padding:2px 9px;border-radius:20px;font-weight:600;border:0}
 .rbadge.cgl{background:var(--Hb);color:var(--H)}
@@ -731,6 +796,7 @@ table.att .tlabel{font-size:12px;color:var(--muted);font-weight:600}
       <header class="phead" id="coachHero">
         <div><div class="crumb" id="cCrumb">Halo, Coach</div><h1 id="coachHeroH">Overview semua CG</h1><div class="meta" id="coachMeta">Memuat...</div></div>
         <div class="actions">
+          <div class="seg light" id="cRegSeg" role="group" aria-label="Region"><button type="button" data-reg="jaktim1" class="on" aria-pressed="true" onclick="coachSetRegion('jaktim1')">Jaktim 1</button><button type="button" data-reg="jaktim2" aria-pressed="false" onclick="coachSetRegion('jaktim2')">Jaktim 2</button></div>
           <div class="csearch">
             <label class="search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><span class="sr">Cari nama member</span><input id="coachSearch" type="search" placeholder="Cari nama member…" autocomplete="off" oninput="handleCoachSearch(this.value)" onblur="setTimeout(()=>{document.getElementById('coachSearchResults').style.display='none'},200)" onfocus="if(this.value)handleCoachSearch(this.value)"></label>
             <div id="coachSearchResults" class="csresults" style="display:none"></div>
@@ -3737,6 +3803,15 @@ function setCTabUI(id) {
   const regLbl = coachRole === 'tl' ? 'semua region' : (coachReg === 'jaktim2' ? 'Jaktim 2' : 'Jaktim 1');
   const titles = {'c-overview':'Overview ' + regLbl,'c-absensi':'Absensi per CG','c-milestone':'Milestone per CG','c-visi':'Visi semua CG','c-events':'Events'};
   const cTop = document.getElementById('cTop'); if (cTop) cTop.style.display = id === 'c-overview' ? '' : 'none';
+  const seg = document.getElementById('cRegSeg');
+  if (seg) {
+    seg.style.display = coachRole === 'tl' ? 'none' : '';
+    seg.querySelectorAll('button').forEach(b => { const on = b.dataset.reg === coachReg; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
+  }
+  const lbl = document.getElementById('coachRoleLabel');
+  if (lbl) lbl.textContent = coachRole === 'tl' ? 'Team Leader · semua region' : 'Coach · ' + (coachReg === 'jaktim2' ? 'Jaktim 2' : 'Jaktim 1');
+  const msub = document.getElementById('cMSub');
+  if (msub) msub.textContent = coachRole === 'tl' ? 'Semua region' : (coachReg === 'jaktim2' ? 'Jaktim 2' : 'Jaktim 1');
   const who = coachRole === 'tl' ? 'Team Leader' : 'Coach';
   const h = document.getElementById('coachHeroH'); if (h) h.textContent = titles[id] || '';
   const c = document.getElementById('cCrumb'); if (c) c.innerHTML = 'Halo, ' + who + ' · <b>' + esc(titles[id] || '') + '</b>';
@@ -3874,6 +3949,34 @@ function getCGStats(cg) {
   return { cg, leader, total, pct, atRisk, msPct, blmMsj1, info, mems };
 }
 
+// Sparkline 8 ibadah terakhir (yang sudah ada isinya) untuk kartu CG di Overview
+function cgSparkline(c, color) {
+  const mems = c.mems || [];
+  if (!mems.length) return '';
+  const reg = mems[0].region;
+  const dates = ALL_DATES.filter(d => !reg || d.region === reg).slice().sort((a,b) => (a.sort_order||0) - (b.sort_order||0))
+    .filter(d => mems.some(m => ALL_ATTENDANCE[m.id+'_'+d.id])).slice(-8);
+  if (!dates.length) return '';
+  return '<div class="spark" aria-hidden="true">' + dates.map(d => {
+    let h = 0, f = 0;
+    mems.forEach(m => { const st = ALL_ATTENDANCE[m.id+'_'+d.id]; if (st) { f++; if (st === 'H') h++; } });
+    const v = f ? Math.round(h/f*100) : 0;
+    return '<i style="height:'+Math.max(4, Math.round(v*.4))+'px;background:'+(v >= 75 ? color : '#D8D5E3')+'"></i>';
+  }).join('') + '</div>';
+}
+
+// Ganti region Coach dari segmented di header (sama dengan toggle region lama di Overview)
+function coachSetRegion(r) {
+  coachReg = r;
+  window.__WILAYAH_KEC = 'all';
+  window.__WILAYAH_KEL = 'all';
+  renderCoachOverview();
+  renderCoachAbsensi();
+  renderCoachMilestone();
+  renderCoachVisi();
+  if (_CACHED_ALL_CG_EVENTS) renderCoachEvents(false);
+}
+
 async function renderCoachOverview() {
   const el = document.getElementById('tab-c-overview');
   const region = coachRole === 'tl' ? 'all' : coachReg;
@@ -3896,69 +3999,42 @@ async function renderCoachOverview() {
   document.getElementById('coachMeta').textContent = cgs.length + ' CG aktif \u00b7 ' + totalMbr + ' member \u00b7 ' + avgHadir + '% kehadiran';
 
   let html = '';
-  // Top bar: region toggle + Export Detail buttons
-  html += '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px;margin-top:4px">';
-  if (coachRole !== 'tl') {
-    html += '<div class="region-toggle" style="display:inline-flex;margin:0"><button class="region-btn '+(coachReg==='jaktim1'?'active':'')+'" onclick="coachReg=\'jaktim1\';window.__WILAYAH_KEC=\'all\';window.__WILAYAH_KEL=\'all\';renderCoachOverview();renderCoachAbsensi();renderCoachMilestone();renderCoachVisi()" style="padding:6px 18px;font-size:12px">JAKTIM 1</button><button class="region-btn '+(coachReg==='jaktim2'?'active':'')+'" onclick="coachReg=\'jaktim2\';window.__WILAYAH_KEC=\'all\';window.__WILAYAH_KEL=\'all\';renderCoachOverview();renderCoachAbsensi();renderCoachMilestone();renderCoachVisi()" style="padding:6px 18px;font-size:12px">JAKTIM 2</button></div>';
-  } else {
-    html += '<div></div>';
-  }
   const detailScope = coachRole === 'tl' ? 'all' : coachReg;
-  const detailLabel = coachRole === 'tl' ? 'Semua' : (coachReg === 'jaktim1' ? 'Jaktim 1' : 'Jaktim 2');
-  html += '<div style="display:flex;gap:6px;align-items:center">';
-  html += '<span style="font-size:10px;color:var(--g4);font-weight:600;letter-spacing:.3px;text-transform:uppercase">Export Detail '+detailLabel+'</span>';
-  html += '<button onclick="exportDetailCSV(\''+detailScope+'\')" style="padding:6px 12px;border-radius:8px;border:1.5px solid #16a34a;background:linear-gradient(135deg,#f0fdf4,#dcfce7);color:#16a34a;font-size:10px;font-weight:700;cursor:pointer;letter-spacing:.3px;transition:all .15s" onmouseover="this.style.transform=\'translateY(-1px)\'" onmouseout="this.style.transform=\'\'" title="Export No HP, Alamat, Milestone, dll">📊 Detail CSV</button>';
-  html += '<button onclick="exportDetailPDF(\''+detailScope+'\')" style="padding:6px 12px;border-radius:8px;border:1.5px solid #dc2626;background:linear-gradient(135deg,#fef2f2,#fee2e2);color:#dc2626;font-size:10px;font-weight:700;cursor:pointer;letter-spacing:.3px;transition:all .15s" onmouseover="this.style.transform=\'translateY(-1px)\'" onmouseout="this.style.transform=\'\'" title="Export No HP, Alamat, Milestone, dll">📄 Detail PDF</button>';
-  html += '</div>';
-  html += '</div>';
+  const detailLabel = coachRole === 'tl' ? 'semua region' : (coachReg === 'jaktim1' ? 'Jaktim 1' : 'Jaktim 2');
+  html += '<div class="tabbar"><div class="sub" style="margin:0">Export detail member '+detailLabel+'</div><div class="actions">';
+  html += '<button type="button" class="btn sm" onclick="exportDetailCSV(\''+detailScope+'\')" title="Export No HP, Alamat, Milestone, dll">'+icon('down',16)+'Detail CSV</button>';
+  html += '<button type="button" class="btn sm" onclick="exportDetailPDF(\''+detailScope+'\')" title="Export No HP, Alamat, Milestone, dll">'+icon('down',16)+'Detail PDF</button>';
+  html += '</div></div>';
 
   // Visi Coach per region (editable). Untuk TL, tampilkan dua kotak: Jaktim 1 + Jaktim 2
   const visiRegions = coachRole === 'tl' ? ['jaktim1','jaktim2'] : [coachReg];
   const visiData = {};
   await Promise.all(visiRegions.map(async r => { visiData[r] = await loadCoachRegionVision(r); }));
+  html += '<div class="cvisi-wrap">';
   visiRegions.forEach(r => {
     const cv = visiData[r] || {visi:'',misi:''};
     const rlbl = r === 'jaktim1' ? 'Jaktim 1' : 'Jaktim 2';
-    const hasVisi = cv.visi && cv.visi.trim();
-    // Card container
-    html += '<div style="background:#fff;border:1px solid #e9e3ff;border-radius:16px;overflow:hidden;margin-bottom:16px;box-shadow:0 4px 20px rgba(108,92,231,.06)">';
-    // Header gradient bar
-    html += '<div style="background:linear-gradient(135deg,#6C5CE7,#a855f7);padding:14px 18px;display:flex;align-items:center;justify-content:space-between">';
-    html += '<div style="display:flex;align-items:center;gap:10px"><div style="width:32px;height:32px;border-radius:10px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></div>';
-    html += '<div><div style="font-weight:700;font-size:13px;color:#fff;letter-spacing:.3px">Visi '+rlbl+'</div><div style="font-size:10px;color:rgba(255,255,255,.7);margin-top:1px">Arah & tujuan CG region ini</div></div></div>';
-    html += '<span style="font-size:9px;color:rgba(255,255,255,.6);letter-spacing:.5px">auto-save</span></div>';
-    // Body — Visi
-    html += '<div style="padding:16px 18px">';
-    html += '<div style="margin-bottom:14px"><div style="font-size:10px;font-weight:700;letter-spacing:1px;color:var(--purple);text-transform:uppercase;margin-bottom:6px">Visi</div>';
-    html += '<textarea id="coachVisi_'+r+'" placeholder="Contoh: Loving God Loving People" style="width:100%;min-height:56px;padding:12px 14px;border:1.5px solid #e4dcff;border-radius:12px;font-family:\'Instrument Serif\',serif;font-size:16px;color:var(--g1);background:linear-gradient(135deg,#fdfaff,#fff);resize:vertical;line-height:1.4;transition:border-color .2s;font-style:italic" onfocus="this.style.borderColor=\'#6C5CE7\'" onblur="this.style.borderColor=\'#e4dcff\';saveCoachVisiFromUI(\''+r+'\')">'+esc(cv.visi||'')+'</textarea></div>';
-    // Body — Misi
-    html += '<div><div style="font-size:10px;font-weight:700;letter-spacing:1px;color:var(--g3);text-transform:uppercase;margin-bottom:6px">Misi <span style="font-weight:500;letter-spacing:0;text-transform:none;color:var(--g4)">(opsional)</span></div>';
-    html += '<textarea id="coachMisi_'+r+'" placeholder="Langkah konkret untuk mencapai visi..." style="width:100%;min-height:48px;padding:10px 14px;border:1.5px solid var(--g5);border-radius:12px;font-family:Inter,sans-serif;font-size:12px;color:var(--g2);background:#fafafa;resize:vertical;line-height:1.5;transition:border-color .2s" onfocus="this.style.borderColor=\'#6C5CE7\';this.style.background=\'#fff\'" onblur="this.style.borderColor=\'var(--g5)\';this.style.background=\'#fafafa\';saveCoachVisiFromUI(\''+r+'\')">'+esc(cv.misi||'')+'</textarea></div>';
-    html += '</div></div>';
-  });
-
-  // CG Cards Grid
-  html += '<div class="coach-grid">';
-  allStats.sort((a, b) => b.pct - a.pct);
-  allStats.forEach(c => {
-    const color = CG_COLORS[c.cg] || '#7c3aed';
-    const dash = Math.round(c.pct * 97.4 / 100);
-    html += '<div class="coach-card" style="border-left:4px solid '+color+'" onclick="enterFromCoach(\''+jsEsc(c.cg)+'\')">';
-    html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><div style="font-weight:800;font-size:15px">'+esc(c.cg)+'</div>';
-    html += '<div style="position:relative;width:40px;height:40px"><svg viewBox="0 0 36 36" style="transform:rotate(-90deg)"><circle cx="18" cy="18" r="15.5" fill="none" stroke="#e5e7eb" stroke-width="3"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="'+color+'" stroke-width="3" stroke-dasharray="'+dash+' 97.4" stroke-linecap="round"/></svg><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700">'+c.pct+'%</div></div></div>';
-    html += '<div style="font-size:11px;color:var(--g3);margin-bottom:8px">CGL: '+esc(c.leader)+'</div>';
-    html += '<div style="display:flex;gap:14px;font-size:11px;margin-bottom:8px"><div style="text-align:center"><span style="font-family:\'Instrument Serif\',serif;font-size:18px;display:block">'+c.total+'</span>Member</div><div style="text-align:center"><span style="font-family:\'Instrument Serif\',serif;font-size:18px;color:var(--red);display:block">'+c.atRisk+'</span>At Risk</div></div>';
-    html += '<div style="font-size:9px;color:var(--g3);margin-bottom:3px">Milestone Progress</div><div class="ms-bar"><div class="ms-bar-fill" style="width:'+c.msPct+'%"></div></div><div style="font-size:9px;color:var(--g4)">'+c.msPct+'% selesai</div></div>';
+    html += '<section class="visi-box cvisi"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><small>Visi '+rlbl+'</small><span class="autosave">tersimpan otomatis</span></div>';
+    html += '<label class="sr" for="coachVisi_'+r+'">Visi '+rlbl+'</label><textarea id="coachVisi_'+r+'" rows="2" placeholder="Contoh: Loving God Loving People" onblur="saveCoachVisiFromUI(\''+r+'\')">'+esc(cv.visi||'')+'</textarea>';
+    html += '<label class="cmisi"><span>Misi (opsional)</span><textarea id="coachMisi_'+r+'" rows="2" placeholder="Langkah konkret untuk mencapai visi…" onblur="saveCoachVisiFromUI(\''+r+'\')">'+esc(cv.misi||'')+'</textarea></label>';
+    html += '</section>';
   });
   html += '</div>';
 
-  // Bar chart comparison
-  html += '<div class="section" style="margin-top:20px"><div class="section-title">\ud83d\udcca Perbandingan Antar CG</div>';
-  allStats.forEach(c => {
-    const color = CG_COLORS[c.cg] || '#7c3aed';
-    html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><div style="width:70px;font-size:11px;font-weight:600;text-align:right">'+esc(c.cg)+'</div><div style="flex:1;height:22px;background:var(--g6);border-radius:6px;overflow:hidden"><div style="width:'+c.pct+'%;height:100%;background:'+color+';border-radius:6px;display:flex;align-items:center;padding-left:8px"><span style="font-size:9px;color:#fff;font-weight:700">'+c.pct+'%</span></div></div></div>';
+  // CG Cards Grid — urut dari kehadiran terendah
+  html += '<section><div class="chead" style="margin-top:24px"><div><h2 style="font-size:22px">CG kamu</h2><div class="sub">Urut dari kehadiran terendah · klik kartu untuk buka dashboard CG</div></div></div><div class="cggrid">';
+  allStats.slice().sort((a, b) => a.pct - b.pct).forEach(c => {
+    const color = CG_COLORS[c.cg] || '#5B45E0';
+    const bg = CG_BG[c.cg] || '#EEEAFB';
+    const init = CG_INIT[c.cg] ? CG_INIT[c.cg].replace(/^T/,'') : String(c.cg).replace(/\D/g,'').slice(-2);
+    const tag = c.pct >= 75 ? ['Sehat','var(--Hb)','var(--H)'] : c.pct >= 50 ? ['Pantau','var(--Sb)','var(--S)'] : ['Kritis','var(--Ab)','var(--A)'];
+    html += '<button type="button" class="cgcard" onclick="enterFromCoach(\''+jsEsc(c.cg)+'\')">';
+    html += '<div class="cg-top"><span class="cgnum" style="background:'+bg+';color:'+color+'">'+esc(init)+'</span><div style="flex:1;min-width:0"><b>'+esc(c.cg)+'</b><span class="sub" style="margin:0;display:block">'+esc(c.leader||'-')+' · '+c.total+' anggota</span></div><span class="pill" style="background:'+tag[1]+';color:'+tag[2]+'">'+tag[0]+'</span></div>';
+    html += '<div class="cg-mid"><div><div class="sub" style="margin:0 0 4px">Kehadiran</div><span class="cg-pct">'+c.pct+'%</span></div>'+cgSparkline(c, color)+'</div>';
+    html += '<div class="cg-foot"><span class="mini"><b style="color:var(--A)">'+c.atRisk+'</b> at risk</span><span class="mini"><b style="color:var(--S)">'+c.blmMsj1+'</b> belum MSJ 1</span><span class="mini">Milestone <b>'+c.msPct+'%</b></span></div>';
+    html += '</button>';
   });
-  html += '</div>';
+  html += '</div></section>';
 
   // Distribusi Wilayah \u2014 filter chip kecamatan + kelurahan, list member per area
   html += buildWilayahSection(region);
@@ -4030,69 +4106,66 @@ function buildWilayahSection(region) {
     return true;
   }).sort((a,b) => (a.cg||'').localeCompare(b.cg||'') || (a.nama||'').localeCompare(b.nama||''));
 
-  let html = '<div id="wilayahSection" class="section" style="margin-top:20px">';
-  html += '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px">';
-  html += '<div class="section-title" style="margin:0">\u{1F5FA}\ufe0f Distribusi Wilayah</div>';
-  html += '<button onclick="exportWilayahCSV()" style="padding:6px 12px;border-radius:8px;border:1.5px solid #16a34a;background:linear-gradient(135deg,#f0fdf4,#dcfce7);color:#16a34a;font-size:10px;font-weight:700;cursor:pointer;letter-spacing:.3px" title="Export list member area aktif">\u{1F4CA} Export CSV</button>';
-  html += '</div>';
-
+  const jsq = (k) => k.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+  let html = '<section id="wilayahSection" class="card" style="margin-top:24px">';
+  html += '<div class="chead"><div><h2>Distribusi wilayah</h2>';
   // Info total + counter — pakai normWilayah supaya whitespace-only tidak di-count sebagai punya alamat
   const totalWithAddr = active.filter(m => normWilayah(m.kecamatan) || normWilayah(m.kelurahan)).length;
   const totalNoAddr = active.length - totalWithAddr;
-  html += '<div style="font-size:11px;color:var(--g3);margin-bottom:12px">'+active.length+' member \u00b7 '+totalWithAddr+' punya alamat';
-  if (totalNoAddr > 0) html += ' \u00b7 <span style="color:#c2410c">'+totalNoAddr+' belum ada alamat</span>';
-  html += '</div>';
+  html += '<div class="sub">'+active.length+' member · '+totalWithAddr+' punya alamat';
+  if (totalNoAddr > 0) html += ' · <span style="color:var(--S);font-weight:600">'+totalNoAddr+' belum ada alamat</span>';
+  html += '</div></div>';
+  html += '<button type="button" class="btn sm" onclick="exportWilayahCSV()" title="Export list member area aktif">'+icon('down',16)+'Wilayah CSV</button></div>';
 
   // Kecamatan chips
-  html += '<div style="font-size:10px;font-weight:700;color:var(--g3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Kecamatan</div>';
-  html += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">';
+  html += '<div class="flabel" style="margin-bottom:8px">Kecamatan</div>';
+  html += '<div class="chips" style="margin-bottom:16px">';
   const kecActiveAll = window.__WILAYAH_KEC === 'all';
-  html += '<button onclick="setWilayahKec(\'all\')" style="padding:5px 12px;border-radius:20px;border:1.5px solid '+(kecActiveAll?'#6C5CE7':'var(--g5)')+';background:'+(kecActiveAll?'#6C5CE7':'#fff')+';color:'+(kecActiveAll?'#fff':'var(--g2)')+';font-size:11px;font-weight:600;cursor:pointer;transition:all .15s">Semua ('+active.length+')</button>';
+  html += '<button type="button" class="chip'+(kecActiveAll?' on':'')+'" aria-pressed="'+kecActiveAll+'" onclick="setWilayahKec(\'all\')">Semua kecamatan <span style="opacity:.7">('+active.length+')</span></button>';
   kecList.forEach(kec => {
     const isActive = window.__WILAYAH_KEC === kec;
-    const label = titleCaseWilayah(kec);
-    html += '<button onclick="setWilayahKec(\''+kec.replace(/\\/g,'\\\\').replace(/\'/g,"\\'")+'\')" style="padding:5px 12px;border-radius:20px;border:1.5px solid '+(isActive?'#6C5CE7':'var(--g5)')+';background:'+(isActive?'#6C5CE7':'#fff')+';color:'+(isActive?'#fff':'var(--g2)')+';font-size:11px;font-weight:600;cursor:pointer;transition:all .15s">'+esc(label)+' ('+kecCount[kec]+')</button>';
+    html += '<button type="button" class="chip'+(isActive?' on':'')+'" aria-pressed="'+isActive+'" onclick="setWilayahKec(\''+esc(jsq(kec))+'\')">'+esc(titleCaseWilayah(kec))+' <span style="opacity:.7">('+kecCount[kec]+')</span></button>';
   });
   html += '</div>';
 
+  // Bar per kecamatan (hanya saat semua kecamatan)
+  if (kecActiveAll && kecList.length) {
+    const mx = Math.max(1, ...kecList.map(k => kecCount[k]));
+    html += '<div style="margin-bottom:18px">' + kecList.slice(0, 10).map(k => '<div class="prog"><span class="pl" style="width:130px">'+esc(titleCaseWilayah(k))+'</span><span class="tr"><i style="width:'+Math.round(kecCount[k]/mx*100)+'%"></i></span><span class="v">'+kecCount[k]+'</span></div>').join('') + '</div>';
+  }
+
   // Kelurahan chips (kalau ada)
   if (kelList.length > 0) {
-    html += '<div style="font-size:10px;font-weight:700;color:var(--g3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Kelurahan</div>';
-    html += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">';
+    html += '<div class="flabel" style="margin-bottom:8px">Kelurahan</div>';
+    html += '<div class="chips" style="margin-bottom:16px">';
     const kelActiveAll = window.__WILAYAH_KEL === 'all';
     const kelTotal = kelList.reduce((s,k) => s+kelCount[k], 0);
-    html += '<button onclick="setWilayahKel(\'all\')" style="padding:5px 12px;border-radius:20px;border:1.5px solid '+(kelActiveAll?'#a855f7':'var(--g5)')+';background:'+(kelActiveAll?'#a855f7':'#fff')+';color:'+(kelActiveAll?'#fff':'var(--g2)')+';font-size:11px;font-weight:600;cursor:pointer;transition:all .15s">Semua ('+kelTotal+')</button>';
+    html += '<button type="button" class="chip kel'+(kelActiveAll?' on':'')+'" aria-pressed="'+kelActiveAll+'" onclick="setWilayahKel(\'all\')">Semua <span style="opacity:.7">('+kelTotal+')</span></button>';
     kelList.forEach(kel => {
       const isActive = window.__WILAYAH_KEL === kel;
-      const label = titleCaseWilayah(kel);
-      html += '<button onclick="setWilayahKel(\''+kel.replace(/\\/g,'\\\\').replace(/\'/g,"\\'")+'\')" style="padding:5px 12px;border-radius:20px;border:1.5px solid '+(isActive?'#a855f7':'var(--g5)')+';background:'+(isActive?'#a855f7':'#fff')+';color:'+(isActive?'#fff':'var(--g2)')+';font-size:11px;font-weight:600;cursor:pointer;transition:all .15s">'+esc(label)+' ('+kelCount[kel]+')</button>';
+      html += '<button type="button" class="chip kel'+(isActive?' on':'')+'" aria-pressed="'+isActive+'" onclick="setWilayahKel(\''+esc(jsq(kel))+'\')">'+esc(titleCaseWilayah(kel))+' <span style="opacity:.7">('+kelCount[kel]+')</span></button>';
     });
     html += '</div>';
   }
 
   // List member yang match filter
-  html += '<div style="font-size:11px;font-weight:700;color:var(--g2);margin-bottom:8px">'+filtered.length+' member ditemukan</div>';
+  html += '<div class="flabel" style="margin-bottom:8px">'+filtered.length+' member ditemukan</div>';
   if (filtered.length === 0) {
-    html += '<div style="padding:20px;text-align:center;color:var(--g4);font-size:12px;font-style:italic;background:#fafafa;border-radius:10px">Tidak ada member di area ini</div>';
+    html += '<div class="empty">Tidak ada member di area ini.</div>';
   } else {
-    html += '<div style="display:flex;flex-direction:column;gap:6px;max-height:400px;overflow-y:auto">';
+    html += '<div class="wlist">';
     filtered.forEach(m => {
-      const color = (typeof CG_COLORS !== 'undefined' && CG_COLORS[m.cg]) || '#6C5CE7';
-      const alamat = [m.kelurahan, m.kecamatan].filter(Boolean).map(titleCaseWilayah).join(', ') || '(alamat belum diisi)';
-      const wa = m.wa ? esc(m.wa) : '<span style="color:var(--g4);font-style:italic">no HP kosong</span>';
-      html += '<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:#fff;border:1px solid var(--g5);border-radius:8px;transition:all .15s" onmouseover="this.style.borderColor=\''+color+'55\'" onmouseout="this.style.borderColor=\'var(--g5)\'">';
-      html += '<div style="width:4px;height:32px;background:'+color+';border-radius:2px;flex-shrink:0"></div>';
-      html += '<div style="flex:1;min-width:0">';
-      html += '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap"><span style="font-weight:600;font-size:12px;color:var(--g1)">'+esc(m.nama||'')+'</span><span style="font-size:9px;color:'+color+';font-weight:700;background:'+color+'15;padding:1px 6px;border-radius:5px">'+esc(m.cg||'')+'</span><span style="font-size:9px;color:var(--g3)">'+esc(m.status||'')+'</span></div>';
-      html += '<div style="font-size:10px;color:var(--g3);margin-top:2px">\u{1F4CD} '+esc(alamat)+'</div>';
-      html += '</div>';
-      html += '<div style="font-size:10px;color:var(--g2);flex-shrink:0">'+wa+'</div>';
-      html += '</div>';
+      const color = (typeof CG_COLORS !== 'undefined' && CG_COLORS[m.cg]) || '#5B45E0';
+      const bg = (typeof CG_BG !== 'undefined' && CG_BG[m.cg]) || '#EEEAFB';
+      const alamat = [m.kelurahan, m.kecamatan].filter(Boolean).map(titleCaseWilayah).join(', ') || 'Alamat belum diisi';
+      html += '<div class="lrow" style="margin:0"><span class="ava" aria-hidden="true" style="background:'+bg+';color:'+color+'">'+initialOf(m.nama)+'</span>';
+      html += '<div class="grow"><b>'+esc(m.nama||'')+' <span class="pill" style="background:'+bg+';color:'+color+'">'+esc(m.cg||'')+'</span></b><small>'+esc(m.status||'Member')+' · '+esc(alamat)+'</small></div>';
+      html += '<small style="flex:none;white-space:nowrap">'+(m.wa ? esc(m.wa) : '<i>no HP kosong</i>')+'</small></div>';
     });
     html += '</div>';
   }
 
-  html += '</div>';
+  html += '</section>';
   return html;
 }
 
@@ -4542,6 +4615,18 @@ async function exportDetailPDF(scope) {
   }
 }
 
+// State accordion Absensi Coach (bertahan saat render ulang realtime/polling)
+const _CABS_OPEN = new Set();
+function toggleCoachAbsAcc(btn, cg) {
+  const acc = btn.closest('.acc');
+  const body = acc.querySelector('.acc-b');
+  const open = !acc.classList.contains('open');
+  acc.classList.toggle('open', open);
+  btn.setAttribute('aria-expanded', String(open));
+  if (body) body.hidden = !open;
+  if (open) _CABS_OPEN.add(cg); else _CABS_OPEN.delete(cg);
+}
+
 function renderCoachAbsensi() {
   const el = document.getElementById('tab-c-absensi');
   const region = coachRole === 'tl' ? 'all' : coachReg;
@@ -4552,22 +4637,15 @@ function renderCoachAbsensi() {
   const regionDates = region === 'all' ? ALL_DATES : ALL_DATES.filter(d => d.region === region);
   const nextMonthInfo = computeNextMonth(regionDates);
 
-  let html = '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-bottom:14px">';
-  html += '<div style="display:flex;gap:10px;align-items:center">';
-  if (coachRole !== 'tl') {
-    html += '<div class="region-toggle" style="display:inline-flex;margin:0"><button class="region-btn '+(coachReg==='jaktim1'?'active':'')+'" onclick="coachReg=\'jaktim1\';renderCoachAbsensi()" style="padding:6px 16px;font-size:11px">JAKTIM 1</button><button class="region-btn '+(coachReg==='jaktim2'?'active':'')+'" onclick="coachReg=\'jaktim2\';renderCoachAbsensi()" style="padding:6px 16px;font-size:11px">JAKTIM 2</button></div>';
-  }
-  html += '</div>';
   // Generate Sabtu button (Coach + TL only — already inside Coach dashboard)
   const genLabel = 'Generate Sabtu ' + nextMonthInfo.monthName + ' ' + nextMonthInfo.year;
   const scope = coachRole === 'tl' ? 'all' : coachReg;
-  html += '<div style="display:flex;gap:8px;flex-wrap:wrap">';
-  html += '<button onclick="refreshCoachAttendance()" style="padding:8px 14px;border-radius:10px;border:1.5px solid #0ea5e9;background:linear-gradient(135deg,#f0f9ff,#e0f2fe);color:#0369a1;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.3px;box-shadow:0 2px 6px rgba(14,165,233,.1);transition:all .2s" onmouseover="this.style.transform=\'translateY(-1px)\'" onmouseout="this.style.transform=\'\'" title="Refresh data dari Supabase">🔄 Refresh</button>';
-  html += '<button onclick="exportRegionAttendanceCSV(\''+scope+'\')" style="padding:8px 14px;border-radius:10px;border:1.5px solid #16a34a;background:linear-gradient(135deg,#f0fdf4,#dcfce7);color:#16a34a;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.3px;box-shadow:0 2px 6px rgba(22,163,74,.1);transition:all .2s" onmouseover="this.style.transform=\'translateY(-1px)\'" onmouseout="this.style.transform=\'\'" title="Export tabel kehadiran ke CSV">📊 Absensi CSV</button>';
-  html += '<button onclick="exportRegionAttendancePDF(\''+scope+'\')" style="padding:8px 14px;border-radius:10px;border:1.5px solid #dc2626;background:linear-gradient(135deg,#fef2f2,#fee2e2);color:#dc2626;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.3px;box-shadow:0 2px 6px rgba(220,38,38,.1);transition:all .2s" onmouseover="this.style.transform=\'translateY(-1px)\'" onmouseout="this.style.transform=\'\'" title="Export tabel kehadiran ke PDF">📄 Absensi PDF</button>';
-  html += '<button onclick="generateSabtuBulan(\''+scope+'\','+nextMonthInfo.year+','+nextMonthInfo.month+')" style="padding:8px 14px;border-radius:10px;border:1.5px solid #6C5CE7;background:linear-gradient(135deg,#f5f3ff,#ede9fe);color:#6C5CE7;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.3px;transition:all .2s;box-shadow:0 2px 6px rgba(108,92,231,.1)" onmouseover="this.style.transform=\'translateY(-1px)\';this.style.boxShadow=\'0 4px 12px rgba(108,92,231,.2)\'" onmouseout="this.style.transform=\'\';this.style.boxShadow=\'0 2px 6px rgba(108,92,231,.1)\'">+ '+genLabel+'</button>';
-  html += '</div>';
-  html += '</div>';
+  let html = '<div class="tabbar"><div class="sub" style="margin:0">Klik kotak untuk ubah absensi langsung dari Coach</div><div class="actions">';
+  html += '<button type="button" class="btn sm" onclick="refreshCoachAttendance()" title="Ambil data absensi terbaru">'+icon('refresh',16)+'Refresh</button>';
+  html += '<button type="button" class="btn sm" onclick="exportRegionAttendanceCSV(\''+scope+'\')">'+icon('down',16)+'Absensi CSV</button>';
+  html += '<button type="button" class="btn sm" onclick="exportRegionAttendancePDF(\''+scope+'\')">'+icon('down',16)+'Absensi PDF</button>';
+  html += '<button type="button" class="btn sm primary" onclick="generateSabtuBulan(\''+scope+'\','+nextMonthInfo.year+','+nextMonthInfo.month+')">'+icon('plus',16)+esc(genLabel)+'</button>';
+  html += '</div></div>';
 
   // Mobile-only month nav (sekali di atas semua CG cards)
   const mobile = isMobileScreen();
@@ -4579,29 +4657,19 @@ function renderCoachAbsensi() {
   // ── Pending CGL section: list CG yang belum input absensi di bulan berjalan ──
   const pendingList = computePendingCGLs(region);
   if (pendingList.length > 0) {
-    html += '<div style="background:linear-gradient(135deg,#fff7ed,#fef3c7);border:1.5px solid #fbbf24;border-radius:14px;padding:14px 16px;margin-bottom:18px;box-shadow:0 2px 8px rgba(251,191,36,.15)">';
-    html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;flex-wrap:wrap">';
-    html += '<div style="display:flex;align-items:center;gap:8px">';
-    html += '<div style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#f59e0b,#dc2626);display:flex;align-items:center;justify-content:center;font-size:14px">⚠️</div>';
-    html += '<div><div style="font-weight:800;font-size:13px;color:#92400e;letter-spacing:.3px">CGL Belum Input Absensi</div><div style="font-size:10px;color:#a16207;margin-top:1px">'+pendingList.length+' CG · 4 ibadah terakhir</div></div>';
-    html += '</div>';
-    html += '<button onclick="sendAllReminders()" style="padding:7px 14px;border-radius:10px;border:1.5px solid #d97706;background:#fff;color:#92400e;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.3px;display:inline-flex;align-items:center;gap:5px;transition:all .15s" onmouseover="this.style.background=\'#fef3c7\'" onmouseout="this.style.background=\'#fff\'">🔔 Ingatkan Semua</button>';
-    html += '</div>';
-    html += '<div style="display:flex;flex-direction:column;gap:8px">';
+    html += '<section class="card pending">';
+    html += '<div class="chead" style="margin-bottom:4px"><div><h2>CGL belum input absensi</h2><div class="sub">'+pendingList.length+' CG · 4 ibadah terakhir</div></div>';
+    html += '<button type="button" class="btn sm" onclick="sendAllReminders()">'+icon('bell',16)+'Ingatkan semua</button></div>';
     pendingList.forEach((p, idx) => {
-      const color = CG_COLORS[p.cg] || '#7c3aed';
+      const color = CG_COLORS[p.cg] || '#5B45E0';
+      const bg = CG_BG[p.cg] || '#EEEAFB';
       const dateList = p.missingDates.map(d => esc(d.label)).join(', ');
-      html += '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#fff;border:1px solid #fde68a;border-radius:10px;transition:all .15s" onmouseover="this.style.borderColor=\'#f59e0b\';this.style.transform=\'translateX(2px)\'" onmouseout="this.style.borderColor=\'#fde68a\';this.style.transform=\'\'">';
-      html += '<div style="flex:1;min-width:0">';
-      html += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px"><span style="font-weight:700;font-size:12px;color:'+color+'">'+esc(p.cg)+'</span><span style="font-size:9px;color:var(--g4)">·</span><span style="font-size:10px;color:var(--g3)">CGL: '+esc(p.leader)+'</span><span style="font-size:9px;color:#dc2626;font-weight:700;background:#fee2e2;padding:1px 6px;border-radius:5px">'+p.missingDates.length+' tanggal</span></div>';
-      html += '<div style="font-size:10px;color:var(--g3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">📅 '+dateList+'</div>';
-      html += '</div>';
+      html += '<div class="lrow"><span class="cgnum" style="width:36px;height:36px;font-size:12px;background:'+bg+';color:'+color+'">'+esc(String(p.cg).replace(/\D/g,'').slice(-2))+'</span>';
+      html += '<div class="grow"><b>'+esc(p.cg)+' <span class="pill" style="background:var(--Ab);color:var(--A)">'+p.missingDates.length+' belum</span></b><small style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">CGL '+esc(p.leader)+' · '+dateList+'</small></div>';
       // Pakai index lookup ke window.__pendingCGLs (set di bawah) supaya tidak rentan terhadap label dengan kutip
-      html += '<button onclick="sendReminderByIdx('+idx+')" style="padding:6px 10px;border-radius:8px;border:1.5px solid #f59e0b;background:#fff;color:#92400e;font-size:10px;font-weight:700;cursor:pointer;flex-shrink:0;display:inline-flex;align-items:center;gap:4px;transition:all .15s" onmouseover="this.style.background=\'#fef3c7\'" onmouseout="this.style.background=\'#fff\'" title="Kirim pengingat ke CGL">🔔 Ingatkan</button>';
-      html += '</div>';
+      html += '<button type="button" class="btn sm" onclick="sendReminderByIdx('+idx+')">'+icon('bell',16)+'Ingatkan</button></div>';
     });
-    html += '</div>';
-    html += '</div>';
+    html += '</section>';
 
     // Auto-broadcast (rate-limited 2 jam per CG)
     setTimeout(() => autoBroadcastPendingReminders(pendingList), 800);
@@ -4647,10 +4715,12 @@ function renderCoachAbsensi() {
   const chartHtml = buildAttendanceLineChart(chartMems, chartDates, ALL_ATTENDANCE);
   if (chartHtml) {
     // Sisipkan label region di heading chart
-    html += chartHtml.replace('Progress Kehadiran per Minggu</div>', 'Progress Kehadiran '+chartScopeLabel+'</div>');
+    html += chartHtml.replace('Tren kehadiran per minggu</h2>', 'Tren kehadiran '+esc(chartScopeLabel)+'</h2>');
   }
 
-  // Per-CG card layout for cleaner visual separation
+  // Accordion per CG — isi tabel selalu dirender (disembunyikan saat tertutup) supaya patch realtime per-dot tetap jalan
+  const pendingIdx = {};
+  (pendingList || []).forEach((p, i) => { pendingIdx[p.cg] = i; });
   cgs.sort().forEach(cg => {
     const mems = ALL_MEMBERS.filter(m => m.cg === cg);
     if (mems.length === 0) return;
@@ -4658,54 +4728,49 @@ function renderCoachAbsensi() {
     const cgRegion = mems[0].region;
     const cgDatesAll = ALL_DATES.filter(d => d.region === cgRegion);
     const cgDates = mobile ? cgDatesAll.filter(d => parseLabelToMonth(d.label) === active.month) : cgDatesAll;
-    const color = CG_COLORS[cg] || '#7c3aed';
-    const bg = CG_BG[cg] || '#faf5ff';
+    const color = CG_COLORS[cg] || '#5B45E0';
+    const bg = CG_BG[cg] || '#EEEAFB';
     const info = ALL_CG_INFO.find(c => c.cg === cg) || {};
 
     // Compute CG average %
-    let cgH=0, cgT=0;
-    mems.forEach(m => { cgDates.forEach(d => { const s=ALL_ATTENDANCE[m.id+'_'+d.id]; if(s){cgT++;if(s==='H')cgH++;} }); });
+    let cgH=0, cgT=0, cgA=0;
+    mems.forEach(m => { cgDates.forEach(d => { const s=ALL_ATTENDANCE[m.id+'_'+d.id]; if(s){cgT++;if(s==='H')cgH++;if(s==='A')cgA++;} }); });
     const cgPct = cgT ? Math.round(cgH/cgT*100) : 0;
+    const open = _CABS_OPEN.has(cg);
 
-    html += '<div style="background:#fff;border:1px solid var(--g5);border-radius:14px;overflow:hidden;margin-bottom:18px;box-shadow:0 1px 4px rgba(0,0,0,.03)">';
-    // CG header
-    html += '<div style="background:linear-gradient(135deg,'+bg+','+bg+'cc);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid '+color+'33">';
-    html += '<div style="display:flex;align-items:center;gap:10px">';
-    html += '<div><div style="font-weight:700;font-size:13px;color:'+color+'">'+esc(cg)+'</div><div style="font-size:10px;color:var(--g3)">CGL: '+esc(info.leader||'-')+' · '+mems.length+' member · '+(cgRegion==='jaktim1'?'Jaktim 1':'Jaktim 2')+'</div></div>';
-    html += '</div>';
-    html += '<div style="text-align:right"><div style="font-family:\'Instrument Serif\',serif;font-size:20px;color:'+color+';line-height:1">'+cgPct+'%</div><div style="font-size:9px;color:var(--g4);letter-spacing:.5px">avg hadir</div></div>';
-    html += '</div>';
+    html += '<div class="acc'+(open?' open':'')+'">';
+    html += '<button type="button" class="acc-h" aria-expanded="'+open+'" onclick="toggleCoachAbsAcc(this,\''+jsEsc(cg)+'\')">';
+    html += '<span class="cgnum" style="background:'+bg+';color:'+color+'">'+esc(String(cg).replace(/\D/g,'').slice(-2))+'</span>';
+    html += '<span class="grow"><b>'+esc(cg)+'</b><span class="sub" style="margin:0;display:block">CGL '+esc(info.leader||'-')+' · '+mems.length+' anggota · '+cgA+'× alpa · '+(cgRegion==='jaktim1'?'Jaktim 1':'Jaktim 2')+'</span></span>';
+    html += '<span class="hbar" aria-hidden="true"><i style="width:'+cgPct+'%;background:'+pctColorOf(cgPct)+'"></i></span>';
+    html += '<span class="pct" style="color:'+pctColorOf(cgPct)+';width:56px;text-align:right">'+cgPct+'%</span>';
+    html += '<span class="chev">'+icon('chev')+'</span></button>';
+    html += '<div class="acc-b"'+(open?'':' hidden')+'>';
 
     // Empty state untuk mobile kalau bulan aktif tidak ada ibadah
     if (mobile && cgDates.length === 0) {
-      html += '<div style="padding:20px 16px;text-align:center;color:var(--g4);font-size:11px;font-style:italic">Tidak ada ibadah di '+active.label+' '+active.year+'</div></div>';
-      return;
-    }
-
-    // Attendance table inside card
-    html += '<div style="overflow-x:auto"><table class="t" style="border-collapse:collapse;width:100%">';
-    html += '<thead><tr><th style="background:#fafafa;text-align:left">Nama</th>';
-    cgDates.forEach(d => { html += '<th style="background:#fafafa">' + esc(d.label||d.id) + '</th>'; });
-    html += '<th style="background:#fafafa">% Hadir</th></tr></thead><tbody>';
-
-    mems.sort((a,b) => roleRankLC(a.status) - roleRankLC(b.status)).forEach(m => {
-      let hCount=0, tCount=0;
-      cgDates.forEach(d => { const s=ALL_ATTENDANCE[m.id+'_'+d.id]; if(s){tCount++;if(s==='H')hCount++;} });
-      const pct = tCount ? Math.round(hCount/tCount*100) : 0;
-      const pctColor = pct>=75?'var(--green)':pct>=50?'var(--orange)':'var(--red)';
-      const atRisk = tCount>1 && pct<50;
-
-      html += '<tr'+(atRisk?' style="background:#fef2f2"':'')+'>';
-      html += '<td class="name-cell"'+(atRisk?' style="color:var(--red)"':'')+'>'+esc(m.nama)+'<span class="role-tag">'+esc(m.status)+'</span></td>';
-      cgDates.forEach(d => {
-        const st = ALL_ATTENDANCE[m.id+'_'+d.id] || null;
-        const cls = st || 'X';
-        html += '<td><span class="dot '+cls+'" data-mid="'+m.id+'" data-did="'+d.id+'" onclick="cycleDotCoach(this,'+m.id+',\''+d.id+'\')" style="cursor:pointer">'+(st||'-')+'</span></td>';
+      html += '<div class="empty">Tidak ada ibadah di '+active.label+' '+active.year+'</div>';
+    } else {
+      html += '<div class="tblwrap"><table class="t att"><thead><tr><th scope="col">Anggota</th>';
+      cgDates.forEach(d => { html += '<th scope="col">' + esc(d.label||d.id) + '</th>'; });
+      html += '<th scope="col" class="pctcol">Hadir</th></tr></thead><tbody>';
+      mems.sort((a,b) => roleRankLC(a.status) - roleRankLC(b.status)).forEach(m => {
+        let hCount=0, tCount=0;
+        cgDates.forEach(d => { const s=ALL_ATTENDANCE[m.id+'_'+d.id]; if(s){tCount++;if(s==='H')hCount++;} });
+        const pct = tCount ? Math.round(hCount/tCount*100) : 0;
+        const atRisk = tCount>1 && pct<50;
+        html += '<tr><td class="name-cell"><div class="mem"><span class="ava'+(atRisk?' risk':'')+'" aria-hidden="true">'+initialOf(m.nama)+'</span><div><b'+(atRisk?' style="color:var(--A)"':'')+'>'+esc(m.nama)+'</b>'+rolePill(m.status)+'</div></div></td>';
+        cgDates.forEach(d => {
+          const st = ALL_ATTENDANCE[m.id+'_'+d.id] || null;
+          html += '<td><button type="button" class="dot '+(st||'X')+'" data-mid="'+m.id+'" data-did="'+d.id+'" onclick="cycleDotCoach(this,'+m.id+',\''+d.id+'\')">'+(st||'-')+'</button></td>';
+        });
+        html += '<td class="pctcol"><span class="pct" style="color:'+pctColorOf(pct)+'">'+pct+'%</span><small class="pctsub">'+hCount+'/'+tCount+'</small></td></tr>';
       });
-      html += '<td><div class="pbar"><div class="pbar-track"><div class="pbar-fill" style="width:'+pct+'%;background:'+pctColor+'"></div></div><span class="pbar-val" style="color:'+pctColor+'">'+pct+'%</span></div></td></tr>';
-    });
-
-    html += '</tbody></table></div></div>';
+      html += '</tbody></table></div>';
+    }
+    html += '<div class="acc-actions"><button type="button" class="btn sm" onclick="enterFromCoach(\''+jsEsc(cg)+'\')">Buka dashboard '+esc(cg)+' '+icon('right',16)+'</button>';
+    if (pendingIdx[cg] !== undefined) html += '<button type="button" class="btn sm" onclick="sendReminderByIdx('+pendingIdx[cg]+')">'+icon('bell',16)+'Ingatkan CGL</button>';
+    html += '</div></div></div>';
   });
   el.innerHTML = html;
 }
@@ -4719,176 +4784,117 @@ function renderCoachMilestone() {
   const mems = region === 'all' ? ALL_MEMBERS : ALL_MEMBERS.filter(m => m.region === region);
   const total = mems.length || 1;
 
-  let html = '';
-  if (coachRole !== 'tl') {
-    html += '<div class="region-toggle" style="display:inline-flex;margin-bottom:16px;margin-top:4px"><button class="region-btn '+(coachReg==='jaktim1'?'active':'')+'" onclick="coachReg=\'jaktim1\';renderCoachMilestone()" style="padding:6px 18px;font-size:12px">JAKTIM 1</button><button class="region-btn '+(coachReg==='jaktim2'?'active':'')+'" onclick="coachReg=\'jaktim2\';renderCoachMilestone()" style="padding:6px 18px;font-size:12px">JAKTIM 2</button></div>';
-  }
-
   const cmsf = window.__COACH_MS_FILTER || 'all';
-  html += '<div class="filter-chips" style="margin-bottom:16px">';
+  let html = '<div class="filter-chips" role="group" aria-label="Filter milestone">';
   [['all','Semua'],['msj','MSJ'],['cgt','CGT'],['baptis','Baptis']].forEach(function(f){
-    html += '<span class="chip '+(cmsf===f[0]?'on':'')+'" onclick="setCoachMsFilter(\''+f[0]+'\')">'+f[1]+'</span>';
+    html += '<button type="button" class="chip big'+(cmsf===f[0]?' on':'')+'" aria-pressed="'+(cmsf===f[0])+'" onclick="setCoachMsFilter(\''+f[0]+'\')">'+f[1]+'</button>';
   });
   html += '</div>';
 
-  // Donut stats — filtered by cmsf
-  const allDonuts = {
-    msj: [
-      {field:'msj1',label:'MSJ 1',stroke:'#16a34a',color:'var(--green)',grad:'linear-gradient(135deg,#f0fdf4,#dcfce7)'},
-      {field:'msj2',label:'MSJ 2',stroke:'#2563eb',color:'var(--blue)',grad:'linear-gradient(135deg,#eff6ff,#dbeafe)'},
-      {field:'msj3',label:'MSJ 3',stroke:'#9333ea',color:'#9333ea',grad:'linear-gradient(135deg,#faf5ff,#f3e8ff)'}
-    ],
-    cgt: [
-      {field:'cgt1',label:'CGT 1',stroke:'#0f766e',color:'#0f766e',grad:'linear-gradient(135deg,#f0fdfa,#ccfbf1)'},
-      {field:'cgt2',label:'CGT 2',stroke:'#059669',color:'#059669',grad:'linear-gradient(135deg,#ecfdf5,#d1fae5)'},
-      {field:'cgt3',label:'CGT 3',stroke:'#0891b2',color:'#0891b2',grad:'linear-gradient(135deg,#ecfeff,#cffafe)'}
-    ],
-    baptis: [
-      {field:'baptis_air',label:'B. Air',stroke:'#7c3aed',color:'#7c3aed',grad:'linear-gradient(135deg,#faf5ff,#ede9fe)'},
-      {field:'baptis_roh',label:'B. Roh',stroke:'#db2777',color:'#db2777',grad:'linear-gradient(135deg,#fdf2f8,#fce7f3)'}
-    ],
-    all: [
-      {field:'msj1',label:'MSJ 1',stroke:'#16a34a',color:'var(--green)',grad:'linear-gradient(135deg,#f0fdf4,#dcfce7)'},
-      {field:'msj2',label:'MSJ 2',stroke:'#2563eb',color:'var(--blue)',grad:'linear-gradient(135deg,#eff6ff,#dbeafe)'},
-      {field:'msj3',label:'MSJ 3',stroke:'#9333ea',color:'#9333ea',grad:'linear-gradient(135deg,#faf5ff,#f3e8ff)'},
-      {field:'cgt1',label:'CGT 1',stroke:'#0f766e',color:'#0f766e',grad:'linear-gradient(135deg,#f0fdfa,#ccfbf1)'},
-      {field:'cgt2',label:'CGT 2',stroke:'#059669',color:'#059669',grad:'linear-gradient(135deg,#ecfdf5,#d1fae5)'},
-      {field:'cgt3',label:'CGT 3',stroke:'#0891b2',color:'#0891b2',grad:'linear-gradient(135deg,#ecfeff,#cffafe)'},
-      {field:'baptis_air',label:'B. Air',stroke:'#7c3aed',color:'#7c3aed',grad:'linear-gradient(135deg,#faf5ff,#ede9fe)'},
-      {field:'baptis_roh',label:'B. Roh',stroke:'#db2777',color:'#db2777',grad:'linear-gradient(135deg,#fdf2f8,#fce7f3)'}
-    ]
-  };
-  const donutItems = allDonuts[cmsf] || allDonuts.all;
-  // 8 donuts di Semua → 4 per baris; filter spesifik → sesuai jumlah (3 atau 2)
-  const gridCols = donutItems.length >= 8 ? 4 : donutItems.length;
+  // Kelompok milestone sesuai filter: [field, label, warna]
+  const groupIdx = { all:[0,1,2,3,4,5,6,7], msj:[0,1,2], cgt:[3,4,5], baptis:[6,7] };
+  const idxs = groupIdx[cmsf] || groupIdx.all;
+  const group = idxs.map(i => [MS_FIELDS[i], MS_LABELS[i], msColor(i)]);
 
-  html += '<div style="display:grid;grid-template-columns:repeat('+gridCols+',1fr);gap:10px;margin-bottom:20px">';
-  donutItems.forEach(d => {
-    const cnt = mems.filter(m => m[d.field]).length;
-    const dash = Math.round(cnt/total*97.4);
-    html += '<div style="background:'+d.grad+';border-radius:14px;padding:16px;text-align:center"><div style="position:relative;width:56px;height:56px;margin:0 auto 6px"><svg viewBox="0 0 36 36" style="transform:rotate(-90deg)"><circle cx="18" cy="18" r="15.5" fill="none" stroke="#e5e7eb" stroke-width="3"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="'+d.stroke+'" stroke-width="3" stroke-dasharray="'+dash+' 97.4" stroke-linecap="round"/></svg><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:\'Instrument Serif\',serif;font-size:15px;color:'+d.color+'">'+cnt+'</div></div><div style="font-size:9px;font-weight:600;letter-spacing:1px;color:'+d.color+'">'+d.label+'</div><div style="font-size:8px;color:var(--g4)">'+cnt+'/'+total+'</div></div>';
+  // Donut — filtered by cmsf
+  html += '<div class="donuts">';
+  group.forEach(([f, l, c]) => {
+    const cnt = mems.filter(m => m[f]).length;
+    html += '<div class="donut">'+msDonut(Math.round(cnt/total*100), c)+'<b>'+l+'</b><small>'+cnt+' dari '+mems.length+'</small></div>';
   });
   html += '</div>';
 
-  // Consolidated view across all CGs (helpful for TL/Coach to scan follow-up)
-  const tlGroups = {
-    all: [['msj1','MSJ 1','#16a34a'],['msj2','MSJ 2','#2563eb'],['msj3','MSJ 3','#9333ea'],['cgt1','CGT 1','#0f766e'],['cgt2','CGT 2','#059669'],['cgt3','CGT 3','#0891b2'],['baptis_air','B.Air','#7c3aed'],['baptis_roh','B.Roh','#db2777']],
-    msj: [['msj1','MSJ 1','#16a34a'],['msj2','MSJ 2','#2563eb'],['msj3','MSJ 3','#9333ea']],
-    cgt: [['cgt1','CGT 1','#0f766e'],['cgt2','CGT 2','#059669'],['cgt3','CGT 3','#0891b2']],
-    baptis: [['baptis_air','B.Air','#7c3aed'],['baptis_roh','B.Roh','#db2777']]
-  };
-  const tlGroup = tlGroups[cmsf] || tlGroups.all;
-  html += '<div class="section" style="background:#fff;border:1px solid var(--g5);border-radius:14px;margin-bottom:16px;padding:0;overflow:hidden">';
-  html += '<div style="padding:14px 16px;background:linear-gradient(135deg,#fef2f2,#fff);border-bottom:1px solid #fecaca;display:flex;align-items:center;gap:10px">';
-  html += '<div style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#dc2626,#ef4444);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px">\u26A0</div>';
-  html += '<div><div style="font-weight:700;font-size:13px;color:#991b1b">Daftar Follow-up</div><div style="font-size:10px;color:#dc2626;opacity:.75">Member yang belum complete per milestone</div></div>';
-  html += '</div>';
+  // Heatmap CG × milestone
+  html += '<section class="card" style="margin-top:24px"><div class="chead"><div><h2>Persentase milestone per CG</h2><div class="sub">Semakin gelap, semakin banyak yang selesai</div></div></div><div class="tblwrap"><table class="heat"><thead><tr><th scope="col"></th>';
+  group.forEach(([f, l]) => { html += '<th scope="col">'+l+'</th>'; });
+  html += '</tr></thead><tbody>';
+  cgs.slice().sort().forEach(cg => {
+    const cgMems = ALL_MEMBERS.filter(m => m.cg === cg);
+    if (!cgMems.length) return;
+    html += '<tr><th scope="row">'+esc(cg)+'</th>';
+    group.forEach(([f]) => {
+      const p = Math.round(cgMems.filter(m => m[f]).length / cgMems.length * 100);
+      const alpha = (.08 + p/100*.9).toFixed(2);
+      html += '<td style="background:rgba(91,69,224,'+alpha+');color:'+(p>=55?'#fff':'#17151F')+'">'+p+'%</td>';
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table></div></section>';
 
-  // Setiap milestone: section expandable dengan grouping by CG
+  // Daftar follow-up per milestone, dikelompokkan per CG
   // Prerequisite map untuk progression: hanya tampil "belum X" kalau sudah prerequisite-nya
   const prereq = { msj2:'msj1', msj3:'msj2', cgt2:'cgt1', cgt3:'cgt2', baptis_roh:'baptis_air' };
-  tlGroup.forEach(([f, l, c]) => {
+  html += '<section class="card" style="margin-top:24px"><div class="chead"><div><h2>Daftar follow-up</h2><div class="sub">Member yang belum menyelesaikan milestone (yang sudah memenuhi syarat sebelumnya)</div></div></div>';
+  group.forEach(([f, l, c]) => {
     // Filter: belum field ini, DAN (tidak ada prereq ATAU sudah prereq)
     const allBelum = mems.filter(m => !m[f] && (!prereq[f] || m[prereq[f]]));
     // Group by CG
     const byCG = {};
     allBelum.forEach(m => { if (!byCG[m.cg]) byCG[m.cg] = []; byCG[m.cg].push(m); });
     const cgList = Object.keys(byCG).sort();
-    const isCollapsed = true; // default selalu tertutup — user klik untuk expand
-
-    html += '<div style="border-bottom:1px solid var(--g6)">';
-    // Header clickable
-    html += '<div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\';this.querySelector(\'.fu-arrow\').textContent=this.nextElementSibling.style.display===\'none\'?\'+\':\'\u2212\'" style="padding:12px 16px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:background .15s" onmouseover="this.style.background=\''+c+'08\'" onmouseout="this.style.background=\'transparent\'">';
-    html += '<div style="display:flex;align-items:center;gap:10px">';
-    html += '<div style="width:4px;height:20px;background:'+c+';border-radius:2px"></div>';
-    html += '<span style="font-size:12px;font-weight:700;color:'+c+'">'+l+'</span>';
+    html += '<div class="fu">';
+    html += '<button type="button" class="fu-h" aria-expanded="false"'+(allBelum.length?' onclick="toggleFu(this)"':' disabled')+'><span class="fu-dot" style="background:'+c+'"></span><b>'+l+'</b>';
     html += allBelum.length === 0
-      ? '<span style="font-size:10px;color:#16a34a;font-weight:600">\u2713 Semua complete</span>'
-      : '<span style="font-size:10px;color:var(--g3)">'+allBelum.length+' belum</span>';
-    html += '</div>';
-    html += '<div style="display:flex;align-items:center;gap:8px">';
+      ? '<span class="pill" style="background:var(--Hb);color:var(--H)">Semua selesai</span>'
+      : '<span class="pill" style="background:var(--faint);color:var(--muted)">'+allBelum.length+' belum</span><span class="chev">'+icon('chev',18)+'</span>';
+    html += '</button>';
     if (allBelum.length > 0) {
-      html += '<span style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:10px;background:'+c+'15;color:'+c+'">'+allBelum.length+'</span>';
-      html += '<span class="fu-arrow" style="font-size:14px;color:var(--g3);font-weight:300;width:16px;text-align:center">'+(isCollapsed?'+':'\u2212')+'</span>';
-    }
-    html += '</div></div>';
-
-    // Body — grouped by CG
-    if (allBelum.length > 0) {
-      html += '<div style="display:'+(isCollapsed?'none':'block')+';padding:4px 16px 14px">';
+      html += '<div class="fu-b" hidden>';
       cgList.forEach(cgName => {
         const cgMembers = byCG[cgName];
-        const cgColor = CG_COLORS[cgName] || '#6b7280';
-        const cgBg = CG_BG[cgName] || '#f5f5f5';
-        html += '<div style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-top:1px dashed var(--g6)">';
-        html += '<span style="padding:3px 10px;background:'+cgColor+';color:#fff;border-radius:8px;font-size:10px;font-weight:700;flex-shrink:0;min-width:62px;text-align:center">'+esc(cgName)+'</span>';
-        html += '<div style="flex:1;font-size:11.5px;color:var(--g1);line-height:1.6">';
-        html += cgMembers.map(m => esc(m.nama)).join('<span style="color:var(--g4);margin:0 4px">\u00b7</span>');
-        html += '</div>';
-        html += '<span style="font-size:10px;color:var(--g3);flex-shrink:0">'+cgMembers.length+'</span>';
-        html += '</div>';
+        const cgColor = CG_COLORS[cgName] || '#5B45E0';
+        const cgBg = CG_BG[cgName] || '#EEEAFB';
+        html += '<div class="fu-row"><span class="pill" style="background:'+cgBg+';color:'+cgColor+';min-width:72px;justify-content:center">'+esc(cgName)+'</span>';
+        html += '<div class="fu-names">'+cgMembers.map(m => esc(m.nama)).join('<span class="fu-sep">·</span>')+'</div>';
+        html += '<span class="sub" style="margin:0">'+cgMembers.length+'</span></div>';
       });
       html += '</div>';
     }
     html += '</div>';
   });
-  html += '</div>';
+  html += '</section>';
 
-  // Per-CG accordion
-  html += '<div class="section"><div class="section-title">\ud83d\udccb Breakdown per CG</div>';
+  // Breakdown per CG (accordion)
+  html += '<section class="card" style="margin-top:24px"><div class="chead"><h2>Breakdown per CG</h2></div>';
   cgs.sort().forEach(cg => {
     const cgMems = ALL_MEMBERS.filter(m => m.cg === cg);
     const cgTotal = cgMems.length || 1;
-    const color = CG_COLORS[cg] || '#7c3aed';
-    const bg = CG_BG[cg] || '#faf5ff';
+    const color = CG_COLORS[cg] || '#5B45E0';
+    const bg = CG_BG[cg] || '#EEEAFB';
     const msCounts = {};
     MS_FIELDS.forEach(f => { msCounts[f] = cgMems.filter(m => m[f]).length; });
     const msDone = MS_FIELDS.reduce((s,f) => s + msCounts[f], 0);
     const msPct = Math.round(msDone / (cgTotal*8) * 100);
-    html += '<div style="border:1px solid var(--g5);border-radius:10px;margin-bottom:10px;overflow:hidden">';
-    html += '<div style="padding:12px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;background:'+bg+';border-left:3px solid '+color+'" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\';this.querySelector(\'.acc-arrow\').textContent=this.nextElementSibling.style.display===\'none\'?\'+\':\'-\'">';
-    html += '<div><span style="font-weight:700;font-size:13px">'+esc(cg)+'</span> <span style="font-size:10px;color:var(--g3)">\u00b7 '+cgTotal+' member</span></div>';
-    html += '<div style="display:flex;align-items:center;gap:10px"><span style="font-size:11px;font-weight:600;color:'+color+'">'+msPct+'% milestone</span><span class="acc-arrow" style="font-size:14px;color:var(--g3)">+</span></div></div>';
-    html += '<div style="display:none;padding:14px;background:var(--white)">';
-    const accGroups = {
-      all: [['msj1','MSJ 1','var(--green)'],['msj2','MSJ 2','var(--blue)'],['msj3','MSJ 3','#9333ea'],['cgt1','CGT 1','#0f766e'],['cgt2','CGT 2','#059669'],['cgt3','CGT 3','#0891b2'],['baptis_air','B.Air','#7c3aed'],['baptis_roh','B.Roh','#db2777']],
-      msj: [['msj1','MSJ 1','var(--green)'],['msj2','MSJ 2','var(--blue)'],['msj3','MSJ 3','#9333ea']],
-      cgt: [['cgt1','CGT 1','#0f766e'],['cgt2','CGT 2','#059669'],['cgt3','CGT 3','#0891b2']],
-      baptis: [['baptis_air','B.Air','#7c3aed'],['baptis_roh','B.Roh','#db2777']]
-    };
-    const currentGroup = accGroups[cmsf] || accGroups.all;
-
-    // Breakdown per member — tabel matrix yang clean
-    html += '<div style="border:1px solid var(--g5);border-radius:10px;overflow:hidden">';
-    html += '<table class="t" style="width:100%;font-size:11px;border-collapse:collapse">';
-    html += '<thead><tr style="background:#fafafa"><th style="text-align:left;padding:8px 12px;font-size:10px;letter-spacing:.5px;color:var(--g3)">NAMA</th>';
-    currentGroup.forEach(([f, l, c]) => {
-      html += '<th style="padding:8px 6px;font-size:9px;letter-spacing:.3px;color:'+c+';text-align:center;min-width:48px">'+l+'</th>';
-    });
+    html += '<div class="acc">';
+    html += '<button type="button" class="acc-h" aria-expanded="false" onclick="toggleFu(this)"><span class="cgnum" style="background:'+bg+';color:'+color+'">'+esc(String(cg).replace(/\D/g,'').slice(-2))+'</span><span class="grow"><b>'+esc(cg)+'</b><span class="sub" style="margin:0;display:block">'+cgMems.length+' anggota</span></span>';
+    html += '<span class="hbar" aria-hidden="true"><i style="width:'+msPct+'%;background:var(--accent)"></i></span><span class="pct" style="width:56px;text-align:right">'+msPct+'%</span><span class="chev">'+icon('chev')+'</span></button>';
+    html += '<div class="acc-b" hidden><div class="tblwrap"><table class="t mstable"><thead><tr><th scope="col" style="text-align:left">Nama</th>';
+    group.forEach(([f, l, c]) => { html += '<th scope="col" style="color:'+c+'">'+l+'</th>'; });
     html += '</tr></thead><tbody>';
     const sortedCgMems = [...cgMems].sort((a,b) => roleRankLC(a.status) - roleRankLC(b.status));
     sortedCgMems.forEach(m => {
-      html += '<tr>';
-      html += '<td style="padding:8px 12px;font-weight:500;color:var(--g1);border-top:1px solid var(--g6)">'+esc(m.nama)+'</td>';
-      currentGroup.forEach(([f, l, c]) => {
-        const done = !!m[f];
-        html += '<td style="padding:6px;text-align:center;border-top:1px solid var(--g6)">';
-        if (done) {
-          html += '<span style="display:inline-block;width:22px;height:22px;border-radius:6px;background:'+c+'22;color:'+c+';font-weight:800;line-height:22px">\u2713</span>';
-        } else {
-          html += '<span style="display:inline-block;width:22px;height:22px;border-radius:6px;background:#fef2f2;color:#dc2626;font-weight:800;line-height:22px">\u2715</span>';
-        }
-        html += '</td>';
+      html += '<tr><td class="name-cell">'+esc(m.nama)+'</td>';
+      group.forEach(([f, l, c]) => {
+        html += '<td>'+(m[f] ? '<span class="msok" aria-label="Selesai">'+icon('check',16)+'</span>' : '<span class="msno" aria-label="Belum">'+icon('x',14)+'</span>')+'</td>';
       });
       html += '</tr>';
     });
-    html += '</tbody></table></div>';
-
-    html += '</div></div>';
+    html += '</tbody></table></div></div></div>';
   });
-  html += '</div>';
+  html += '</section>';
 
   el.innerHTML = html;
+}
+
+// Buka/tutup panel follow-up & breakdown (panel tepat setelah tombol)
+function toggleFu(btn) {
+  const body = btn.nextElementSibling;
+  if (!body) return;
+  const open = body.hidden;
+  body.hidden = !open;
+  btn.setAttribute('aria-expanded', String(open));
+  const box = btn.parentElement;
+  if (box) box.classList.toggle('open', open);
 }
 
 // Parse misi text → array poin (split per baris, strip leading "1.", "2.", "-", "*")
@@ -4928,11 +4934,8 @@ async function hideMisiEdit(textarea) {
     view.style.display = '';
     textarea.style.display = 'none';
     // Update counter badge
-    const card = textarea.closest('div[style*="border:1.5px solid var(--g5)"]') || textarea.parentElement;
-    if (card) {
-      const counter = card.querySelector('span[style*="fef3c7"]');
-      if (counter && lines.length) counter.textContent = lines.length + ' poin';
-    }
+    const counter = document.getElementById(viewId.replace(/_view$/,'') + '_count');
+    if (counter) { counter.textContent = lines.length + ' poin'; counter.style.display = lines.length ? '' : 'none'; }
   }
 }
 
@@ -4940,10 +4943,10 @@ async function hideMisiEdit(textarea) {
 const _VISI_EXPANDED = new Set();
 function toggleVisiAccordion(headerEl, cg) {
   const body = headerEl.nextElementSibling;
-  const isOpen = body.style.display !== 'none';
-  body.style.display = isOpen ? 'none' : 'block';
-  const arrow = headerEl.querySelector('.visi-arrow');
-  if (arrow) arrow.textContent = isOpen ? '+' : '−';
+  const isOpen = !body.hidden;
+  body.hidden = isOpen;
+  headerEl.setAttribute('aria-expanded', String(!isOpen));
+  const acc = headerEl.closest('.acc'); if (acc) acc.classList.toggle('open', !isOpen);
   if (isOpen) _VISI_EXPANDED.delete(cg); else _VISI_EXPANDED.add(cg);
 }
 
@@ -4966,84 +4969,49 @@ async function renderCoachVisi() {
   const cgDataMap = {};
   cgDataArr.forEach(d => { cgDataMap[d.cg] = d; });
 
-  let html = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">';
-  html += '<div style="font-size:11px;color:var(--g3)">Edit visi & misi setiap CG. Tambahkan feedback.</div>';
-  if (coachRole !== 'tl') {
-    html += '<div class="region-toggle" style="margin:0;display:inline-flex"><button class="region-btn '+(coachReg==='jaktim1'?'active':'')+'" onclick="coachReg=\'jaktim1\';renderCoachVisi()" style="padding:4px 14px;font-size:11px">JAKTIM 1</button><button class="region-btn '+(coachReg==='jaktim2'?'active':'')+'" onclick="coachReg=\'jaktim2\';renderCoachVisi()" style="padding:4px 14px;font-size:11px">JAKTIM 2</button></div>';
-  }
-  html += '</div>';
+  let html = '<div class="tabbar"><div class="sub" style="margin:0">Visi, misi, dan rencana pengembangan tiap CG · tulis catatan Coach untuk CGL</div></div>';
 
   cgs.sort().forEach(cg => {
     const stats = getCGStats(cg);
-    const color = CG_COLORS[cg] || '#7c3aed';
-    const bg = CG_BG[cg] || '#faf5ff';
-    const init = CG_INIT[cg] || cg.replace('TEEN ','T');
+    const color = CG_COLORS[cg] || '#5B45E0';
+    const bg = CG_BG[cg] || '#EEEAFB';
     const cd = cgDataMap[cg] || {};
     const vision = cd.vision || '';
     const mission = cd.mission || '';
     const coachNotes = cd.coachNotes || '';
     const devPlan = cd.devPlan || [];
     const cgRegion = cd.region || 'jaktim1';
-
-    // Quick stats pills
-    const msPct = stats.msPct || 0;
     const devCount = devPlan.length;
     const hasNotes = coachNotes.trim().length > 0;
 
-    // ── Accordion card wrapper ──
-    html += '<div style="background:#fff;border:1px solid '+color+'22;border-radius:16px;overflow:hidden;margin-bottom:12px;box-shadow:0 2px 12px rgba(0,0,0,.04);transition:box-shadow .2s" onmouseover="this.style.boxShadow=\'0 6px 24px '+color+'18\'" onmouseout="this.style.boxShadow=\'0 2px 12px rgba(0,0,0,.04)\'">';
-
-    // ── Clickable header (always visible) ──
+    // ── Accordion (preserve expand state via _VISI_EXPANDED) ──
     const isExpanded = _VISI_EXPANDED.has(cg);
     const cgEsc = jsEsc(cg);
-    html += '<div onclick="toggleVisiAccordion(this,\''+cgEsc+'\')" style="padding:14px 18px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;background:linear-gradient(135deg,'+bg+' 0%,#fff 100%);border-left:4px solid '+color+';transition:background .15s" onmouseover="this.style.background=\''+bg+'\'" onmouseout="this.style.background=\'linear-gradient(135deg,'+bg+' 0%,#fff 100%)\'">';
+    html += '<div class="acc'+(isExpanded?' open':'')+'">';
+    html += '<button type="button" class="acc-h" aria-expanded="'+isExpanded+'" onclick="toggleVisiAccordion(this,\''+cgEsc+'\')">';
+    html += '<span class="cgnum" style="background:'+bg+';color:'+color+'">'+esc(String(cg).replace(/\D/g,'').slice(-2))+'</span>';
+    html += '<span class="grow"><b>'+esc(cg)+'</b><span class="sub" style="margin:0;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(vision ? esc(vision) : 'CGL '+esc(stats.leader||'-')+' · '+stats.total+' anggota · belum ada visi')+'</span></span>';
+    html += '<span class="accpills">';
+    if (devCount) html += '<span class="pill" style="background:var(--Ib);color:var(--I)">'+devCount+' rencana</span>';
+    if (hasNotes) html += '<span class="pill" style="background:'+bg+';color:'+color+'">Catatan</span>';
+    html += '</span>';
+    html += '<span class="pct" style="width:56px;text-align:right;color:'+pctColorOf(stats.pct)+'">'+stats.pct+'%</span>';
+    html += '<span class="chev">'+icon('chev')+'</span></button>';
 
-    // Left: badge + info
-    html += '<div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0">';
-    html += '<div style="flex:1;min-width:0"><div style="font-weight:700;font-size:14px;color:var(--g1)">'+esc(cg)+'</div>';
-    html += '<div style="font-size:10px;color:var(--g3);margin-top:2px">CGL: '+esc(stats.leader)+' · '+stats.total+' member</div></div></div>';
+    html += '<div class="acc-b"'+(isExpanded?'':' hidden')+'><div class="cv-body">';
 
-    // Right: quick stats + % + arrow
-    html += '<div style="display:flex;align-items:center;gap:10px;flex-shrink:0">';
-    // Mini stat pills
-    html += '<div style="display:flex;gap:4px">';
-    if (vision) html += '<span style="padding:2px 6px;border-radius:6px;background:#f0fdf4;color:#16a34a;font-size:9px;font-weight:700">Visi</span>';
-    if (devCount) html += '<span style="padding:2px 6px;border-radius:6px;background:#eff6ff;color:#2563eb;font-size:9px;font-weight:700">'+devCount+' Dev</span>';
-    if (hasNotes) html += '<span style="padding:2px 6px;border-radius:6px;background:'+bg+';color:'+color+';font-size:9px;font-weight:700">Notes</span>';
-    html += '</div>';
-    html += '<div style="text-align:right"><div style="font-family:\'Instrument Serif\',serif;font-size:22px;color:'+color+';line-height:1">'+stats.pct+'%</div><div style="font-size:8px;color:var(--g4);letter-spacing:.5px">Hadir</div></div>';
-    html += '<span class="visi-arrow" style="font-size:18px;color:var(--g3);font-weight:300;width:20px;text-align:center">'+(isExpanded?'−':'+')+'</span>';
-    html += '</div></div>';
+    // Visi
+    html += '<label class="field"><span class="flabel">Visi</span><textarea class="textarea cv-visi" data-cg="'+esc(cg)+'" data-region="'+esc(cgRegion)+'" data-type="vision" onblur="saveCoachVisiField(this)" placeholder="Tulis visi CG…">'+esc(vision)+'</textarea></label>';
 
-    // ── Collapsible body (preserve expand state via _VISI_EXPANDED) ──
-    html += '<div style="display:'+(isExpanded?'block':'none')+';border-top:1px solid '+color+'15">';
-    html += '<div style="padding:16px 18px;display:flex;flex-direction:column;gap:12px">';
-
-    // Card 1 — Visi
-    html += '<div style="background:linear-gradient(135deg,#fdfaff,#fff);border:1.5px solid #e4dcff;border-radius:12px;padding:12px 14px">';
-    html += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px"><div style="width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,#6C5CE7,#a855f7);display:flex;align-items:center;justify-content:center"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></div><span style="font-size:10px;font-weight:700;letter-spacing:.8px;color:var(--purple);text-transform:uppercase">Visi</span></div>';
-    html += '<textarea class="vedit" style="min-height:50px;font-family:\'Instrument Serif\',Georgia,serif;font-size:18px;font-style:italic;line-height:1.5;letter-spacing:.2px;color:var(--g1);border-color:#e4dcff;background:transparent;padding:10px 12px" data-cg="'+cg+'" data-region="'+cgRegion+'" data-type="vision" onfocus="this.style.borderColor=\'#6C5CE7\'" onblur="this.style.borderColor=\'#e4dcff\';saveCoachVisiField(this)" placeholder="Tulis visi CG...">'+esc(vision)+'</textarea></div>';
-
-    // Card 2 — Misi (display mode formatted list + click to edit)
+    // Misi (display mode formatted list + click to edit)
     const misiId = 'misi_' + cg.replace(/\W/g,'_');
     const missionLines = parseMissionLines(mission);
-    html += '<div style="background:linear-gradient(135deg,#fafafa,#fff);border:1.5px solid var(--g5);border-radius:12px;padding:14px 16px;transition:all .15s">';
-    html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">';
-    html += '<div style="display:flex;align-items:center;gap:6px"><div style="width:22px;height:22px;border-radius:7px;background:linear-gradient(135deg,#f59e0b,#d97706);display:flex;align-items:center;justify-content:center"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><line x1="4" y1="22" x2="4" y2="15"/><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/></svg></div><span style="font-size:10px;font-weight:700;letter-spacing:.8px;color:#92400e;text-transform:uppercase">Misi</span></div>';
-    if (missionLines.length) html += '<span style="font-size:9px;font-weight:700;color:#92400e;background:#fef3c7;padding:2px 8px;border-radius:8px">'+missionLines.length+' poin</span>';
-    html += '</div>';
-    // Display view (default)
-    html += '<div id="'+misiId+'_view" style="cursor:text;min-height:30px" onclick="showMisiEdit(\''+misiId+'\')">' + renderMisiList(missionLines) + '</div>';
-    // Edit textarea (hidden by default)
-    html += '<textarea id="'+misiId+'_edit" class="vedit" style="display:none;min-height:120px;font-size:13px;line-height:1.7;border-color:#fbbf24;background:#fffbeb;font-family:Inter,sans-serif" data-cg="'+cg+'" data-region="'+cgRegion+'" data-type="mission" data-view="'+misiId+'_view" onblur="hideMisiEdit(this)" placeholder="Tulis misi (satu poin per baris)\n1. Contoh misi pertama\n2. Contoh misi kedua">'+esc(mission)+'</textarea>';
-    html += '</div>';
+    html += '<div class="field"><div style="display:flex;align-items:center;gap:8px"><span class="flabel">Misi</span><span class="pill" id="'+misiId+'_count" style="background:#FFF4D1;color:#7A5300'+(missionLines.length?'':';display:none')+'">'+missionLines.length+' poin</span></div>';
+    html += '<div id="'+misiId+'_view" class="misiview" role="button" tabindex="0" onclick="showMisiEdit(\''+misiId+'\')" onkeydown="if(event.key===\'Enter\')showMisiEdit(\''+misiId+'\')">' + renderMisiList(missionLines) + '</div>';
+    html += '<textarea id="'+misiId+'_edit" class="textarea" style="display:none;min-height:130px" data-cg="'+esc(cg)+'" data-region="'+esc(cgRegion)+'" data-type="mission" data-view="'+misiId+'_view" onblur="hideMisiEdit(this)" placeholder="Tulis misi (satu poin per baris)\n1. Contoh misi pertama\n2. Contoh misi kedua">'+esc(mission)+'</textarea></div>';
 
-    // Card 3 — Dev Plan
-    html += '<div style="background:linear-gradient(135deg,#f0f7ff,#fff);border:1.5px solid #dbeafe;border-radius:12px;padding:14px 16px">';
-    html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">';
-    html += '<div style="display:flex;align-items:center;gap:6px"><div style="width:22px;height:22px;border-radius:7px;background:linear-gradient(135deg,#2563eb,#60a5fa);display:flex;align-items:center;justify-content:center"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><span style="font-size:10px;font-weight:700;letter-spacing:.8px;color:#1e40af;text-transform:uppercase">Rencana Pengembangan</span></div>';
-    if (devPlan.length) html += '<span style="font-size:9px;font-weight:700;color:#1e40af;background:#dbeafe;padding:2px 8px;border-radius:8px">'+devPlan.length+' member</span>';
-    html += '</div>';
+    // Development plan (read-only dari CGL)
+    html += '<div class="field"><span class="flabel">Rencana pengembangan</span>';
     if (devPlan.length) {
       const sortedDP = devPlan.slice().sort((a,b) => {
         if (!a.deadline && !b.deadline) return 0;
@@ -5052,51 +5020,32 @@ async function renderCoachVisi() {
         return new Date(a.deadline) - new Date(b.deadline);
       });
       const today = new Date(); today.setHours(0,0,0,0);
-      sortedDP.forEach((d, idx) => {
+      sortedDP.forEach(d => {
         const memberName = d.member_name || d.name || '';
         const currentRole = roleLabel(d.current_status || d.currentRole || 'Member');
         const targetRole = roleLabel(d.target_status || d.target || 'Sponsor');
-        const curCls = roleCls(currentRole);
-        const tgtCls = roleCls(targetRole);
         const deadline = d.deadline ? new Date(d.deadline) : null;
-        let badgeBg = '#f3f4f6', badgeFc = '#6b7280', badgeTxt = 'Tanpa target', icon = '\u23f3';
-        let dateStr = '';
+        let col = ['var(--faint)','var(--muted)'], txt = 'Tanpa target', dateStr = '';
         if (deadline) {
           const diffDays = Math.ceil((deadline - today) / 86400000);
           dateStr = deadline.toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' });
-          if (diffDays < 0) { badgeBg='#fee2e2'; badgeFc='#b91c1c'; badgeTxt='Lewat '+Math.abs(diffDays)+'h'; icon='\u26a0'; }
-          else if (diffDays === 0) { badgeBg='#fef3c7'; badgeFc='#92400e'; badgeTxt='Hari ini'; icon='\ud83d\udd25'; }
-          else if (diffDays <= 7) { badgeBg='#ffedd5'; badgeFc='#c2410c'; badgeTxt=diffDays+' hari lagi'; icon='\u23f0'; }
-          else if (diffDays <= 30) { badgeBg='#e0f2fe'; badgeFc='#0369a1'; badgeTxt=diffDays+' hari lagi'; icon='\ud83d\udcc5'; }
-          else { badgeBg='#dcfce7'; badgeFc='#15803d'; badgeTxt=diffDays+' hari lagi'; icon='\ud83d\udcc5'; }
+          if (diffDays < 0) { col=['var(--Ab)','var(--A)']; txt='Lewat '+Math.abs(diffDays)+' hari'; }
+          else if (diffDays === 0) { col=['var(--Sb)','var(--S)']; txt='Hari ini'; }
+          else if (diffDays <= 14) { col=['var(--Sb)','var(--S)']; txt=diffDays+' hari lagi'; }
+          else { col=['var(--faint)','var(--muted)']; txt=diffDays+' hari lagi'; }
         }
-        html += '<div style="display:flex;flex-direction:column;gap:8px;padding:10px 12px;background:#fff;border:1px solid #e5e7eb;border-radius:10px;'+(idx<sortedDP.length-1?'margin-bottom:8px':'')+';transition:all .15s" onmouseover="this.style.borderColor=\'#93c5fd\';this.style.boxShadow=\'0 2px 8px rgba(37,99,235,.08)\'" onmouseout="this.style.borderColor=\'#e5e7eb\';this.style.boxShadow=\'none\'">';
-        html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">';
-        html += '<span style="font-weight:700;font-size:12px;color:var(--g1);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(memberName)+'</span>';
-        html += '<div style="display:flex;align-items:center;gap:4px;flex-shrink:0">';
-        html += '<span class="role-btn '+curCls+'" style="cursor:default;font-size:9px;padding:2px 7px;border-radius:6px">'+esc(currentRole)+'</span>';
-        html += '<span style="color:var(--g4);font-size:11px;font-weight:600">\u2192</span>';
-        html += '<span class="role-btn '+tgtCls+'" style="cursor:default;font-size:9px;padding:2px 7px;border-radius:6px;font-weight:700">'+esc(targetRole)+'</span>';
-        html += '</div></div>';
-        html += '<div style="display:flex;align-items:center;gap:8px;font-size:10px;padding-top:6px;border-top:1px dashed #e5e7eb">';
-        html += '<span style="color:var(--g3);display:inline-flex;align-items:center;gap:4px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>'+(dateStr || '<span style="font-style:italic;color:var(--g4)">tanpa tanggal target</span>')+'</span>';
-        html += '<span style="margin-left:auto;background:'+badgeBg+';color:'+badgeFc+';padding:3px 9px;border-radius:8px;font-size:9px;font-weight:700;display:inline-flex;align-items:center;gap:3px">'+icon+' '+badgeTxt+'</span>';
-        html += '</div>';
-        html += '</div>';
+        html += '<div class="plan"><div class="plan-top"><b>'+esc(memberName)+'</b><span class="pill" style="background:'+col[0]+';color:'+col[1]+'">'+txt+'</span></div>';
+        html += '<div class="plan-row"><span class="rbadge '+roleCls(currentRole)+'">'+esc(currentRole)+'</span><span aria-hidden="true" style="color:var(--muted);display:flex">'+icon('right',14)+'</span><span class="rbadge '+roleCls(targetRole)+'">'+esc(targetRole)+'</span>'+(dateStr?'<span class="sub" style="margin:0 0 0 auto">'+esc(dateStr)+'</span>':'')+'</div></div>';
       });
     } else {
-      html += '<div style="font-size:11px;color:var(--g4);font-style:italic;text-align:center;padding:14px 0">Belum ada rencana pengembangan dari CGL</div>';
+      html += '<div class="empty" style="padding:16px">Belum ada rencana pengembangan dari CGL.</div>';
     }
     html += '</div>';
 
-    // Card 4 — Catatan Coach
-    html += '<div style="background:'+bg+';border:1.5px solid '+color+'33;border-radius:12px;padding:12px 14px">';
-    html += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px"><div style="width:20px;height:20px;border-radius:6px;background:'+color+';display:flex;align-items:center;justify-content:center"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><span style="font-size:10px;font-weight:700;letter-spacing:.8px;color:'+color+';text-transform:uppercase">Catatan Coach</span></div>';
-    html += '<textarea class="vedit" style="min-height:40px;font-size:12px;line-height:1.4;border-color:'+color+'44;background:rgba(255,255,255,.6)" data-cg="'+cg+'" data-region="'+cgRegion+'" data-type="coach_notes" onfocus="this.style.borderColor=\''+color+'\';this.style.background=\'#fff\'" onblur="this.style.borderColor=\''+color+'44\';this.style.background=\'rgba(255,255,255,.6)\';saveCoachVisiField(this)" placeholder="Tulis catatan untuk CGL...">'+esc(coachNotes)+'</textarea>';
-    html += '</div>';
+    // Catatan Coach
+    html += '<label class="field"><span class="flabel">Catatan Coach</span><textarea class="textarea" style="min-height:80px" data-cg="'+esc(cg)+'" data-region="'+esc(cgRegion)+'" data-type="coach_notes" onblur="saveCoachVisiField(this)" placeholder="Tulis catatan untuk CGL…">'+esc(coachNotes)+'</textarea></label>';
 
-    html += '</div></div>'; // end collapsible body
-    html += '</div>'; // end card wrapper
+    html += '</div></div></div>'; // end body + acc
   });
 
   el.innerHTML = html;
