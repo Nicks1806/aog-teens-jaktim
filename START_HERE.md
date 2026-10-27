@@ -1,5 +1,20 @@
 # 🚀 START HERE — Claude Code Entry Point
 
+> ## 🆕 Update v32 → v37 (27 Oktober 2026)
+> Sumber paling akurat & lengkap: **CLAUDE.md** (versi, aturan, riwayat). Bagian lain dokumen ini sebagian masih menggambarkan v30/v31.
+>
+> - **Versi aktif: v37** (production = branch `main`; `redesign` = preview, selalu fast-forward ke `main`). Bump versi: `App version">v37` (2 tempat di `index.html`) + `CACHE_NAME = 'aog-absensi-v37'`.
+> - **URL:** CGL `https://absenibadahjaktim.vercel.app/teen-01` (dst, refresh tetap di dashboard CG), Coach `/coach`, TL `/tl` — rewrite di `vercel.json`. `?role=coach` lama tetap jalan. Landing **tidak** punya link Coach/TL lagi.
+> - **v32** Redesign UI: sidebar + bottom nav; tema/warna/font tetap v31 (Instrument Serif + Inter); landing persis v31; ikon SVG pengganti emoji.
+> - **v33** HP mode rapat (≤600px); tab Detail = kartu anak + chart garis tren, klik → modal detail anak; pindah tab crossfade (`smoothSwap`); toggle Coach/TL slider; tema tahun bisa diedit Coach/TL (`cg_vision` cg=`__THEME__`); pengingat ke CGL hanya manual (auto-broadcast dimatikan); Distribusi wilayah rapi.
+> - **v34** Tabel absensi desktop lebih lega; banner "Versi baru tersedia · Muat ulang".
+> - **v35** Pengaman transisi tab tanpa error console; cek versi tanpa membengkakkan cache SW.
+> - **v36** Ringkasan CG di tab Detail (rata-rata hadir + tren, follow-up, milestone, data belum lengkap).
+> - **v37** Absensi tersimpan di HP saat sinyal jelek (`saveAttendance` + antrean `aog_att_queue_v1`); **Arsipkan** + Hapus member; **Pindah CG** untuk Coach/TL (termasuk mengembalikan dari arsip lewat pencarian member); pemilih tanggal lahir; saran kecamatan/kelurahan.
+> - **Data dibersihkan 27 Okt 2026:** 21 member kolom sekolah (teks "· Kelas X" bug pra-v31), 6 member kolom kelurahan. Cadangan: `C:\Penyimpanan utama\Downloads\backup_*_2026-10-27*.json`.
+> - **Belum ada:** PIN untuk Coach/TL (alamat `/coach` & `/tl` mudah ditebak).
+
+
 > **Untuk Claude Code:** Kamu baru buka folder ini. Baca file ini dulu (~2 menit), lalu ikuti checklist di bawah. Setelah itu kamu punya konteks & akses penuh untuk melanjutkan project.
 
 **Untuk User (Nick):** Kalau kamu pindah ke Claude Code baru, kasih prompt ini:

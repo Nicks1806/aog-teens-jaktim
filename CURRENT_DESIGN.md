@@ -1,5 +1,8 @@
 # AOG Teens Jaktim — Current UI/UX Design Reference (v31)
 
+> ⚠️ **Desain LAMA (v31).** Desain aktif sejak v32 = tata letak baru (sidebar + bottom nav) dengan warna & font v31 — lihat **CLAUDE.md → Desain (v32 — redesign)**. Link "Coach / TL? Masuk disini" di landing sudah dihapus (v32); Coach/TL buka lewat `/coach` atau `/tl`.
+
+
 > **Tujuan file ini:** Referensi lengkap desain visual + struktur UI saat ini, untuk dipakai sebagai base redesign di Claude Design.
 
 ---

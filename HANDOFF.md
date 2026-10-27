@@ -1,5 +1,20 @@
 # AOG Teens Jaktim — Handoff Document untuk Claude Code Baru
 
+> ## 🆕 Update v32 → v37 (27 Oktober 2026)
+> Sumber paling akurat & lengkap: **CLAUDE.md** (versi, aturan, riwayat). Bagian lain dokumen ini sebagian masih menggambarkan v30/v31.
+>
+> - **Versi aktif: v37** (production = branch `main`; `redesign` = preview, selalu fast-forward ke `main`). Bump versi: `App version">v37` (2 tempat di `index.html`) + `CACHE_NAME = 'aog-absensi-v37'`.
+> - **URL:** CGL `https://absenibadahjaktim.vercel.app/teen-01` (dst, refresh tetap di dashboard CG), Coach `/coach`, TL `/tl` — rewrite di `vercel.json`. `?role=coach` lama tetap jalan. Landing **tidak** punya link Coach/TL lagi.
+> - **v32** Redesign UI: sidebar + bottom nav; tema/warna/font tetap v31 (Instrument Serif + Inter); landing persis v31; ikon SVG pengganti emoji.
+> - **v33** HP mode rapat (≤600px); tab Detail = kartu anak + chart garis tren, klik → modal detail anak; pindah tab crossfade (`smoothSwap`); toggle Coach/TL slider; tema tahun bisa diedit Coach/TL (`cg_vision` cg=`__THEME__`); pengingat ke CGL hanya manual (auto-broadcast dimatikan); Distribusi wilayah rapi.
+> - **v34** Tabel absensi desktop lebih lega; banner "Versi baru tersedia · Muat ulang".
+> - **v35** Pengaman transisi tab tanpa error console; cek versi tanpa membengkakkan cache SW.
+> - **v36** Ringkasan CG di tab Detail (rata-rata hadir + tren, follow-up, milestone, data belum lengkap).
+> - **v37** Absensi tersimpan di HP saat sinyal jelek (`saveAttendance` + antrean `aog_att_queue_v1`); **Arsipkan** + Hapus member; **Pindah CG** untuk Coach/TL (termasuk mengembalikan dari arsip lewat pencarian member); pemilih tanggal lahir; saran kecamatan/kelurahan.
+> - **Data dibersihkan 27 Okt 2026:** 21 member kolom sekolah (teks "· Kelas X" bug pra-v31), 6 member kolom kelurahan. Cadangan: `C:\Penyimpanan utama\Downloads\backup_*_2026-10-27*.json`.
+> - **Belum ada:** PIN untuk Coach/TL (alamat `/coach` & `/tl` mudah ditebak).
+
+
 Dokumen ini berisi semua yang perlu diketahui untuk melanjutkan project ini di sesi Claude Code baru. Baca urut dari atas ke bawah.
 
 ---
@@ -17,7 +32,7 @@ Dokumen ini berisi semua yang perlu diketahui untuk melanjutkan project ini di s
 
 **URL Production:**
 - Public: `https://absenibadahjaktim.vercel.app`
-- Coach/TL: `https://absenibadahjaktim.vercel.app/?role=coach`
+- Coach: `https://absenibadahjaktim.vercel.app/coach` · TL: `https://absenibadahjaktim.vercel.app/tl` · CGL: `https://absenibadahjaktim.vercel.app/teen-01` (dst). `?role=coach` lama tetap jalan
 
 **Struktur Region:**
 - **jaktim1:** 5 CG — TEEN 01, TEEN 06, TEEN 09, TEEN 23, TEEN 25 (baru)
@@ -120,7 +135,7 @@ absen ibadahh/
 - Toggle region JAKTIM 1 / JAKTIM 2
 - Custom dropdown CG Leader (avatar + panel, bukan native select)
 - Tombol "Masuk Dashboard"
-- Link "Coach / TL? Masuk disini →" (`?role=coach`)
+- ~~Link "Coach / TL? Masuk disini →"~~ — **dihapus di v32**; Coach/TL buka lewat `/coach` atau `/tl`
 
 ### Halaman 2: CGL Dashboard (`pageD`)
 6 tab:
