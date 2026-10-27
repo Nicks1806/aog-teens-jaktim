@@ -3129,7 +3129,7 @@ function openCGLMember(memberId) {
   html += '<label class="field md-sec"><span class="flabel">Catatan CGL</span><textarea class="textarea mnote" placeholder="Tulis catatan…" data-mid="'+m.id+'" onblur="saveMemberNotes(this)">' + esc(_DETAIL_NOTES[m.id]||'') + '</textarea></label>';
   if (fromCoach) html += moveCgControlHTML(m);
   html += '<div class="mfoot md-foot"><div class="md-foot-l"><button type="button" class="btn sm ghost" onclick="archiveMember('+m.id+',\''+jsEsc(m.nama)+'\')" title="Pindah ke CG arsip — riwayat tetap aman">'+icon('archive',16)+'Arsipkan</button>';
-  if (fromCoach) html += '<button type="button" class="btn sm ghost danger" onclick="deleteMember('+m.id+',\''+jsEsc(m.nama)+'\')" title="Hapus permanen beserta semua absensinya">'+icon('trash',16)+'Hapus permanen</button>';
+  html += '<button type="button" class="btn sm ghost danger" onclick="deleteMember('+m.id+',\''+jsEsc(m.nama)+'\')" title="Hapus permanen beserta semua absensinya">'+icon('trash',16)+'Hapus member</button>';
   html += '</div><button type="button" class="btn" onclick="closeModal(\'cglMemberModal\')">Tutup</button></div>';
 
   document.getElementById('cglMemberBody').innerHTML = html;
@@ -3208,7 +3208,7 @@ async function moveMemberCG(memberId) {
 }
 
 async function deleteMember(memberId, memberName) {
-  if (!confirm('Hapus "'+memberName+'" dari CG ini?\n\nSemua data attendance & notes member ini akan ikut terhapus. Aksi ini tidak bisa di-undo.')) return;
+  if (!confirm('HAPUS PERMANEN "'+memberName+'"?\n\nSemua absensi & catatan member ini ikut terhapus dan TIDAK bisa dikembalikan.\n\nKalau anak ini hanya sudah tidak aktif, pilih Batal lalu pakai "Arsipkan" (riwayat tetap aman).')) return;
   try {
     // Hapus data terkait dulu, lalu member — cek error tiap step supaya tidak ada orphan row
     const attRes = await supa.from('attendance').delete().eq('member_id', memberId);

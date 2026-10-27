@@ -1,6 +1,6 @@
 # AOG Teens Jaktim — CG Dashboard (Absensi + Management)
 
-**Current version:** v36 · **Last updated:** 27 Oktober 2026
+**Current version:** v37 · **Last updated:** 27 Oktober 2026
 
 ## Project Overview
 Single-file web app untuk tracking attendance, pelayanan, milestone, events, visi, dan distribusi wilayah CG untuk AOG Teens Jakarta Timur. Dipakai oleh ~54 member, 9 CG Leaders, 2 Coach, dan 1 Team Leader secara bersamaan saat ibadah hari Minggu.
@@ -277,8 +277,8 @@ Edit index.html locally (+ file lain kalau perlu)
 ```
 
 **Version bump pattern setiap push code:**
-1. `index.html` — cari `App version">v36` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
-2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v36'` → naikkan sama
+1. `index.html` — cari `App version">v37` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
+2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v37'` → naikkan sama
 
 ---
 
@@ -305,6 +305,11 @@ Edit index.html locally (+ file lain kalau perlu)
 - Accordion Absensi Coach: tabel tetap dirender saat tertutup (pakai `hidden`), supaya patch realtime per-dot jalan. State buka: `_CABS_OPEN`, Visi: `_VISI_EXPANDED`
 - Toggle region Coach ada di header (`#cRegSeg` → `coachSetRegion()`), bukan per tab
 - KPI + banner visi CGL (`#dTop`) hanya tampil di tab Absensi; KPI Coach (`#cTop`) hanya di Overview
+
+### Absensi offline (v37)
+- SEMUA simpan absensi lewat `saveAttendance(memberId, dateId, status)` — jangan panggil `supa.from('attendance')` langsung dari UI
+- Gagal karena jaringan → antrean di HP + kotak `.dot.pend`; error database tetap di-throw (bukan diantrekan)
+- `handleAttendanceChange` skip key yang masih di `_ATT_Q`; render pakai `attShown()`
 
 ### Code Safety
 - **JANGAN pakai `prompt()`** — block main thread. Pakai `asyncPrompt()`
@@ -387,6 +392,7 @@ Edit index.html locally (+ file lain kalau perlu)
 | v29 | **Distribusi Wilayah** — filter kecamatan + kelurahan di Coach/TL Overview |
 | v30 | Wilayah filter hardening (escape + reset state + count consistency) |
 | v31 | **27 bug fixes** — attendance stats inflate, data corruption (sekolah/kelas split), XSS (PDF export), error handling (21 Supabase ops), TEEN 25 color map, reconnect race guard, undo sync, milestone prereq, visi TOCTOU fix |
+| v37 | **Absensi offline** (antrean `aog_att_queue_v1` di localStorage via `saveAttendance()`/`flushAttQueue()`), **Arsipkan** member (`archiveMember` → ARSIP JAKTIM 1/2) + Hapus member tetap ada, **Pindah CG** Coach/TL (`moveMemberCG`, juga di pencarian member → restore dari arsip), tgl lahir pakai date picker (`parseLahir`, data lama tak lengkap tidak terhapus), saran kecamatan/kelurahan (`WILAYAH_MAP`, `canonWilayah`), field tidak disimpan kalau tidak berubah (`data-orig`) |
 | v36 | Detail CG: ringkasan CG (rata-rata hadir + tren, follow-up, milestone, data belum lengkap) + info sekolah di kartu anak |
 | v35 | Pengaman transisi tab tanpa error console; cek versi pakai `fetch('/')` (cegah cache SW membengkak) |
 | v34 | Tabel absensi desktop lebih lega; banner "Versi baru tersedia · Muat ulang" (`checkNewVersion`) |
