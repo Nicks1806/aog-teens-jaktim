@@ -1,6 +1,6 @@
 # AOG Teens Jaktim — CG Dashboard (Absensi + Management)
 
-**Current version:** v49 · **Last updated:** 27 Oktober 2026
+**Current version:** v50 · **Last updated:** 27 Oktober 2026
 
 ## Project Overview
 Single-file web app untuk tracking attendance, pelayanan, milestone, events, visi, dan distribusi wilayah CG untuk AOG Teens Jakarta Timur. Dipakai oleh ~54 member, 9 CG Leaders, 2 Coach, dan 1 Team Leader secara bersamaan saat ibadah hari Minggu.
@@ -278,8 +278,8 @@ Edit index.html locally (+ file lain kalau perlu)
 ```
 
 **Version bump pattern setiap push code:**
-1. `index.html` — cari `App version">v49` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
-2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v49'` → naikkan sama
+1. `index.html` — cari `App version">v50` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
+2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v50'` → naikkan sama
 
 ---
 
@@ -394,6 +394,7 @@ Edit index.html locally (+ file lain kalau perlu)
 | v29 | **Distribusi Wilayah** — filter kecamatan + kelurahan di Coach/TL Overview |
 | v30 | Wilayah filter hardening (escape + reset state + count consistency) |
 | v31 | **27 bug fixes** — attendance stats inflate, data corruption (sekolah/kelas split), XSS (PDF export), error handling (21 Supabase ops), TEEN 25 color map, reconnect race guard, undo sync, milestone prereq, visi TOCTOU fix |
+| v50 | Tombol **Training AI** (dulu "Pengetahuan AI", label tetap tampil di HP) + kolom cepat "Ajarkan hal baru" (`aiTeachAdd` → poin baru di akhir, tersimpan setelah Simpan). HP: baris tombol atas chat turun ke baris kedua; teks tips isi absensi tidak terpecah |
 | v49 | **Bagan struktur** di jawaban AI: blok ```struktur {judul, node:{nama, peran, anak:[…]}}``` → pohon kartu (`aiStrukturHTML`, warna per tingkat, maks 80 kotak), "Simpan gambar" (`aiOrgCanvas`), Salin/WA jadi daftar teks (`aiStrukturText`). Nama yang tidak diketahui ditulis "(belum diisi)" |
 | v48 | **Isi absensi lewat chat / suara** (Coach/TL & CGL): AI menulis blok ```absen {cg,tanggal,hasil:[{id,nama,status}],tidak_cocok}``` → kartu `aiAbsenCardHTML` → "Cek & simpan" (`aiAbsenFromChat`) → layar cek `aiAbsenModal` (sumber `chat`, tanggal bisa diganti `abSetDateKeep`) → `abSave()`; tidak ada yang tersimpan otomatis; CGL hanya CG-nya. Konteks anggota + `id`. `_AB` mendukung dashboard CGL (`_AB.cgl` → MEMBERS/DATES/ATTENDANCE; simpan perbarui ATTENDANCE & ALL_ATTENDANCE + computeStats). **Absen dari foto di tab Absensi CGL** (`openAbsenFoto(CUR_CG, true)`) |
 | v47 | **Tanya AI untuk CGL** (tab `ai` di dashboard CG, `renderCGLAI` → `aiMountChat('cgl')`; konteks `buildCGLAIContext` dari `MEMBERS/DATES/ATTENDANCE` — hanya CG itu; layar chat 1 di DOM, `_AI.mode/_AI.scope`). **Pengetahuan AI ("training")**: Coach/TL isi teks di modal `aiNotesModal` → `cg_vision` `cg='__AI_NOTES__'`, `region='all'` (maks 20.000 karakter) → dikirim sebagai `notes` → masuk system prompt. **Data pribadi anak** (no HP, tgl lahir, sekolah, kelas, kelurahan/kecamatan, catatan CGL) dikirim sebagai `private` → server HANYA meneruskan ke Claude, tidak ke Gemini (keputusan Nick 27 Okt 2026). **Pilihan AI** Auto/Claude/Gemini (`localStorage aog_ai_provider`, body `provider`), label "dijawab Claude/Gemini". Tombol Absen dari foto dihapus dari tab Tanya AI (tetap di tab Absensi) |
@@ -417,7 +418,7 @@ Edit index.html locally (+ file lain kalau perlu)
 Detail changelog per version ada di git log (`git log --oneline`).
 
 ### Pengetahuan AI (27 Okt 2026)
-- Baris `cg_vision` id 55 (`__AI_NOTES__`/`all`) diisi riset GMS (situs resmi gms.church, berita; medsos tidak terbaca tanpa login) + info pemimpin (TL Bro Justin Seravian, Gembala Lokal Ko Mike Budiman, Gembala Lokal AOG KG Ko Amos, Gembala Regional Ko Fuji Harsono, Gembala Sinode Ko Philip) atas permintaan Nick. Cadangan sebelum diubah: `C:\Penyimpanan utama\Downloads\backup_ai_notes_2026-10-27.json` dan `..._tahap2.json`. Edit selanjutnya lewat tombol "Pengetahuan AI" di tab Tanya AI Coach/TL
+- Baris `cg_vision` id 55 (`__AI_NOTES__`/`all`) diisi riset GMS (situs resmi gms.church, berita; medsos tidak terbaca tanpa login) + info pemimpin (TL Bro Justin Seravian, Gembala Lokal Ko Mike Budiman, Gembala Lokal AOG KG Ko Amos, Gembala Regional Ko Fuji Harsono, Gembala Sinode Ko Philip) atas permintaan Nick. Cadangan sebelum diubah: `C:\Penyimpanan utama\Downloads\backup_ai_notes_2026-10-27.json` dan `..._tahap2.json`. Edit selanjutnya lewat tombol "Training AI" di tab Tanya AI Coach/TL
 
 ### Pembersihan data (27 Okt 2026, langsung di Supabase, cadangan di `C:\Penyimpanan utama\Downloads\backup_*_2026-10-27*.json`)
 - 21 member: teks "· Kelas X" (bug input gabungan pra-v31) dihapus dari kolom `sekolah`; kelas diisi/dinaikkan ke angka tertinggi (aturan dari Nick)
