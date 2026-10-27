@@ -80,41 +80,53 @@ h1,h2,h3{font-family:var(--display)}
 
 /* App shell */
 .app{display:none}
-.app-nav{background:var(--white);border-bottom:1px solid var(--g5);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
-.app-nav-left{display:flex;align-items:center;gap:10px}
-.app-back{font-size:18px;cursor:pointer;color:var(--g3)}
-.app-back:hover{color:var(--g1)}
-.app-cg-badge{padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:.8px}
-.app-cgl{font-size:13px;font-weight:600}
-.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block;animation:pulse 2s infinite}
+.shell{display:flex;min-height:100vh}
+.side{width:232px;flex:none;background:var(--side);color:var(--side-ink);padding:28px 16px 24px;display:flex;flex-direction:column;gap:24px;position:sticky;top:0;height:100vh;overflow-y:auto}
+.brand{display:flex;align-items:center;gap:12px;padding:0 8px}
+.logo{width:40px;height:40px;border-radius:12px;background:var(--gold);color:var(--side);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:800;font-size:18px;flex:none}
+.brand b{display:block;font-family:var(--display);font-size:17px}
+.brand small{display:block;font-size:12px;color:var(--side-muted);margin-top:2px}
+.navlist{display:flex;flex-direction:column;gap:4px}
+.nav{display:flex;align-items:center;gap:12px;min-height:44px;padding:0 12px;border:0;border-radius:12px;background:transparent;color:var(--side-muted);font-weight:500;font-size:14px;text-align:left;width:100%;cursor:pointer}
+.nav:hover{background:rgba(255,255,255,.08);color:#fff}
+.nav.on{background:rgba(255,255,255,.12);color:#fff;font-weight:600}
+.nav svg{flex:none}
+.nav .count{margin-left:auto;font-size:11px;font-weight:700;background:var(--gold);color:var(--side);border-radius:20px;padding:2px 8px}
+.rolesw{display:flex;gap:4px;padding:4px;background:rgba(255,255,255,.06);border-radius:12px}
+.rolesw button{flex:1;min-height:36px;border:0;border-radius:9px;background:transparent;color:var(--side-muted);font-weight:700;font-size:12px;letter-spacing:.8px;cursor:pointer}
+.rolesw button.on{background:rgba(255,255,255,.16);color:#fff}
+.backcoach{display:flex;align-items:center;gap:8px;min-height:40px;padding:0 12px;border:1px solid rgba(255,255,255,.14);border-radius:12px;background:transparent;color:var(--side-ink);font-size:13px;font-weight:600;cursor:pointer}
+.backcoach:hover{background:rgba(255,255,255,.08)}
+.sidetheme{margin-top:auto;padding:0 12px;display:flex;flex-direction:column;gap:4px}
+.sidetheme small{font-size:11px;font-weight:600;letter-spacing:1.4px;text-transform:uppercase;color:var(--side-muted)}
+.sidetheme b{font-family:var(--display);font-weight:800;font-size:22px;line-height:1;color:var(--gold)}
+.sidetheme span{font-family:var(--display);font-weight:700;font-size:15px}
+.profile{display:flex;align-items:center;gap:12px;padding:16px 12px 0;border-top:1px solid rgba(255,255,255,.1)}
+.profile .ava{background:var(--gold);color:var(--side);font-weight:800}
+.profile b{display:block;font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.live{white-space:nowrap;display:flex;align-items:center;gap:6px;font-size:12px;color:var(--side-muted)}
+.live-dot{width:7px;height:7px;border-radius:50%;background:#4ADE80;box-shadow:0 0 0 3px rgba(74,222,128,.2);display:inline-block;animation:pulse 2s infinite;flex:none}
+.live-dot.off{background:#F87171;box-shadow:0 0 0 3px rgba(248,113,113,.2);animation:none}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.exit{background:none;border:0;color:var(--side-muted);margin-left:auto;width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none}
+.exit:hover{background:rgba(255,255,255,.08);color:#fff}
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.mtop,.mnav{display:none}
+.content{padding:32px 40px 56px;display:flex;flex-direction:column;gap:24px;max-width:1320px;width:100%}
+.phead{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:20px}
+.crumb{font-size:13px;color:var(--muted)}
+.crumb b{color:var(--ink);font-weight:600}
+.phead h1{font-weight:800;font-size:40px;line-height:1.05;letter-spacing:-1px;margin:8px 0}
+.meta{font-size:14px;color:var(--muted);display:flex;flex-wrap:wrap;align-items:center;gap:4px}
+.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.csearch{position:relative}
+.csresults{position:absolute;top:calc(100% + 6px);right:0;left:0;min-width:300px;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 24px 60px rgba(36,28,92,.22);max-height:380px;overflow-y:auto;z-index:100}
+.visibanner{background:var(--side);color:#fff;border-radius:20px;padding:22px 24px;font-family:var(--display);font-weight:700;font-size:22px;line-height:1.3}
+.visibanner small{display:block;font-family:Inter,sans-serif;font-size:12px;font-weight:600;letter-spacing:1.4px;text-transform:uppercase;color:#CFC9F2;margin-bottom:6px}
+.visibanner .vb-misi{font-family:Inter,sans-serif;font-size:13px;font-weight:500;color:#CFC9F2;line-height:1.55;margin-top:10px;white-space:pre-wrap}
 
-.app-hero{padding:24px 20px 20px;border-bottom:1px solid var(--g5);background:var(--white)}
-#pageD .app-hero{display:flex;gap:24px;align-items:center;justify-content:space-between;flex-wrap:wrap}
-.app-hero-left{flex:0 0 auto;min-width:160px}
-.app-hero-visi{flex:1;min-width:240px;text-align:right;font-family:'Instrument Serif',serif;font-size:clamp(22px,3.4vw,34px);line-height:1.1;color:var(--g1);font-style:italic;opacity:.95}
-.app-hero-tag{font-size:10px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:var(--g4);margin-bottom:6px}
-.app-hero-h{font-family:'Instrument Serif',serif;font-size:clamp(26px,5vw,42px);line-height:1.05;color:var(--g1)}
-.app-hero-h em{font-style:italic;color:var(--g3)}
-.app-hero-meta{font-size:12px;color:var(--g3);margin-top:6px}
-
-.app-stats{display:grid;grid-template-columns:repeat(4,1fr);background:var(--white);border-bottom:1px solid var(--g5)}
-.app-stat{padding:14px 12px;text-align:center;border-right:1px solid var(--g5)}
-.app-stat:last-child{border-right:none}
-.app-stat-label{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--g3)}
-.app-stat-num{font-family:'Instrument Serif',serif;font-size:24px;margin-top:2px}
-.app-stat-pct{font-size:10px;color:var(--g3)}
-.ct .app-stat-num{color:var(--green)}.cb .app-stat-num{color:var(--blue)}.co .app-stat-num{color:var(--orange)}.cr .app-stat-num{color:var(--red)}
-
-.app-body{max-width:900px;margin:0 auto;padding:0 16px}
-.app-tabs{display:flex;gap:0;padding:12px 0 0;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--g5);background:var(--white);margin:0 -16px;padding-left:16px;position:sticky;top:49px;z-index:99}
-.app-tabs::-webkit-scrollbar{display:none}
-.app-tab{padding:8px 14px;font-size:12px;font-weight:600;color:var(--g3);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .2s}
-.app-tab:hover{color:var(--g1)}
-.app-tab.on{color:var(--g1);border-bottom-color:var(--purple)}
-
-.tab-content{display:none;padding:20px 0}
-.tab-content.active{display:block;animation:tabFadeIn .2s ease}
+.tab-content{display:none}
+.tab-content.active{display:block;animation:tabFadeIn .18s ease}
 
 /* Shared */
 .section{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:22px;margin-bottom:16px}
@@ -256,11 +268,6 @@ thead th:first-child{position:sticky;left:0;z-index:3;background:var(--card)}
 @keyframes tabFadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 /* Mobile responsive — Coach nav */
 @media (max-width:600px){
-  #coachSearch{width:36px !important;padding-left:32px !important;padding-right:0 !important;color:transparent}
-  #coachSearch::placeholder{color:transparent}
-  #coachSearch:focus{width:calc(100vw - 80px) !important;color:var(--g1);padding-right:12px !important}
-  #coachSearch:focus::placeholder{color:var(--g4)}
-  #pageC .app-nav{flex-wrap:wrap;gap:6px}
 }
 .skel{background:linear-gradient(90deg,var(--faint) 0%,#FAF9FC 50%,var(--faint) 100%);background-size:200% 100%;border-radius:8px;animation:skel-pulse 1.4s ease-in-out infinite;display:block}
 .skel-row{height:14px;margin-bottom:8px}
@@ -276,8 +283,6 @@ textarea.modal-input{line-height:1.5}
 .modal-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
 
 @media(max-width:640px){
-  .app-stats{grid-template-columns:repeat(2,1fr)}
-  .app-stat{border-bottom:1px solid var(--g5)}
   .dgrid{grid-template-columns:1fr}
   .dev-row{flex-direction:column;align-items:flex-start;gap:6px}
   #visiCardsContainer > div[style*="grid-template-columns:repeat(2"]{grid-template-columns:1fr !important}
@@ -353,6 +358,23 @@ textarea.modal-input{line-height:1.5}
 
 /* HP: input ≥16px supaya iOS tidak auto-zoom (zoom manual sekarang diizinkan) */
 @media (max-width:880px){
+  .side{display:none}
+  .mtop{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--side);color:#fff;position:sticky;top:0;z-index:50}
+  .mtop .logo{width:36px;height:36px;font-size:16px}
+  .mtop b{font-size:15px;display:block;font-family:var(--display)}
+  .mtop small{font-size:12px;color:var(--side-muted)}
+  .mtop .grow{flex:1;min-width:0}
+  .mtop button{width:44px;height:44px;border-radius:12px;border:0;background:rgba(255,255,255,.08);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none}
+  .mnav{display:flex;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);z-index:60;padding:6px 4px calc(6px + env(safe-area-inset-bottom));overflow-x:auto}
+  .mnav button{flex:1;min-width:58px;display:flex;flex-direction:column;align-items:center;gap:3px;min-height:48px;justify-content:center;border:0;background:transparent;color:var(--muted);font-size:11px;font-weight:500;border-radius:12px;cursor:pointer}
+  .mnav button.on{color:var(--accent-ink);font-weight:700;background:var(--accent-soft)}
+  .content{padding:20px 16px 100px;gap:18px}
+  .phead h1{font-size:30px}
+  .actions{width:100%}
+  .csearch{flex:1;min-width:0}
+  .csresults{min-width:0}
+  .visibanner{font-size:18px;padding:18px}
+  .toast{bottom:88px}
   input,select,textarea{font-size:16px !important}
   .card{padding:18px}
   .kpi .num{font-size:30px}.kpi.hero .num{font-size:36px}
@@ -493,83 +515,87 @@ textarea.modal-input{line-height:1.5}
 
 <!-- CGL DASHBOARD -->
 <div class="app" id="pageD">
-  <div class="app-nav"><div class="app-nav-left"><div class="app-back" onclick="goBack()">&larr;</div><span class="app-cg-badge" id="nB"></span><span class="app-cgl" id="nN"></span></div><div style="display:flex;align-items:center;gap:6px"><span class="notif-bell" onclick="toggleNotif()" title="Notifikasi" style="cursor:pointer;font-size:14px;user-select:none">🔔</span><span class="live-dot"></span><span class="live-label" style="font-size:10px;color:var(--green);font-weight:600">Live</span></div></div>
-  <div class="app-hero">
-    <div class="app-hero-left">
-      <div class="app-hero-tag">Januari &mdash; April 2026</div>
-      <div class="app-hero-h">Rekap<br><em>CG.</em></div>
-      <div class="app-hero-meta"><span id="hC">0</span> anggota &middot; <span id="hS"></span> &middot; <span id="hL"></span></div>
-    </div>
-    <div class="app-hero-visi" id="regionVisiBanner" style="display:none"></div>
-  </div>
-  <div class="app-stats">
-    <div class="app-stat ct"><div class="app-stat-label">Hadir</div><div class="app-stat-num" id="sH">0</div><div class="app-stat-pct" id="sHp">0%</div></div>
-    <div class="app-stat cb"><div class="app-stat-label">Izin</div><div class="app-stat-num" id="sI">0</div><div class="app-stat-pct" id="sIp">0%</div></div>
-    <div class="app-stat co"><div class="app-stat-label">Sakit</div><div class="app-stat-num" id="sS">0</div><div class="app-stat-pct" id="sSp">0%</div></div>
-    <div class="app-stat cr"><div class="app-stat-label">Alpa</div><div class="app-stat-num" id="sA">0</div><div class="app-stat-pct" id="sAp">0%</div></div>
-  </div>
-
-  <div class="app-body">
-    <div class="app-tabs">
-      <div class="app-tab on" onclick="sTab('absensi',this)">Absensi</div>
-      <div class="app-tab" onclick="sTab('detail',this)">Detail CG</div>
-      <div class="app-tab" onclick="sTab('visi',this)">Visi CG</div>
-      <div class="app-tab" onclick="sTab('pelayanan',this)">Pelayanan</div>
-      <div class="app-tab" onclick="sTab('milestone',this)">Milestone</div>
-      <div class="app-tab" onclick="sTab('events',this)">Events</div>
-    </div>
-
+ <div class="shell">
+  <aside class="side" aria-label="Navigasi utama">
+    <div class="brand"><div class="logo" aria-hidden="true">A</div><div><b>AOG Teens</b><small id="dSideSub">CG</small></div></div>
+    <button type="button" class="backcoach" id="dBackCoach" onclick="goBack()" style="display:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Kembali ke Coach</button>
+    <nav class="navlist" aria-label="Tab CG"><button type="button" class="nav app-tab on" data-tab="absensi" aria-current="page" onclick="sTab('absensi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M9 15l2 2 4-4"/></svg><span>Absensi</span></button><button type="button" class="nav app-tab" data-tab="detail" onclick="sTab('detail',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c1.9.7 3.1 2.4 3.5 5.2"/></svg><span>Detail CG</span></button><button type="button" class="nav app-tab" data-tab="visi" onclick="sTab('visi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span>Visi CG</span></button><button type="button" class="nav app-tab" data-tab="pelayanan" onclick="sTab('pelayanan',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"/></svg><span>Pelayanan</span></button><button type="button" class="nav app-tab" data-tab="milestone" onclick="sTab('milestone',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4h11l-2 4 2 4H5"/></svg><span>Milestone</span></button><button type="button" class="nav app-tab" data-tab="events" onclick="sTab('events',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4z"/><path d="M14 7v10"/></svg><span>Events</span></button></nav>
+    <div class="sidetheme"><small>The year of</small><b>Unity</b><span>&amp; Open Heavens</span></div>
+    <div class="profile"><span class="ava" id="dAva" aria-hidden="true">A</span><div style="flex:1;min-width:0"><b id="nN"></b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v31</span></span></span></div><button type="button" class="exit" onclick="goBack()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
+  </aside>
+  <div class="main">
+    <header class="mtop">
+      <button type="button" id="dMBack" onclick="goBack()" aria-label="Kembali" style="display:none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button><div class="logo" id="dMLogo" aria-hidden="true">A</div>
+      <div class="grow"><b id="dMTitle">CG</b><small id="dMSub"></small></div>
+      <button type="button" onclick="goBack()" aria-label="Keluar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button>
+    </header>
+    <main class="content">
+      <header class="phead">
+        <div><div class="crumb" id="dCrumb"></div><h1 id="dTitle">Rekap Absensi</h1><div class="meta"><span id="nB"></span> <span id="hC">0</span> anggota · <span id="hS"></span> · <span id="hL"></span></div></div>
+        <div class="actions"><button type="button" class="iconbtn notif-bell" onclick="toggleNotif()" aria-label="Notifikasi"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg></button></div>
+      </header>
+      <div class="visibanner" id="regionVisiBanner" style="display:none"></div>
+      <div class="grid-kpi">
+        <div class="kpi hero"><div class="lbl">Rata-rata kehadiran</div><div class="num"><span id="dAvg">0</span><small>%</small></div><div class="track"><i id="dAvgBar" style="width:0%"></i></div><div class="foot" id="dAvgFoot" style="color:#CFC9F2;font-weight:500">dari 0 catatan</div></div>
+        <div class="kpi"><div class="lbl">Hadir<span class="badge c-H">H</span></div><div class="num" id="sH">0</div><div class="foot" style="color:var(--H)"><span id="sHp">0%</span> dari total</div></div>
+        <div class="kpi"><div class="lbl">Izin<span class="badge c-I">I</span></div><div class="num" id="sI">0</div><div class="foot" style="color:var(--I)"><span id="sIp">0%</span> dari total</div></div>
+        <div class="kpi"><div class="lbl">Sakit<span class="badge c-S">S</span></div><div class="num" id="sS">0</div><div class="foot" style="color:var(--S)"><span id="sSp">0%</span> dari total</div></div>
+        <div class="kpi"><div class="lbl">Alpa<span class="badge c-A">A</span></div><div class="num" id="sA">0</div><div class="foot" style="color:var(--A)"><span id="sAp">0%</span> dari total</div></div>
+      </div>
     <div class="tab-content active" id="tab-absensi"><div class="loading-msg">Memuat...</div></div>
     <div class="tab-content" id="tab-detail"><div class="loading-msg">Memuat...</div></div>
     <div class="tab-content" id="tab-visi"><div class="loading-msg">Memuat...</div></div>
     <div class="tab-content" id="tab-pelayanan"><div class="loading-msg">Memuat...</div></div>
     <div class="tab-content" id="tab-milestone"><div class="loading-msg">Memuat...</div></div>
     <div class="tab-content" id="tab-events"><div class="loading-msg">Memuat...</div></div>
+    </main>
   </div>
+  <nav class="mnav" aria-label="Navigasi"><button type="button" class="app-tab on" data-tab="absensi" aria-current="page" onclick="sTab('absensi',this)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M9 15l2 2 4-4"/></svg><span>Absensi</span></button><button type="button" class="app-tab" data-tab="detail" onclick="sTab('detail',this)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c1.9.7 3.1 2.4 3.5 5.2"/></svg><span>Detail</span></button><button type="button" class="app-tab" data-tab="visi" onclick="sTab('visi',this)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span>Visi</span></button><button type="button" class="app-tab" data-tab="pelayanan" onclick="sTab('pelayanan',this)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"/></svg><span>Pelayanan</span></button><button type="button" class="app-tab" data-tab="milestone" onclick="sTab('milestone',this)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4h11l-2 4 2 4H5"/></svg><span>Milestone</span></button><button type="button" class="app-tab" data-tab="events" onclick="sTab('events',this)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4z"/><path d="M14 7v10"/></svg><span>Events</span></button></nav>
+ </div>
 </div>
 
 <!-- COACH -->
 <div class="app" id="pageC">
-  <div class="app-nav">
-    <div class="app-nav-left">
-      <div class="app-back" onclick="goBackCoach()">&larr;</div>
-      <span style="font-size:13px;font-weight:700" id="coachRoleLabel">Coach</span>
-      <div style="display:inline-flex;background:#e8e8e8;border-radius:14px;padding:2px;margin-left:8px">
-        <button id="roleCoachBtn" onclick="switchRole('coach')" style="padding:4px 12px;border-radius:12px;border:none;font-size:10px;font-weight:700;cursor:pointer;background:var(--purple);color:#fff;letter-spacing:.4px">COACH</button>
-        <button id="roleTLBtn" onclick="switchRole('tl')" style="padding:4px 12px;border-radius:12px;border:none;font-size:10px;font-weight:700;cursor:pointer;background:transparent;color:var(--g3);letter-spacing:.4px">TL</button>
+ <div class="shell">
+  <aside class="side" aria-label="Navigasi utama">
+    <div class="brand"><div class="logo" aria-hidden="true">A</div><div><b>AOG Teens</b><small id="coachRoleLabel">Coach</small></div></div>
+    <div class="rolesw" role="group" aria-label="Peran"><button type="button" id="roleCoachBtn" class="on" aria-pressed="true" onclick="switchRole('coach')">COACH</button><button type="button" id="roleTLBtn" aria-pressed="false" onclick="switchRole('tl')">TL</button></div>
+    <nav class="navlist" id="coachTabs" aria-label="Tab Coach"><button type="button" class="nav app-tab on" data-tab="c-overview" aria-current="page" onclick="sCoachTab('c-overview',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"/></svg><span>Overview</span></button><button type="button" class="nav app-tab" data-tab="c-absensi" onclick="sCoachTab('c-absensi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M9 15l2 2 4-4"/></svg><span>Absensi</span></button><button type="button" class="nav app-tab" data-tab="c-milestone" onclick="sCoachTab('c-milestone',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4h11l-2 4 2 4H5"/></svg><span>Milestone</span></button><button type="button" class="nav app-tab" data-tab="c-visi" onclick="sCoachTab('c-visi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span>Visi</span></button><button type="button" class="nav app-tab" data-tab="c-events" onclick="sCoachTab('c-events',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4z"/><path d="M14 7v10"/></svg><span>Events</span></button></nav>
+    <div class="sidetheme"><small>The year of</small><b>Unity</b><span>&amp; Open Heavens</span></div>
+    <div class="profile"><span class="ava" id="cAva" aria-hidden="true">C</span><div style="flex:1;min-width:0"><b id="cWho">Coach</b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v31</span></span></span></div><button type="button" class="exit" onclick="goBackCoach()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
+  </aside>
+  <div class="main">
+    <header class="mtop">
+      <div class="logo" aria-hidden="true">A</div>
+      <div class="grow"><b id="cMTitle">Coach</b><small id="cMSub">Jaktim</small></div>
+      <button type="button" onclick="goBackCoach()" aria-label="Keluar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button>
+    </header>
+    <main class="content">
+      <header class="phead" id="coachHero">
+        <div><div class="crumb" id="cCrumb">Halo, Coach</div><h1 id="coachHeroH">Overview semua CG</h1><div class="meta" id="coachMeta">Memuat...</div></div>
+        <div class="actions">
+          <div class="csearch">
+            <label class="search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><span class="sr">Cari nama member</span><input id="coachSearch" type="search" placeholder="Cari nama member…" autocomplete="off" oninput="handleCoachSearch(this.value)" onblur="setTimeout(()=>{document.getElementById('coachSearchResults').style.display='none'},200)" onfocus="if(this.value)handleCoachSearch(this.value)"></label>
+            <div id="coachSearchResults" class="csresults" style="display:none"></div>
+          </div>
+          <button type="button" class="iconbtn notif-bell" onclick="toggleNotif()" aria-label="Notifikasi"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg></button>
+        </div>
+      </header>
+      <div class="grid-kpi">
+        <div class="kpi hero"><div class="lbl">Rata-rata kehadiran</div><div class="num" id="csAvgHadir">-</div><div class="track"><i id="csAvgBar" style="width:0%"></i></div></div>
+        <div class="kpi"><div class="lbl">Total anggota</div><div class="num" id="csTotalMbr">0</div><div class="foot" style="color:var(--accent-ink)" id="csRegLabel">-</div></div>
+        <div class="kpi"><div class="lbl">At risk (&lt;50%)</div><div class="num" id="csAtRisk">0</div><div class="foot" style="color:var(--A)">perlu di-follow up</div></div>
+        <div class="kpi"><div class="lbl">Belum MSJ 1</div><div class="num" id="csBlmMsj">0</div><div class="foot" style="color:var(--S)">ajak kelas berikutnya</div></div>
       </div>
-    </div>
-    <div style="display:flex;align-items:center;gap:10px">
-      <div style="position:relative">
-        <input id="coachSearch" type="text" placeholder="Cari nama member..." oninput="handleCoachSearch(this.value)" onblur="this.style.borderColor='#e4dcff';this.style.width='200px';setTimeout(()=>{document.getElementById('coachSearchResults').style.display='none'},200)" onfocus="this.style.borderColor='#6C5CE7';this.style.width='260px';if(this.value)handleCoachSearch(this.value)" style="padding:7px 14px 7px 32px;border:1.5px solid #e4dcff;border-radius:20px;font-size:11.5px;font-family:Inter,sans-serif;width:200px;outline:none;transition:all .2s;background:#fff url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236C5CE7' stroke-width='2.5' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E&quot;) no-repeat 10px center;background-size:14px">
-        <div id="coachSearchResults" style="display:none;position:absolute;top:calc(100% + 4px);right:0;left:0;background:#fff;border:1px solid #e4dcff;border-radius:12px;box-shadow:0 12px 28px rgba(108,92,231,.15);max-height:360px;overflow-y:auto;z-index:100;min-width:280px"></div>
-      </div>
-      <div style="display:flex;align-items:center;gap:6px"><span style="font-size:9px;color:var(--g4);font-weight:600;letter-spacing:.3px" title="App version">v31</span><span class="notif-bell" onclick="toggleNotif()" title="Notifikasi" style="cursor:pointer;font-size:14px;user-select:none">🔔</span><span class="live-dot"></span><span class="live-label" style="font-size:10px;color:var(--green);font-weight:600">Live</span></div>
-    </div>
+      <div class="tab-content active" id="tab-c-overview"><div class="loading-msg">Memuat...</div></div>
+      <div class="tab-content" id="tab-c-absensi"><div class="loading-msg">Memuat...</div></div>
+      <div class="tab-content" id="tab-c-milestone"><div class="loading-msg">Memuat...</div></div>
+      <div class="tab-content" id="tab-c-visi"><div class="loading-msg">Memuat...</div></div>
+      <div class="tab-content" id="tab-c-events"><div class="loading-msg">Memuat...</div></div>
+    </main>
   </div>
-  <div class="app-hero" id="coachHero"><div class="app-hero-tag">Januari &mdash; April 2026</div><div class="app-hero-h" id="coachHeroH">Semua<br><em>CG.</em></div><div class="app-hero-meta" id="coachMeta">Memuat...</div></div>
-  <div class="app-stats">
-    <div class="app-stat ct"><div class="app-stat-label">Member</div><div class="app-stat-num" id="csTotalMbr">0</div><div class="app-stat-pct" id="csRegLabel">-</div></div>
-    <div class="app-stat cb"><div class="app-stat-label">Avg Hadir</div><div class="app-stat-num" id="csAvgHadir">-</div><div class="app-stat-pct">rata-rata</div></div>
-    <div class="app-stat co"><div class="app-stat-label">At Risk</div><div class="app-stat-num" id="csAtRisk">0</div><div class="app-stat-pct">&lt; 50%</div></div>
-    <div class="app-stat cr"><div class="app-stat-label">Blm MSJ1</div><div class="app-stat-num" id="csBlmMsj">0</div><div class="app-stat-pct">perlu follow</div></div>
-  </div>
-
-  <div class="app-body">
-    <div class="app-tabs" id="coachTabs">
-      <div class="app-tab on" onclick="sCoachTab('c-overview',this)">Overview</div>
-      <div class="app-tab" onclick="sCoachTab('c-absensi',this)">Absensi</div>
-      <div class="app-tab" onclick="sCoachTab('c-milestone',this)">Milestone</div>
-      <div class="app-tab" onclick="sCoachTab('c-visi',this)">Visi</div>
-      <div class="app-tab" onclick="sCoachTab('c-events',this)">Events</div>
-    </div>
-
-    <div class="tab-content active" id="tab-c-overview"><div class="loading-msg">Memuat...</div></div>
-    <div class="tab-content" id="tab-c-absensi"><div class="loading-msg">Memuat...</div></div>
-    <div class="tab-content" id="tab-c-milestone"><div class="loading-msg">Memuat...</div></div>
-    <div class="tab-content" id="tab-c-visi"><div class="loading-msg">Memuat...</div></div>
-    <div class="tab-content" id="tab-c-events"><div class="loading-msg">Memuat...</div></div>
-  </div>
+  <nav class="mnav" aria-label="Navigasi"><button type="button" class="app-tab on" data-tab="c-overview" aria-current="page" onclick="sCoachTab('c-overview',this)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"/></svg><span>Overview</span></button><button type="button" class="app-tab" data-tab="c-absensi" onclick="sCoachTab('c-absensi',this)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M9 15l2 2 4-4"/></svg><span>Absensi</span></button><button type="button" class="app-tab" data-tab="c-milestone" onclick="sCoachTab('c-milestone',this)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4h11l-2 4 2 4H5"/></svg><span>Milestone</span></button><button type="button" class="app-tab" data-tab="c-visi" onclick="sCoachTab('c-visi',this)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span>Visi</span></button><button type="button" class="app-tab" data-tab="c-events" onclick="sCoachTab('c-events',this)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4z"/><path d="M14 7v10"/></svg><span>Events</span></button></nav>
+ </div>
 </div>
 
 <script>
@@ -730,13 +756,8 @@ function pushNotif(title, body, tag) {
 }
 
 function updateLiveIndicator(connected) {
-  document.querySelectorAll('.live-dot').forEach(d => {
-    d.style.background = connected ? 'var(--green)' : '#dc2626';
-  });
-  document.querySelectorAll('.live-label').forEach(l => {
-    l.textContent = connected ? 'Live' : 'Offline';
-    l.style.color = connected ? 'var(--green)' : '#dc2626';
-  });
+  document.querySelectorAll('.live-dot').forEach(d => d.classList.toggle('off', !connected));
+  document.querySelectorAll('.live-label').forEach(l => { l.textContent = connected ? 'Live' : 'Offline'; });
 }
 
 // ── Attendance handler: patch per-dot (tanpa full re-render) ──
@@ -883,9 +904,7 @@ function handleVisionChange(payload) {
         const b = document.getElementById('regionVisiBanner');
         if (b && cv && cv.visi) {
           b.style.display = 'block';
-          let inner = '<div style="white-space:pre-wrap">'+esc(cv.visi)+'</div>';
-          if (cv.misi) inner += '<div style="font-size:11px;color:var(--g3);line-height:1.5;margin-top:8px;letter-spacing:.5px;white-space:pre-wrap;font-style:normal;font-family:Inter,sans-serif">'+esc(cv.misi)+'</div>';
-          b.innerHTML = inner;
+          b.innerHTML = regionVisiBannerHTML(cv);
         }
       }
       // Visi tab
@@ -1511,6 +1530,12 @@ async function enterFromCoach(cg) {
   await openCGDashboard(cg);
 }
 
+function regionVisiBannerHTML(cv) {
+  let inner = '<small>Visi Coach region</small><div style="white-space:pre-wrap">'+esc(cv.visi)+'</div>';
+  if (cv.misi) inner += '<div class="vb-misi">'+esc(cv.misi)+'</div>';
+  return inner;
+}
+
 // ========== OPEN CGL DASHBOARD ==========
 let TAB_RENDERED = {};
 
@@ -1527,7 +1552,7 @@ async function openCGDashboard(cg) {
   // Reset default tab + clear stale global data segera (sebelum async load)
   MEMBERS = []; DATES = []; ATTENDANCE = {};
   _CACHED_CG_EVENTS = null; // Reset event cache untuk CG baru
-  document.querySelectorAll('#pageD .app-tab').forEach((t,i) => t.classList.toggle('on', i===0));
+  setDTabUI('absensi');
   document.querySelectorAll('#pageD .tab-content').forEach((t,i) => t.classList.toggle('active', i===0));
 
   // Reset tab render flags — hanya Absensi yang akan di-render di awal
@@ -1574,11 +1599,22 @@ async function openCGDashboard(cg) {
   const color = CG_COLORS[cg] || '#7c3aed';
   const bg = CG_BG[cg] || '#faf5ff';
   document.getElementById('nB').textContent = cg;
-  document.getElementById('nB').style.cssText = 'padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:.8px;background:'+bg+';color:'+color+';border:1px solid '+color+'40';
+  document.getElementById('nB').style.cssText = 'padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700;margin-right:4px;background:'+bg+';color:'+color;
   document.getElementById('nN').textContent = CUR_CG_INFO.leader || '';
   document.getElementById('hC').textContent = MEMBERS.length;
   document.getElementById('hS').textContent = CUR_CG_INFO.hari_jam || '';
   document.getElementById('hL').textContent = CUR_CG_INFO.lokasi || '';
+  // Shell (sidebar / top bar HP)
+  const regLbl = CUR_REGION === 'jaktim2' ? 'Jaktim 2' : 'Jaktim 1';
+  document.getElementById('dSideSub').textContent = cg + ' · ' + regLbl;
+  document.getElementById('dMTitle').textContent = cg;
+  document.getElementById('dMSub').textContent = (CUR_CG_INFO.leader ? 'CGL ' + CUR_CG_INFO.leader + ' · ' : '') + regLbl;
+  document.getElementById('dAva').textContent = String(CUR_CG_INFO.leader || cg).trim().charAt(0).toUpperCase() || 'A';
+  document.getElementById('dBackCoach').style.display = fromCoach ? 'flex' : 'none';
+  document.getElementById('dMBack').style.display = fromCoach ? 'flex' : 'none';
+  document.getElementById('dMLogo').style.display = fromCoach ? 'none' : 'flex';
+  const activeT = document.querySelector('#pageD .nav.app-tab.on');
+  setDTabUI(activeT ? activeT.dataset.tab : 'absensi');
 
   computeStats();
 
@@ -1588,9 +1624,7 @@ async function openCGDashboard(cg) {
     if (!b) return;
     if (cv && cv.visi) {
       b.style.display = 'block';
-      let inner = '<div style="white-space:pre-wrap">'+esc(cv.visi)+'</div>';
-      if (cv.misi) inner += '<div style="font-size:11px;color:var(--g3);line-height:1.5;margin-top:8px;letter-spacing:.5px;white-space:pre-wrap;font-style:normal;font-family:Inter,sans-serif">'+esc(cv.misi)+'</div>';
-      b.innerHTML = inner;
+      b.innerHTML = regionVisiBannerHTML(cv);
     } else {
       b.style.display = 'none';
     }
@@ -1641,6 +1675,10 @@ function computeStats() {
   document.getElementById('sIp').textContent = Math.round(i/tot*100)+'%';
   document.getElementById('sSp').textContent = Math.round(s/tot*100)+'%';
   document.getElementById('sAp').textContent = Math.round(a/tot*100)+'%';
+  const avg = Math.round(h/tot*100);
+  const dAvg = document.getElementById('dAvg'); if (dAvg) dAvg.textContent = avg;
+  const dBar = document.getElementById('dAvgBar'); if (dBar) dBar.style.width = avg + '%';
+  const dFoot = document.getElementById('dAvgFoot'); if (dFoot) dFoot.textContent = 'dari ' + (h+i+s+a) + ' catatan absensi';
 }
 
 // ========== ABSENSI TAB ==========
@@ -3329,11 +3367,24 @@ function goBack() {
   window.scrollTo(0, 0);
 }
 
+const CGL_TAB_TITLES = {absensi:'Rekap Absensi',detail:'Detail CG',visi:'Visi CG',pelayanan:'Jadwal Pelayanan',milestone:'Milestone',events:'Events'};
+function setDTabUI(id) {
+  document.querySelectorAll('#pageD .app-tab').forEach(t => {
+    const on = t.dataset.tab === id;
+    t.classList.toggle('on', on);
+    if (on) t.setAttribute('aria-current','page'); else t.removeAttribute('aria-current');
+  });
+  const title = CGL_TAB_TITLES[id] || '';
+  const h = document.getElementById('dTitle'); if (h) h.textContent = title;
+  const c = document.getElementById('dCrumb');
+  if (c) c.innerHTML = esc(CUR_REGION === 'jaktim2' ? 'Jaktim 2' : 'Jaktim 1') + ' / ' + esc(CUR_CG || '') + ' / <b>' + esc(title) + '</b>';
+}
+
 function sTab(id, b) {
-  document.querySelectorAll('#pageD .app-tab').forEach(t => t.classList.remove('on'));
-  b.classList.add('on');
+  setDTabUI(id);
   document.querySelectorAll('#pageD .tab-content').forEach(t => t.classList.remove('active'));
   document.getElementById('tab-' + id).classList.add('active');
+  window.scrollTo(0, 0);
   // Lazy render tab kalau belum pernah di-render
   ensureTabRendered(id);
 }
@@ -3564,11 +3615,28 @@ async function refreshCoachAttendance(silent) {
   }
 }
 
+function setCTabUI(id) {
+  document.querySelectorAll('#pageC .app-tab').forEach(t => {
+    const on = t.dataset.tab === id;
+    t.classList.toggle('on', on);
+    if (on) t.setAttribute('aria-current','page'); else t.removeAttribute('aria-current');
+  });
+  const regLbl = coachRole === 'tl' ? 'semua region' : (coachReg === 'jaktim2' ? 'Jaktim 2' : 'Jaktim 1');
+  const titles = {'c-overview':'Overview ' + regLbl,'c-absensi':'Absensi per CG','c-milestone':'Milestone per CG','c-visi':'Visi semua CG','c-events':'Events'};
+  const who = coachRole === 'tl' ? 'Team Leader' : 'Coach';
+  const h = document.getElementById('coachHeroH'); if (h) h.textContent = titles[id] || '';
+  const c = document.getElementById('cCrumb'); if (c) c.innerHTML = 'Halo, ' + who + ' · <b>' + esc(titles[id] || '') + '</b>';
+}
+function currentCoachTab() {
+  const t = document.querySelector('#pageC .tab-content.active');
+  return t ? t.id.replace('tab-','') : 'c-overview';
+}
+
 async function sCoachTab(id, b) {
-  document.querySelectorAll('#pageC .app-tab').forEach(t => t.classList.remove('on'));
-  b.classList.add('on');
+  setCTabUI(id);
   document.querySelectorAll('#pageC .tab-content').forEach(t => t.classList.remove('active'));
   document.getElementById('tab-' + id).classList.add('active');
+  window.scrollTo(0, 0);
   // Saat switch ke Absensi/Overview, refetch attendance + dates fresh
   // (dates juga penting supaya date_id konsisten dengan CGL)
   if (id === 'c-absensi' || id === 'c-overview') {
@@ -3705,7 +3773,9 @@ async function renderCoachOverview() {
   const totalBlm = allStats.reduce((s, c) => s + c.blmMsj1, 0);
 
   document.getElementById('csTotalMbr').textContent = totalMbr;
-  document.getElementById('csAvgHadir').textContent = avgHadir + '%';
+  document.getElementById('csAvgHadir').innerHTML = avgHadir + '<small>%</small>';
+  const csBar = document.getElementById('csAvgBar'); if (csBar) csBar.style.width = (parseInt(avgHadir,10) || 0) + '%';
+  setCTabUI(currentCoachTab());
   document.getElementById('csAtRisk').textContent = totalRisk;
   document.getElementById('csBlmMsj').textContent = totalBlm;
   document.getElementById('csRegLabel').textContent = coachRole === 'tl' ? 'Total semua' : (coachReg === 'jaktim1' ? 'Jaktim 1' : 'Jaktim 2');
@@ -5138,19 +5208,16 @@ async function switchRole(role) {
   const coachBtn = document.getElementById('roleCoachBtn');
   const tlBtn = document.getElementById('roleTLBtn');
   const label = document.getElementById('coachRoleLabel');
-  const heroH = document.getElementById('coachHeroH');
-
-  if (role === 'tl') {
-    coachBtn.style.background='transparent';coachBtn.style.color='var(--g3)';
-    tlBtn.style.background='var(--purple)';tlBtn.style.color='#fff';
-    label.textContent = 'Team Leader';
-    heroH.innerHTML = 'Overview<br><em>Total.</em>';
-  } else {
-    tlBtn.style.background='transparent';tlBtn.style.color='var(--g3)';
-    coachBtn.style.background='var(--purple)';coachBtn.style.color='#fff';
-    label.textContent = 'Coach';
-    heroH.innerHTML = 'Semua<br><em>CG.</em>';
-  }
+  const isTL = role === 'tl';
+  coachBtn.classList.toggle('on', !isTL); coachBtn.setAttribute('aria-pressed', String(!isTL));
+  tlBtn.classList.toggle('on', isTL); tlBtn.setAttribute('aria-pressed', String(isTL));
+  const who = isTL ? 'Team Leader' : 'Coach';
+  label.textContent = isTL ? 'Team Leader · semua region' : 'Coach · ' + (coachReg === 'jaktim2' ? 'Jaktim 2' : 'Jaktim 1');
+  document.getElementById('cWho').textContent = who;
+  document.getElementById('cAva').textContent = isTL ? 'T' : 'C';
+  document.getElementById('cMTitle').textContent = who;
+  document.getElementById('cMSub').textContent = isTL ? 'Semua region' : (coachReg === 'jaktim2' ? 'Jaktim 2' : 'Jaktim 1');
+  setCTabUI(currentCoachTab());
   _CACHED_ALL_CG_EVENTS = null;
   COACH_TAB_RENDERED = {};
   renderCoachOverview();
