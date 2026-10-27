@@ -116,7 +116,7 @@ module.exports = async function handler(req, res) {
   if (PIN && String(body.pin || '') !== String(PIN)) return send(res, 401, { error: 'Kode akses AI salah.' });
 
   // Diagnosa: daftar model yang tersedia untuk key ini (hanya nama model, tanpa data rahasia)
-  const claudeInfo = { aktif: !!CLAUDE_KEY, model: CLAUDE_MODEL, format: !CLAUDE_KEY ? 'kosong' : (/^sk-ant-api\d*-/.test(CLAUDE_KEY) ? 'API key (benar)' : 'BUKAN API key — awalan ' + CLAUDE_KEY.slice(0, 10) + '…'), panjang: CLAUDE_KEY.length };
+  const claudeInfo = { aktif: !!CLAUDE_KEY, model: CLAUDE_MODEL, format: !CLAUDE_KEY ? 'kosong' : (/^sk-ant-/.test(CLAUDE_KEY) ? 'format sk-ant (ok)' : 'bukan key Anthropic — awalan ' + CLAUDE_KEY.slice(0, 10) + '…'), panjang: CLAUDE_KEY.length };
   if (body.action === 'models') {
     if (!KEY) return send(res, 200, { claude: claudeInfo, current: null, models: [] });
     try {
