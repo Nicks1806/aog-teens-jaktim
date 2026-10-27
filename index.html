@@ -881,6 +881,16 @@ html.vt .tab-content.active{animation:none}
 .ai-chart{margin:10px 0 12px;background:#fafaf8;max-width:720px}
 .ai-img-btn{display:inline-flex;align-items:center;gap:5px;margin-top:8px;font:inherit;font-size:12px;color:#6C5CE7;background:#fff;border:1px solid #e4dcff;border-radius:9px;padding:4px 10px;cursor:pointer}
 .ai-img-btn:hover{border-color:#6C5CE7}
+.ai-lagu{margin:10px 0 12px;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:#fafaf8;max-width:620px}
+.lg-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px dashed var(--line)}
+.lg-row:first-of-type{border-top:0}
+.lg-row .grow{flex:1;min-width:0}
+.lg-row b{display:block;font-size:14px}
+.lg-row small{font-size:12px;color:var(--muted)}
+.lg-n{width:24px;height:24px;border-radius:8px;background:#f3f0ff;color:#4b35c9;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none}
+.lg-btn{display:inline-flex;align-items:center;gap:4px;flex:none;font-size:12px;font-weight:600;color:#6C5CE7;background:#fff;border:1px solid #e4dcff;border-radius:9px;padding:5px 9px;text-decoration:none}
+.lg-btn:hover{border-color:#6C5CE7}
+.lg-note{display:block;margin-top:6px;font-size:11.5px;color:var(--muted)}
 .ub-card{padding:10px 12px;border-radius:12px;background:#FAF9FC}
 .ub-card>b{font-size:14px}.ub-card>small{font-size:12px;color:var(--muted)}
 .ub-row{display:grid;grid-template-columns:minmax(110px,auto) minmax(0,1fr) auto minmax(0,1.3fr);gap:8px;align-items:center;margin-top:8px;font-size:13px}
@@ -1271,7 +1281,7 @@ html.vt .tab-content.active{animation:none}
     <button type="button" class="backcoach" id="dBackCoach" onclick="goBack()" style="display:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Kembali ke Coach</button>
     <nav class="navlist" aria-label="Tab CG"><button type="button" class="nav app-tab on" data-tab="absensi" aria-current="page" onclick="sTab('absensi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M9 15l2 2 4-4"/></svg><span>Absensi</span></button><button type="button" class="nav app-tab" data-tab="detail" onclick="sTab('detail',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c1.9.7 3.1 2.4 3.5 5.2"/></svg><span>Detail CG</span></button><button type="button" class="nav app-tab" data-tab="visi" onclick="sTab('visi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span>Visi CG</span></button><button type="button" class="nav app-tab" data-tab="pelayanan" onclick="sTab('pelayanan',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"/></svg><span>Pelayanan</span></button><button type="button" class="nav app-tab" data-tab="milestone" onclick="sTab('milestone',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4h11l-2 4 2 4H5"/></svg><span>Milestone</span></button><button type="button" class="nav app-tab" data-tab="events" onclick="sTab('events',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4z"/><path d="M14 7v10"/></svg><span>Events</span></button><button type="button" class="nav app-tab ai-nav" data-tab="ai" onclick="sTab('ai',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg><span>Tanya AI</span></button></nav>
     <div class="sidetheme"><small>The year of</small><b>Unity</b><span>&amp; Open Heavens</span></div>
-    <div class="profile"><span class="ava" id="dAva" aria-hidden="true">A</span><div style="flex:1;min-width:0"><b id="nN"></b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v52</span></span></span></div><button type="button" class="exit" onclick="goBack()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
+    <div class="profile"><span class="ava" id="dAva" aria-hidden="true">A</span><div style="flex:1;min-width:0"><b id="nN"></b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v53</span></span></span></div><button type="button" class="exit" onclick="goBack()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
   </aside>
   <div class="main">
     <header class="mtop">
@@ -1315,7 +1325,7 @@ html.vt .tab-content.active{animation:none}
     <div class="rolesw" role="group" aria-label="Peran"><button type="button" id="roleCoachBtn" class="on" aria-pressed="true" onclick="switchRole('coach')">Coach</button><button type="button" id="roleTLBtn" aria-pressed="false" onclick="switchRole('tl')">TL</button></div>
     <nav class="navlist" id="coachTabs" aria-label="Tab Coach"><button type="button" class="nav app-tab on" data-tab="c-overview" aria-current="page" onclick="sCoachTab('c-overview',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"/></svg><span>Overview</span></button><button type="button" class="nav app-tab" data-tab="c-absensi" onclick="sCoachTab('c-absensi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M9 15l2 2 4-4"/></svg><span>Absensi</span></button><button type="button" class="nav app-tab" data-tab="c-milestone" onclick="sCoachTab('c-milestone',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4h11l-2 4 2 4H5"/></svg><span>Milestone</span></button><button type="button" class="nav app-tab" data-tab="c-visi" onclick="sCoachTab('c-visi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span>Visi</span></button><button type="button" class="nav app-tab" data-tab="c-events" onclick="sCoachTab('c-events',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4z"/><path d="M14 7v10"/></svg><span>Events</span></button><button type="button" class="nav app-tab ai-nav" data-tab="c-ai" onclick="sCoachTab('c-ai',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg><span>Tanya AI</span></button></nav>
     <button type="button" class="sidetheme editable" onclick="openThemeEdit()" aria-label="Edit tema tahun ini" title="Klik untuk edit tema"><small>The year of</small><b>Unity</b><span>&amp; Open Heavens</span><i class="st-edit" aria-hidden="true">Edit</i></button>
-    <div class="profile"><span class="ava" id="cAva" aria-hidden="true">C</span><div style="flex:1;min-width:0"><b id="cWho">Coach</b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v52</span></span></span></div><button type="button" class="exit" onclick="goBackCoach()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
+    <div class="profile"><span class="ava" id="cAva" aria-hidden="true">C</span><div style="flex:1;min-width:0"><b id="cWho">Coach</b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v53</span></span></span></div><button type="button" class="exit" onclick="goBackCoach()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
   </aside>
   <div class="main">
     <header class="mtop">
@@ -5909,16 +5919,48 @@ function aiBdaySend(id) {
   window.open((waLinkOf(m.wa) || 'https://wa.me/') + '?text=' + encodeURIComponent(t), '_blank', 'noopener');
 }
 
+// ── Daftar lagu PAW di jawaban AI: blok ```lagu {judul, lagu:[{judul, artis, tipe}]}``` → kartu + tombol Lirik (YouTube) & Spotify ──
+// Pakai link PENCARIAN (bukan URL video tertentu) supaya tidak pernah rusak / salah lagu
+function aiLaguSpec(raw) {
+  let sp;
+  try { sp = JSON.parse(raw); } catch(e) { return null; }
+  const list = (Array.isArray(sp && sp.lagu) ? sp.lagu : []).filter(x => x && x.judul).slice(0, 12)
+    .map(x => ({ judul: String(x.judul).slice(0, 80), artis: String(x.artis || '').slice(0, 60), tipe: String(x.tipe || '').toUpperCase().charAt(0) }));
+  return list.length ? { judul: String(sp.judul || ''), lagu: list } : null;
+}
+function aiLaguLinks(x) {
+  const q = (x.judul + ' ' + x.artis).trim();
+  return { yt: 'https://www.youtube.com/results?search_query=' + encodeURIComponent(q + ' lyrics'), sp: 'https://open.spotify.com/search/' + encodeURIComponent(q) };
+}
+function aiLaguHTML(raw) {
+  const sp = aiLaguSpec(raw);
+  if (!sp) return '';
+  const TIPE = { P: ['Praise', '#16a34a', '#f0fdf4'], W: ['Worship', '#6C5CE7', '#f3f0ff'], S: ['Sedang', '#d97706', '#fffbeb'] };
+  return '<div class="ai-lagu">' + (sp.judul ? '<div class="ai-chart-t">' + esc(sp.judul) + '</div>' : '') +
+    sp.lagu.map((x, i) => {
+      const l = aiLaguLinks(x), t = TIPE[x.tipe];
+      return '<div class="lg-row"><span class="lg-n">' + (i + 1) + '</span><div class="grow"><b>' + esc(x.judul) + '</b><small>' + esc(x.artis) + (t ? ' · <span style="color:' + t[1] + '">' + t[0] + '</span>' : '') + '</small></div>' +
+        '<a class="lg-btn" href="' + esc(l.yt) + '" target="_blank" rel="noopener" aria-label="Lirik ' + esc(x.judul) + ' di YouTube">' + icon('music', 14) + 'Lirik</a>' +
+        '<a class="lg-btn" href="' + esc(l.sp) + '" target="_blank" rel="noopener" aria-label="' + esc(x.judul) + ' di Spotify">Spotify</a></div>';
+    }).join('') + '<small class="lg-note">Lirik dibuka di YouTube (video lirik resmi biasanya paling atas).</small></div>';
+}
+// Versi teks (Salin / Kirim WA): judul + artis + link lirik
+function aiLaguText(raw) {
+  const sp = aiLaguSpec(raw);
+  if (!sp) return '';
+  return (sp.judul ? sp.judul + '\n' : '') + sp.lagu.map((x, i) => (i + 1) + '. ' + x.judul + (x.artis ? ' — ' + x.artis : '') + '\n   Lirik: ' + aiLaguLinks(x).yt).join('\n');
+}
+
 // Markdown ringan → HTML aman (teks di-escape dulu)
 function aiFormat(text) {
   // Blok grafik diproses dulu (JSON mentah), sisanya markdown biasa
   const src = String(text || '');
-  if (/```(chart|absen|struktur|ubah)/i.test(src)) {
-    const parts = src.split(/```(chart|absen|struktur|ubah)\s*([\s\S]*?)```/i);
+  if (/```(chart|absen|struktur|ubah|lagu)/i.test(src)) {
+    const parts = src.split(/```(chart|absen|struktur|ubah|lagu)\s*([\s\S]*?)```/i);
     let out = '';
     for (let i = 0; i < parts.length; i += 3) {
       out += aiFormatText(parts[i]);
-      if (i + 2 < parts.length) { const k = parts[i + 1].toLowerCase(); out += k === 'absen' ? aiAbsenCardHTML(parts[i + 2]) : k === 'struktur' ? aiStrukturHTML(parts[i + 2]) : k === 'ubah' ? aiUbahCardHTML(parts[i + 2]) : aiChartHTML(parts[i + 2]); }
+      if (i + 2 < parts.length) { const k = parts[i + 1].toLowerCase(); out += k === 'absen' ? aiAbsenCardHTML(parts[i + 2]) : k === 'struktur' ? aiStrukturHTML(parts[i + 2]) : k === 'ubah' ? aiUbahCardHTML(parts[i + 2]) : k === 'lagu' ? aiLaguHTML(parts[i + 2]) : aiChartHTML(parts[i + 2]); }
     }
     return out;
   }
@@ -6141,7 +6183,7 @@ function aiScopeChanged() {
 }
 function aiGrow(t) { t.style.height = 'auto'; t.style.height = Math.min(t.scrollHeight, 160) + 'px'; }
 function aiKey(e) { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); aiAsk(); } }
-function aiPlain(t) { return String(t || '').replace(/```struktur\s*([\s\S]*?)```/gi, (m, j) => aiStrukturText(j)).replace(/```(?:chart|absen|ubah)[\s\S]*?```/gi, '').replace(/\*\*(.+?)\*\*/g, '$1').replace(/^#{1,4}\s+/gm, '').replace(/^[ \t]*>[ \t]?/gm, '').replace(/\n{3,}/g, '\n\n').trim(); }
+function aiPlain(t) { return String(t || '').replace(/```struktur\s*([\s\S]*?)```/gi, (m, j) => aiStrukturText(j)).replace(/```lagu\s*([\s\S]*?)```/gi, (m, j) => aiLaguText(j)).replace(/```(?:chart|absen|ubah)[\s\S]*?```/gi, '').replace(/\*\*(.+?)\*\*/g, '$1').replace(/^#{1,4}\s+/gm, '').replace(/^[ \t]*>[ \t]?/gm, '').replace(/\n{3,}/g, '\n\n').trim(); }
 async function aiCopy(i) {
   const m = _AI.msgs[i]; if (!m) return;
   try { await navigator.clipboard.writeText(aiPlain(m.text)); toast('✓ Jawaban disalin'); } catch(e) { toast('❌ Gagal menyalin'); }
@@ -6155,7 +6197,7 @@ function aiWA(i) {
 const AI_DOTS = '<span class="ai-dots" aria-label="AI sedang menjawab"><span></span><span></span><span></span></span>';
 function aiLiveHTML(t) {
   if (!t) return AI_DOTS;
-  [['chart', 'grafik'], ['absen', 'absensi'], ['struktur', 'bagan struktur'], ['ubah', 'perubahan data']].forEach(([tag, lbl]) => {
+  [['chart', 'grafik'], ['absen', 'absensi'], ['struktur', 'bagan struktur'], ['ubah', 'perubahan data'], ['lagu', 'daftar lagu']].forEach(([tag, lbl]) => {
     const i = t.lastIndexOf('```' + tag);
     if (i >= 0 && t.indexOf('```', i + 3 + tag.length) < 0) t = t.slice(0, i) + '\n\n*menyiapkan ' + lbl + '…*';
   });
