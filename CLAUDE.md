@@ -1,6 +1,6 @@
 # AOG Teens Jaktim — CG Dashboard (Absensi + Management)
 
-**Current version:** v48 · **Last updated:** 27 Oktober 2026
+**Current version:** v49 · **Last updated:** 27 Oktober 2026
 
 ## Project Overview
 Single-file web app untuk tracking attendance, pelayanan, milestone, events, visi, dan distribusi wilayah CG untuk AOG Teens Jakarta Timur. Dipakai oleh ~54 member, 9 CG Leaders, 2 Coach, dan 1 Team Leader secara bersamaan saat ibadah hari Minggu.
@@ -278,8 +278,8 @@ Edit index.html locally (+ file lain kalau perlu)
 ```
 
 **Version bump pattern setiap push code:**
-1. `index.html` — cari `App version">v48` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
-2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v48'` → naikkan sama
+1. `index.html` — cari `App version">v49` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
+2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v49'` → naikkan sama
 
 ---
 
@@ -394,6 +394,7 @@ Edit index.html locally (+ file lain kalau perlu)
 | v29 | **Distribusi Wilayah** — filter kecamatan + kelurahan di Coach/TL Overview |
 | v30 | Wilayah filter hardening (escape + reset state + count consistency) |
 | v31 | **27 bug fixes** — attendance stats inflate, data corruption (sekolah/kelas split), XSS (PDF export), error handling (21 Supabase ops), TEEN 25 color map, reconnect race guard, undo sync, milestone prereq, visi TOCTOU fix |
+| v49 | **Bagan struktur** di jawaban AI: blok ```struktur {judul, node:{nama, peran, anak:[…]}}``` → pohon kartu (`aiStrukturHTML`, warna per tingkat, maks 80 kotak), "Simpan gambar" (`aiOrgCanvas`), Salin/WA jadi daftar teks (`aiStrukturText`). Nama yang tidak diketahui ditulis "(belum diisi)" |
 | v48 | **Isi absensi lewat chat / suara** (Coach/TL & CGL): AI menulis blok ```absen {cg,tanggal,hasil:[{id,nama,status}],tidak_cocok}``` → kartu `aiAbsenCardHTML` → "Cek & simpan" (`aiAbsenFromChat`) → layar cek `aiAbsenModal` (sumber `chat`, tanggal bisa diganti `abSetDateKeep`) → `abSave()`; tidak ada yang tersimpan otomatis; CGL hanya CG-nya. Konteks anggota + `id`. `_AB` mendukung dashboard CGL (`_AB.cgl` → MEMBERS/DATES/ATTENDANCE; simpan perbarui ATTENDANCE & ALL_ATTENDANCE + computeStats). **Absen dari foto di tab Absensi CGL** (`openAbsenFoto(CUR_CG, true)`) |
 | v47 | **Tanya AI untuk CGL** (tab `ai` di dashboard CG, `renderCGLAI` → `aiMountChat('cgl')`; konteks `buildCGLAIContext` dari `MEMBERS/DATES/ATTENDANCE` — hanya CG itu; layar chat 1 di DOM, `_AI.mode/_AI.scope`). **Pengetahuan AI ("training")**: Coach/TL isi teks di modal `aiNotesModal` → `cg_vision` `cg='__AI_NOTES__'`, `region='all'` (maks 20.000 karakter) → dikirim sebagai `notes` → masuk system prompt. **Data pribadi anak** (no HP, tgl lahir, sekolah, kelas, kelurahan/kecamatan, catatan CGL) dikirim sebagai `private` → server HANYA meneruskan ke Claude, tidak ke Gemini (keputusan Nick 27 Okt 2026). **Pilihan AI** Auto/Claude/Gemini (`localStorage aog_ai_provider`, body `provider`), label "dijawab Claude/Gemini". Tombol Absen dari foto dihapus dari tab Tanya AI (tetap di tab Absensi) |
 | v46 | **Tanya AI mengalir (streaming)**: `aiAsk` kirim `stream: true` → server balas NDJSON (`{"t"}`… `{"done"}` / `{"error"}`) dari Claude SSE atau Gemini `streamGenerateContent?alt=sse`; fallback ke Gemini hanya kalau Claude gagal **sebelum** ada teks. Client `aiReadStream`/`aiPaintLive` (timer 60 ms, bukan rAF), grafik ditahan sampai blok ```chart lengkap. Absen dari foto & ringkasan anak tetap non-stream. Fix: kutipan `>` dirender sebagai kotak (`.ai-quote`) |
