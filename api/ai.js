@@ -63,6 +63,19 @@ module.exports = async function handler(req, res) {
 
   if (PIN && String(body.pin || '') !== String(PIN)) return send(res, 401, { error: 'Kode akses AI salah.' });
 
+  // Diagnosa: daftar model yang tersedia untuk key ini (hanya nama model, tanpa data rahasia)
+  if (body.action === 'models') {
+    try {
+      const ctrl = new AbortController(); const timer = setTimeout(() => ctrl.abort(), 15000);
+      const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=200', { headers: { 'x-goog-api-key': KEY }, signal: ctrl.signal });
+      clearTimeout(timer);
+      const data = await r.json().catch(() => ({}));
+      if (!r.ok) return send(res, 502, { error: (data.error && data.error.message) || ('HTTP ' + r.status) });
+      const models = (data.models || []).filter(m => (m.supportedGenerationMethods || []).includes('generateContent')).map(m => String(m.name || '').replace(/^models\//, ''));
+      return send(res, 200, { current: MODEL, models });
+    } catch (e) { return send(res, 502, { error: 'Gagal mengambil daftar model.' }); }
+  }
+
   const question = String(body.question || '').trim().slice(0, 2000);
   if (!question) return send(res, 400, { error: 'Pertanyaan kosong.' });
   const context = typeof body.context === 'string' ? body.context.slice(0, 400000) : JSON.stringify(body.context || {}).slice(0, 400000);
@@ -80,17 +93,23 @@ module.exports = async function handler(req, res) {
   contents.push({ role: 'user', parts: [{ text: question }] });
 
   const callGemini = async (model) => {
-    const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(model) + ':generateContent', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': KEY },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
-        contents,
-        generationConfig: { temperature: 0.3, maxOutputTokens: 4096 }
-      })
-    });
-    const data = await r.json().catch(() => ({}));
-    return { r, data, msg: (data && data.error && data.error.message) || ('HTTP ' + r.status) };
+    // Batas 25 dtk per panggilan supaya tidak menggantung sampai Vercel timeout
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 25000);
+    try {
+      const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(model) + ':generateContent', {
+        method: 'POST',
+        signal: ctrl.signal,
+        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': KEY },
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+          contents,
+          generationConfig: { temperature: 0.3, maxOutputTokens: 4096 }
+        })
+      });
+      const data = await r.json().catch(() => ({}));
+      return { r, data, msg: (data && data.error && data.error.message) || ('HTTP ' + r.status) };
+    } finally { clearTimeout(timer); }
   };
 
   try {
@@ -114,6 +133,7 @@ module.exports = async function handler(req, res) {
     if (!text) return send(res, 502, { error: 'Gemini tidak memberi jawaban' + (cand && cand.finishReason ? ' (' + cand.finishReason + ')' : '') + '.' });
     return send(res, 200, { text, model });
   } catch (e) {
+    if (e && e.name === 'AbortError') return send(res, 504, { error: 'Gemini terlalu lama menjawab. Coba lagi atau persingkat pertanyaan.' });
     console.error('[api/ai] fetch failed', e);
     return send(res, 502, { error: 'Gagal menghubungi Gemini. Coba lagi.' });
   }
