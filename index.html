@@ -4668,7 +4668,7 @@ async function sCoachTab(id, b) {
 // Tiap pertanyaan: refetch absensi + tanggal, lalu kirim ringkasan data TERBARU.
 // Data pribadi (no HP, alamat, tgl lahir, sekolah, catatan) TIDAK dikirim.
 // ═══════════════════════════════════════════════════════════
-const _AI = { msgs: [], busy: false };
+const _AI = { msgs: [], busy: false, needPin: false }; // needPin: hanya kalau server minta (AI_PIN diisi di Vercel)
 const AI_PIN_KEY = 'aog_ai_pin';
 const AI_SUGGEST = [
   'Rangkum kehadiran bulan ini per CG',
@@ -4801,7 +4801,7 @@ function aiRender() {
   const meta = document.getElementById('aiMeta');
   if (meta) meta.textContent = 'Gemini · data ' + aiScopeLabel() + ' · selalu pakai data terbaru';
   const send = document.getElementById('aiSend'); if (send) send.disabled = _AI.busy;
-  if (!aiGetPin()) {
+  if (_AI.needPin && !aiGetPin()) {
     box.innerHTML = '<div class="ai-gate"><span class="ai-badge big" aria-hidden="true">' + icon('spark', 26) + '</span>' +
       '<h3>Masukkan kode akses AI</h3><p>Kode ini khusus Coach & TL (tanya Nick). Cukup sekali di HP/laptop ini.</p>' +
       '<form onsubmit="event.preventDefault();aiSavePin()"><label class="sr" for="aiPinIn">Kode akses</label><input id="aiPinIn" type="password" autocomplete="off" placeholder="Kode akses"><button type="submit" class="btn primary">Simpan</button></form></div>';
@@ -4826,6 +4826,7 @@ function aiSavePin() {
   const v = (document.getElementById('aiPinIn') || {}).value || '';
   if (!v.trim()) { toast('Isi kode akses dulu'); return; }
   aiSetPin(v.trim());
+  _AI.needPin = false;
   aiRender();
   setTimeout(() => { const q = document.getElementById('aiQ'); if (q) q.focus(); }, 50);
 }
@@ -4847,8 +4848,7 @@ async function aiAsk(qOverride) {
   const ta = document.getElementById('aiQ');
   const q = String(qOverride || (ta ? ta.value : '')).trim();
   if (!q) return;
-  const pin = aiGetPin();
-  if (!pin) { aiRender(); return; }
+  const pin = aiGetPin(); // boleh kosong kalau server tidak memakai kode akses
   if (ta) { ta.value = ''; aiGrow(ta); }
   const history = _AI.msgs.filter(m => !m.err).slice(-10).map(m => ({ role: m.role, text: m.text }));
   _AI.msgs.push({ role: 'user', text: q });
@@ -4859,7 +4859,7 @@ async function aiAsk(qOverride) {
     const r = await fetch('/api/ai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ pin, question: q, context, history }) });
     let data = {};
     try { data = await r.json(); } catch(e) {}
-    if (r.status === 401) { aiSetPin(''); _AI.msgs.push({ role: 'model', text: 'Kode akses AI salah. Masukkan lagi kode yang benar.', err: true }); }
+    if (r.status === 401) { aiSetPin(''); _AI.needPin = true; _AI.msgs.push({ role: 'model', text: 'AI ini memakai kode akses. Masukkan kode yang benar ya.', err: true }); }
     else if (!r.ok) _AI.msgs.push({ role: 'model', text: data.error || ('AI belum bisa dipakai (HTTP ' + r.status + ').'), err: true });
     else _AI.msgs.push({ role: 'model', text: data.text || '(jawaban kosong)' });
   } catch(e) {
@@ -4868,7 +4868,7 @@ async function aiAsk(qOverride) {
   }
   _AI.busy = false;
   aiRender();
-  if (!aiGetPin()) setTimeout(aiRender, 1800);
+  if (_AI.needPin && !aiGetPin()) setTimeout(aiRender, 1800);
 }
 
 // ========== COACH DASHBOARD ==========

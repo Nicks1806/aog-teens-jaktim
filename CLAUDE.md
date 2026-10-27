@@ -94,7 +94,7 @@ Header: Rekap CG + Visi Coach (read-only) di kanan. Stats cards: Hadir, Izin, Sa
 3. **Milestone** — filter chips (Semua/MSJ/CGT/Baptis) + donut + per-CG accordion + Daftar Follow-up (progression-aware)
 4. **Visi** — accordion per CG (preserve expand state across realtime re-render) — Visi, Misi, Dev Plan (with deadline countdown), Catatan Coach
 5. **Events** — filter chips + CRUD + countdown + target dropdown (Global / Region / Per-CG)
-6. **Tanya AI** (v38) — chat Gemini untuk Coach/TL (`renderCoachAI`, `aiAsk`, `buildAIContext`). Tiap pertanyaan: refetch absensi + tanggal + event → kirim ringkasan JSON (nama, CG, status, string absensi per tanggal, %, milestone, event) ke `/api/ai`. **Tidak** dikirim: WA, alamat, tgl lahir, sekolah, catatan. Kode akses disimpan di `localStorage aog_ai_pin`
+6. **Tanya AI** (v38) — chat Gemini untuk Coach/TL (`renderCoachAI`, `aiAsk`, `buildAIContext`). Tiap pertanyaan: refetch absensi + tanggal + event → kirim ringkasan JSON (nama, CG, status, string absensi per tanggal, %, milestone, event) ke `/api/ai`. **Tidak** dikirim: WA, alamat, tgl lahir, sekolah, catatan. Form kode akses hanya muncul kalau server membalas 401 (AI_PIN diisi); kode disimpan di `localStorage aog_ai_pin`
 
 **Toggle:**
 - COACH mode: 1 region (jaktim1 / jaktim2)
@@ -291,7 +291,7 @@ Edit index.html locally (+ file lain kalau perlu)
 - **JANGAN pakai npm/node** — pure vanilla JS
 - **JANGAN buat file README.md atau dokumentasi baru** kecuali diminta
 - `vercel.json` hanya berisi `rewrites` untuk `/coach`, `/tl`, dan `/teen-NN` — jangan tambah build setting
-- **Pengecualian single-file:** `api/ai.js` = Vercel Serverless Function (CommonJS, tanpa npm) proxy ke Gemini. Env var di Vercel: `GEMINI_API_KEY` (wajib), `AI_PIN` (wajib, kode akses Coach/TL), `GEMINI_MODEL` (opsional, default `gemini-2.5-flash`). **JANGAN** taruh API key di `index.html`/repo. System prompt ada di server (`SYSTEM_PROMPT`), rate limit 15/menit per IP
+- **Pengecualian single-file:** `api/ai.js` = Vercel Serverless Function (CommonJS, tanpa npm) proxy ke Gemini. Env var di Vercel: `GEMINI_API_KEY` (wajib), `AI_PIN` (opsional — kosong = tanpa kode akses; Nick memilih tanpa kode, 27 Okt 2026), `GEMINI_MODEL` (opsional, default `gemini-2.5-flash`). **JANGAN** taruh API key di `index.html`/repo. System prompt ada di server (`SYSTEM_PROMPT`), rate limit 15/menit per IP
 - Pindah tab pakai `smoothSwap()` (View Transitions + `skipTransition()` pengaman 450ms) — jangan hapus pengamannya
 - HP ≤600px: blok CSS "mode rapat" di akhir `<style>`; input Android 14px, iOS tetap 16px (anti auto-zoom)
 

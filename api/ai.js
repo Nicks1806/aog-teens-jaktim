@@ -2,7 +2,7 @@
 // Tanpa npm / build step: Node 18+ sudah punya fetch.
 // Environment variables (Vercel → Settings → Environment Variables):
 //   GEMINI_API_KEY  (wajib)  — key Gemini, JANGAN ditaruh di index.html / repo
-//   AI_PIN          (wajib)  — kode akses AI untuk Coach/TL
+//   AI_PIN          (opsional) — kalau diisi, Coach/TL wajib memasukkan kode akses; kosong = tanpa kode
 //   GEMINI_MODEL    (opsional, default 'gemini-2.5-flash')
 
 const SYSTEM_PROMPT = [
@@ -52,7 +52,7 @@ module.exports = async function handler(req, res) {
   const KEY = process.env.GEMINI_API_KEY;
   const PIN = process.env.AI_PIN;
   const MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
-  if (!KEY || !PIN) return send(res, 503, { error: 'AI belum aktif: GEMINI_API_KEY / AI_PIN belum diisi di Vercel.' });
+  if (!KEY) return send(res, 503, { error: 'AI belum aktif: GEMINI_API_KEY belum diisi di Vercel.' });
 
   const ip = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'unknown';
   if (rateLimited(ip)) return send(res, 429, { error: 'Terlalu banyak pertanyaan. Tunggu 1 menit ya.' });
@@ -60,7 +60,7 @@ module.exports = async function handler(req, res) {
   let body;
   try { body = await readBody(req); } catch (e) { return send(res, 400, { error: 'Data terlalu besar / tidak valid.' }); }
 
-  if (String(body.pin || '') !== String(PIN)) return send(res, 401, { error: 'Kode akses AI salah.' });
+  if (PIN && String(body.pin || '') !== String(PIN)) return send(res, 401, { error: 'Kode akses AI salah.' });
 
   const question = String(body.question || '').trim().slice(0, 2000);
   if (!question) return send(res, 400, { error: 'Pertanyaan kosong.' });
