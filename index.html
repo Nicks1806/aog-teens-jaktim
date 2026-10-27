@@ -877,6 +877,21 @@ html.vt .tab-content.active{animation:none}
 .ai-m.bot .ai-b{width:fit-content;max-width:100%}
 .ai-m.bot .ai-b:has(.ai-chart),.ai-m.bot .ai-b:has(.ai-tblw){width:100%}
 .ai-chart{margin:10px 0 12px;background:#fafaf8;max-width:720px}
+.ai-img-btn{display:inline-flex;align-items:center;gap:5px;margin-top:8px;font:inherit;font-size:12px;color:#6C5CE7;background:#fff;border:1px solid #e4dcff;border-radius:9px;padding:4px 10px;cursor:pointer}
+.ai-img-btn:hover{border-color:#6C5CE7}
+.ai-tblw .ai-img-btn{margin-top:6px}
+.ai-bars{display:flex;align-items:flex-end;gap:10px;height:200px;padding-top:22px}
+.ai-bcol{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;height:100%}
+.ai-bstack{flex:1;width:100%;display:flex;align-items:flex-end;justify-content:center;gap:3px}
+.ai-bar{position:relative;flex:1;max-width:38px;border-radius:6px 6px 2px 2px}
+.ai-bar b{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);font-size:11px;font-weight:700;white-space:nowrap;padding-bottom:2px}
+.ai-bcol small{font-size:11px;line-height:1.25;color:#888;font-weight:600;margin-top:6px;text-align:center;max-width:100%;overflow-wrap:anywhere;min-height:2.5em}
+.ai-attach{display:flex;align-items:center;gap:10px;margin:0 14px;padding:8px;border:1px dashed #cfc6ff;border-radius:12px;background:#faf8ff;font-size:12.5px;color:var(--muted)}
+.ai-attach[hidden]{display:none}
+.ai-attach img{width:48px;height:48px;object-fit:cover;border-radius:8px;flex:none}
+.ai-attach span{flex:1;min-width:0}
+.ai-thumb{display:block;max-width:180px;max-height:180px;border-radius:10px;margin-bottom:6px;border:2px solid rgba(255,255,255,.5)}
+.ai-foto{display:inline-flex;align-items:center;gap:4px;font-size:12px;opacity:.85;margin-right:6px}
 .ai-chart .trend-plot{height:190px}
 .ai-chart .ln{stroke-width:2.5}
 .ai-chart-t{font-size:12.5px;font-weight:700;margin:-8px 0 12px}
@@ -1131,7 +1146,7 @@ html.vt .tab-content.active{animation:none}
     <button type="button" class="backcoach" id="dBackCoach" onclick="goBack()" style="display:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Kembali ke Coach</button>
     <nav class="navlist" aria-label="Tab CG"><button type="button" class="nav app-tab on" data-tab="absensi" aria-current="page" onclick="sTab('absensi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M9 15l2 2 4-4"/></svg><span>Absensi</span></button><button type="button" class="nav app-tab" data-tab="detail" onclick="sTab('detail',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c1.9.7 3.1 2.4 3.5 5.2"/></svg><span>Detail CG</span></button><button type="button" class="nav app-tab" data-tab="visi" onclick="sTab('visi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span>Visi CG</span></button><button type="button" class="nav app-tab" data-tab="pelayanan" onclick="sTab('pelayanan',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"/></svg><span>Pelayanan</span></button><button type="button" class="nav app-tab" data-tab="milestone" onclick="sTab('milestone',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4h11l-2 4 2 4H5"/></svg><span>Milestone</span></button><button type="button" class="nav app-tab" data-tab="events" onclick="sTab('events',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4z"/><path d="M14 7v10"/></svg><span>Events</span></button></nav>
     <div class="sidetheme"><small>The year of</small><b>Unity</b><span>&amp; Open Heavens</span></div>
-    <div class="profile"><span class="ava" id="dAva" aria-hidden="true">A</span><div style="flex:1;min-width:0"><b id="nN"></b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v42</span></span></span></div><button type="button" class="exit" onclick="goBack()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
+    <div class="profile"><span class="ava" id="dAva" aria-hidden="true">A</span><div style="flex:1;min-width:0"><b id="nN"></b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v43</span></span></span></div><button type="button" class="exit" onclick="goBack()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
   </aside>
   <div class="main">
     <header class="mtop">
@@ -1174,7 +1189,7 @@ html.vt .tab-content.active{animation:none}
     <div class="rolesw" role="group" aria-label="Peran"><button type="button" id="roleCoachBtn" class="on" aria-pressed="true" onclick="switchRole('coach')">Coach</button><button type="button" id="roleTLBtn" aria-pressed="false" onclick="switchRole('tl')">TL</button></div>
     <nav class="navlist" id="coachTabs" aria-label="Tab Coach"><button type="button" class="nav app-tab on" data-tab="c-overview" aria-current="page" onclick="sCoachTab('c-overview',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"/></svg><span>Overview</span></button><button type="button" class="nav app-tab" data-tab="c-absensi" onclick="sCoachTab('c-absensi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M9 15l2 2 4-4"/></svg><span>Absensi</span></button><button type="button" class="nav app-tab" data-tab="c-milestone" onclick="sCoachTab('c-milestone',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4h11l-2 4 2 4H5"/></svg><span>Milestone</span></button><button type="button" class="nav app-tab" data-tab="c-visi" onclick="sCoachTab('c-visi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span>Visi</span></button><button type="button" class="nav app-tab" data-tab="c-events" onclick="sCoachTab('c-events',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4z"/><path d="M14 7v10"/></svg><span>Events</span></button><button type="button" class="nav app-tab ai-nav" data-tab="c-ai" onclick="sCoachTab('c-ai',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg><span>Tanya AI</span></button></nav>
     <button type="button" class="sidetheme editable" onclick="openThemeEdit()" aria-label="Edit tema tahun ini" title="Klik untuk edit tema"><small>The year of</small><b>Unity</b><span>&amp; Open Heavens</span><i class="st-edit" aria-hidden="true">Edit</i></button>
-    <div class="profile"><span class="ava" id="cAva" aria-hidden="true">C</span><div style="flex:1;min-width:0"><b id="cWho">Coach</b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v42</span></span></span></div><button type="button" class="exit" onclick="goBackCoach()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
+    <div class="profile"><span class="ava" id="cAva" aria-hidden="true">C</span><div style="flex:1;min-width:0"><b id="cWho">Coach</b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v43</span></span></span></div><button type="button" class="exit" onclick="goBackCoach()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
   </aside>
   <div class="main">
     <header class="mtop">
@@ -4882,10 +4897,23 @@ function aiChartHTML(raw) {
   const series = (Array.isArray(spec.seri) ? spec.seri : []).slice(0, 6)
     .map(x => ({ nama: String(x.nama || ''), data: labels.map((_, i) => { const v = Array.isArray(x.data) ? x.data[i] : null; return typeof v === 'number' && isFinite(v) ? v : null; }) }))
     .filter(x => x.data.some(v => v !== null));
-  if (labels.length < 2 || !series.length) return '';
+  const bar = String(spec.tipe || '').toLowerCase() === 'batang';
+  if (labels.length < (bar ? 1 : 2) || !series.length) return '';
+  const imgSpec = esc(JSON.stringify({ type: 'chart', judul: spec.judul || '', satuan: spec.satuan || '', tipe: bar ? 'batang' : 'garis', label: labels, seri: series }));
+  const saveBtn = '<button type="button" class="ai-img-btn" onclick="aiSaveImage(this)">' + icon('down', 13) + 'Simpan gambar</button>';
   const unit = String(spec.satuan || '');
   const all = series.flatMap(x => x.data.filter(v => v !== null));
   const maxV = unit === '%' ? 100 : Math.max(1, Math.ceil(Math.max(...all) * 1.1));
+  if (bar) {
+    const colB = (x, i) => (typeof CG_COLORS !== 'undefined' && CG_COLORS[x.nama]) || AI_CHART_COLORS[i % AI_CHART_COLORS.length];
+    const maxB = unit === '%' ? 100 : Math.max(1, Math.ceil(Math.max(...series.flatMap(x => x.data.filter(v => v !== null))) * 1.1));
+    const cols = labels.map((l, i) => '<div class="ai-bcol"><div class="ai-bstack">' + series.map((x, si) => {
+      const v = x.data[i];
+      return '<span class="ai-bar" style="height:' + (v === null ? 0 : Math.max(1, v / maxB * 100)) + '%;background:' + colB(x, si) + '" title="' + esc(x.nama + ' · ' + l + ': ' + (v === null ? '-' : v + unit)) + '">' + (v === null ? '' : '<b>' + esc(String(v)) + esc(unit) + '</b>') + '</span>';
+    }).join('') + '</div><small>' + esc(l) + '</small></div>').join('');
+    const legB = series.length > 1 ? '<div class="ai-leg">' + series.map((x, si) => '<span><i style="background:' + colB(x, si) + '"></i>' + esc(x.nama) + '</span>').join('') + '</div>' : '';
+    return '<div class="ai-chart" data-img="' + imgSpec + '">' + (spec.judul ? '<div class="ai-chart-t">' + esc(String(spec.judul)) + '</div>' : '') + '<div class="ai-bars">' + cols + '</div>' + legB + saveBtn + '</div>';
+  }
   const X0 = 10, X1 = 96, Y0 = 8, Y1 = 90;
   const xs = labels.map((_, i) => X0 + i * (X1 - X0) / (labels.length - 1));
   const yOf = v => Y1 - (Math.max(0, Math.min(v, maxV)) / maxV) * (Y1 - Y0);
@@ -4907,8 +4935,150 @@ function aiChartHTML(raw) {
   const yl = [1, 0.5, 0].map(f => '<span class="ty" style="top:' + (Y1 - f * (Y1 - Y0)) + '%">' + Math.round(f * maxV) + esc(unit) + '</span>').join('');
   const xl = labels.map((l, i) => '<span style="left:' + xs[i] + '%">' + esc(l) + '</span>').join('');
   const leg = series.length > 1 ? '<div class="ai-leg">' + series.map((x, si) => '<span><i style="background:' + col(x, si) + '"></i>' + esc(x.nama) + '</span>').join('') + '</div>' : '';
-  return '<div class="ai-chart trend">' + (spec.judul ? '<div class="ai-chart-t">' + esc(String(spec.judul)) + '</div>' : '') +
-    '<div class="trend-plot">' + svg + yl + pts + '</div><div class="trend-x">' + xl + '</div>' + leg + '</div>';
+  return '<div class="ai-chart trend" data-img="' + imgSpec + '">' + (spec.judul ? '<div class="ai-chart-t">' + esc(String(spec.judul)) + '</div>' : '') +
+    '<div class="trend-plot">' + svg + yl + pts + '</div><div class="trend-x">' + xl + '</div>' + leg + saveBtn + '</div>';
+}
+
+
+// ── Simpan grafik / tabel jawaban AI sebagai gambar PNG (dibagikan ke WA di HP, diunduh di laptop) ──
+function aiCanvasHeader(ctx, W, title) {
+  ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, W, ctx.canvas.height);
+  ctx.fillStyle = '#1c1c1c'; ctx.font = '700 34px Inter, sans-serif'; ctx.textBaseline = 'top';
+  ctx.fillText(String(title || 'Data AOG Teens').slice(0, 60), 48, 40);
+  ctx.fillStyle = '#888'; ctx.font = '500 20px Inter, sans-serif';
+  const d = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+  ctx.fillText('AOG Teens · ' + aiScopeLabel() + ' · ' + d, 48, 86);
+}
+function aiChartCanvas(sp) {
+  const W = 1200, H = 760, c = document.createElement('canvas'); c.width = W; c.height = H;
+  const ctx = c.getContext('2d'); aiCanvasHeader(ctx, W, sp.judul);
+  const unit = sp.satuan || '', labels = sp.label, series = sp.seri;
+  const all = series.flatMap(x => x.data.filter(v => v !== null));
+  const maxV = unit === '%' ? 100 : Math.max(1, Math.ceil(Math.max(...all) * 1.1));
+  const L = 110, R = W - 50, T = 150, B = H - (series.length > 1 ? 150 : 100);
+  const col = (x, i) => (typeof CG_COLORS !== 'undefined' && CG_COLORS[x.nama]) || AI_CHART_COLORS[i % AI_CHART_COLORS.length];
+  const yOf = v => B - (Math.max(0, Math.min(v, maxV)) / maxV) * (B - T);
+  ctx.textBaseline = 'middle'; ctx.font = '500 20px Inter, sans-serif';
+  [0, 0.25, 0.5, 0.75, 1].forEach(f => {
+    const y = B - f * (B - T);
+    ctx.strokeStyle = f === 0 ? '#cfcfc8' : '#ececE6'; ctx.lineWidth = 2; ctx.setLineDash(f === 0 ? [] : [6, 8]);
+    ctx.beginPath(); ctx.moveTo(L, y); ctx.lineTo(R, y); ctx.stroke();
+    ctx.fillStyle = '#999'; ctx.textAlign = 'right'; ctx.fillText(Math.round(f * maxV) + unit, L - 16, y);
+  });
+  ctx.setLineDash([]);
+  const n = labels.length, slot = (R - L) / n;
+  const xOf = i => sp.tipe === 'batang' ? L + slot * (i + 0.5) : (n === 1 ? (L + R) / 2 : L + 20 + i * (R - L - 40) / (n - 1));
+  ctx.fillStyle = '#666'; ctx.textAlign = 'center'; ctx.font = '600 20px Inter, sans-serif';
+  labels.forEach((l, i) => ctx.fillText(String(l).slice(0, 14), xOf(i), B + 30));
+  const valLabels = series.length === 1 && n <= 12;
+  if (sp.tipe === 'batang') {
+    const bw = Math.min(70, (slot * 0.75) / series.length);
+    series.forEach((x, si) => x.data.forEach((v, i) => {
+      if (v === null) return;
+      const x0 = xOf(i) - (bw * series.length) / 2 + si * bw, y = yOf(v);
+      ctx.fillStyle = col(x, si); ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(x0 + 3, y, bw - 6, B - y, [8, 8, 0, 0]); else ctx.rect(x0 + 3, y, bw - 6, B - y);
+      ctx.fill();
+      if (valLabels || series.length <= 3) { ctx.fillStyle = '#1c1c1c'; ctx.font = '700 18px Inter, sans-serif'; ctx.fillText(v + unit, x0 + bw / 2, y - 16); }
+    }));
+  } else {
+    series.forEach((x, si) => {
+      ctx.strokeStyle = col(x, si); ctx.lineWidth = 5; ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.beginPath();
+      let pen = false;
+      x.data.forEach((v, i) => { if (v === null) { pen = false; return; } if (pen) ctx.lineTo(xOf(i), yOf(v)); else ctx.moveTo(xOf(i), yOf(v)); pen = true; });
+      ctx.stroke();
+      x.data.forEach((v, i) => {
+        if (v === null) return;
+        ctx.beginPath(); ctx.arc(xOf(i), yOf(v), 8, 0, Math.PI * 2); ctx.fillStyle = '#fff'; ctx.fill(); ctx.lineWidth = 4; ctx.strokeStyle = col(x, si); ctx.stroke();
+        if (valLabels) { ctx.fillStyle = col(x, si); ctx.font = '700 19px Inter, sans-serif'; ctx.fillText(v + unit, xOf(i), yOf(v) - 26); }
+      });
+    });
+  }
+  if (series.length > 1) {
+    ctx.font = '600 20px Inter, sans-serif'; ctx.textAlign = 'left';
+    let lx = L, ly = H - 70;
+    series.forEach((x, si) => {
+      const w = ctx.measureText(x.nama).width + 60;
+      if (lx + w > R) { lx = L; ly += 34; }
+      ctx.fillStyle = col(x, si); ctx.fillRect(lx, ly - 9, 18, 18); ctx.fillStyle = '#444'; ctx.fillText(x.nama, lx + 28, ly); lx += w;
+    });
+  }
+  return c;
+}
+function aiTableCanvas(rows) {
+  rows = rows.slice(0, 30).map(r => r.slice(0, 8));
+  const tmp = document.createElement('canvas').getContext('2d');
+  const font = (b) => (b ? '700 ' : '500 ') + '22px Inter, sans-serif';
+  const ncol = Math.max(...rows.map(r => r.length));
+  const widths = Array.from({ length: ncol }, (_, j) => Math.min(420, Math.max(...rows.map((r, i) => { tmp.font = font(i === 0); return tmp.measureText(String(r[j] || '')).width; })) + 40));
+  const W = Math.max(720, widths.reduce((a, b) => a + b, 0) + 96), rowH = 52, H = 150 + rows.length * rowH + 50;
+  const c = document.createElement('canvas'); c.width = W; c.height = H;
+  const ctx = c.getContext('2d'); aiCanvasHeader(ctx, W, 'Tabel AOG Teens');
+  ctx.textBaseline = 'middle';
+  rows.forEach((r, i) => {
+    const y = 150 + i * rowH;
+    if (i === 0) { ctx.fillStyle = '#f3f0ff'; ctx.fillRect(48, y, W - 96, rowH); }
+    else if (i % 2 === 0) { ctx.fillStyle = '#fafaf8'; ctx.fillRect(48, y, W - 96, rowH); }
+    let x = 48;
+    r.forEach((cell, j) => {
+      ctx.fillStyle = i === 0 ? '#4b35c9' : '#1c1c1c'; ctx.font = font(i === 0); ctx.textAlign = 'left';
+      let t = String(cell || ''); while (t.length > 3 && ctx.measureText(t).width > widths[j] - 30) t = t.slice(0, -2);
+      ctx.fillText(t === String(cell || '') ? t : t + '…', x + 18, y + rowH / 2); x += widths[j];
+    });
+    ctx.strokeStyle = '#ececE6'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(48, y + rowH); ctx.lineTo(W - 48, y + rowH); ctx.stroke();
+  });
+  return c;
+}
+async function aiSaveImage(btn) {
+  const host = btn.closest('[data-img]'); if (!host) return;
+  let sp; try { sp = JSON.parse(host.getAttribute('data-img')); } catch(e) { toast('❌ Gambar tidak bisa dibuat'); return; }
+  try { if (document.fonts && document.fonts.ready) await document.fonts.ready; } catch(e) {}
+  const canvas = sp.type === 'table' ? aiTableCanvas(sp.rows || []) : aiChartCanvas(sp);
+  const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+  if (!blob) { toast('❌ Gambar tidak bisa dibuat'); return; }
+  const name = 'aog-' + (sp.type === 'table' ? 'tabel' : 'grafik') + '-' + new Date().toISOString().slice(0, 10) + '.png';
+  const file = new File([blob], name, { type: 'image/png' });
+  // HP: menu bagikan (WA, dll). Laptop / tidak didukung: unduh file.
+  if (navigator.canShare && navigator.canShare({ files: [file] }) && matchMedia('(pointer:coarse)').matches) {
+    try { await navigator.share({ files: [file], title: sp.judul || 'AOG Teens' }); return; }
+    catch(e) { if (e && e.name === 'AbortError') return; }
+  }
+  const url = URL.createObjectURL(blob), a = document.createElement('a');
+  a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+  toast('✓ Gambar disimpan');
+}
+
+// ── Kirim foto ke AI: diperkecil dulu di HP (maks 1400px JPEG) ──
+function aiResizeImage(file) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file), img = new Image();
+    img.onload = () => {
+      const s = Math.min(1, 1400 / Math.max(img.width, img.height));
+      const c = document.createElement('canvas'); c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      const ts = Math.min(1, 220 / Math.max(c.width, c.height));
+      const t = document.createElement('canvas'); t.width = Math.round(c.width * ts); t.height = Math.round(c.height * ts);
+      t.getContext('2d').drawImage(c, 0, 0, t.width, t.height);
+      URL.revokeObjectURL(url);
+      resolve({ mimeType: 'image/jpeg', data: c.toDataURL('image/jpeg', 0.8).split(',')[1], thumb: t.toDataURL('image/jpeg', 0.7) });
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Foto tidak bisa dibaca')); };
+    img.src = url;
+  });
+}
+async function aiPickImage(input) {
+  const f = input.files && input.files[0]; input.value = '';
+  if (!f) return;
+  if (!/^image\//.test(f.type || 'image/')) { toast('❌ Pilih file gambar'); return; }
+  try { _AI.img = await aiResizeImage(f); aiShowAttach(); document.getElementById('aiQ')?.focus(); }
+  catch(e) { toast('❌ ' + (e.message || 'Foto tidak bisa dibaca')); }
+}
+function aiShowAttach() {
+  const box = document.getElementById('aiAttach'); if (!box) return;
+  if (!_AI.img) { box.hidden = true; box.innerHTML = ''; return; }
+  box.hidden = false;
+  box.innerHTML = '<img src="' + _AI.img.thumb + '" alt="Foto yang akan dikirim"><span>Foto siap dikirim — tulis pertanyaan atau langsung kirim</span><button type="button" class="iconbtn" aria-label="Hapus foto" onclick="_AI.img=null;aiShowAttach()">' + icon('x', 16) + '</button>';
 }
 
 // Markdown ringan → HTML aman (teks di-escape dulu)
@@ -4928,7 +5098,8 @@ function aiFormatText(text) {
   const flushTbl = () => {
     if (!tbl.length) return;
     const rows = tbl.filter(r => !/^\|?\s*:?-{2,}/.test(r)).map(r => r.replace(/^\||\|$/g, '').split('|').map(c => c.trim()));
-    html += '<div class="ai-tblw"><table class="ai-tbl">' + rows.map((r, i) => '<tr>' + r.map(c => i === 0 ? '<th>' + inline(c) + '</th>' : '<td>' + inline(c) + '</td>').join('') + '</tr>').join('') + '</table></div>';
+    const plainRows = rows.map(r => r.map(c => c.replace(/\*\*(.+?)\*\*/g, '$1').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'")));
+    html += '<div class="ai-tblw" data-img="' + esc(JSON.stringify({ type: 'table', rows: plainRows })) + '"><table class="ai-tbl">' + rows.map((r, i) => '<tr>' + r.map(c => i === 0 ? '<th>' + inline(c) + '</th>' : '<td>' + inline(c) + '</td>').join('') + '</tr>').join('') + '</table><button type="button" class="ai-img-btn" onclick="aiSaveImage(this)">' + icon('down', 13) + 'Simpan gambar</button></div>';
     tbl = [];
   };
   lines.forEach(l => {
@@ -4956,13 +5127,16 @@ function renderCoachAI() {
           '<div class="grow"><b>Asisten data AOG Teens</b><small id="aiMeta"></small></div>' +
           '<button type="button" class="btn sm ghost" onclick="aiReset()" title="Mulai percakapan baru">' + icon('refresh', 16) + '<span class="ai-hide-sm">Percakapan baru</span></button></div>' +
         '<div class="ai-msgs" id="aiMsgs" aria-live="polite"></div>' +
+        '<div class="ai-attach" id="aiAttach" hidden></div>' +
         '<form class="ai-input" onsubmit="event.preventDefault();aiAsk()">' +
+          '<input type="file" id="aiFile" accept="image/*" hidden onchange="aiPickImage(this)">' +
+          '<button type="button" class="ai-mic" onclick="document.getElementById(\'aiFile\').click()" aria-label="Kirim foto ke AI" title="Kirim foto (mis. daftar hadir kertas)">' + icon('image', 20) + '</button>' +
           '<label class="sr" for="aiQ">Pertanyaan</label>' +
           '<textarea id="aiQ" rows="1" placeholder="Tanya apa saja tentang absensi, CG, milestone, event…" onkeydown="aiKey(event)" oninput="aiGrow(this)"></textarea>' +
           (aiMicSupported() ? '<button type="button" class="ai-mic" id="aiMic" onclick="aiMic()" aria-label="Tanya pakai suara" title="Tanya pakai suara">' + icon('mic', 20) + '</button>' : '') +
           '<button type="submit" class="ai-send" id="aiSend" aria-label="Kirim pertanyaan">' + icon('right', 20) + '</button>' +
         '</form>' +
-        '<div class="ai-note">Dikirim ke AI setiap bertanya: nama, CG, status, riwayat absensi, milestone, pelayanan, rencana pengembangan, visi/misi & event terbaru. <b>Tidak</b> dikirim: no HP, alamat, tanggal lahir, sekolah, catatan. Riwayat chat tersimpan di HP ini.</div>' +
+        '<div class="ai-note">Dikirim ke AI setiap bertanya: nama, CG, status, riwayat absensi, milestone, pelayanan, rencana pengembangan, visi/misi & event terbaru. <b>Tidak</b> dikirim: no HP, alamat, tanggal lahir, sekolah, catatan. Foto yang kamu kirim juga dibaca AI. Riwayat chat tersimpan di HP ini.</div>' +
       '</div>' +
     '</section>';
   if (!_AI.msgs.length) aiLoadChat();
@@ -4990,7 +5164,7 @@ function aiRender() {
     return;
   }
   box.innerHTML = _AI.msgs.map((m, i) => {
-    if (m.role === 'user') return '<div class="ai-m user"><div class="ai-b">' + esc(m.text).replace(/\n/g, '<br>') + '</div></div>';
+    if (m.role === 'user') return '<div class="ai-m user"><div class="ai-b">' + (m.img && /^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(m.img) ? '<img class="ai-thumb" src="' + m.img + '" alt="Foto">' : (m.foto ? '<span class="ai-foto">' + icon('image', 13) + 'foto</span>' : '')) + esc(m.text).replace(/\n/g, '<br>') + '</div></div>';
     return '<div class="ai-m bot' + (m.err ? ' err' : '') + '"><span class="ai-av" aria-hidden="true">' + icon('spark', 16) + '</span><div class="grow" style="min-width:0"><div class="ai-b">' + aiFormat(m.text) + '</div>' +
       (m.err ? '' : '<div class="ai-acts"><button type="button" onclick="aiCopy(' + i + ')">' + icon('copy', 13) + 'Salin</button><button type="button" onclick="aiWA(' + i + ')">' + icon('wa', 13) + 'Kirim WA</button></div>') + '</div></div>';
   }).join('') + (_AI.busy ? '<div class="ai-m bot"><span class="ai-av" aria-hidden="true">' + icon('spark', 16) + '</span><div class="ai-b"><span class="ai-dots" aria-label="AI sedang menjawab"><span></span><span></span><span></span></span></div></div>' : '');
@@ -5013,7 +5187,7 @@ function aiScopeKey() { return coachRole === 'tl' ? 'tl' : 'coach:' + coachReg; 
 function aiSaveChat() {
   try {
     const all = JSON.parse(localStorage.getItem(AI_CHAT_KEY) || '{}') || {};
-    all[aiScopeKey()] = _AI.msgs.filter(m => !m.err).slice(-30);
+    all[aiScopeKey()] = _AI.msgs.filter(m => !m.err).slice(-30).map(m => m.img ? { role: m.role, text: m.text, foto: true } : m);
     localStorage.setItem(AI_CHAT_KEY, JSON.stringify(all));
   } catch(e) {}
 }
@@ -5115,17 +5289,20 @@ function aiWA(i) {
 async function aiAsk(qOverride) {
   if (_AI.busy) return;
   const ta = document.getElementById('aiQ');
-  const q = String(qOverride || (ta ? ta.value : '')).trim();
+  const img = qOverride ? null : _AI.img;
+  let q = String(qOverride || (ta ? ta.value : '')).trim();
+  if (!q && img) q = 'Baca foto ini dan rangkum isinya. Kalau berisi daftar nama/kehadiran, cocokkan dengan data anggota.';
   if (!q) return;
   const pin = aiGetPin(); // boleh kosong kalau server tidak memakai kode akses
   if (ta) { ta.value = ''; aiGrow(ta); }
   const history = _AI.msgs.filter(m => !m.err).slice(-10).map(m => ({ role: m.role, text: m.text }));
-  _AI.msgs.push({ role: 'user', text: q });
+  _AI.msgs.push(img ? { role: 'user', text: q, img: img.thumb } : { role: 'user', text: q });
+  if (img) { _AI.img = null; aiShowAttach(); }
   _AI.busy = true; aiRender();
   try {
     const extra = await aiRefreshData();
     const context = buildAIContext(extra);
-    const r = await fetch('/api/ai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ pin, question: q, context, history }) });
+    const r = await fetch('/api/ai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.assign({ pin, question: q, context, history }, img ? { image: { mimeType: img.mimeType, data: img.data } } : {})) });
     let data = {};
     try { data = await r.json(); } catch(e) {}
     if (r.status === 401) { aiSetPin(''); _AI.needPin = true; _AI.msgs.push({ role: 'model', text: 'AI ini memakai kode akses. Masukkan kode yang benar ya.', err: true }); }

@@ -1,6 +1,6 @@
 # AOG Teens Jaktim — CG Dashboard (Absensi + Management)
 
-**Current version:** v42 · **Last updated:** 27 Oktober 2026
+**Current version:** v43 · **Last updated:** 27 Oktober 2026
 
 ## Project Overview
 Single-file web app untuk tracking attendance, pelayanan, milestone, events, visi, dan distribusi wilayah CG untuk AOG Teens Jakarta Timur. Dipakai oleh ~54 member, 9 CG Leaders, 2 Coach, dan 1 Team Leader secara bersamaan saat ibadah hari Minggu.
@@ -278,8 +278,8 @@ Edit index.html locally (+ file lain kalau perlu)
 ```
 
 **Version bump pattern setiap push code:**
-1. `index.html` — cari `App version">v42` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
-2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v42'` → naikkan sama
+1. `index.html` — cari `App version">v43` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
+2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v43'` → naikkan sama
 
 ---
 
@@ -394,6 +394,7 @@ Edit index.html locally (+ file lain kalau perlu)
 | v29 | **Distribusi Wilayah** — filter kecamatan + kelurahan di Coach/TL Overview |
 | v30 | Wilayah filter hardening (escape + reset state + count consistency) |
 | v31 | **27 bug fixes** — attendance stats inflate, data corruption (sekolah/kelas split), XSS (PDF export), error handling (21 Supabase ops), TEEN 25 color map, reconnect race guard, undo sync, milestone prereq, visi TOCTOU fix |
+| v43 | Tanya AI: **simpan grafik/tabel jadi PNG** (`aiSaveImage` → canvas; HP = menu bagikan/WA, laptop = unduh), **grafik batang** (`"tipe":"batang"` di blok chart), **kirim foto ke AI** (`aiPickImage`/`aiResizeImage` maks 1400px JPEG, dikirim sebagai `image` → Gemini `inlineData`; server cek mime jpeg/png/webp + maks ~3.5MB; foto tidak disimpan di riwayat, hanya tanda "foto") |
 | v42 | Tanya AI: data + pelayanan 4 bulan, rencana pengembangan, visi/misi, milestone berikutnya (`aiData`); **Ringkasan AI per anak** + draft WA (`aiSummarizeMember`, di modal detail anak Coach & pencarian member; nomor WA hanya dipakai lokal); **grafik garis** dari blok ```chart JSON``` (`aiChartHTML`); riwayat chat per cakupan (`localStorage aog_ai_chat_v1`); input suara (`aiMic`); cache data 90 dtk + prefetch; server `thinkingLevel: low` (fallback tanpa); tulisan "Gemini" dihapus dari UI |
 | v41 | Tanya AI: konteks berisi angka siap pakai (persen per bulan per CG & anak, 3 ibadah terakhir, terakhir hadir, bulan_ini) supaya AI tidak salah periode/hitung |
 | v40 | Tanya AI: jawaban ringkas default + petunjuk kalau terpotong (`finish: MAX_TOKENS`), formatter (nomor asli, sub-poin, garis, miring), sapaan/cakupan ikut ganti Coach↔TL & region (`aiScopeChanged`) |

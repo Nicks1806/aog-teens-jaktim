@@ -21,9 +21,10 @@ const SYSTEM_PROMPT = [
   '- Default jawaban RINGKAS (maksimal ±250 kata, utamakan tabel atau poin). Jawaban panjang/detail hanya kalau diminta.',
   '- Kalau jawaban membahas tren angka dari waktu ke waktu (mis. persen hadir per bulan) atau membandingkan beberapa CG/anak dari waktu ke waktu, sertakan SATU grafik garis dengan blok kode persis seperti ini (JSON valid, tanpa komentar):',
   '```chart',
-  '{"judul":"Kehadiran per bulan","satuan":"%","label":["Jun","Jul","Agu"],"seri":[{"nama":"TEEN 01","data":[83,75,71]}]}',
+  '{"judul":"Kehadiran per bulan","tipe":"garis","satuan":"%","label":["Jun","Jul","Agu"],"seri":[{"nama":"TEEN 01","data":[83,75,71]}]}',
   '```',
-  '  label = sumbu X urut waktu (maks 12), data = angka sejajar label (null kalau tidak ada), maks 6 seri. Nama seri = nama CG/anak. Jangan buat grafik kalau tidak perlu.',
+  '  tipe "garis" untuk tren dari waktu ke waktu (label = urutan waktu); tipe "batang" untuk membandingkan beberapa CG/anak pada satu periode (label = nama CG/anak, 1 seri). Maks 12 label, data = angka sejajar label (null kalau tidak ada), maks 6 seri. Jangan buat grafik kalau tidak perlu.',
+  '- Kalau pertanyaan disertai FOTO (mis. daftar hadir di kertas, catatan, poster): baca isinya dengan teliti, cocokkan nama dengan data anggota (sebutkan nama yang tidak ditemukan / tidak terbaca), dan jangan mengarang isi yang tidak jelas.',
   '- Jangan meminta atau menebak data pribadi (nomor HP, alamat, tanggal lahir) — data itu sengaja tidak dikirim.'
 ].join('\n');
 
@@ -52,7 +53,7 @@ async function readBody(req) {
   if (typeof req.body === 'string') return JSON.parse(req.body || '{}');
   const chunks = [];
   let size = 0;
-  for await (const c of req) { size += c.length; if (size > 600 * 1024) throw new Error('too_large'); chunks.push(c); }
+  for await (const c of req) { size += c.length; if (size > 4 * 1024 * 1024) throw new Error('too_large'); chunks.push(c); }
   return JSON.parse(Buffer.concat(chunks).toString('utf8') || '{}');
 }
 
@@ -99,7 +100,16 @@ module.exports = async function handler(req, res) {
     const text = String((h && h.text) || '').slice(0, 4000);
     if (text) contents.push({ role, parts: [{ text }] });
   });
-  contents.push({ role: 'user', parts: [{ text: question }] });
+  const parts = [{ text: question }];
+  // Foto opsional dari HP (sudah diperkecil di client)
+  const img = body.image;
+  if (img && typeof img === 'object') {
+    const mt = String(img.mimeType || '');
+    const data = String(img.data || '');
+    if (!/^image\/(jpeg|png|webp)$/.test(mt) || !/^[A-Za-z0-9+/=]+$/.test(data) || data.length > 3500000) return send(res, 400, { error: 'Foto tidak valid / terlalu besar.' });
+    parts.push({ inlineData: { mimeType: mt, data } });
+  }
+  contents.push({ role: 'user', parts });
 
   const callGemini = async (model, think) => {
     // Batas 20 dtk per panggilan supaya tidak menggantung sampai Vercel timeout
