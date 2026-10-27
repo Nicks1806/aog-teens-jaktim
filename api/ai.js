@@ -3,7 +3,8 @@
 // Environment variables (Vercel → Settings → Environment Variables):
 //   GEMINI_API_KEY  (wajib)  — key Gemini, JANGAN ditaruh di index.html / repo
 //   AI_PIN          (opsional) — kalau diisi, Coach/TL wajib memasukkan kode akses; kosong = tanpa kode
-//   GEMINI_MODEL    (opsional, default 'gemini-2.5-flash')
+//   GEMINI_MODEL    (opsional, default 'gemini-flash-latest' — alias Flash terbaru)
+// Kalau Google menolak model dan menyarankan model lain ("use models/xxx"), otomatis dicoba ulang sekali.
 
 const SYSTEM_PROMPT = [
   'Kamu adalah asisten data untuk Coach dan Team Leader AOG Teens (pelayanan remaja gereja, Jakarta Timur).',
@@ -51,7 +52,7 @@ module.exports = async function handler(req, res) {
 
   const KEY = process.env.GEMINI_API_KEY;
   const PIN = process.env.AI_PIN;
-  const MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+  const MODEL = process.env.GEMINI_MODEL || 'gemini-flash-latest';
   if (!KEY) return send(res, 503, { error: 'AI belum aktif: GEMINI_API_KEY belum diisi di Vercel.' });
 
   const ip = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'unknown';
@@ -78,26 +79,40 @@ module.exports = async function handler(req, res) {
   });
   contents.push({ role: 'user', parts: [{ text: question }] });
 
-  try {
-    const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(MODEL) + ':generateContent', {
+  const callGemini = async (model) => {
+    const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(model) + ':generateContent', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-goog-api-key': KEY },
       body: JSON.stringify({
         systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
         contents,
-        generationConfig: { temperature: 0.3, maxOutputTokens: 2048 }
+        generationConfig: { temperature: 0.3, maxOutputTokens: 4096 }
       })
     });
     const data = await r.json().catch(() => ({}));
+    return { r, data, msg: (data && data.error && data.error.message) || ('HTTP ' + r.status) };
+  };
+
+  try {
+    let model = MODEL;
+    let { r, data, msg } = await callGemini(model);
     if (!r.ok) {
-      const msg = (data && data.error && data.error.message) || ('HTTP ' + r.status);
+      // Model dipensiunkan → pakai model yang disarankan Google (sekali saja)
+      const sug = /use (?:models\/)?([a-z0-9][a-z0-9.\-]*)/i.exec(msg);
+      if (sug && sug[1] && sug[1] !== model && (r.status === 400 || r.status === 403 || r.status === 404)) {
+        console.warn('[api/ai] model', model, 'ditolak, coba', sug[1]);
+        model = sug[1];
+        ({ r, data, msg } = await callGemini(model));
+      }
+    }
+    if (!r.ok) {
       console.error('[api/ai] gemini error', r.status, msg);
       return send(res, 502, { error: 'Gemini menolak permintaan: ' + msg.slice(0, 200) });
     }
     const cand = data.candidates && data.candidates[0];
     const text = cand && cand.content && Array.isArray(cand.content.parts) ? cand.content.parts.map(p => p.text || '').join('') : '';
     if (!text) return send(res, 502, { error: 'Gemini tidak memberi jawaban' + (cand && cand.finishReason ? ' (' + cand.finishReason + ')' : '') + '.' });
-    return send(res, 200, { text, model: MODEL });
+    return send(res, 200, { text, model });
   } catch (e) {
     console.error('[api/ai] fetch failed', e);
     return send(res, 502, { error: 'Gagal menghubungi Gemini. Coba lagi.' });
