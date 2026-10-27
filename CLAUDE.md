@@ -6,7 +6,7 @@
 Single-file web app untuk tracking attendance, pelayanan, milestone, events, visi, dan distribusi wilayah CG untuk AOG Teens Jakarta Timur. Dipakai oleh ~54 member, 9 CG Leaders, 2 Coach, dan 1 Team Leader secara bersamaan saat ibadah hari Minggu.
 
 **URL Production:** https://absenibadahjaktim.vercel.app
-**Coach URL:** https://absenibadahjaktim.vercel.app/coach · **TL URL:** https://absenibadahjaktim.vercel.app/tl (rewrite di `vercel.json`; `?role=coach` lama tetap jalan)
+**CGL URL:** https://absenibadahjaktim.vercel.app/teen-01 (slug `cgSlug()`, refresh tetap di dashboard CG) · **Coach URL:** https://absenibadahjaktim.vercel.app/coach · **TL URL:** https://absenibadahjaktim.vercel.app/tl (rewrite di `vercel.json`; `?role=coach` lama tetap jalan)
 
 Untuk konteks handoff lengkap ke Claude Code baru, baca `HANDOFF.md`.
 
@@ -289,7 +289,9 @@ Edit index.html locally (+ file lain kalau perlu)
 - **JANGAN tambah build step** — Vercel publish dir `.` (root), no build command
 - **JANGAN pakai npm/node** — pure vanilla JS
 - **JANGAN buat file README.md atau dokumentasi baru** kecuali diminta
-- `vercel.json` hanya berisi `rewrites` untuk `/coach` & `/tl` — jangan tambah build setting
+- `vercel.json` hanya berisi `rewrites` untuk `/coach`, `/tl`, dan `/teen-NN` — jangan tambah build setting
+- Pindah tab pakai `smoothSwap()` (View Transitions + `skipTransition()` pengaman 450ms) — jangan hapus pengamannya
+- HP ≤600px: blok CSS "mode rapat" di akhir `<style>`; input Android 14px, iOS tetap 16px (anti auto-zoom)
 
 ### Desain (v32 — redesign)
 - **Tata letak baru (sidebar + bottom nav), tema/warna/font tetap seperti v31 live.** Token warna di `:root` (`--bg`, `--card`, `--line`, `--ink`, `--muted`, `--accent` #6C5CE7, `--grad` ungu, `--H/--I/--S/--A/--X` + `b`/`br`) memakai palet v31. Override tema ada di blok CSS `TEMA v31 (live)`

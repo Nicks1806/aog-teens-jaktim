@@ -105,7 +105,7 @@ h1,h2,h3{font-family:var(--display)}
 .exit:hover{background:rgba(255,255,255,.08);color:#fff}
 .main{flex:1;min-width:0;display:flex;flex-direction:column}
 .mtop,.mnav{display:none}
-.content{padding:32px 40px 56px;display:flex;flex-direction:column;gap:24px;max-width:1320px;width:100%}
+.content{padding:32px 40px 56px;display:flex;flex-direction:column;gap:24px;width:100%;min-width:0}
 .phead{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:20px}
 .crumb{font-size:13px;color:var(--muted)}
 .crumb b{color:var(--ink);font-weight:600}
@@ -367,8 +367,10 @@ table.att .tlabel{font-size:12px;color:var(--muted);font-weight:600}
 .kc-mid{display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
 .kc-pct{font-family:var(--display);font-size:38px;line-height:.9}
 .kc-pct small{font-family:'Inter',sans-serif;font-size:11px;color:#999;margin-left:4px;letter-spacing:.3px}
-.kc-strip{display:flex;gap:3px;padding-bottom:4px}
-.kc-strip i{width:10px;height:18px;border-radius:3px;background:var(--Xb)}
+.kc-trend{display:flex;flex-direction:column;gap:5px;width:116px;flex:none}
+.kc-spark{display:block;overflow:visible}
+.kc-strip{display:flex;gap:2px}
+.kc-strip i{flex:1;height:5px;border-radius:3px;background:var(--Xb)}
 .kc-strip i.H{background:var(--H)}.kc-strip i.I{background:var(--I)}.kc-strip i.S{background:var(--S)}.kc-strip i.A{background:var(--A)}
 .kc-ms{display:flex;align-items:center;gap:8px;font-size:11px;color:#8a8a8a;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
 .kc-ms .tr{flex:1;height:6px;border-radius:6px;background:#f0f0ed;overflow:hidden}
@@ -515,7 +517,18 @@ table.att .tlabel{font-size:12px;color:var(--muted);font-weight:600}
 .mini{font-size:12px;padding:4px 10px;border-radius:8px;background:#FAF9FC;color:var(--muted)}
 .chip.kel.on{background:var(--accent);border-color:var(--accent)}
 .wlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:8px;max-height:460px;overflow-y:auto}
-.wlist .lrow b .pill{vertical-align:middle;margin-left:4px}
+.wlist{grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:8px;padding-right:2px}
+.wrow{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:12px;background:#fafaf8;border:1px solid var(--line2);min-width:0}
+.wrow .ava{width:34px;height:34px;font-size:13px}
+.wr-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.wr-top{display:flex;align-items:baseline;gap:8px;min-width:0}
+.wr-main b{flex:1;min-width:0;font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wr-main small{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wr-main small .pill{padding:1px 7px;margin-right:2px;vertical-align:1px}
+.wr-wa{flex:none;font-size:12px;font-weight:600;color:var(--H);text-decoration:none;font-variant-numeric:tabular-nums;white-space:nowrap}
+.wr-wa:hover{text-decoration:underline}
+.wr-none{color:#b0b0b0;font-weight:500}
+.chip.more{border-style:dashed;color:var(--accent-ink);background:transparent}
 /* Accordion (Coach Absensi & Visi) */
 .acc{background:#fff;border:1px solid var(--line);border-radius:18px;margin-bottom:12px;overflow:hidden}
 .acc-h{width:100%;display:flex;align-items:center;gap:14px;padding:16px 18px;border:0;background:transparent;text-align:left;cursor:pointer;color:var(--ink)}
@@ -629,7 +642,7 @@ body{background:var(--bg);color:var(--ink)}
 html{scrollbar-gutter:stable}
 .brand .grow{min-width:0}
 .brand small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sidetheme.editable{position:relative;border:1px dashed transparent;border-radius:12px;background:transparent;text-align:left;padding:10px 12px;margin:0 0 4px;cursor:pointer;font:inherit;color:inherit;width:100%}
+.sidetheme.editable{position:relative;border:1px dashed transparent;border-radius:12px;background:transparent;text-align:left;padding:8px 11px;margin:auto 0 -8px;cursor:pointer;font:inherit;color:inherit;width:100%}
 .sidetheme.editable:hover{border-color:#d9d2ff;background:#faf8ff}
 .st-edit{position:absolute;top:8px;right:8px;font-style:normal;font-size:11px;font-weight:700;color:#6C5CE7;opacity:0;transition:opacity .15s}
 .sidetheme.editable:hover .st-edit,.sidetheme.editable:focus-visible .st-edit{opacity:1}
@@ -671,9 +684,32 @@ html{scrollbar-gutter:stable}
 .nav:hover{background:var(--faint);color:var(--ink)}
 .nav.on{background:#f3f0ff;color:#6C5CE7;font-weight:700}
 .nav .count{background:#6C5CE7;color:#fff}
+/* Logo kotak "A" disembunyikan (permintaan Nick) — elemen tetap ada karena di-toggle JS */
+.brand .logo,.mtop .logo{display:none !important}
+.brand{padding:0 12px}
+.brand b{font-size:18px;letter-spacing:-.3px}
+/* Menu tab lebih halus: weight lebih ringan, transisi lembut */
+.nav{font-weight:500;font-size:14px;letter-spacing:-.1px;color:#5f5f5f;transition:background-color .2s ease,color .2s ease}
+.nav svg{opacity:.75;transition:opacity .2s ease}
+.nav:hover svg,.nav.on svg{opacity:1}
+.nav.on{font-weight:600}
+.rolesw button{font-weight:600;font-size:13px;letter-spacing:0;text-transform:none;transition:background .25s ease,color .25s ease,box-shadow .25s ease}
+.mnav button{font-weight:500;letter-spacing:-.1px;transition:background-color .2s ease,color .2s ease}
+.mnav button.on{font-weight:600}
+.tab-content.active{animation:tabFadeIn .22s cubic-bezier(.2,.7,.3,1)}
 .rolesw{background:#e8e8e8;border-radius:14px;padding:3px}
 .rolesw button{color:#888;border-radius:12px}
 .rolesw button.on{background:var(--grad);color:#fff;box-shadow:0 4px 12px rgba(108,92,231,.3)}
+/* Toggle Coach/TL: pill ungu meluncur (bukan lompat) */
+.rolesw{position:relative;isolation:isolate;gap:0}
+.rolesw::before{content:'';position:absolute;top:3px;bottom:3px;left:3px;width:calc(50% - 3px);border-radius:12px;background:var(--grad);box-shadow:0 4px 12px rgba(108,92,231,.3);transition:transform .32s cubic-bezier(.4,0,.2,1);z-index:-1}
+.rolesw.is-tl::before{transform:translateX(100%)}
+.rolesw button,.rolesw button.on{background:transparent;box-shadow:none;position:relative;transition:color .3s ease}
+.rolesw button.on{color:#fff}
+/* Pindah tab: crossfade halus (View Transitions); browser lain tetap fade biasa */
+::view-transition-old(root),::view-transition-new(root){animation-duration:.2s;animation-timing-function:cubic-bezier(.2,.7,.3,1)}
+html.vt .tab-content.active{animation:none}
+@media (prefers-reduced-motion:reduce){.rolesw::before{transition:none}.tab-content.active{animation:none}}
 .backcoach{border-color:var(--line);color:var(--ink)}
 .backcoach:hover{background:var(--faint)}
 .sidetheme small{color:#888;letter-spacing:2px}
@@ -743,6 +779,59 @@ html{scrollbar-gutter:stable}
   .visibanner{font-size:24px;text-align:left}
   .visibanner .vb-misi{text-align:left}
   .visi-box textarea{font-size:24px}
+}
+
+/* ══════════ HP: mode rapat (≤600px) — ukuran lebih kecil supaya tidak terasa "di-zoom" ══════════ */
+@media (max-width:600px){
+  .content{padding:14px 14px 92px;gap:14px}
+  .mtop{padding:8px 14px;gap:10px}
+  .mtop .logo{width:32px;height:32px;font-size:14px;border-radius:10px}
+  .mtop b{font-size:14px}
+  .mtop small{font-size:11px}
+  .mtop button{width:38px;height:38px;border-radius:10px}
+  .mnav{padding:4px 4px calc(4px + env(safe-area-inset-bottom))}
+  .mnav button{min-height:44px;gap:2px}
+  .mnav button svg{width:20px;height:20px}
+  .phead{gap:12px}
+  .phead h1{font-size:30px;margin:4px 0}
+  .crumb{letter-spacing:1px}
+  .meta{font-size:12.5px}
+  .phead .iconbtn{width:38px;height:38px;border-radius:10px}
+  .card{padding:14px;border-radius:14px}
+  .card h2,.chead h2{font-size:14px}
+  .chead{margin-bottom:12px}
+  .sub{font-size:12px}
+  .btn{min-height:40px;font-size:13px;padding:0 14px;border-radius:10px}
+  .btn.sm{min-height:34px;font-size:12.5px;padding:0 10px}
+  .chip,.filter-chips .chip{min-height:30px;font-size:12px;padding:0 11px}
+  .filter-chips{flex-wrap:nowrap;overflow-x:auto;max-width:100%;min-width:0;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+  .filter-chips::-webkit-scrollbar{display:none}
+  .filter-chips .chip{flex:none}
+  .seg button{min-height:36px;font-size:12.5px}
+  .grid-kpi{gap:8px}
+  .kpi{padding:14px;border-radius:14px;gap:6px}
+  .kpi .num{font-size:30px}
+  .kpi.hero .num{font-size:40px}
+  .visibanner{font-size:19px;padding:14px 16px}
+  .visi-box{padding:16px}
+  .visi-box textarea{font-size:20px}
+  .donut{padding:12px;border-radius:14px}
+  .kcard{padding:14px;gap:12px;border-radius:14px}
+  .kc-pct{font-size:32px}
+  .modal-box{padding:18px;border-radius:18px}
+  .md-sec{margin-top:16px}
+  .md-foot .btn{min-height:38px}
+  .lastatt{gap:6px}
+  .lastatt span{min-width:38px}
+  .lastatt .dot{width:26px;height:26px;font-size:11px;border-radius:8px}
+  .trend{padding:18px 10px 6px}
+  .trend-plot{height:140px}
+  .info input{height:34px}
+  .textarea.mnote{min-height:48px}
+}
+/* Android: input cukup 14px (auto-zoom saat fokus hanya terjadi di iOS, jadi iOS tetap 16px) */
+@supports not (-webkit-touch-callout:none){
+  @media (max-width:880px){ input,select,textarea{font-size:14px !important} }
 }
 </style>
 </head>
@@ -951,7 +1040,7 @@ html{scrollbar-gutter:stable}
  <div class="shell">
   <aside class="side" aria-label="Navigasi utama">
     <div class="brand"><div class="logo" aria-hidden="true">A</div><div><b>AOG Teens</b><small id="coachRoleLabel">Coach</small></div></div>
-    <div class="rolesw" role="group" aria-label="Peran"><button type="button" id="roleCoachBtn" class="on" aria-pressed="true" onclick="switchRole('coach')">COACH</button><button type="button" id="roleTLBtn" aria-pressed="false" onclick="switchRole('tl')">TL</button></div>
+    <div class="rolesw" role="group" aria-label="Peran"><button type="button" id="roleCoachBtn" class="on" aria-pressed="true" onclick="switchRole('coach')">Coach</button><button type="button" id="roleTLBtn" aria-pressed="false" onclick="switchRole('tl')">TL</button></div>
     <nav class="navlist" id="coachTabs" aria-label="Tab Coach"><button type="button" class="nav app-tab on" data-tab="c-overview" aria-current="page" onclick="sCoachTab('c-overview',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"/></svg><span>Overview</span></button><button type="button" class="nav app-tab" data-tab="c-absensi" onclick="sCoachTab('c-absensi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M9 15l2 2 4-4"/></svg><span>Absensi</span></button><button type="button" class="nav app-tab" data-tab="c-milestone" onclick="sCoachTab('c-milestone',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4h11l-2 4 2 4H5"/></svg><span>Milestone</span></button><button type="button" class="nav app-tab" data-tab="c-visi" onclick="sCoachTab('c-visi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span>Visi</span></button><button type="button" class="nav app-tab" data-tab="c-events" onclick="sCoachTab('c-events',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4z"/><path d="M14 7v10"/></svg><span>Events</span></button></nav>
     <button type="button" class="sidetheme editable" onclick="openThemeEdit()" aria-label="Edit tema tahun ini" title="Klik untuk edit tema"><small>The year of</small><b>Unity</b><span>&amp; Open Heavens</span><i class="st-edit" aria-hidden="true">Edit</i></button>
     <div class="profile"><span class="ava" id="cAva" aria-hidden="true">C</span><div style="flex:1;min-width:0"><b id="cWho">Coach</b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v32</span></span></span></div><button type="button" class="exit" onclick="goBackCoach()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
@@ -2062,12 +2151,19 @@ function regionVisiBannerHTML(cv) {
 // ========== OPEN CGL DASHBOARD ==========
 let TAB_RENDERED = {};
 
-async function openCGDashboard(cg) {
+function cgSlug(cg) { return String(cg || '').trim().toLowerCase().replace(/\s+/g, '-'); }
+let _URL_BEFORE_CG = '/';
+async function openCGDashboard(cg, opts) {
   CUR_CG = cg;
   ['pageL','pageC'].forEach(x => document.getElementById(x).style.display = 'none');
   document.getElementById('pageD').style.display = 'block';
   window.scrollTo(0, 0);
-  try { history.pushState({page:'cg',cg}, '', '#cg='+encodeURIComponent(cg)); } catch(e) {}
+  // URL rapi: /teen-01 (rewrite di vercel.json) — simpan alamat sebelumnya untuk tombol kembali
+  _URL_BEFORE_CG = location.pathname.replace(/^\/(teen-\d+)\/?$/i, '/') + location.search;
+  try {
+    if (opts && opts.replace) history.replaceState({page:'cg',cg}, '', '/' + cgSlug(cg));
+    else history.pushState({page:'cg',cg}, '', '/' + cgSlug(cg));
+  } catch(e) {}
 
   // Auto-cleanup event yang sudah lewat (background, jangan blocking)
   cleanupPastEvents();
@@ -2669,10 +2765,10 @@ function renderDetailGrid() {
     html += '<div class="kc-top"><span class="ava'+(st.atRisk?' risk':'')+'" aria-hidden="true">'+initialOf(m.nama)+'</span>';
     html += '<span class="kc-name"><b>'+esc(m.nama)+'</b>'+rolePill(m.status)+'</span><span class="kc-go" aria-hidden="true">'+icon('right',16)+'</span></div>';
     html += '<div class="kc-mid"><span class="kc-pct" style="color:'+(st.rec?pctColorOf(st.pct):'#bbb')+'">'+(st.rec?st.pct+'%':'–')+'<small>hadir</small></span>';
-    html += '<span class="kc-strip" title="'+st.rec+' absensi tercatat">';
+    html += '<span class="kc-trend">' + memberSparkSVG(m, st.pct) + '<span class="kc-strip" title="8 absensi terakhir">';
     for (let k = 0; k < 8 - last.length; k++) html += '<i class="X"></i>';
     last.forEach(x => { html += '<i class="'+x.st+'" title="'+esc(x.label)+': '+x.st+'"></i>'; });
-    html += '</span></div>';
+    html += '</span></span></div>';
     html += '<div class="kc-ms"><span>Milestone</span><span class="tr"><i style="width:'+Math.round(msDone/8*100)+'%"></i></span><b>'+msDone+'/8</b></div>';
     if (st.atRisk) html += '<span class="kc-flag">Perlu follow-up</span>';
     html += '</button>';
@@ -2686,8 +2782,8 @@ function refreshDetailGrid() {
   if (document.querySelector('#tab-detail .kgrid')) renderDetailGrid();
 }
 
-// Chart garis: % hadir per bulan (bulan = run berurutan month_code di DATES)
-function memberTrendHTML(m) {
+// % hadir per bulan 1 member (bulan = run berurutan month_code di DATES; hanya bulan yang ada absensinya)
+function memberMonthlyPts(m) {
   const months = [];
   DATES.forEach(d => {
     const code = String(d.month_code || '').trim().toUpperCase() || '?';
@@ -2696,7 +2792,37 @@ function memberTrendHTML(m) {
     const st = ATTENDANCE[m.id+'_'+d.id];
     if (st) { cur.f++; if (st === 'H') cur.h++; }
   });
-  const pts = months.filter(x => x.f).map(x => ({ lbl: x.code.charAt(0) + x.code.slice(1).toLowerCase(), v: Math.round(x.h / x.f * 100), n: x.f }));
+  return months.filter(x => x.f).map(x => ({ lbl: x.code.charAt(0) + x.code.slice(1).toLowerCase(), v: Math.round(x.h / x.f * 100), n: x.f }));
+}
+
+// Mini chart garis di kartu anak: tren % hadir 6 bulan terakhir
+function memberSparkSVG(m, pct) {
+  const pts = memberMonthlyPts(m).slice(-6);
+  const W = 116, H = 38, P = 4;
+  const c = pts.length ? pctColorOf(pct) : '#d4d4d0';
+  const y = v => (P + (H - 2 * P) * (1 - v / 100)).toFixed(1);
+  let line, xs;
+  if (pts.length <= 1) {
+    const yy = pts.length ? y(pts[0].v) : (H - P);
+    xs = [W - P];
+    line = 'M' + P + ' ' + yy + ' L' + (W - P) + ' ' + yy;
+  } else {
+    xs = pts.map((p, i) => P + i * (W - 2 * P) / (pts.length - 1));
+    line = pts.map((p, i) => (i ? 'L' : 'M') + xs[i].toFixed(1) + ' ' + y(p.v)).join(' ');
+  }
+  const lastX = xs[xs.length - 1], lastY = pts.length ? y(pts[pts.length - 1].v) : (H - P);
+  const area = line + ' L' + (pts.length <= 1 ? W - P : lastX.toFixed(1)) + ' ' + H + ' L' + P + ' ' + H + ' Z';
+  const title = pts.length ? 'Tren per bulan: ' + pts.map(p => p.lbl + ' ' + p.v + '%').join(', ') : 'Belum ada data absensi';
+  return '<svg class="kc-spark" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" aria-hidden="true"><title>' + esc(title) + '</title>' +
+    '<path d="' + area + '" fill="' + c + '" fill-opacity=".12"/>' +
+    '<path d="' + line + '" fill="none" stroke="' + c + '" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>' +
+    (pts.length ? '<circle cx="' + lastX.toFixed(1) + '" cy="' + lastY + '" r="3.2" fill="' + c + '" stroke="#fff" stroke-width="1.5"/>' : '') +
+    '</svg>';
+}
+
+// Chart garis: % hadir per bulan (bulan = run berurutan month_code di DATES)
+function memberTrendHTML(m) {
+  const pts = memberMonthlyPts(m);
   if (!pts.length) return '<div class="empty" style="padding:24px">Belum ada data absensi</div>';
   const X0 = 14, X1 = 96;
   const xs = pts.map((p, i) => pts.length === 1 ? (X0 + X1) / 2 : X0 + i * (X1 - X0) / (pts.length - 1));
@@ -3855,6 +3981,7 @@ function handleEvImage(e) {
 // ========== NAVIGATION ==========
 function goBack() {
   document.getElementById('pageD').style.display = 'none';
+  try { if (/^\/teen-\d+\/?$/i.test(location.pathname)) history.replaceState(null, '', _URL_BEFORE_CG || '/'); } catch(e) {}
   if (fromCoach) document.getElementById('pageC').style.display = 'block';
   else document.getElementById('pageL').style.display = 'flex';
   window.scrollTo(0, 0);
@@ -3874,11 +4001,25 @@ function setDTabUI(id) {
   if (c) c.innerHTML = esc(CUR_REGION === 'jaktim2' ? 'Jaktim 2' : 'Jaktim 1') + ' / ' + esc(CUR_CG || '') + ' / <b>' + esc(title) + '</b>';
 }
 
+// Pindah tab dengan crossfade halus kalau browser mendukung View Transitions
+const _VT_OK = typeof document.startViewTransition === 'function' && !(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+if (_VT_OK) document.documentElement.classList.add('vt');
+function smoothSwap(fn) {
+  if (!_VT_OK) { fn(); return; }
+  try {
+    const t = document.startViewTransition(fn);
+    // Pengaman: jangan pernah biarkan lapisan transisi nyangkut (halaman jadi tidak bisa diklik)
+    setTimeout(() => { try { t.skipTransition(); } catch(e) {} }, 450);
+  } catch(e) { fn(); }
+}
+
 function sTab(id, b) {
-  setDTabUI(id);
-  document.querySelectorAll('#pageD .tab-content').forEach(t => t.classList.remove('active'));
-  document.getElementById('tab-' + id).classList.add('active');
-  window.scrollTo(0, 0);
+  smoothSwap(() => {
+    setDTabUI(id);
+    document.querySelectorAll('#pageD .tab-content').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + id).classList.add('active');
+    window.scrollTo(0, 0);
+  });
   // Kartu anak dihitung ulang dari ATTENDANCE terbaru (tanpa query)
   if (id === 'detail') refreshDetailGrid();
   // Lazy render tab kalau belum pernah di-render
@@ -4126,10 +4267,12 @@ function currentCoachTab() {
 }
 
 async function sCoachTab(id, b) {
-  setCTabUI(id);
-  document.querySelectorAll('#pageC .tab-content').forEach(t => t.classList.remove('active'));
-  document.getElementById('tab-' + id).classList.add('active');
-  window.scrollTo(0, 0);
+  smoothSwap(() => {
+    setCTabUI(id);
+    document.querySelectorAll('#pageC .tab-content').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + id).classList.add('active');
+    window.scrollTo(0, 0);
+  });
   // Saat switch ke Absensi/Overview, refetch attendance + dates fresh
   // (dates juga penting supaya date_id konsisten dengan CGL)
   if (id === 'c-absensi' || id === 'c-overview') {
@@ -4439,10 +4582,13 @@ function buildWilayahSection(region) {
   html += '<div class="chips" style="margin-bottom:16px">';
   const kecActiveAll = window.__WILAYAH_KEC === 'all';
   html += '<button type="button" class="chip'+(kecActiveAll?' on':'')+'" aria-pressed="'+kecActiveAll+'" onclick="setWilayahKec(\'all\')">Semua kecamatan <span style="opacity:.7">('+active.length+')</span></button>';
-  kecList.forEach(kec => {
+  const KEC_MAX = 8, showAllKec = !!window.__WIL_ALL_KEC;
+  kecList.forEach((kec, i) => {
     const isActive = window.__WILAYAH_KEC === kec;
+    if (!showAllKec && i >= KEC_MAX && !isActive) return;
     html += '<button type="button" class="chip'+(isActive?' on':'')+'" aria-pressed="'+isActive+'" onclick="setWilayahKec(\''+esc(jsq(kec))+'\')">'+esc(titleCaseWilayah(kec))+' <span style="opacity:.7">('+kecCount[kec]+')</span></button>';
   });
+  if (kecList.length > KEC_MAX) html += '<button type="button" class="chip more" onclick="toggleWilayahMore(\'kec\')">'+(showAllKec ? 'Sembunyikan' : '+'+(kecList.length-KEC_MAX)+' lainnya')+'</button>';
   html += '</div>';
 
   // Bar per kecamatan (hanya saat semua kecamatan)
@@ -4458,10 +4604,13 @@ function buildWilayahSection(region) {
     const kelActiveAll = window.__WILAYAH_KEL === 'all';
     const kelTotal = kelList.reduce((s,k) => s+kelCount[k], 0);
     html += '<button type="button" class="chip kel'+(kelActiveAll?' on':'')+'" aria-pressed="'+kelActiveAll+'" onclick="setWilayahKel(\'all\')">Semua <span style="opacity:.7">('+kelTotal+')</span></button>';
-    kelList.forEach(kel => {
+    const KEL_MAX = 10, showAllKel = !!window.__WIL_ALL_KEL;
+    kelList.forEach((kel, i) => {
       const isActive = window.__WILAYAH_KEL === kel;
+      if (!showAllKel && i >= KEL_MAX && !isActive) return;
       html += '<button type="button" class="chip kel'+(isActive?' on':'')+'" aria-pressed="'+isActive+'" onclick="setWilayahKel(\''+esc(jsq(kel))+'\')">'+esc(titleCaseWilayah(kel))+' <span style="opacity:.7">('+kelCount[kel]+')</span></button>';
     });
+    if (kelList.length > KEL_MAX) html += '<button type="button" class="chip more" onclick="toggleWilayahMore(\'kel\')">'+(showAllKel ? 'Sembunyikan' : '+'+(kelList.length-KEL_MAX)+' lainnya')+'</button>';
     html += '</div>';
   }
 
@@ -4474,16 +4623,28 @@ function buildWilayahSection(region) {
     filtered.forEach(m => {
       const color = (typeof CG_COLORS !== 'undefined' && CG_COLORS[m.cg]) || '#6C5CE7';
       const bg = (typeof CG_BG !== 'undefined' && CG_BG[m.cg]) || '#faf5ff';
-      const alamat = [m.kelurahan, m.kecamatan].filter(Boolean).map(titleCaseWilayah).join(', ') || 'Alamat belum diisi';
-      html += '<div class="lrow" style="margin:0"><span class="ava" aria-hidden="true" style="background:'+bg+';color:'+color+'">'+initialOf(m.nama)+'</span>';
-      html += '<div class="grow"><b>'+esc(m.nama||'')+' <span class="pill" style="background:'+bg+';color:'+color+'">'+esc(m.cg||'')+'</span></b><small>'+esc(m.status||'Member')+' · '+esc(alamat)+'</small></div>';
-      html += '<small style="flex:none;white-space:nowrap">'+(m.wa ? esc(m.wa) : '<i>no HP kosong</i>')+'</small></div>';
+      const alamat = [m.kelurahan, m.kecamatan].filter(Boolean).map(titleCaseWilayah).join(', ');
+      const wa = waLinkOf(m.wa);
+      html += '<div class="wrow"><span class="ava" aria-hidden="true" style="background:'+bg+';color:'+color+'">'+initialOf(m.nama)+'</span>';
+      html += '<div class="wr-main"><div class="wr-top"><b title="'+esc(m.nama||'')+'">'+esc(m.nama||'')+'</b>';
+      html += wa ? '<a class="wr-wa" href="'+esc(wa)+'" target="_blank" rel="noopener" title="Chat WhatsApp">'+esc(m.wa)+'</a>' : '<span class="wr-wa wr-none">No HP kosong</span>';
+      html += '</div>';
+      html += '<small><span class="pill" style="background:'+bg+';color:'+color+'">'+esc(m.cg||'')+'</span> '+esc(m.status||'Member')+' · '+(alamat ? '<span title="'+esc(alamat)+'">'+esc(alamat)+'</span>' : '<span class="wr-none">Alamat belum diisi</span>')+'</small></div>';
+      html += '</div>';
     });
     html += '</div>';
   }
 
   html += '</section>';
   return html;
+}
+
+// Tampilkan semua / lipat chip kecamatan & kelurahan
+function toggleWilayahMore(kind) {
+  if (kind === 'kec') window.__WIL_ALL_KEC = !window.__WIL_ALL_KEC;
+  else window.__WIL_ALL_KEL = !window.__WIL_ALL_KEL;
+  const el = document.getElementById('wilayahSection');
+  if (el) el.outerHTML = buildWilayahSection(coachRole === 'tl' ? 'all' : coachReg);
 }
 
 // Export CSV list member sesuai filter wilayah aktif
@@ -5539,6 +5700,7 @@ function syncCoachRoleUI() {
   const label = document.getElementById('coachRoleLabel');
   const isTL = role === 'tl';
   coachBtn.classList.toggle('on', !isTL); coachBtn.setAttribute('aria-pressed', String(!isTL));
+  const rs = coachBtn.closest('.rolesw'); if (rs) rs.classList.toggle('is-tl', isTL);
   tlBtn.classList.toggle('on', isTL); tlBtn.setAttribute('aria-pressed', String(isTL));
   const who = isTL ? 'Team Leader' : 'Coach';
   label.textContent = isTL ? 'TL · Semua region' : 'Coach · ' + (coachReg === 'jaktim2' ? 'Jaktim 2' : 'Jaktim 1');
@@ -5642,6 +5804,18 @@ document.querySelectorAll('.modal-overlay').forEach(m => {
     startCoachPolling(); // Auto-sync attendance tiap 60s
   } else {
     await loadCGLDropdown();
+    // Buka langsung dashboard CG dari alamat /teen-01 (link dibagikan / refresh)
+    const slug = (path.match(/^\/(teen-\d+)$/) || [])[1];
+    if (slug) {
+      const cgName = [...new Set((ALL_MEMBERS || []).map(m => m.cg))].find(c => c && !isArchivedCg(c) && cgSlug(c) === slug);
+      if (cgName) {
+        fromCoach = false;
+        const sel = document.getElementById('cglSel'); if (sel) sel.value = cgName;
+        await openCGDashboard(cgName, { replace: true });
+      } else {
+        try { history.replaceState(null, '', '/'); } catch(e) {}
+      }
+    }
   }
   // Start realtime subscription (1 WebSocket, tetap aktif selama session)
   setupRealtime();

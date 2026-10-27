@@ -9,6 +9,8 @@
     { "source": "/coach/", "destination": "/index.html" },
     { "source": "/tl/", "destination": "/index.html" },
     { "source": "/TL/", "destination": "/index.html" },
-    { "source": "/Coach/", "destination": "/index.html" }
+    { "source": "/Coach/", "destination": "/index.html" },
+    { "source": "/:cg(teen-[0-9]+)", "destination": "/index.html" },
+    { "source": "/:cg(TEEN-[0-9]+)", "destination": "/index.html" }
   ]
 }
