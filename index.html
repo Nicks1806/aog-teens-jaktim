@@ -854,6 +854,8 @@ html.vt .tab-content.active{animation:none}
 .ai-n{color:#6C5CE7;min-width:18px}
 .ai-b h4{font-size:14px;font-weight:700;margin:12px 0 4px}.ai-b h4:first-child{margin-top:0}
 .ai-b code{background:#f3f0ff;border-radius:5px;padding:1px 5px;font-size:12.5px}
+.ai-quote{margin:6px 0 10px;padding:10px 14px;border-left:3px solid #cfc6ff;background:#faf8ff;border-radius:0 12px 12px 0}
+.ai-quote p{margin:0 0 8px !important}.ai-quote p:last-child{margin-bottom:0 !important}
 .ai-tblw{overflow-x:auto;margin:6px 0 10px}
 .ai-tbl{border-collapse:collapse;font-size:13px;min-width:100%}
 .ai-tbl th,.ai-tbl td{border:1px solid var(--line);padding:6px 10px;text-align:left;white-space:nowrap}
@@ -1197,7 +1199,7 @@ html.vt .tab-content.active{animation:none}
     <button type="button" class="backcoach" id="dBackCoach" onclick="goBack()" style="display:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Kembali ke Coach</button>
     <nav class="navlist" aria-label="Tab CG"><button type="button" class="nav app-tab on" data-tab="absensi" aria-current="page" onclick="sTab('absensi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M9 15l2 2 4-4"/></svg><span>Absensi</span></button><button type="button" class="nav app-tab" data-tab="detail" onclick="sTab('detail',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c1.9.7 3.1 2.4 3.5 5.2"/></svg><span>Detail CG</span></button><button type="button" class="nav app-tab" data-tab="visi" onclick="sTab('visi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span>Visi CG</span></button><button type="button" class="nav app-tab" data-tab="pelayanan" onclick="sTab('pelayanan',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"/></svg><span>Pelayanan</span></button><button type="button" class="nav app-tab" data-tab="milestone" onclick="sTab('milestone',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4h11l-2 4 2 4H5"/></svg><span>Milestone</span></button><button type="button" class="nav app-tab" data-tab="events" onclick="sTab('events',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4z"/><path d="M14 7v10"/></svg><span>Events</span></button></nav>
     <div class="sidetheme"><small>The year of</small><b>Unity</b><span>&amp; Open Heavens</span></div>
-    <div class="profile"><span class="ava" id="dAva" aria-hidden="true">A</span><div style="flex:1;min-width:0"><b id="nN"></b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v45</span></span></span></div><button type="button" class="exit" onclick="goBack()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
+    <div class="profile"><span class="ava" id="dAva" aria-hidden="true">A</span><div style="flex:1;min-width:0"><b id="nN"></b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v46</span></span></span></div><button type="button" class="exit" onclick="goBack()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
   </aside>
   <div class="main">
     <header class="mtop">
@@ -1240,7 +1242,7 @@ html.vt .tab-content.active{animation:none}
     <div class="rolesw" role="group" aria-label="Peran"><button type="button" id="roleCoachBtn" class="on" aria-pressed="true" onclick="switchRole('coach')">Coach</button><button type="button" id="roleTLBtn" aria-pressed="false" onclick="switchRole('tl')">TL</button></div>
     <nav class="navlist" id="coachTabs" aria-label="Tab Coach"><button type="button" class="nav app-tab on" data-tab="c-overview" aria-current="page" onclick="sCoachTab('c-overview',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"/></svg><span>Overview</span></button><button type="button" class="nav app-tab" data-tab="c-absensi" onclick="sCoachTab('c-absensi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M9 15l2 2 4-4"/></svg><span>Absensi</span></button><button type="button" class="nav app-tab" data-tab="c-milestone" onclick="sCoachTab('c-milestone',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4h11l-2 4 2 4H5"/></svg><span>Milestone</span></button><button type="button" class="nav app-tab" data-tab="c-visi" onclick="sCoachTab('c-visi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span>Visi</span></button><button type="button" class="nav app-tab" data-tab="c-events" onclick="sCoachTab('c-events',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4z"/><path d="M14 7v10"/></svg><span>Events</span></button><button type="button" class="nav app-tab ai-nav" data-tab="c-ai" onclick="sCoachTab('c-ai',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg><span>Tanya AI</span></button></nav>
     <button type="button" class="sidetheme editable" onclick="openThemeEdit()" aria-label="Edit tema tahun ini" title="Klik untuk edit tema"><small>The year of</small><b>Unity</b><span>&amp; Open Heavens</span><i class="st-edit" aria-hidden="true">Edit</i></button>
-    <div class="profile"><span class="ava" id="cAva" aria-hidden="true">C</span><div style="flex:1;min-width:0"><b id="cWho">Coach</b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v45</span></span></span></div><button type="button" class="exit" onclick="goBackCoach()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
+    <div class="profile"><span class="ava" id="cAva" aria-hidden="true">C</span><div style="flex:1;min-width:0"><b id="cWho">Coach</b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v46</span></span></span></div><button type="button" class="exit" onclick="goBackCoach()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
   </aside>
   <div class="main">
     <header class="mtop">
@@ -5380,8 +5382,17 @@ function aiFormat(text) {
 function aiFormatText(text) {
   const inline = t => t.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/(^|[\s(])\*(?!\s)([^*]+?)\*(?=[\s).,:;!?]|$)/g, '$1<i>$2</i>').replace(/`([^`]+)`/g, '<code>$1</code>');
   const lines = esc(String(text || '')).split('\n');
-  let html = '', list = null, tbl = [];
+  let html = '', list = null, tbl = [], quote = [];
   const closeList = () => { if (list) { html += '</ul>'; list = null; } };
+  // Kutipan (baris diawali ">", mis. contoh pesan WA) → kotak kutipan; baris ">" kosong = ganti paragraf
+  const flushQuote = () => {
+    if (!quote.length) return;
+    const paras = []; let cur = [];
+    quote.forEach(q => { if (q) cur.push(q); else if (cur.length) { paras.push(cur); cur = []; } });
+    if (cur.length) paras.push(cur);
+    if (paras.length) html += '<blockquote class="ai-quote">' + paras.map(p => '<p>' + p.join('<br>') + '</p>').join('') + '</blockquote>';
+    quote = [];
+  };
   const flushTbl = () => {
     if (!tbl.length) return;
     const rows = tbl.filter(r => !/^\|?\s*:?-{2,}/.test(r)).map(r => r.replace(/^\||\|$/g, '').split('|').map(c => c.trim()));
@@ -5390,6 +5401,9 @@ function aiFormatText(text) {
     tbl = [];
   };
   lines.forEach(l => {
+    const qm = l.match(/^\s*&gt;\s?(.*)$/);
+    if (qm) { closeList(); flushTbl(); quote.push(qm[1].trim() ? inline(qm[1].trim()) : ''); return; }
+    flushQuote();
     if (/^\s*\|.*\|\s*$/.test(l)) { closeList(); tbl.push(l.trim()); return; }
     flushTbl();
     let m;
@@ -5400,7 +5414,7 @@ function aiFormatText(text) {
     if ((m = l.match(/^#{1,4}\s+(.*)$/))) { html += '<h4>' + inline(m[1]) + '</h4>'; return; }
     if (l.trim()) html += '<p>' + inline(l) + '</p>';
   });
-  flushTbl(); closeList();
+  flushTbl(); flushQuote(); closeList();
   return html;
 }
 
@@ -5453,9 +5467,10 @@ function aiRender() {
   }
   box.innerHTML = _AI.msgs.map((m, i) => {
     if (m.role === 'user') return '<div class="ai-m user"><div class="ai-b">' + (m.img && /^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(m.img) ? '<img class="ai-thumb" src="' + m.img + '" alt="Foto">' : (m.foto ? '<span class="ai-foto">' + icon('image', 13) + 'foto</span>' : '')) + esc(m.text).replace(/\n/g, '<br>') + '</div></div>';
+    if (m.live) return '<div class="ai-m bot live"><span class="ai-av" aria-hidden="true">' + icon('spark', 16) + '</span><div class="grow" style="min-width:0"><div class="ai-b">' + aiLiveHTML(m.text) + '</div></div></div>';
     return '<div class="ai-m bot' + (m.err ? ' err' : '') + '"><span class="ai-av" aria-hidden="true">' + icon('spark', 16) + '</span><div class="grow" style="min-width:0"><div class="ai-b">' + aiFormat(m.text) + '</div>' +
       (m.err ? '' : '<div class="ai-acts"><button type="button" onclick="aiCopy(' + i + ')">' + icon('copy', 13) + 'Salin</button><button type="button" onclick="aiWA(' + i + ')">' + icon('wa', 13) + 'Kirim WA</button></div>') + '</div></div>';
-  }).join('') + (_AI.busy ? '<div class="ai-m bot"><span class="ai-av" aria-hidden="true">' + icon('spark', 16) + '</span><div class="ai-b"><span class="ai-dots" aria-label="AI sedang menjawab"><span></span><span></span><span></span></span></div></div>' : '');
+  }).join('') + (_AI.busy && !(_AI.msgs.length && _AI.msgs[_AI.msgs.length - 1].live) ? '<div class="ai-m bot"><span class="ai-av" aria-hidden="true">' + icon('spark', 16) + '</span><div class="ai-b"><span class="ai-dots" aria-label="AI sedang menjawab"><span></span><span></span><span></span></span></div></div>' : '');
   box.scrollTop = box.scrollHeight;
 }
 
@@ -5564,7 +5579,7 @@ function aiMemSendWA(id) {
 function aiScopeChanged() { if (!_AI.busy) aiLoadChat(); aiRender(); }
 function aiGrow(t) { t.style.height = 'auto'; t.style.height = Math.min(t.scrollHeight, 160) + 'px'; }
 function aiKey(e) { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); aiAsk(); } }
-function aiPlain(t) { return String(t || '').replace(/```chart[\s\S]*?```/gi, '').replace(/\*\*(.+?)\*\*/g, '$1').replace(/^#{1,4}\s+/gm, '').replace(/\n{3,}/g, '\n\n').trim(); }
+function aiPlain(t) { return String(t || '').replace(/```chart[\s\S]*?```/gi, '').replace(/\*\*(.+?)\*\*/g, '$1').replace(/^#{1,4}\s+/gm, '').replace(/^[ \t]*>[ \t]?/gm, '').replace(/\n{3,}/g, '\n\n').trim(); }
 async function aiCopy(i) {
   const m = _AI.msgs[i]; if (!m) return;
   try { await navigator.clipboard.writeText(aiPlain(m.text)); toast('✓ Jawaban disalin'); } catch(e) { toast('❌ Gagal menyalin'); }
@@ -5572,6 +5587,51 @@ async function aiCopy(i) {
 function aiWA(i) {
   const m = _AI.msgs[i]; if (!m) return;
   window.open('https://wa.me/?text=' + encodeURIComponent(aiPlain(m.text)), '_blank', 'noopener');
+}
+
+// ── Jawaban mengalir (streaming): teks digambar bertahap, grafik ditahan sampai blok JSON-nya lengkap ──
+const AI_DOTS = '<span class="ai-dots" aria-label="AI sedang menjawab"><span></span><span></span><span></span></span>';
+function aiLiveHTML(t) {
+  if (!t) return AI_DOTS;
+  const i = t.lastIndexOf('```chart');
+  if (i >= 0 && t.indexOf('```', i + 8) < 0) t = t.slice(0, i) + '\n\n*menyiapkan grafik…*';
+  return aiFormat(t);
+}
+function aiPaintLive(msg) {
+  const box = document.getElementById('aiMsgs');
+  const b = box && box.querySelector('.ai-m.bot.live .ai-b');
+  if (!b) return;
+  const near = box.scrollHeight - box.scrollTop - box.clientHeight < 120;
+  b.innerHTML = aiLiveHTML(msg.text);
+  if (near) box.scrollTop = box.scrollHeight;
+}
+async function aiReadStream(r) {
+  const msg = { role: 'model', text: '', live: true };
+  _AI.msgs.push(msg);
+  aiRender();
+  const reader = r.body.getReader(), dec = new TextDecoder();
+  let buf = '', fin = null, err = null, queued = false;
+  try {
+    for (;;) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buf += dec.decode(value, { stream: true });
+      let i;
+      while ((i = buf.indexOf('\n')) >= 0) {
+        const line = buf.slice(0, i).trim(); buf = buf.slice(i + 1);
+        if (!line) continue;
+        let j; try { j = JSON.parse(line); } catch(e) { continue; }
+        if (typeof j.t === 'string') msg.text += j.t;
+        if (j.done) fin = j;
+        if (j.error) err = j.error;
+      }
+      if (!queued) { queued = true; setTimeout(() => { queued = false; aiPaintLive(msg); }, 60); } // maks ±16x/detik
+    }
+  } catch(e) { console.error('[aiReadStream]', e); err = err || 'Koneksi terputus — coba tanya lagi.'; }
+  delete msg.live;
+  if (!fin && !err) err = 'Jawaban terputus — coba tanya lagi.';
+  if (fin && fin.finish === 'MAX_TOKENS') msg.text += '\n\n*(Jawaban terpotong — ketik "lanjutkan" untuk meneruskan.)*';
+  if (err) { if (msg.text.trim()) msg.text += '\n\n*(' + err + ')*'; else { msg.text = err; msg.err = true; } }
 }
 
 async function aiAsk(qOverride) {
@@ -5590,10 +5650,14 @@ async function aiAsk(qOverride) {
   try {
     const extra = await aiRefreshData();
     const context = buildAIContext(extra);
-    const r = await fetch('/api/ai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.assign({ pin, question: q, context, history }, img ? { image: { mimeType: img.mimeType, data: img.data } } : {})) });
+    const r = await fetch('/api/ai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.assign({ pin, question: q, context, history, stream: true }, img ? { image: { mimeType: img.mimeType, data: img.data } } : {})) });
+    // Server mengalirkan jawaban (NDJSON) → tampil sambil diketik. Error / server lama → JSON biasa.
+    const streaming = r.ok && /ndjson/i.test(r.headers.get('content-type') || '') && r.body && r.body.getReader;
     let data = {};
-    try { data = await r.json(); } catch(e) {}
-    if (r.status === 401) { aiSetPin(''); _AI.needPin = true; _AI.msgs.push({ role: 'model', text: 'AI ini memakai kode akses. Masukkan kode yang benar ya.', err: true }); }
+    if (streaming) await aiReadStream(r);
+    else { try { data = await r.json(); } catch(e) {} }
+    if (streaming) {}
+    else if (r.status === 401) { aiSetPin(''); _AI.needPin = true; _AI.msgs.push({ role: 'model', text: 'AI ini memakai kode akses. Masukkan kode yang benar ya.', err: true }); }
     else if (!r.ok) _AI.msgs.push({ role: 'model', text: data.error || ('AI belum bisa dipakai (HTTP ' + r.status + ').'), err: true });
     else _AI.msgs.push({ role: 'model', text: (data.text || '(jawaban kosong)') + (data.finish === 'MAX_TOKENS' ? '\n\n*(Jawaban terpotong — ketik "lanjutkan" untuk meneruskan.)*' : '') });
   } catch(e) {

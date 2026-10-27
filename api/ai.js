@@ -155,6 +155,11 @@ module.exports = async function handler(req, res) {
   const hasImage = parts.length > 1;
   const wantJSON = body.json === true; // mis. Absen dari foto → jawaban JSON murni
 
+  const geminiBody = think => JSON.stringify({
+    systemInstruction: { parts: [{ text: SYSTEM_PROMPT + '\n\n' + APP_GUIDE }] },
+    contents,
+    generationConfig: Object.assign({ temperature: 0.3, maxOutputTokens: 8192 }, think ? { thinkingConfig: { thinkingLevel: 'low' } } : {}, wantJSON ? { responseMimeType: 'application/json' } : {})
+  });
   const callGemini = async (model, think) => {
     // Batas 20 dtk per panggilan supaya tidak menggantung sampai Vercel timeout
     const ctrl = new AbortController();
@@ -164,11 +169,7 @@ module.exports = async function handler(req, res) {
         method: 'POST',
         signal: ctrl.signal,
         headers: { 'Content-Type': 'application/json', 'x-goog-api-key': KEY },
-        body: JSON.stringify({
-          systemInstruction: { parts: [{ text: SYSTEM_PROMPT + '\n\n' + APP_GUIDE }] },
-          contents,
-          generationConfig: Object.assign({ temperature: 0.3, maxOutputTokens: 8192 }, think ? { thinkingConfig: { thinkingLevel: 'low' } } : {}, wantJSON ? { responseMimeType: 'application/json' } : {})
-        })
+        body: geminiBody(think)
       });
       const data = await r.json().catch(() => ({}));
       return { r, data, msg: (data && data.error && data.error.message) || ('HTTP ' + r.status) };
@@ -177,7 +178,7 @@ module.exports = async function handler(req, res) {
 
   // ── Claude (utama): Messages API lewat fetch (proyek tanpa npm). Gagal apa pun → lanjut ke Gemini ──
   const imgData = hasImage ? parts[1].inlineData : null;
-  const callClaude = async (useFormat) => {
+  const claudeBody = (useFormat, stream) => {
     const msgs = [];
     const push = (role, blocks) => {
       const last = msgs[msgs.length - 1];
@@ -196,20 +197,25 @@ module.exports = async function handler(req, res) {
     push('user', lastBlocks);
     const output_config = { effort: 'low' }; // chat & ekstraksi: low = cepat, tetap teliti
     if (useFormat) output_config.format = { type: 'json_schema', schema: ABSEN_SCHEMA };
+    return JSON.stringify({
+      model: CLAUDE_MODEL,
+      max_tokens: 12000,
+      stream: !!stream,
+      system: [{ type: 'text', text: SYSTEM_PROMPT + '\n\n' + APP_GUIDE, cache_control: { type: 'ephemeral' } }],
+      messages: msgs,
+      output_config
+    });
+  };
+  const CLAUDE_HEADERS = { 'Content-Type': 'application/json', 'x-api-key': CLAUDE_KEY, 'anthropic-version': '2026-10-21' };
+  const callClaude = async (useFormat) => {
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), hasImage ? 35000 : 25000);
     try {
       const r = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         signal: ctrl.signal,
-        headers: { 'Content-Type': 'application/json', 'x-api-key': CLAUDE_KEY, 'anthropic-version': '2026-10-21' },
-        body: JSON.stringify({
-          model: CLAUDE_MODEL,
-          max_tokens: 12000,
-          system: [{ type: 'text', text: SYSTEM_PROMPT + '\n\n' + APP_GUIDE, cache_control: { type: 'ephemeral' } }],
-          messages: msgs,
-          output_config
-        })
+        headers: CLAUDE_HEADERS,
+        body: claudeBody(useFormat, false)
       });
       const data = await r.json().catch(() => ({}));
       if (!r.ok) return { status: r.status, err: 'HTTP ' + r.status + ' ' + String((data.error && data.error.message) || '').slice(0, 160) };
@@ -222,6 +228,111 @@ module.exports = async function handler(req, res) {
       return { err: e && e.name === 'AbortError' ? 'timeout' : 'gagal terhubung' };
     } finally { clearTimeout(timer); }
   };
+
+  // ── Streaming: teks dikirim sepotong-sepotong (NDJSON) → jawaban langsung muncul di HP ──
+  // Baris: {"t":"teks"} … lalu {"done":true,"model":…,"finish":…} atau {"error":"…"}
+  const withTimer = (firstMs, idleMs) => {
+    const ctrl = new AbortController();
+    let tm = setTimeout(() => ctrl.abort(), firstMs);
+    return { signal: ctrl.signal, kick: () => { clearTimeout(tm); tm = setTimeout(() => ctrl.abort(), idleMs); }, stop: () => clearTimeout(tm) };
+  };
+  const readSSE = async (resp, onData, kick) => {
+    const reader = resp.body.getReader(), dec = new TextDecoder();
+    let buf = '';
+    for (;;) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      kick();
+      buf = (buf + dec.decode(value, { stream: true })).replace(/\r\n/g, '\n');
+      let i;
+      while ((i = buf.indexOf('\n\n')) >= 0) {
+        const evt = buf.slice(0, i); buf = buf.slice(i + 2);
+        const data = evt.split('\n').filter(l => l.startsWith('data:')).map(l => l.slice(5).trim()).join('\n');
+        if (!data || data === '[DONE]') continue;
+        let j; try { j = JSON.parse(data); } catch (e) { continue; }
+        onData(j);
+      }
+    }
+  };
+  const streamClaude = async (emit) => {
+    const tmr = withTimer(hasImage ? 35000 : 25000, 25000);
+    let model = CLAUDE_MODEL, stop = '', got = false, err = '';
+    try {
+      const r = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', signal: tmr.signal, headers: CLAUDE_HEADERS, body: claudeBody(false, true) });
+      if (!r.ok) { const d = await r.json().catch(() => ({})); return { err: 'HTTP ' + r.status + ' ' + String((d.error && d.error.message) || '').slice(0, 160) }; }
+      await readSSE(r, ev => {
+        if (ev.type === 'message_start' && ev.message && ev.message.model) model = ev.message.model;
+        else if (ev.type === 'content_block_delta' && ev.delta && ev.delta.type === 'text_delta' && ev.delta.text) { got = true; emit(ev.delta.text); }
+        else if (ev.type === 'message_delta' && ev.delta && ev.delta.stop_reason) stop = ev.delta.stop_reason;
+        else if (ev.type === 'error') err = String((ev.error && ev.error.message) || 'error').slice(0, 160);
+      }, tmr.kick);
+    } catch (e) { err = e && e.name === 'AbortError' ? 'timeout' : 'gagal terhubung'; }
+    finally { tmr.stop(); }
+    if (stop === 'refusal' && !got) return { err: 'refusal' };
+    if (err) return { err };
+    if (!got) return { err: 'jawaban kosong (' + (stop || '-') + ')' };
+    return { ok: true, model, finish: stop === 'max_tokens' ? 'MAX_TOKENS' : 'STOP' };
+  };
+  const streamGemini = async (model, think, emit) => {
+    const tmr = withTimer(hasImage ? 35000 : 20000, 20000);
+    let got = false, finish = '', err = '';
+    try {
+      const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(model) + ':streamGenerateContent?alt=sse', {
+        method: 'POST', signal: tmr.signal, headers: { 'Content-Type': 'application/json', 'x-goog-api-key': KEY }, body: geminiBody(think)
+      });
+      if (!r.ok) { const d = await r.json().catch(() => ({})); return { status: r.status, msg: (d && d.error && d.error.message) || ('HTTP ' + r.status) }; }
+      await readSSE(r, ev => {
+        const c = ev.candidates && ev.candidates[0];
+        if (c && c.content && Array.isArray(c.content.parts)) c.content.parts.forEach(p => { if (p.text && !p.thought) { got = true; emit(p.text); } });
+        if (c && c.finishReason) finish = c.finishReason;
+      }, tmr.kick);
+    } catch (e) { err = e && e.name === 'AbortError' ? 'timeout' : 'gagal terhubung'; }
+    finally { tmr.stop(); }
+    if (err) return { err, status: 504 };
+    if (!got) return { status: 502, msg: 'AI tidak memberi jawaban (' + (finish || '-') + ')' };
+    return { ok: true, finish };
+  };
+  const streamAnswer = async () => {
+    let started = false, note = '';
+    const emit = obj => {
+      if (!started) {
+        started = true;
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/x-ndjson; charset=utf-8');
+        res.setHeader('Cache-Control', 'no-store');
+        res.setHeader('X-Accel-Buffering', 'no');
+      }
+      res.write(JSON.stringify(obj) + '\n');
+    };
+    const text = t => emit({ t });
+    if (CLAUDE_KEY) {
+      const c = await streamClaude(text);
+      if (c.ok) { emit({ done: true, model: c.model, finish: c.finish }); return res.end(); }
+      if (started) { emit({ error: 'Jawaban terputus — coba tanya lagi.' }); return res.end(); }
+      note = 'Claude: ' + c.err; // belum ada teks terkirim → aman pindah ke Gemini
+      console.warn('[api/ai] claude stream gagal, pakai Gemini', note);
+    }
+    if (!KEY) return send(res, 502, { error: 'AI tidak bisa dihubungi. Coba lagi sebentar lagi.', note });
+    const queue = [MODEL].concat(FALLBACK_MODELS), tried = [];
+    let lastErr = 'AI tidak bisa dihubungi.';
+    while (queue.length && Date.now() - t0 < 55000) {
+      const model = queue.shift();
+      if (!model || tried.includes(model)) continue;
+      tried.push(model);
+      let r = await streamGemini(model, true, text);
+      if (!r.ok && !started && r.status === 400 && /thinking/i.test(r.msg || '')) r = await streamGemini(model, false, text);
+      if (r.ok) { emit(Object.assign({ done: true, model, finish: r.finish }, note ? { note } : {})); return res.end(); }
+      if (started) { emit({ error: 'Jawaban terputus — coba tanya lagi.' }); return res.end(); }
+      lastErr = r.msg ? 'AI menolak permintaan: ' + String(r.msg).slice(0, 200) : (r.err === 'timeout' ? 'AI terlalu lama menjawab.' : 'Gagal menghubungi AI.');
+      const sug = r.msg && /use (?:models\/)?([a-z0-9][a-z0-9.\-]*)/i.exec(r.msg);
+      if (sug && sug[1]) queue.unshift(sug[1]);
+      const retriable = !r.msg || [404, 429, 500, 503].includes(r.status) || /high demand|overloaded|unavailable|no longer available|not found|try again/i.test(r.msg);
+      if (!retriable) break;
+    }
+    return send(res, 502, Object.assign({ error: lastErr.replace(/[.\s]*$/, '.') + ' Coba lagi sebentar lagi.', tried }, note ? { note } : {}));
+  };
+  if (body.stream === true && !wantJSON) return streamAnswer();
+
   let claudeNote = '';
   if (CLAUDE_KEY) {
     let c = await callClaude(wantJSON);
