@@ -21,6 +21,9 @@ const SYSTEM_PROMPT = [
   '- Jangan meminta atau menebak data pribadi (nomor HP, alamat, tanggal lahir) — data itu sengaja tidak dikirim.'
 ].join('\n');
 
+// Model cadangan kalau model utama sibuk ("high demand") / dipensiunkan / timeout
+const FALLBACK_MODELS = ['gemini-3.8-flash', 'gemini-3.5-flash', 'gemini-flash-lite-latest'];
+
 // Rate limit sederhana per IP (per instance — cukup untuk mencegah pemakaian berlebihan)
 const HITS = new Map();
 function rateLimited(ip) {
@@ -93,9 +96,9 @@ module.exports = async function handler(req, res) {
   contents.push({ role: 'user', parts: [{ text: question }] });
 
   const callGemini = async (model) => {
-    // Batas 25 dtk per panggilan supaya tidak menggantung sampai Vercel timeout
+    // Batas 20 dtk per panggilan supaya tidak menggantung sampai Vercel timeout
     const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), 25000);
+    const timer = setTimeout(() => ctrl.abort(), 20000);
     try {
       const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(model) + ':generateContent', {
         method: 'POST',
@@ -112,29 +115,35 @@ module.exports = async function handler(req, res) {
     } finally { clearTimeout(timer); }
   };
 
-  try {
-    let model = MODEL;
-    let { r, data, msg } = await callGemini(model);
-    if (!r.ok) {
-      // Model dipensiunkan → pakai model yang disarankan Google (sekali saja)
-      const sug = /use (?:models\/)?([a-z0-9][a-z0-9.\-]*)/i.exec(msg);
-      if (sug && sug[1] && sug[1] !== model && (r.status === 400 || r.status === 403 || r.status === 404)) {
-        console.warn('[api/ai] model', model, 'ditolak, coba', sug[1]);
-        model = sug[1];
-        ({ r, data, msg } = await callGemini(model));
-      }
+  // Coba model utama, lalu cadangan kalau sibuk / dipensiunkan / timeout (maks ±55 dtk total)
+  const queue = [MODEL].concat(FALLBACK_MODELS);
+  const tried = [];
+  const started = Date.now();
+  let lastErr = 'Gemini tidak bisa dihubungi.', lastStatus = 502;
+  while (queue.length && Date.now() - started < 55000) {
+    const model = queue.shift();
+    if (!model || tried.includes(model)) continue;
+    tried.push(model);
+    let out;
+    try { out = await callGemini(model); }
+    catch (e) {
+      if (e && e.name === 'AbortError') { lastErr = 'Gemini terlalu lama menjawab.'; lastStatus = 504; console.warn('[api/ai] timeout', model); continue; }
+      console.error('[api/ai] fetch failed', model, e); lastErr = 'Gagal menghubungi Gemini.'; continue;
     }
-    if (!r.ok) {
-      console.error('[api/ai] gemini error', r.status, msg);
-      return send(res, 502, { error: 'Gemini menolak permintaan: ' + msg.slice(0, 200) });
+    const { r, data, msg } = out;
+    if (r.ok) {
+      const cand = data.candidates && data.candidates[0];
+      const text = cand && cand.content && Array.isArray(cand.content.parts) ? cand.content.parts.map(p => p.text || '').join('') : '';
+      if (text) return send(res, 200, { text, model });
+      return send(res, 502, { error: 'Gemini tidak memberi jawaban' + (cand && cand.finishReason ? ' (' + cand.finishReason + ')' : '') + '.' });
     }
-    const cand = data.candidates && data.candidates[0];
-    const text = cand && cand.content && Array.isArray(cand.content.parts) ? cand.content.parts.map(p => p.text || '').join('') : '';
-    if (!text) return send(res, 502, { error: 'Gemini tidak memberi jawaban' + (cand && cand.finishReason ? ' (' + cand.finishReason + ')' : '') + '.' });
-    return send(res, 200, { text, model });
-  } catch (e) {
-    if (e && e.name === 'AbortError') return send(res, 504, { error: 'Gemini terlalu lama menjawab. Coba lagi atau persingkat pertanyaan.' });
-    console.error('[api/ai] fetch failed', e);
-    return send(res, 502, { error: 'Gagal menghubungi Gemini. Coba lagi.' });
+    console.warn('[api/ai] gemini error', model, r.status, msg);
+    lastErr = 'Gemini menolak permintaan: ' + msg.slice(0, 200); lastStatus = 502;
+    // Google menyarankan model pengganti → coba itu dulu
+    const sug = /use (?:models\/)?([a-z0-9][a-z0-9.\-]*)/i.exec(msg);
+    if (sug && sug[1]) queue.unshift(sug[1]);
+    const retriable = [404, 429, 500, 503].includes(r.status) || /high demand|overloaded|unavailable|no longer available|not found|try again/i.test(msg);
+    if (!retriable) break; // mis. key salah → tidak perlu coba model lain
   }
+  return send(res, lastStatus, { error: lastErr.replace(/[.\s]*$/, '.') + ' Coba lagi sebentar lagi.', tried });
 };
