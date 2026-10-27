@@ -90,7 +90,7 @@ Header: Rekap CG + Visi Coach (read-only) di kanan. Stats cards: Hadir, Izin, Sa
 ### 3. Coach / TL Dashboard (`pageC`)
 5 tab:
 1. **Overview** — stats + Visi Coach editable + CG cards + Bar chart + **Distribusi Wilayah** (v29+) + Export Detail
-2. **Absensi** — per-CG cards (dot clickable via `cycleDotCoach`) + line chart + Pending CGL list + auto-broadcast reminder + Generate Sabtu + Export Absensi
+2. **Absensi** — per-CG cards (dot clickable via `cycleDotCoach`) + line chart + Pending CGL list + tombol pengingat manual + Generate Sabtu + Export Absensi
 3. **Milestone** — filter chips (Semua/MSJ/CGT/Baptis) + donut + per-CG accordion + Daftar Follow-up (progression-aware)
 4. **Visi** — accordion per CG (preserve expand state across realtime re-render) — Visi, Misi, Dev Plan (with deadline countdown), Catatan Coach
 5. **Events** — filter chips + CRUD + countdown + target dropdown (Global / Region / Per-CG)
@@ -167,7 +167,7 @@ Section paling bawah Overview tab:
 
 ### Coach/TL Dashboard Extras
 - **Pending CGL list** — CG yang belum input absensi 4 tanggal ibadah terakhir
-- **Auto-broadcast reminder** via Realtime channel (rate-limited 2 jam per CG)
+- **Pengingat ke CGL hanya manual** (v32) — auto-broadcast saat render dimatikan karena terpicu tiap buka dashboard di tiap device. `autoBroadcastPendingReminders()` masih ada tapi tidak dipanggil. `broadcastReminder()` cek status `send() === 'ok'`
 - Tombol manual "🔔 Ingatkan" per CG + "Ingatkan Semua"
 - **Bar chart comparison** antar CG (persentase kehadiran)
 

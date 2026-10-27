@@ -5,6 +5,10 @@
     { "source": "/COACH", "destination": "/index.html" },
     { "source": "/tl", "destination": "/index.html" },
     { "source": "/TL", "destination": "/index.html" },
-    { "source": "/Tl", "destination": "/index.html" }
+    { "source": "/Tl", "destination": "/index.html" },
+    { "source": "/coach/", "destination": "/index.html" },
+    { "source": "/tl/", "destination": "/index.html" },
+    { "source": "/TL/", "destination": "/index.html" },
+    { "source": "/Coach/", "destination": "/index.html" }
   ]
 }

@@ -93,8 +93,9 @@ self.addEventListener('notificationclick', (event) => {
   const url = (event.notification.data && event.notification.data.url) || '/';
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((wins) => {
+      // App sudah terbuka → cukup fokus (jangan navigate/reload: CGL/Coach bisa terlempar ke halaman depan)
       for (const w of wins) {
-        if ('focus' in w) { w.navigate(url).catch(() => {}); return w.focus(); }
+        if ('focus' in w) return w.focus();
       }
       if (self.clients.openWindow) return self.clients.openWindow(url);
     })

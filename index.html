@@ -1144,7 +1144,7 @@ function pushNotif(title, body, tag) {
   try {
     const icon = '/icon.jpg';
     navigator.serviceWorker.ready.then(reg => {
-      reg.showNotification(title, { body, icon, badge: icon, tag: tag || 'aog', vibrate: [80,40,80], data: { url: '/' } });
+      reg.showNotification(title, { body, icon, badge: icon, tag: tag || 'aog', vibrate: [80,40,80], data: { url: location.pathname + location.search } });
     }).catch(() => {});
   } catch(e) { void 0; }
 }
@@ -1185,6 +1185,7 @@ function handleAttendanceChange(payload) {
 
   // Re-compute stats header (debounced)
   rtDebounce('att-stats', () => { try { computeStats(); } catch(e) {} }, 300);
+  if (isMyCG) rtDebounce('detail-grid', () => { try { refreshDetailGrid(); } catch(e) {} }, 500);
 
   // Coach Absensi: re-render % per row + avg hadir (debounced lebih lama supaya batch)
   rtDebounce('coach-att-refresh', () => {
@@ -1345,12 +1346,12 @@ function handleReminderBroadcast(payload) {
 async function broadcastReminder(cg, dateLabels) {
   if (!realtimeChannel) return false;
   try {
-    await realtimeChannel.send({
+    const res = await realtimeChannel.send({
       type: 'broadcast',
       event: 'cgl_reminder',
       payload: { cg, dateCount: dateLabels.length, dates: dateLabels.slice(0,5), from: 'coach', ts: Date.now() }
     });
-    return true;
+    return res === 'ok';
   } catch(e) { return false; }
 }
 
@@ -3878,6 +3879,8 @@ function sTab(id, b) {
   document.querySelectorAll('#pageD .tab-content').forEach(t => t.classList.remove('active'));
   document.getElementById('tab-' + id).classList.add('active');
   window.scrollTo(0, 0);
+  // Kartu anak dihitung ulang dari ATTENDANCE terbaru (tanpa query)
+  if (id === 'detail') refreshDetailGrid();
   // Lazy render tab kalau belum pernah di-render
   ensureTabRendered(id);
 }
@@ -4985,8 +4988,8 @@ function renderCoachAbsensi() {
     });
     html += '</section>';
 
-    // Auto-broadcast (rate-limited 2 jam per CG)
-    setTimeout(() => autoBroadcastPendingReminders(pendingList), 800);
+    // Pengingat hanya dikirim lewat tombol "Ingatkan" / "Ingatkan semua".
+    // (Dulu auto-kirim tiap render tab — terpicu tiap buka dashboard/polling di tiap device Coach/TL.)
     // Simpan ke window supaya tombol "Ingatkan Semua" bisa akses
     window.__pendingCGLs = pendingList;
   }
