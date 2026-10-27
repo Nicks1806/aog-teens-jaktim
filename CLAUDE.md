@@ -1,6 +1,6 @@
 # AOG Teens Jaktim — CG Dashboard (Absensi + Management)
 
-**Current version:** v37 · **Last updated:** 27 Oktober 2026
+**Current version:** v38 · **Last updated:** 27 Oktober 2026
 
 ## Project Overview
 Single-file web app untuk tracking attendance, pelayanan, milestone, events, visi, dan distribusi wilayah CG untuk AOG Teens Jakarta Timur. Dipakai oleh ~54 member, 9 CG Leaders, 2 Coach, dan 1 Team Leader secara bersamaan saat ibadah hari Minggu.
@@ -94,6 +94,7 @@ Header: Rekap CG + Visi Coach (read-only) di kanan. Stats cards: Hadir, Izin, Sa
 3. **Milestone** — filter chips (Semua/MSJ/CGT/Baptis) + donut + per-CG accordion + Daftar Follow-up (progression-aware)
 4. **Visi** — accordion per CG (preserve expand state across realtime re-render) — Visi, Misi, Dev Plan (with deadline countdown), Catatan Coach
 5. **Events** — filter chips + CRUD + countdown + target dropdown (Global / Region / Per-CG)
+6. **Tanya AI** (v38) — chat Gemini untuk Coach/TL (`renderCoachAI`, `aiAsk`, `buildAIContext`). Tiap pertanyaan: refetch absensi + tanggal + event → kirim ringkasan JSON (nama, CG, status, string absensi per tanggal, %, milestone, event) ke `/api/ai`. **Tidak** dikirim: WA, alamat, tgl lahir, sekolah, catatan. Kode akses disimpan di `localStorage aog_ai_pin`
 
 **Toggle:**
 - COACH mode: 1 region (jaktim1 / jaktim2)
@@ -277,8 +278,8 @@ Edit index.html locally (+ file lain kalau perlu)
 ```
 
 **Version bump pattern setiap push code:**
-1. `index.html` — cari `App version">v37` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
-2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v37'` → naikkan sama
+1. `index.html` — cari `App version">v38` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
+2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v38'` → naikkan sama
 
 ---
 
@@ -290,6 +291,7 @@ Edit index.html locally (+ file lain kalau perlu)
 - **JANGAN pakai npm/node** — pure vanilla JS
 - **JANGAN buat file README.md atau dokumentasi baru** kecuali diminta
 - `vercel.json` hanya berisi `rewrites` untuk `/coach`, `/tl`, dan `/teen-NN` — jangan tambah build setting
+- **Pengecualian single-file:** `api/ai.js` = Vercel Serverless Function (CommonJS, tanpa npm) proxy ke Gemini. Env var di Vercel: `GEMINI_API_KEY` (wajib), `AI_PIN` (wajib, kode akses Coach/TL), `GEMINI_MODEL` (opsional, default `gemini-2.5-flash`). **JANGAN** taruh API key di `index.html`/repo. System prompt ada di server (`SYSTEM_PROMPT`), rate limit 15/menit per IP
 - Pindah tab pakai `smoothSwap()` (View Transitions + `skipTransition()` pengaman 450ms) — jangan hapus pengamannya
 - HP ≤600px: blok CSS "mode rapat" di akhir `<style>`; input Android 14px, iOS tetap 16px (anti auto-zoom)
 
@@ -392,6 +394,7 @@ Edit index.html locally (+ file lain kalau perlu)
 | v29 | **Distribusi Wilayah** — filter kecamatan + kelurahan di Coach/TL Overview |
 | v30 | Wilayah filter hardening (escape + reset state + count consistency) |
 | v31 | **27 bug fixes** — attendance stats inflate, data corruption (sekolah/kelas split), XSS (PDF export), error handling (21 Supabase ops), TEEN 25 color map, reconnect race guard, undo sync, milestone prereq, visi TOCTOU fix |
+| v38 | **Tab Tanya AI** (Coach/TL) via Gemini: `api/ai.js` (key & kode akses di Vercel env), data terbaru dikirim tiap pertanyaan tanpa data pribadi, saran pertanyaan, salin / kirim WA, render tabel & daftar |
 | v37 | **Absensi offline** (antrean `aog_att_queue_v1` di localStorage via `saveAttendance()`/`flushAttQueue()`), **Arsipkan** member (`archiveMember` → ARSIP JAKTIM 1/2) + Hapus member tetap ada, **Pindah CG** Coach/TL (`moveMemberCG`, juga di pencarian member → restore dari arsip), tgl lahir pakai date picker (`parseLahir`, data lama tak lengkap tidak terhapus), saran kecamatan/kelurahan (`WILAYAH_MAP`, `canonWilayah`), field tidak disimpan kalau tidak berubah (`data-orig`) |
 | v36 | Detail CG: ringkasan CG (rata-rata hadir + tren, follow-up, milestone, data belum lengkap) + info sekolah di kartu anak |
 | v35 | Pengaman transisi tab tanpa error console; cek versi pakai `fetch('/')` (cegah cache SW membengkak) |
