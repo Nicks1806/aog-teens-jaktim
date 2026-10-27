@@ -18,6 +18,7 @@ const SYSTEM_PROMPT = [
   '- Milestone berurutan: MSJ 1 → MSJ 2 → MSJ 3, CGT 1 → CGT 2 → CGT 3, lalu Baptis Air & Baptis Roh.',
   '- Kalau diminta pesan WhatsApp, tulis hangat, sopan, cocok untuk remaja, tanpa menyebut angka persentase yang bisa mempermalukan.',
   '- Fokus membantu pelayanan: siapa yang perlu didoakan / di-follow-up, tren, perbandingan CG, rekap, dan ide tindak lanjut.',
+  '- Default jawaban RINGKAS (maksimal ±250 kata, utamakan tabel atau poin). Jawaban panjang/detail hanya kalau diminta.',
   '- Jangan meminta atau menebak data pribadi (nomor HP, alamat, tanggal lahir) — data itu sengaja tidak dikirim.'
 ].join('\n');
 
@@ -107,7 +108,7 @@ module.exports = async function handler(req, res) {
         body: JSON.stringify({
           systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
           contents,
-          generationConfig: { temperature: 0.3, maxOutputTokens: 4096 }
+          generationConfig: { temperature: 0.3, maxOutputTokens: 8192 }
         })
       });
       const data = await r.json().catch(() => ({}));
@@ -134,7 +135,7 @@ module.exports = async function handler(req, res) {
     if (r.ok) {
       const cand = data.candidates && data.candidates[0];
       const text = cand && cand.content && Array.isArray(cand.content.parts) ? cand.content.parts.map(p => p.text || '').join('') : '';
-      if (text) return send(res, 200, { text, model });
+      if (text) return send(res, 200, { text, model, finish: cand.finishReason || '' });
       return send(res, 502, { error: 'Gemini tidak memberi jawaban' + (cand && cand.finishReason ? ' (' + cand.finishReason + ')' : '') + '.' });
     }
     console.warn('[api/ai] gemini error', model, r.status, msg);
