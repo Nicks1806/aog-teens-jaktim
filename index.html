@@ -41,24 +41,42 @@ h1,h2,h3{font-family:var(--display)}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
 /* Landing */
-.landing{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:20px;background:radial-gradient(ellipse at top,#faf5ff,#f8f8f5 60%)}
-.landing-title{font-family:'Instrument Serif',serif;font-size:32px;margin-bottom:2px}
-.landing-sub{font-size:11px;color:var(--g3);letter-spacing:2px;text-transform:uppercase;margin-bottom:36px}
-.region-toggle{display:flex;background:rgba(232,232,232,.6);backdrop-filter:blur(10px);border-radius:24px;padding:3px;margin-bottom:28px;box-shadow:inset 0 1px 2px rgba(0,0,0,.04)}
-.region-btn{padding:10px 32px;border-radius:22px;border:none;font-size:14px;font-weight:700;cursor:pointer;transition:all .3s cubic-bezier(.4,0,.2,1);background:transparent;color:var(--g3);letter-spacing:.5px}
-.region-btn.active{background:linear-gradient(135deg,#6C5CE7,#8B5CF6);color:#fff;box-shadow:0 4px 14px rgba(108,92,231,.4),0 0 0 2px rgba(108,92,231,.1)}
-.region-btn:hover:not(.active){color:var(--g1);background:rgba(255,255,255,.5)}
-
-/* Custom dropdown */
-.cgl-selector{width:100%;max-width:420px;margin-bottom:16px;position:relative}
-
-/* Enter button */
-.enter-btn{width:100%;max-width:420px;padding:16px;border:none;border-radius:16px;background:linear-gradient(135deg,#6C5CE7,#8B5CF6);color:#fff;font-size:15px;font-weight:700;letter-spacing:.5px;cursor:pointer;transition:all .25s cubic-bezier(.4,0,.2,1);box-shadow:0 6px 20px rgba(108,92,231,.35);position:relative;overflow:hidden}
-.enter-btn:not(:disabled):hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(108,92,231,.45)}
-.enter-btn:not(:disabled):active{transform:translateY(0);box-shadow:0 4px 12px rgba(108,92,231,.35)}
-.enter-btn:disabled{background:#e5e5e5;color:#a1a1aa;cursor:not-allowed;box-shadow:none}
-.enter-btn::after{content:'→';margin-left:8px;display:inline-block;transition:transform .2s}
-.enter-btn:not(:disabled):hover::after{transform:translateX(4px)}
+.landing{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:var(--side);position:relative;overflow:hidden}
+.landing:before{content:"";position:absolute;width:720px;height:720px;border-radius:50%;background:#33267A;top:-320px;right:-240px;pointer-events:none}
+.landing:after{content:"";position:absolute;width:420px;height:420px;border-radius:50%;background:#2C2270;bottom:-200px;left:-140px;pointer-events:none}
+.lcard{position:relative;z-index:1;width:100%;max-width:440px;background:var(--card);border-radius:28px;padding:36px 32px;display:flex;flex-direction:column;gap:22px;box-shadow:0 30px 80px rgba(10,6,40,.35);animation:tabFadeIn .25s ease}
+.theme small{display:block;font-size:12px;font-weight:600;letter-spacing:1.6px;text-transform:uppercase;color:var(--muted)}
+.theme b{display:block;font-family:var(--display);font-weight:800;font-size:44px;line-height:1;letter-spacing:-1px;color:var(--side)}
+.theme span{font-family:var(--display);font-weight:700;font-size:18px;color:var(--accent-ink)}
+.lcard h1{font-size:26px;font-weight:800}
+.lcard p{margin-top:4px;color:var(--muted);font-size:14px}
+.lfoot{text-align:center;font-size:14px;color:var(--muted)}
+.lfoot .linkbtn{display:inline-flex;align-items:center}
+.dd{position:relative}
+.ddbtn{width:100%;min-height:62px;display:flex;align-items:center;gap:12px;padding:8px 14px 8px 8px;border:1px solid var(--line);border-radius:16px;background:#fff;text-align:left;cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.ddbtn:hover{border-color:#CFCAE3}
+.dd.open .ddbtn{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.ddval{display:flex;align-items:center;gap:12px;flex:1;min-width:0}
+.ddico{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex:none}
+.ddtxt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.ddtxt b{font-size:15px;font-weight:700;color:var(--ink)}
+.ddtxt small{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ddtxt .ph{font-size:15px;color:var(--muted)}
+.ddchev{color:var(--muted);display:flex;transition:transform .2s}
+.dd.open .ddchev{transform:rotate(180deg);color:var(--accent)}
+.ddpanel{position:absolute;left:0;right:0;top:calc(100% + 8px);background:#fff;border:1px solid var(--line);border-radius:18px;padding:6px;box-shadow:0 24px 60px rgba(36,28,92,.22);z-index:50;max-height:330px;overflow-y:auto;animation:fadeIn .15s}
+.ddhead{font-size:11px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);padding:10px 10px 6px}
+.ddopt{width:100%;display:flex;align-items:center;gap:12px;padding:8px 10px 8px 8px;border:0;border-radius:12px;background:transparent;text-align:left;cursor:pointer}
+.ddopt:hover,.ddopt:focus-visible{background:var(--faint);outline:none}
+.ddopt[aria-selected=true]{background:var(--accent-soft)}
+.ddopt .ddico{width:40px;height:40px;border-radius:11px}
+.ddopt .ok{color:var(--accent);display:flex}
+.ddempty{padding:20px;text-align:center;font-size:13px;color:var(--muted)}
+.region-toggle{display:flex;gap:4px;padding:4px;background:var(--faint);border-radius:14px}
+.region-btn{flex:1;white-space:nowrap;min-height:40px;padding:0 16px;border:0;border-radius:10px;background:transparent;font-weight:600;font-size:14px;color:var(--muted);cursor:pointer}
+.region-btn:hover:not(.active){color:var(--ink)}
+.region-btn.active{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(23,21,31,.12)}
+@media (max-width:520px){.lcard{padding:28px 22px}.theme b{font-size:38px}}
 
 /* App shell */
 .app{display:none}
@@ -261,7 +279,6 @@ textarea.modal-input{line-height:1.5}
   .app-stats{grid-template-columns:repeat(2,1fr)}
   .app-stat{border-bottom:1px solid var(--g5)}
   .dgrid{grid-template-columns:1fr}
-  .region-btn{padding:8px 24px;font-size:13px}
   .dev-row{flex-direction:column;align-items:flex-start;gap:6px}
   #visiCardsContainer > div[style*="grid-template-columns:repeat(2"]{grid-template-columns:1fr !important}
 }
@@ -453,22 +470,25 @@ textarea.modal-input{line-height:1.5}
 
 <!-- LANDING -->
 <div class="landing" id="pageL">
-  <div style="font-size:13px;letter-spacing:3px;color:var(--g3);text-transform:uppercase;margin-bottom:6px;font-weight:600">THE YEAR OF</div>
-  <div style="font-family:'Inter',sans-serif;font-weight:900;font-size:44px;letter-spacing:-2px;line-height:1">UNITY</div>
-  <div style="font-family:'Inter',sans-serif;font-weight:800;font-size:22px;margin-bottom:28px;letter-spacing:-.5px">& OPEN HEAVENS</div>
-  <div class="landing-title" style="font-size:44px;line-height:1.1">Absensi Dashboard</div>
-  <div class="landing-sub" style="font-size:13px;letter-spacing:1.5px">AOG Teens Jaktim 2026</div>
-  <div class="region-toggle"><button class="region-btn active" onclick="selReg('jaktim1',this)">JAKTIM 1</button><button class="region-btn" onclick="selReg('jaktim2',this)">JAKTIM 2</button></div>
-  <div class="cgl-selector" id="cgDD" style="position:relative">
-    <button type="button" id="cgDDBtn" onclick="toggleCGDropdown(event)" style="width:100%;padding:16px 18px;background:#fff;border:2px solid #e4dcff;border-radius:14px;display:flex;align-items:center;gap:12px;cursor:pointer;font-family:Inter,sans-serif;font-size:13px;color:var(--g1);box-shadow:0 4px 14px rgba(108,92,231,.06);transition:all .2s" onmouseover="this.style.borderColor='#c4b5fd';this.style.boxShadow='0 6px 20px rgba(108,92,231,.12)'" onmouseout="this.style.borderColor='#e4dcff';this.style.boxShadow='0 4px 14px rgba(108,92,231,.06)'">
-      <span id="cgDDLabel" style="flex:1;text-align:left;color:var(--g3);font-weight:500">Pilih CG Leader</span>
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6C5CE7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" id="cgDDChevron" style="transition:transform .2s"><polyline points="6 9 12 15 18 9"/></svg>
-    </button>
-    <div id="cgDDPanel" style="display:none;position:absolute;top:calc(100% + 6px);left:0;right:0;background:#fff;border:1px solid #e4dcff;border-radius:14px;box-shadow:0 12px 36px rgba(108,92,231,.18);overflow:hidden;z-index:50;max-height:340px;overflow-y:auto"></div>
-    <input type="hidden" id="cglSel" value="">
-  </div>
-  <button class="enter-btn" id="enterBtn" disabled onclick="enterDash()">Masuk Dashboard</button>
-  <div style="margin-top:24px;padding:10px 18px;border-radius:20px;background:rgba(255,255,255,.6);backdrop-filter:blur(10px);border:1px solid rgba(108,92,231,.15);font-size:11px;color:var(--g3);letter-spacing:.3px">Coach / TL? <a href="?role=coach" style="color:var(--purple);font-weight:700;text-decoration:none;margin-left:4px">Masuk disini &rarr;</a></div>
+  <main class="lcard">
+    <div class="theme"><small>The year of</small><b>Unity</b><span>&amp; Open Heavens</span></div>
+    <div><h1>Absensi Dashboard</h1><p>AOG Teens Jaktim · 2026</p></div>
+    <div class="field"><span class="flabel">Region</span>
+      <div class="seg region-toggle" role="group" aria-label="Region"><button type="button" class="region-btn active" aria-pressed="true" onclick="selReg('jaktim1',this)">Jaktim 1</button><button type="button" class="region-btn" aria-pressed="false" onclick="selReg('jaktim2',this)">Jaktim 2</button></div>
+    </div>
+    <div class="field"><span class="flabel" id="ddlbl">CG kamu</span>
+      <div class="dd" id="cgDD">
+        <button type="button" class="ddbtn" id="cgDDBtn" onclick="toggleCGDropdown(event)" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="ddlbl cgDDLabel">
+          <span id="cgDDLabel" class="ddval"><span class="ddico" style="background:var(--faint);color:var(--muted)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c1.9.7 3.1 2.4 3.5 5.2"/></svg></span><span class="ddtxt"><span class="ph">Pilih CG Leader…</span></span></span>
+          <span class="ddchev" id="cgDDChevron"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></span>
+        </button>
+        <div class="ddpanel" id="cgDDPanel" role="listbox" aria-labelledby="ddlbl" style="display:none"></div>
+        <input type="hidden" id="cglSel" value="">
+      </div>
+    </div>
+    <button type="button" class="btn primary big" id="enterBtn" disabled onclick="enterDash()">Masuk dashboard <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+    <div class="lfoot">Coach / TL? <a class="linkbtn" href="?role=coach">Masuk di sini</a></div>
+  </main>
 </div>
 
 <!-- CGL DASHBOARD -->
@@ -1352,9 +1372,18 @@ async function loadCGLDropdown() {
 
 function selReg(r, b) {
   curReg = r;
-  document.querySelectorAll('#pageL .region-btn').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('#pageL .region-btn').forEach(x => { x.classList.remove('active'); x.setAttribute('aria-pressed','false'); });
   b.classList.add('active');
+  b.setAttribute('aria-pressed','true');
+  setCGDropdownOpen(false);
   popDD();
+}
+
+const DD_PLACEHOLDER = '<span class="ddico" style="background:var(--faint);color:var(--muted)">'+icon('users')+'</span><span class="ddtxt"><span class="ph">Pilih CG Leader…</span></span>';
+function ddBody(cg, shortName, cgInit, cgColor, cgBg) {
+  const n = ALL_MEMBERS.filter(x => x.cg === cg).length;
+  return '<span class="ddico" style="background:'+esc(cgBg)+';color:'+esc(cgColor)+'">'+esc(cgInit)+'</span>'+
+    '<span class="ddtxt"><b>'+esc(cg)+'</b><small>CGL '+esc(shortName)+' · '+n+' anggota</small></span>';
 }
 
 function popDD() {
@@ -1365,9 +1394,7 @@ function popDD() {
 
   // Reset selection
   hidden.value = '';
-  label.textContent = 'Pilih CG Leader';
-  label.style.color = 'var(--g3)';
-  label.style.fontWeight = '500';
+  label.innerHTML = DD_PLACEHOLDER;
   document.getElementById('enterBtn').disabled = true;
 
   // Filter CGL berdasarkan region aktif — skip CG yang di-arsip
@@ -1388,48 +1415,66 @@ function popDD() {
     const parts = String(m.nama||'').trim().split(/\s+/);
     const shortName = parts.length >= 2 ? parts[0] + ' ' + parts[parts.length-1] : (m.nama||'');
     const cgInit = (m.cg || '').replace(/\D/g,'') || (m.cg||'').slice(0,2);
-    const cgColor = (typeof CG_COLORS !== 'undefined' && CG_COLORS[m.cg]) || '#6C5CE7';
-    const cgBg = (typeof CG_BG !== 'undefined' && CG_BG[m.cg]) || '#faf5ff';
+    const cgColor = (typeof CG_COLORS !== 'undefined' && CG_COLORS[m.cg]) || '#5B45E0';
+    const cgBg = (typeof CG_BG !== 'undefined' && CG_BG[m.cg]) || '#EEEAFB';
 
-    const opt = document.createElement('div');
-    opt.className = 'cg-dd-opt';
+    const opt = document.createElement('button');
+    opt.type = 'button';
+    opt.className = 'ddopt cg-dd-opt';
+    opt.setAttribute('role','option');
+    opt.setAttribute('aria-selected','false');
     opt.dataset.cg = m.cg;
     opt.dataset.short = shortName;
     opt.dataset.cgInit = cgInit;
     opt.dataset.cgColor = cgColor;
     opt.dataset.cgBg = cgBg;
-    opt.style.cssText = 'padding:14px 16px;cursor:pointer;border-bottom:1px solid #f5f0ff;transition:background .15s';
-    opt.innerHTML =
-      '<div style="font-weight:700;font-size:13px;color:var(--g1);line-height:1.2">'+esc(shortName)+'</div>' +
-      '<div style="font-size:10px;color:var(--g4);margin-top:3px;letter-spacing:.4px">'+esc(m.cg)+' &middot; CG Leader</div>';
-    opt.onmouseenter = () => { opt.style.background = cgBg; };
-    opt.onmouseleave = () => { opt.style.background = ''; };
+    opt.innerHTML = ddBody(m.cg, shortName, cgInit, cgColor, cgBg);
     opt.onclick = (e) => { e.stopPropagation(); selectCGOption(m.cg, shortName, cgInit, cgColor, cgBg); };
     panel.appendChild(opt);
   });
 
-  if (cgls.length === 0) {
-    panel.innerHTML = '<div style="padding:20px;text-align:center;font-size:11px;color:var(--g4);font-style:italic">Tidak ada CG Leader untuk region ini</div>';
+  if (seen.size) {
+    const regLabel = String(curReg||'').toLowerCase() === 'jaktim2' ? 'Jaktim 2' : 'Jaktim 1';
+    panel.insertAdjacentHTML('afterbegin', '<div class="ddhead">'+regLabel+' · '+seen.size+' CG</div>');
+  } else {
+    panel.innerHTML = '<div class="ddempty">Tidak ada CG Leader untuk region ini</div>';
+  }
+}
+
+function setCGDropdownOpen(open) {
+  const dd = document.getElementById('cgDD');
+  const panel = document.getElementById('cgDDPanel');
+  const btn = document.getElementById('cgDDBtn');
+  if (!dd || !panel) return;
+  panel.style.display = open ? 'block' : 'none';
+  dd.classList.toggle('open', open);
+  if (btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  if (open) {
+    const o = panel.querySelector('.ddopt[aria-selected="true"]') || panel.querySelector('.ddopt');
+    if (o) o.focus();
   }
 }
 
 function toggleCGDropdown(e) {
   if (e) e.stopPropagation();
   const panel = document.getElementById('cgDDPanel');
-  const chev = document.getElementById('cgDDChevron');
-  const open = panel.style.display === 'block';
-  panel.style.display = open ? 'none' : 'block';
-  if (chev) chev.style.transform = open ? '' : 'rotate(180deg)';
+  setCGDropdownOpen(panel.style.display !== 'block');
 }
 
 function selectCGOption(cg, shortName, cgInit, cgColor, cgBg) {
   document.getElementById('cglSel').value = cg;
-  const label = document.getElementById('cgDDLabel');
-  label.textContent = cg + ' · ' + shortName;
-  label.style.color = 'var(--g1)';
-  label.style.fontWeight = '700';
-  document.getElementById('enterBtn').disabled = false;
-  toggleCGDropdown();
+  document.getElementById('cgDDLabel').innerHTML = ddBody(cg, shortName, cgInit, cgColor, cgBg);
+  document.querySelectorAll('#cgDDPanel .ddopt').forEach(o => {
+    const on = o.dataset.cg === cg;
+    o.setAttribute('aria-selected', on ? 'true' : 'false');
+    const ok = o.querySelector('.ok');
+    if (on && !ok) o.insertAdjacentHTML('beforeend', '<span class="ok">'+icon('check')+'</span>');
+    if (!on && ok) ok.remove();
+  });
+  const enter = document.getElementById('enterBtn');
+  enter.disabled = false;
+  setCGDropdownOpen(false);
+  enter.focus();
 }
 
 // Close dropdown saat klik di luar
@@ -1437,10 +1482,21 @@ document.addEventListener('click', (e) => {
   const dd = document.getElementById('cgDD');
   const panel = document.getElementById('cgDDPanel');
   if (!dd || !panel || panel.style.display !== 'block') return;
-  if (!dd.contains(e.target)) {
-    panel.style.display = 'none';
-    const chev = document.getElementById('cgDDChevron');
-    if (chev) chev.style.transform = '';
+  if (!dd.contains(e.target)) setCGDropdownOpen(false);
+});
+
+// Keyboard: Esc tutup, panah atas/bawah pindah opsi
+document.addEventListener('keydown', (e) => {
+  const panel = document.getElementById('cgDDPanel');
+  if (!panel || panel.style.display !== 'block') return;
+  if (e.key === 'Escape') { setCGDropdownOpen(false); document.getElementById('cgDDBtn').focus(); return; }
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    e.preventDefault();
+    const opts = [...panel.querySelectorAll('.ddopt')];
+    if (!opts.length) return;
+    let i = opts.indexOf(document.activeElement);
+    i = e.key === 'ArrowDown' ? Math.min(opts.length-1, i+1) : Math.max(0, i-1);
+    opts[i].focus();
   }
 });
 
