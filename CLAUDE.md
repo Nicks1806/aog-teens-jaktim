@@ -6,7 +6,7 @@
 Single-file web app untuk tracking attendance, pelayanan, milestone, events, visi, dan distribusi wilayah CG untuk AOG Teens Jakarta Timur. Dipakai oleh ~54 member, 9 CG Leaders, 2 Coach, dan 1 Team Leader secara bersamaan saat ibadah hari Minggu.
 
 **URL Production:** https://absenibadahjaktim.vercel.app
-**Coach/TL URL:** https://absenibadahjaktim.vercel.app/?role=coach
+**Coach URL:** https://absenibadahjaktim.vercel.app/coach · **TL URL:** https://absenibadahjaktim.vercel.app/tl (rewrite di `vercel.json`; `?role=coach` lama tetap jalan)
 
 Untuk konteks handoff lengkap ke Claude Code baru, baca `HANDOFF.md`.
 
@@ -59,6 +59,7 @@ Untuk konteks handoff lengkap ke Claude Code baru, baca `HANDOFF.md`.
 ### Storage Khusus
 - Coach region visi disimpan di `cg_vision` dengan `cg = '__COACH_jaktim1__'` atau `'__COACH_jaktim2__'`
 - CG dengan nama diawali `ARSIP` di-filter dari display aktif (function `isArchivedCg`)
+- **Tema tahun** ("THE YEAR OF / UNITY / & OPEN HEAVENS" di landing + sidebar) disimpan di `cg_vision` dengan `cg = '__THEME__'`, `region = 'all'`, `visi` = JSON `{kicker,title,sub}`. Diedit Coach/TL lewat klik blok tema di sidebar (`openThemeEdit`/`saveTheme`), realtime via `handleVisionChange`
 
 ### Unique Constraints
 - `cg_pelayanan`: `(cg, week_date, role_name)`
@@ -73,12 +74,12 @@ Untuk konteks handoff lengkap ke Claude Code baru, baca `HANDOFF.md`.
 - Custom dropdown CG Leader (panel + avatar, bukan native select)
 - Skip archived CG dari dropdown otomatis
 - Tombol "Masuk Dashboard"
-- Link "Coach / TL? Masuk disini →"
+- **Tidak ada link ke Coach/TL** (v32) — Coach/TL buka lewat alamat `/coach` atau `/tl`
 
 ### 2. CGL Dashboard (`pageD`) — per CG
 6 tab:
 1. **Absensi** — H/I/S/A tabel + line chart + Export Absensi CSV/PDF
-2. **Detail CG** — per-member card (nama, WA, sekolah, alamat, milestone) + Export Detail CSV/PDF
+2. **Detail CG** — kartu ringkas per anak (nama, role, % hadir, strip 8 absensi terakhir, milestone). Klik kartu → modal `cglMemberModal` (`openCGLMember`): % kehadiran, H/I/S/A, chart garis % hadir per bulan, absensi terakhir, edit data diri, milestone, catatan, hapus. Export Detail CSV/PDF
 3. **Visi CG** — visi + misi (click-to-edit numbered list) + Rencana Pengembangan Member (dev plan dengan deadline)
 4. **Pelayanan** — jadwal per minggu, multi-assignee support, statistik
 5. **Milestone** — donut SVG + progress bars + follow-up
@@ -288,6 +289,7 @@ Edit index.html locally (+ file lain kalau perlu)
 - **JANGAN tambah build step** — Vercel publish dir `.` (root), no build command
 - **JANGAN pakai npm/node** — pure vanilla JS
 - **JANGAN buat file README.md atau dokumentasi baru** kecuali diminta
+- `vercel.json` hanya berisi `rewrites` untuk `/coach` & `/tl` — jangan tambah build setting
 
 ### Desain (v32 — redesign)
 - **Tata letak baru (sidebar + bottom nav), tema/warna/font tetap seperti v31 live.** Token warna di `:root` (`--bg`, `--card`, `--line`, `--ink`, `--muted`, `--accent` #6C5CE7, `--grad` ungu, `--H/--I/--S/--A/--X` + `b`/`br`) memakai palet v31. Override tema ada di blok CSS `TEMA v31 (live)`

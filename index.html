@@ -260,7 +260,9 @@ textarea.modal-input{line-height:1.5}
 
 /* ══════════ REDESIGN — tab Absensi & elemen bersama tab ══════════ */
 .dot{padding:0;font-family:inherit;line-height:1}
-.tblwrap{overflow-x:auto;margin:0 -6px;padding:0 6px}
+.tblwrap{overflow-x:auto;margin:0;padding:0}
+/* Kolom nama sticky harus nempel tepat di tepi kiri (padding di wrapper bikin sel yang di-scroll mengintip di kiri) */
+.tblwrap .name-cell{box-shadow:8px 0 8px -8px rgba(0,0,0,.12)}
 table.att{border-collapse:separate;border-spacing:0}
 table.att th{font-size:12px;font-weight:600;color:var(--muted);padding:0 3px 8px;border-bottom:0}
 table.att td{padding:3px;border-bottom:0}
@@ -330,7 +332,87 @@ table.att .tlabel{font-size:12px;color:var(--muted);font-weight:600}
 .msc.done{background:var(--Hb);color:var(--H);border:1px solid var(--Hbr)}
 .msc.pending{background:#fff;color:var(--muted);border:1px solid var(--line)}
 .msc:hover{filter:brightness(.97)}
-@media (max-width:520px){.info{grid-template-columns:1fr}.mgrid{grid-template-columns:1fr}}
+/* Kartu member — rapi: isian 4 kolom (Sekolah lebar, Kelas sempit), milestone grid rata, footer sejajar */
+.mcard{padding:18px 18px 14px;gap:16px}
+.mcard .top .ava{width:42px;height:42px}
+.info{grid-template-columns:repeat(4,minmax(0,1fr));gap:12px 10px;padding-top:16px;border-top:1px solid var(--line2)}
+.info .c1{grid-column:span 1}.info .c2{grid-column:span 2}.info .c3{grid-column:span 3}
+.info label{font-size:11px;gap:5px;color:#8a8a8a}
+.info input{height:36px;border-color:transparent;background:#f6f6f3;border-radius:9px;font-size:13.5px;font-weight:500}
+.info input:hover{border-color:var(--line)}
+.info input::placeholder{color:#bdbdbd;font-weight:400}
+.mcard .flabel{font-size:11px;font-weight:600;color:#8a8a8a;text-transform:uppercase;letter-spacing:.6px}
+.mhead{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px}
+.mhint{font-size:11px;color:#b0b0b0}
+.msgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.msgrid .msc{justify-content:center;min-height:30px;padding:0 4px;font-size:12px;white-space:nowrap}
+.mcard .field{gap:6px}
+.textarea.mnote{min-height:52px;font-size:13px;border-radius:10px;padding:9px 12px;background:#fafaf8}
+.textarea.mnote:focus{background:#fff}
+.mcfoot{margin-top:auto;display:flex;justify-content:flex-end;padding-top:10px;border-top:1px solid var(--line2)}
+.mcfoot .btn{min-height:30px;font-size:12px;padding:0 8px}
+@media (max-width:520px){.mgrid{grid-template-columns:1fr}}
+/* Kartu ringkas anak CG (tab Detail) */
+.kgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.kgrid .addcard{min-height:150px}
+.kcard{position:relative;display:flex;flex-direction:column;gap:14px;text-align:left;background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;cursor:pointer;min-width:0;font:inherit;color:inherit;box-shadow:0 1px 3px rgba(0,0,0,.03);transition:border-color .15s,box-shadow .15s,transform .15s}
+.kcard:hover{border-color:#d9d2ff;box-shadow:0 8px 24px rgba(108,92,231,.12);transform:translateY(-1px)}
+.kcard:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.kc-top{display:flex;align-items:center;gap:11px}
+.kc-top .ava{width:40px;height:40px;font-size:15px}
+.kc-name{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start}
+.kc-name b{font-size:15px;font-weight:700;line-height:1.25;max-width:100%;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;word-break:break-word}
+.kc-go{color:#c4c4c4;display:inline-flex;transition:color .15s,transform .15s}
+.kcard:hover .kc-go{color:var(--accent);transform:translateX(2px)}
+.kc-mid{display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+.kc-pct{font-family:var(--display);font-size:38px;line-height:.9}
+.kc-pct small{font-family:'Inter',sans-serif;font-size:11px;color:#999;margin-left:4px;letter-spacing:.3px}
+.kc-strip{display:flex;gap:3px;padding-bottom:4px}
+.kc-strip i{width:10px;height:18px;border-radius:3px;background:var(--Xb)}
+.kc-strip i.H{background:var(--H)}.kc-strip i.I{background:var(--I)}.kc-strip i.S{background:var(--S)}.kc-strip i.A{background:var(--A)}
+.kc-ms{display:flex;align-items:center;gap:8px;font-size:11px;color:#8a8a8a;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.kc-ms .tr{flex:1;height:6px;border-radius:6px;background:#f0f0ed;overflow:hidden}
+.kc-ms .tr i{display:block;height:100%;border-radius:6px;background:var(--grad)}
+.kc-ms b{color:var(--ink);font-size:12px;letter-spacing:0}
+.kc-flag{position:absolute;top:-8px;right:12px;font-size:11px;font-weight:700;background:var(--Ab);color:var(--A);border:1px solid var(--Abr);border-radius:20px;padding:2px 8px}
+/* Modal detail anak */
+#cglMemberModal .modal-box{max-height:calc(100vh - 32px);overflow-y:auto}
+#cglMemberModal .md-head{position:relative;padding-right:40px}
+.md-x{position:absolute;top:-6px;right:-6px}
+.md-name{font-size:22px;font-weight:700;margin-bottom:4px}
+#cglMemberModal .md-head .sub{margin:0;font-size:13px;color:var(--muted)}
+.md-sec{margin-top:20px}
+.md-foot{justify-content:space-between;padding-top:14px;border-top:1px solid var(--line2)}
+#cglMemberModal .info{border-top:0;padding-top:0}
+.md-pct{text-align:right}
+.trend{background:#fafaf8;border:1px solid var(--line2);border-radius:14px;padding:22px 14px 8px}
+.trend-plot{position:relative;height:170px}
+.trend-plot svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.trend .gl{stroke:#e2e2dc;stroke-width:1;stroke-dasharray:3 4;vector-effect:non-scaling-stroke}
+.trend .ln{fill:none;stroke:#6C5CE7;stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round;vector-effect:non-scaling-stroke}
+.ty{position:absolute;left:0;transform:translateY(-50%);font-size:11px;color:#aaa}
+.tp{position:absolute;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;background:#fff;border:3px solid var(--c);box-sizing:border-box}
+.tp b{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);font-size:12px;font-weight:700;color:var(--c);white-space:nowrap}
+.trend-x{position:relative;height:20px;margin-top:6px}
+.trend-x span{position:absolute;transform:translateX(-50%);font-size:11px;font-weight:600;color:#888;white-space:nowrap}
+.lastatt{display:flex;flex-wrap:wrap;gap:8px}
+.lastatt span{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:44px}
+.lastatt .dot{width:30px;height:30px;font-size:12px;border-radius:9px;cursor:default;font-style:normal}
+.lastatt small{font-size:11px;color:#999}
+@media (max-width:520px){
+  .kgrid{grid-template-columns:1fr}
+  .trend.many .tp b{display:none}
+  .md-name{font-size:17px}
+  #cglMemberModal .md-head{flex-wrap:wrap;gap:12px}
+  #cglMemberModal .md-head>.ava{width:44px !important;height:44px !important;font-size:17px !important}
+  .md-pct{order:3;width:100%;display:flex;align-items:baseline;gap:8px;text-align:left}
+  .md-pct .pct{font-size:34px !important}
+  #cglMemberModal .md-stats{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+  #cglMemberModal .md-stats div{padding:8px 2px}
+  #cglMemberModal .md-stats b{font-size:22px}
+  #cglMemberModal .md-stats span{font-size:11px}
+  #cglMemberModal .mhead{flex-wrap:wrap;gap:2px 8px}
+}
 /* Visi CG */
 .visi-box{background:var(--side);color:#fff;border-radius:20px;padding:28px;margin-bottom:24px}
 .visi-box small{font-size:12px;font-weight:600;letter-spacing:1.4px;text-transform:uppercase;color:#CFC9F2}
@@ -543,6 +625,16 @@ table.att .tlabel{font-size:12px;color:var(--muted);font-weight:600}
 /* ══════════ TEMA v31 (live) di atas tata letak baru ══════════
    Warna, font, dan gaya mengikuti versi live; struktur/layout tetap redesign. */
 body{background:var(--bg);color:var(--ink)}
+/* Layout stabil saat pindah tab / Coach-TL: scrollbar tidak menggeser halaman, label sidebar 1 baris, pill region di mode TL */
+html{scrollbar-gutter:stable}
+.brand .grow{min-width:0}
+.brand small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sidetheme.editable{position:relative;border:1px dashed transparent;border-radius:12px;background:transparent;text-align:left;padding:10px 12px;margin:0 0 4px;cursor:pointer;font:inherit;color:inherit;width:100%}
+.sidetheme.editable:hover{border-color:#d9d2ff;background:#faf8ff}
+.st-edit{position:absolute;top:8px;right:8px;font-style:normal;font-size:11px;font-weight:700;color:#6C5CE7;opacity:0;transition:opacity .15s}
+.sidetheme.editable:hover .st-edit,.sidetheme.editable:focus-visible .st-edit{opacity:1}
+@media (hover:none){.st-edit{opacity:1}}
+.regall{display:inline-flex;align-items:center;height:44px;padding:0 18px;border-radius:24px;background:var(--grad);color:#fff;font-size:13px;font-weight:700;box-shadow:0 4px 12px rgba(108,92,231,.3)}
 .card,.kpi,.mcard,.evcard,.acc,.cgcard,.donut,.section{border-radius:16px}
 .card,.kpi,.mcard,.evcard,.acc,.cgcard,.donut{box-shadow:0 1px 3px rgba(0,0,0,.03)}
 
@@ -752,6 +844,30 @@ body{background:var(--bg);color:var(--ink)}
   </div>
 </div>
 
+<!-- Edit tema tahun (Coach/TL) -->
+<div class="modal-overlay" id="themeModal">
+  <div class="modal-box" role="dialog" aria-modal="true" aria-label="Edit tema tahun ini" style="max-width:440px">
+    <h2 class="modal-title">Tema tahun ini</h2>
+    <div class="sub" style="margin-bottom:16px">Tampil di halaman depan dan sidebar semua CGL, Coach &amp; TL.</div>
+    <div class="mfields">
+      <label class="field"><span class="flabel">Baris atas</span><input class="input" id="themeKicker" maxlength="40" placeholder="The year of"></label>
+      <label class="field"><span class="flabel">Judul</span><input class="input" id="themeTitle" maxlength="30" placeholder="Unity"></label>
+      <label class="field"><span class="flabel">Baris bawah</span><input class="input" id="themeSub" maxlength="40" placeholder="&amp; Open Heavens"></label>
+    </div>
+    <div class="mfoot">
+      <button type="button" class="btn" onclick="closeModal('themeModal')">Batal</button>
+      <button type="button" class="btn primary" id="themeSaveBtn" onclick="saveTheme()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Detail anak CG (CGL, tab Detail) -->
+<div class="modal-overlay" id="cglMemberModal">
+  <div class="modal-box" role="dialog" aria-modal="true" aria-label="Detail anak CG" style="max-width:760px">
+    <div id="cglMemberBody"></div>
+  </div>
+</div>
+
 <!-- Member Detail Modal (Coach search) -->
 <div class="modal-overlay" id="memberDetailModal">
   <div class="modal-box" role="dialog" aria-modal="true" aria-label="Detail member" style="max-width:720px">
@@ -764,9 +880,9 @@ body{background:var(--bg);color:var(--ink)}
 
 <!-- LANDING -->
 <div class="landing" id="pageL">
-  <div style="font-size:13px;letter-spacing:3px;color:var(--g3);text-transform:uppercase;margin-bottom:6px;font-weight:600">THE YEAR OF</div>
-  <div style="font-family:'Inter',sans-serif;font-weight:900;font-size:44px;letter-spacing:-2px;line-height:1">UNITY</div>
-  <div style="font-family:'Inter',sans-serif;font-weight:800;font-size:22px;margin-bottom:28px;letter-spacing:-.5px">& OPEN HEAVENS</div>
+  <div style="font-size:13px;letter-spacing:3px;color:var(--g3);text-transform:uppercase;margin-bottom:6px;font-weight:600" id="ltKicker">THE YEAR OF</div>
+  <div style="font-family:'Inter',sans-serif;font-weight:900;font-size:44px;letter-spacing:-2px;line-height:1" id="ltTitle">UNITY</div>
+  <div style="font-family:'Inter',sans-serif;font-weight:800;font-size:22px;margin-bottom:28px;letter-spacing:-.5px" id="ltSub">& OPEN HEAVENS</div>
   <div class="landing-title" style="font-size:44px;line-height:1.1">Absensi Dashboard</div>
   <div class="landing-sub" style="font-size:13px;letter-spacing:1.5px">AOG Teens Jaktim 2026</div>
   <div class="region-toggle"><button class="region-btn active" onclick="selReg('jaktim1',this)">JAKTIM 1</button><button class="region-btn" onclick="selReg('jaktim2',this)">JAKTIM 2</button></div>
@@ -779,7 +895,6 @@ body{background:var(--bg);color:var(--ink)}
     <input type="hidden" id="cglSel" value="">
   </div>
   <button class="enter-btn" id="enterBtn" disabled onclick="enterDash()">Masuk Dashboard</button>
-  <div style="margin-top:24px;padding:10px 18px;border-radius:20px;background:rgba(255,255,255,.6);backdrop-filter:blur(10px);border:1px solid rgba(108,92,231,.15);font-size:11px;color:var(--g3);letter-spacing:.3px">Coach / TL? <a href="?role=coach" style="color:var(--purple);font-weight:700;text-decoration:none;margin-left:4px">Masuk disini &rarr;</a></div>
 </div>
 
 <!-- CGL DASHBOARD -->
@@ -832,7 +947,7 @@ body{background:var(--bg);color:var(--ink)}
     <div class="brand"><div class="logo" aria-hidden="true">A</div><div><b>AOG Teens</b><small id="coachRoleLabel">Coach</small></div></div>
     <div class="rolesw" role="group" aria-label="Peran"><button type="button" id="roleCoachBtn" class="on" aria-pressed="true" onclick="switchRole('coach')">COACH</button><button type="button" id="roleTLBtn" aria-pressed="false" onclick="switchRole('tl')">TL</button></div>
     <nav class="navlist" id="coachTabs" aria-label="Tab Coach"><button type="button" class="nav app-tab on" data-tab="c-overview" aria-current="page" onclick="sCoachTab('c-overview',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"/></svg><span>Overview</span></button><button type="button" class="nav app-tab" data-tab="c-absensi" onclick="sCoachTab('c-absensi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M9 15l2 2 4-4"/></svg><span>Absensi</span></button><button type="button" class="nav app-tab" data-tab="c-milestone" onclick="sCoachTab('c-milestone',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4h11l-2 4 2 4H5"/></svg><span>Milestone</span></button><button type="button" class="nav app-tab" data-tab="c-visi" onclick="sCoachTab('c-visi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span>Visi</span></button><button type="button" class="nav app-tab" data-tab="c-events" onclick="sCoachTab('c-events',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4z"/><path d="M14 7v10"/></svg><span>Events</span></button></nav>
-    <div class="sidetheme"><small>The year of</small><b>Unity</b><span>&amp; Open Heavens</span></div>
+    <button type="button" class="sidetheme editable" onclick="openThemeEdit()" aria-label="Edit tema tahun ini" title="Klik untuk edit tema"><small>The year of</small><b>Unity</b><span>&amp; Open Heavens</span><i class="st-edit" aria-hidden="true">Edit</i></button>
     <div class="profile"><span class="ava" id="cAva" aria-hidden="true">C</span><div style="flex:1;min-width:0"><b id="cWho">Coach</b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v32</span></span></span></div><button type="button" class="exit" onclick="goBackCoach()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
   </aside>
   <div class="main">
@@ -846,6 +961,7 @@ body{background:var(--bg);color:var(--ink)}
         <div><div class="crumb" id="cCrumb">Halo, Coach</div><h1 id="coachHeroH">Overview semua CG</h1><div class="meta" id="coachMeta">Memuat...</div></div>
         <div class="actions">
           <div class="seg light" id="cRegSeg" role="group" aria-label="Region"><button type="button" data-reg="jaktim1" class="on" aria-pressed="true" onclick="coachSetRegion('jaktim1')">Jaktim 1</button><button type="button" data-reg="jaktim2" aria-pressed="false" onclick="coachSetRegion('jaktim2')">Jaktim 2</button></div>
+          <span class="regall" id="cRegAll" style="display:none">Semua region</span>
           <div class="csearch">
             <label class="search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><span class="sr">Cari nama member</span><input id="coachSearch" type="search" placeholder="Cari nama member…" autocomplete="off" oninput="handleCoachSearch(this.value)" onblur="setTimeout(()=>{document.getElementById('coachSearchResults').style.display='none'},200)" onfocus="if(this.value)handleCoachSearch(this.value)"></label>
             <div id="coachSearchResults" class="csresults" style="display:none"></div>
@@ -1170,6 +1286,11 @@ function handleEventsChange(payload) {
 
 // ── Vision handler: update banner + re-render visi tab ──
 function handleVisionChange(payload) {
+  const row = (payload && (payload.new || payload.old)) || {};
+  if (row.cg === '__THEME__') {
+    if (payload.new && payload.new.visi) { try { applyTheme(JSON.parse(payload.new.visi)); } catch(e) {} }
+    return;
+  }
   rtDebounce('vision', async () => {
     try {
       // CGL banner
@@ -1385,6 +1506,56 @@ async function saveVisionField(cg, region, field, value) {
   }
 }
 
+// Tema tahun (sidebar + landing) — disimpan di cg_vision dengan cg='__THEME__', region='all', visi = JSON {kicker,title,sub}
+const THEME_DEFAULT = { kicker: 'The year of', title: 'Unity', sub: '& Open Heavens' };
+let CUR_THEME = { ...THEME_DEFAULT };
+try { const t = JSON.parse(localStorage.getItem('aog_theme') || 'null'); if (t && t.title) CUR_THEME = { ...THEME_DEFAULT, ...t }; } catch(e) {}
+function applyTheme(t) {
+  CUR_THEME = { ...THEME_DEFAULT, ...(t || {}) };
+  const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  set('ltKicker', CUR_THEME.kicker.toUpperCase());
+  set('ltTitle', CUR_THEME.title.toUpperCase());
+  set('ltSub', CUR_THEME.sub.toUpperCase());
+  document.querySelectorAll('.sidetheme').forEach(el => {
+    const k = el.querySelector('small'), b = el.querySelector('b'), sp = el.querySelector('span');
+    if (k) k.textContent = CUR_THEME.kicker;
+    if (b) b.textContent = CUR_THEME.title;
+    if (sp) sp.textContent = CUR_THEME.sub;
+  });
+  try { localStorage.setItem('aog_theme', JSON.stringify(CUR_THEME)); } catch(e) {}
+}
+async function loadTheme() {
+  const { data, error } = await supa.from('cg_vision').select('visi').eq('cg', '__THEME__').eq('region', 'all').maybeSingle();
+  if (error) { console.warn('[loadTheme]', error); return; }
+  if (!data || !data.visi) return; // belum pernah diedit → pakai default
+  try { applyTheme(JSON.parse(data.visi)); } catch(e) { console.warn('[loadTheme] format tidak valid', e); }
+}
+function openThemeEdit() {
+  document.getElementById('themeKicker').value = CUR_THEME.kicker;
+  document.getElementById('themeTitle').value = CUR_THEME.title;
+  document.getElementById('themeSub').value = CUR_THEME.sub;
+  openModal('themeModal');
+}
+async function saveTheme() {
+  const t = {
+    kicker: document.getElementById('themeKicker').value.trim(),
+    title: document.getElementById('themeTitle').value.trim(),
+    sub: document.getElementById('themeSub').value.trim()
+  };
+  if (!t.title) { toast('❌ Judul tema harus diisi'); return; }
+  const btn = document.getElementById('themeSaveBtn');
+  btn.disabled = true;
+  const { error } = await supa.from('cg_vision').upsert(
+    { cg: '__THEME__', region: 'all', visi: JSON.stringify(t), updated_at: new Date().toISOString() },
+    { onConflict: 'cg,region' }
+  );
+  btn.disabled = false;
+  if (error) { toast('❌ Gagal simpan tema: ' + (error.message || 'cek koneksi').slice(0, 80)); console.error('[saveTheme]', error); return; }
+  applyTheme(t);
+  closeModal('themeModal');
+  toast('✓ Tema disimpan');
+}
+
 // Coach region vision — disimpan di cg_vision dengan cg='__COACH_<region>__'
 async function saveCoachVisiFromUI(region) {
   const v = document.getElementById('coachVisi_'+region)?.value || '';
@@ -1426,8 +1597,9 @@ async function loadMemberNote(memberId) {
 }
 async function saveMemberNote(memberId, note) {
   const {error} = await supa.from('member_notes').upsert({member_id: memberId, cgl_note: note, updated_at: new Date().toISOString()}, {onConflict: 'member_id'});
-  if (error) { toast('\u274c Gagal simpan'); console.error(error); return; }
+  if (error) { toast('\u274c Gagal simpan'); console.error(error); return false; }
   toast('\u2713 Disimpan');
+  return true;
 }
 
 async function loadCoachNote(cg, region) {
@@ -1748,9 +1920,14 @@ document.addEventListener('keydown', (e) => {
   if (e.key !== 'Escape') return;
   if (e.target && e.target.id === '__asyncPromptInput') return; // asyncPrompt tangani Esc sendiri
   const open = [...document.querySelectorAll('.modal-overlay.show:not(.ap)')].pop();
-  if (open) open.classList.remove('show');
+  if (open) { if (open.contains(document.activeElement)) document.activeElement.blur(); open.classList.remove('show'); }
 });
-function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+function closeModal(id) {
+  const m = document.getElementById(id);
+  if (!m) return;
+  if (m.contains(document.activeElement)) document.activeElement.blur(); // isian onblur tetap tersimpan
+  m.classList.remove('show');
+}
 
 // ========== LANDING ==========
 async function loadCGLDropdown() {
@@ -2431,14 +2608,37 @@ async function cycleDotCoach(dotEl, memberId, dateId) {
 }
 
 // ========== DETAIL CG TAB ==========
+// Catatan CGL per member (diisi renderDetail, dipakai modal detail anak)
+let _DETAIL_NOTES = {};
+
 async function renderDetail() {
-  const el = document.getElementById('tab-detail');
   // Load all member notes in ONE batch query (bukan N+1 per member)
   const memberIds = MEMBERS.map(m => m.id);
   const { data: allNotes } = await supa.from('member_notes').select('member_id,cgl_note').in('member_id', memberIds);
   const memberNotes = {};
   (allNotes || []).forEach(n => { memberNotes[n.member_id] = n.cgl_note || ''; });
+  _DETAIL_NOTES = memberNotes;
+  renderDetailGrid();
+}
 
+// Statistik absensi 1 member (CGL scope): persentase = hadir / absensi tercatat
+function memberAttStats(m) {
+  let h = 0, i = 0, s = 0, a = 0, rec = 0;
+  const hist = [];
+  DATES.forEach(d => {
+    const st = ATTENDANCE[m.id+'_'+d.id];
+    if (!st) return;
+    rec++; hist.push({ st, label: d.label });
+    if (st === 'H') h++; else if (st === 'I') i++; else if (st === 'S') s++; else if (st === 'A') a++;
+  });
+  const pct = rec ? Math.round(h / rec * 100) : 0;
+  return { h, i, s, a, rec, pct, hist, atRisk: pct < 50 && rec > 1 };
+}
+
+// Grid kartu ringkas anak CG — klik kartu → modal detail
+function renderDetailGrid() {
+  const el = document.getElementById('tab-detail');
+  if (!el) return;
   // Sort by role priority: CGL > Sponsor > Member > Simpatisan > VIP
   const ROLE_ORDER = {'cgl':0,'leader':0,'sponsor':1,'member':2,'simpatisan':3,'vip':4};
   const sortedMembers = [...MEMBERS].sort((a,b) => {
@@ -2448,57 +2648,128 @@ async function renderDetail() {
     return (a.nama||'').localeCompare(b.nama||'');
   });
 
-  let html = '<div class="tabbar"><div class="sub" style="margin:0">'+MEMBERS.length+' anggota · klik kolom untuk edit, tersimpan otomatis</div>'+
+  let html = '<div class="tabbar"><div class="sub" style="margin:0">'+MEMBERS.length+' anggota · klik kartu untuk lihat detail & edit</div>'+
     '<div class="actions"><button type="button" class="btn sm" onclick="exportDetailCSV(\'cgl\')" title="Export No HP, Alamat, Milestone, dll">'+icon('down',16)+'Detail CSV</button>'+
     '<button type="button" class="btn sm" onclick="exportDetailPDF(\'cgl\')" title="Export No HP, Alamat, Milestone, dll">'+icon('down',16)+'Detail PDF</button>'+
     '<button type="button" class="btn sm primary" onclick="openModal(\'addMemberModal\')">'+icon('plus',16)+'Tambah member</button></div></div>';
 
-  html += '<div class="mgrid">';
-  const fieldInput = (m, field, label, ph, type) => '<label>'+label+'<input type="'+(type||'text')+'" value="' + esc(m[field]||'') + '" data-mid="'+m.id+'" data-field="'+field+'" placeholder="'+(ph||'Belum diisi')+'" onblur="saveMemberField(this)"></label>';
+  html += '<div class="kgrid">';
   sortedMembers.forEach(m => {
-    const hadirCount = DATES.filter(d => ATTENDANCE[m.id+'_'+d.id]==='H').length;
-    const totalDates = DATES.filter(d => ATTENDANCE[m.id+'_'+d.id]).length || 1;
-    const pct = Math.round(hadirCount / totalDates * 100);
-    const atRisk = pct < 50 && totalDates > 1;
-    const memberRoleCls = roleCls(m.status); // whitelist (kalau status aneh, fallback ke 'member')
+    const st = memberAttStats(m);
     const msDone = MS_FIELDS.filter(f => m[f]).length;
-
-    html += '<article class="mcard">';
-    html += '<div class="top"><span class="ava'+(atRisk?' risk':'')+'" aria-hidden="true">'+initialOf(m.nama)+'</span>';
-    html += '<div style="flex:1;min-width:0"><input type="text" value="' + esc(m.nama) + '" class="mname" aria-label="Nama" data-mid="'+m.id+'" data-field="nama" onblur="saveMemberField(this)">';
-    html += '<div class="sub" style="margin-top:2px">'+msDone+'/8 milestone · <span style="color:'+pctColorOf(pct)+';font-weight:600">'+pct+'% hadir</span></div></div>';
-    html += '<div class="role-wrap"><button type="button" class="role-btn '+memberRoleCls+'" aria-haspopup="true" onclick="this.nextElementSibling.classList.toggle(\'show\')">'+esc(m.status)+'</button>';
-    html += '<div class="role-menu">';
-    ['CGL','Sponsor','Member','Simpatisan','VIP'].forEach(r => {
-      html += '<button type="button" class="role-opt '+r.toLowerCase()+'" onclick="pickRole(this,\''+r.toLowerCase()+'\',\''+r+'\','+m.id+')"><span class="rdot"></span>'+r+'</button>';
-    });
-    html += '</div></div></div>';
-
-    if (atRisk) html += '<div class="pill" style="background:var(--Ab);color:var(--A);align-self:flex-start">Kehadiran '+pct+'% · perlu follow-up</div>';
-
-    html += '<div class="info">';
-    html += fieldInput(m,'wa','WhatsApp','08xxx');
-    html += fieldInput(m,'lahir','Tanggal lahir','DD/MM/YYYY');
-    html += fieldInput(m,'sekolah','Sekolah');
-    html += fieldInput(m,'kelas','Kelas');
-    html += fieldInput(m,'kelurahan','Kelurahan');
-    html += fieldInput(m,'kecamatan','Kecamatan');
-    html += '</div>';
-
-    html += '<div><div class="flabel" style="margin-bottom:8px">Milestone <span style="font-weight:500">· klik untuk ubah</span></div><div class="ms-chips">';
-    MS_FIELDS.forEach((f, i) => {
-      const done = m[f] ? true : false;
-      html += '<button type="button" class="msc ' + (done?'done':'pending') + '" onclick="toggleMilestone(this,'+m.id+',\''+f+'\',' + (done?'true':'false') + ')">' + MS_LABELS[i] + (done?' ✓':'') + '</button>';
-    });
-    html += '</div></div>';
-
-    html += '<label class="field"><span class="flabel">Catatan CGL</span><textarea class="textarea" style="min-height:70px" placeholder="Tulis catatan…" data-mid="'+m.id+'" onblur="saveMemberNotes(this)">' + esc(memberNotes[m.id]||'') + '</textarea></label>';
-    html += '<div style="display:flex;justify-content:flex-end"><button type="button" class="btn sm ghost danger" onclick="deleteMember('+m.id+',\''+jsEsc(m.nama)+'\')">'+icon('trash',16)+'Hapus member</button></div>';
-    html += '</article>';
+    const last = st.hist.slice(-8);
+    html += '<button type="button" class="kcard'+(st.atRisk?' risk':'')+'" onclick="openCGLMember('+m.id+')" aria-label="Lihat detail '+esc(m.nama)+'">';
+    html += '<div class="kc-top"><span class="ava'+(st.atRisk?' risk':'')+'" aria-hidden="true">'+initialOf(m.nama)+'</span>';
+    html += '<span class="kc-name"><b>'+esc(m.nama)+'</b>'+rolePill(m.status)+'</span><span class="kc-go" aria-hidden="true">'+icon('right',16)+'</span></div>';
+    html += '<div class="kc-mid"><span class="kc-pct" style="color:'+(st.rec?pctColorOf(st.pct):'#bbb')+'">'+(st.rec?st.pct+'%':'–')+'<small>hadir</small></span>';
+    html += '<span class="kc-strip" title="'+st.rec+' absensi tercatat">';
+    for (let k = 0; k < 8 - last.length; k++) html += '<i class="X"></i>';
+    last.forEach(x => { html += '<i class="'+x.st+'" title="'+esc(x.label)+': '+x.st+'"></i>'; });
+    html += '</span></div>';
+    html += '<div class="kc-ms"><span>Milestone</span><span class="tr"><i style="width:'+Math.round(msDone/8*100)+'%"></i></span><b>'+msDone+'/8</b></div>';
+    if (st.atRisk) html += '<span class="kc-flag">Perlu follow-up</span>';
+    html += '</button>';
   });
-
   html += '<button type="button" class="addcard" onclick="openModal(\'addMemberModal\')">'+icon('plus',28)+'Tambah member</button></div>';
   el.innerHTML = html;
+}
+
+// Grid kartu ikut update setelah edit di modal (tanpa query ulang)
+function refreshDetailGrid() {
+  if (document.querySelector('#tab-detail .kgrid')) renderDetailGrid();
+}
+
+// Chart garis: % hadir per bulan (bulan = run berurutan month_code di DATES)
+function memberTrendHTML(m) {
+  const months = [];
+  DATES.forEach(d => {
+    const code = String(d.month_code || '').trim().toUpperCase() || '?';
+    let cur = months[months.length - 1];
+    if (!cur || cur.code !== code) { cur = { code, h: 0, f: 0 }; months.push(cur); }
+    const st = ATTENDANCE[m.id+'_'+d.id];
+    if (st) { cur.f++; if (st === 'H') cur.h++; }
+  });
+  const pts = months.filter(x => x.f).map(x => ({ lbl: x.code.charAt(0) + x.code.slice(1).toLowerCase(), v: Math.round(x.h / x.f * 100), n: x.f }));
+  if (!pts.length) return '<div class="empty" style="padding:24px">Belum ada data absensi</div>';
+  const X0 = 14, X1 = 96;
+  const xs = pts.map((p, i) => pts.length === 1 ? (X0 + X1) / 2 : X0 + i * (X1 - X0) / (pts.length - 1));
+  const ys = pts.map(p => 10 + 80 * (1 - p.v / 100));
+  const line = pts.map((p, i) => (i ? 'L' : 'M') + xs[i].toFixed(2) + ' ' + ys[i].toFixed(2)).join(' ');
+  const area = line + ' L' + xs[xs.length-1].toFixed(2) + ' 90 L' + xs[0].toFixed(2) + ' 90 Z';
+  let html = '<div class="trend'+(pts.length > 6 ? ' many' : '')+'"><div class="trend-plot">';
+  html += '<svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="trendFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6C5CE7" stop-opacity=".22"/><stop offset="1" stop-color="#6C5CE7" stop-opacity="0"/></linearGradient></defs>';
+  [10, 50, 90].forEach(y => { html += '<line class="gl" x1="'+X0+'" x2="100" y1="'+y+'" y2="'+y+'"/>'; });
+  if (pts.length > 1) html += '<path d="'+area+'" fill="url(#trendFill)"/><path class="ln" d="'+line+'"/>';
+  html += '</svg>';
+  [[10,'100%'],[50,'50%'],[90,'0%']].forEach(([y,t]) => { html += '<span class="ty" style="top:'+y+'%">'+t+'</span>'; });
+  pts.forEach((p, i) => {
+    html += '<span class="tp" style="left:'+xs[i]+'%;top:'+ys[i]+'%;--c:'+pctColorOf(p.v)+'" title="'+esc(p.lbl)+': '+p.v+'% ('+p.n+' tercatat)"><b>'+p.v+'%</b></span>';
+  });
+  html += '</div><div class="trend-x">';
+  pts.forEach((p, i) => { html += '<span style="left:'+xs[i]+'%">'+esc(p.lbl)+'</span>'; });
+  html += '</div></div>';
+  return html;
+}
+
+// Modal detail anak CG: info + persentase + chart + edit (fungsi simpan sama seperti sebelumnya)
+function openCGLMember(memberId) {
+  const m = MEMBERS.find(x => x.id === memberId);
+  if (!m) return;
+  const st = memberAttStats(m);
+  const msDone = MS_FIELDS.filter(f => m[f]).length;
+  const fieldInput = (field, label, ph, span) => '<label class="c'+(span||2)+'">'+label+'<input type="text" value="' + esc(m[field]||'') + '" data-mid="'+m.id+'" data-field="'+field+'" placeholder="'+(ph||'Belum diisi')+'" onblur="saveMemberField(this)"></label>';
+
+  let html = '<div class="md-head"><span class="ava'+(st.atRisk?' risk':'')+'" style="width:56px;height:56px;font-size:20px" aria-hidden="true">'+initialOf(m.nama)+'</span>';
+  html += '<div style="flex:1;min-width:0"><input type="text" value="' + esc(m.nama) + '" class="mname md-name" aria-label="Nama" data-mid="'+m.id+'" data-field="nama" onblur="saveMemberField(this)">';
+  html += '<div class="sub"><div class="role-wrap"><button type="button" class="role-btn '+roleCls(m.status)+'" aria-haspopup="true" onclick="this.nextElementSibling.classList.toggle(\'show\')">'+esc(m.status||'Member')+'</button><div class="role-menu">';
+  ['CGL','Sponsor','Member','Simpatisan','VIP'].forEach(r => {
+    html += '<button type="button" class="role-opt '+r.toLowerCase()+'" onclick="pickRole(this,\''+r.toLowerCase()+'\',\''+r+'\','+m.id+')"><span class="rdot"></span>'+r+'</button>';
+  });
+  html += '</div></div><span>'+esc(CUR_CG)+' · '+msDone+'/8 milestone</span></div></div>';
+  html += '<div class="md-pct"><div class="pct" style="font-size:40px;line-height:1;color:'+(st.rec?pctColorOf(st.pct):'#bbb')+'">'+(st.rec?st.pct+'%':'–')+'</div><div class="sub" style="margin:2px 0 0">kehadiran</div></div>';
+  html += '<button type="button" class="iconbtn md-x" aria-label="Tutup" onclick="closeModal(\'cglMemberModal\')">'+icon('x',18)+'</button></div>';
+
+  if (st.atRisk) html += '<div class="pill" style="background:var(--Ab);color:var(--A);margin-bottom:12px">Kehadiran '+st.pct+'% · perlu follow-up</div>';
+
+  html += '<div class="md-stats" style="margin-top:0">';
+  [['Hadir',st.h,'H'],['Izin',st.i,'I'],['Sakit',st.s,'S'],['Alpa',st.a,'A']].forEach(([label,cnt,k]) => {
+    html += '<div class="c-'+k+'"><b>'+cnt+'</b><span>'+label+'</span></div>';
+  });
+  html += '</div>';
+
+  html += '<div class="md-sec"><div class="mhead"><span class="flabel">Tren kehadiran per bulan</span><span class="mhint">% hadir dari '+st.rec+' absensi tercatat</span></div>'+memberTrendHTML(m)+'</div>';
+  if (st.hist.length) {
+    html += '<div class="md-sec"><div class="mhead"><span class="flabel">Absensi terakhir</span></div><div class="lastatt">';
+    st.hist.slice(-10).forEach(x => { html += '<span><i class="dot '+x.st+'" aria-hidden="true">'+x.st+'</i><small>'+esc(String(x.label||'').replace(/ \d{2}$/,''))+'</small></span>'; });
+    html += '</div></div>';
+  }
+
+  html += '<div class="md-sec"><div class="mhead"><span class="flabel">Data diri</span><span class="mhint">tersimpan otomatis</span></div><div class="info">';
+  html += fieldInput('wa','WhatsApp','08xxx');
+  html += fieldInput('lahir','Tanggal lahir','DD/MM/YYYY');
+  html += fieldInput('sekolah','Sekolah',null,3);
+  html += fieldInput('kelas','Kelas','–',1);
+  html += fieldInput('kelurahan','Kelurahan');
+  html += fieldInput('kecamatan','Kecamatan');
+  html += '</div></div>';
+
+  html += '<div class="md-sec"><div class="mhead"><span class="flabel">Milestone</span><span class="mhint">klik untuk ubah</span></div><div class="msgrid">';
+  // Urutan grid: baris 1 MSJ 1-3 + B.Air, baris 2 CGT 1-3 + B.Roh
+  [0,1,2,6,3,4,5,7].forEach(i => {
+    const f = MS_FIELDS[i];
+    const done = m[f] ? true : false;
+    html += '<button type="button" class="msc ' + (done?'done':'pending') + '" onclick="toggleMilestone(this,'+m.id+',\''+f+'\',' + (done?'true':'false') + ')">' + MS_LABELS[i] + (done?' ✓':'') + '</button>';
+  });
+  html += '</div></div>';
+
+  html += '<label class="field md-sec"><span class="flabel">Catatan CGL</span><textarea class="textarea mnote" placeholder="Tulis catatan…" data-mid="'+m.id+'" onblur="saveMemberNotes(this)">' + esc(_DETAIL_NOTES[m.id]||'') + '</textarea></label>';
+  html += '<div class="mfoot md-foot"><button type="button" class="btn sm ghost danger" onclick="deleteMember('+m.id+',\''+jsEsc(m.nama)+'\')">'+icon('trash',16)+'Hapus member</button>';
+  html += '<button type="button" class="btn" onclick="closeModal(\'cglMemberModal\')">Tutup</button></div>';
+
+  document.getElementById('cglMemberBody').innerHTML = html;
+  const ov = document.getElementById('cglMemberModal');
+  ov.classList.add('show');
+  const box = ov.querySelector('.modal-box'); if (box) box.scrollTop = 0;
 }
 
 async function deleteMember(memberId, memberName) {
@@ -2540,6 +2811,7 @@ async function deleteMember(memberId, memberName) {
       await ensureTabRendered(id);
     }
     try { await loadCGLDropdown(); } catch(e) {}
+    closeModal('cglMemberModal');
     toast('\u2713 '+memberName+' dihapus');
   } catch(e) {
     toast('\u274c Gagal hapus: '+(e.message||'unknown'));
@@ -2552,13 +2824,16 @@ async function saveMemberField(input) {
   const field = input.dataset.field;
   const val = input.value.trim();
   const { error } = await supa.from('members').update({ [field]: val }).eq('id', mid);
-  if (error) { toast('\u274c Gagal simpan — cek koneksi'); console.error('[saveMemberField]', error); }
-  else toast('\u2713 Disimpan');
+  if (error) { toast('\u274c Gagal simpan — cek koneksi'); console.error('[saveMemberField]', error); return; }
+  const m = MEMBERS.find(x => x.id === mid);
+  if (m) m[field] = val;
+  refreshDetailGrid();
+  toast('\u2713 Disimpan');
 }
 
 async function saveMemberNotes(textarea) {
   const mid = parseInt(textarea.dataset.mid);
-  await saveMemberNote(mid, textarea.value);
+  if (await saveMemberNote(mid, textarea.value)) _DETAIL_NOTES[mid] = textarea.value;
 }
 
 async function toggleMilestone(chip, memberId, field, wasDone) {
@@ -2569,6 +2844,7 @@ async function toggleMilestone(chip, memberId, field, wasDone) {
   // Update local
   const m = MEMBERS.find(x => x.id === memberId);
   if (m) m[field] = newVal;
+  refreshDetailGrid();
 
   // Toggle visual
   if (wasDone) {
@@ -2605,6 +2881,7 @@ async function pickRole(el, cls, label, memberId) {
     return;
   }
   if (m) m.status = label;
+  refreshDetailGrid();
   toast('\u2713 Disimpan');
 }
 
@@ -3712,7 +3989,7 @@ async function goBackCoach() {
   window.scrollTo(0, 0);
   // Bersihkan query string ?role=coach supaya refresh tidak balik ke coach
   try {
-    if (location.search) history.replaceState(null, '', location.pathname);
+    if (location.search || /^\/(coach|tl)\/?$/i.test(location.pathname)) history.replaceState(null, '', '/');
   } catch(e) {}
   // Pastikan dropdown CGL ke-populate (kalau user landing dari ?role=coach,
   // loadCGLDropdown belum pernah dipanggil). ALL_MEMBERS sudah ada dari loadCoachData.
@@ -3815,10 +4092,11 @@ function setCTabUI(id) {
   const seg = document.getElementById('cRegSeg');
   if (seg) {
     seg.style.display = coachRole === 'tl' ? 'none' : '';
+    const all = document.getElementById('cRegAll'); if (all) all.style.display = coachRole === 'tl' ? '' : 'none';
     seg.querySelectorAll('button').forEach(b => { const on = b.dataset.reg === coachReg; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
   }
   const lbl = document.getElementById('coachRoleLabel');
-  if (lbl) lbl.textContent = coachRole === 'tl' ? 'Team Leader · semua region' : 'Coach · ' + (coachReg === 'jaktim2' ? 'Jaktim 2' : 'Jaktim 1');
+  if (lbl) lbl.textContent = coachRole === 'tl' ? 'TL · Semua region' : 'Coach · ' + (coachReg === 'jaktim2' ? 'Jaktim 2' : 'Jaktim 1');
   const msub = document.getElementById('cMSub');
   if (msub) msub.textContent = coachRole === 'tl' ? 'Semua region' : (coachReg === 'jaktim2' ? 'Jaktim 2' : 'Jaktim 1');
   const who = coachRole === 'tl' ? 'Team Leader' : 'Coach';
@@ -5212,18 +5490,7 @@ async function switchRole(role) {
   // Reset wilayah filter state supaya tidak stale saat pindah scope
   window.__WILAYAH_KEC = 'all';
   window.__WILAYAH_KEL = 'all';
-  const coachBtn = document.getElementById('roleCoachBtn');
-  const tlBtn = document.getElementById('roleTLBtn');
-  const label = document.getElementById('coachRoleLabel');
-  const isTL = role === 'tl';
-  coachBtn.classList.toggle('on', !isTL); coachBtn.setAttribute('aria-pressed', String(!isTL));
-  tlBtn.classList.toggle('on', isTL); tlBtn.setAttribute('aria-pressed', String(isTL));
-  const who = isTL ? 'Team Leader' : 'Coach';
-  label.textContent = isTL ? 'Team Leader · semua region' : 'Coach · ' + (coachReg === 'jaktim2' ? 'Jaktim 2' : 'Jaktim 1');
-  document.getElementById('cWho').textContent = who;
-  document.getElementById('cAva').textContent = isTL ? 'T' : 'C';
-  document.getElementById('cMTitle').textContent = who;
-  document.getElementById('cMSub').textContent = isTL ? 'Semua region' : (coachReg === 'jaktim2' ? 'Jaktim 2' : 'Jaktim 1');
+  syncCoachRoleUI();
   setCTabUI(currentCoachTab());
   _CACHED_ALL_CG_EVENTS = null;
   COACH_TAB_RENDERED = {};
@@ -5232,6 +5499,26 @@ async function switchRole(role) {
   renderCoachMilestone();
   await renderCoachVisi();
   await renderCoachEvents(true);
+}
+
+// Sinkron label/tombol COACH-TL + alamat /coach ↔ /tl
+function syncCoachRoleUI() {
+  const role = coachRole;
+  const coachBtn = document.getElementById('roleCoachBtn');
+  const tlBtn = document.getElementById('roleTLBtn');
+  const label = document.getElementById('coachRoleLabel');
+  const isTL = role === 'tl';
+  coachBtn.classList.toggle('on', !isTL); coachBtn.setAttribute('aria-pressed', String(!isTL));
+  tlBtn.classList.toggle('on', isTL); tlBtn.setAttribute('aria-pressed', String(isTL));
+  const who = isTL ? 'Team Leader' : 'Coach';
+  label.textContent = isTL ? 'TL · Semua region' : 'Coach · ' + (coachReg === 'jaktim2' ? 'Jaktim 2' : 'Jaktim 1');
+  document.getElementById('cWho').textContent = who;
+  document.getElementById('cAva').textContent = isTL ? 'T' : 'C';
+  document.getElementById('cMTitle').textContent = who;
+  document.getElementById('cMSub').textContent = isTL ? 'Semua region' : (coachReg === 'jaktim2' ? 'Jaktim 2' : 'Jaktim 1');
+  try {
+    if (/^\/(coach|tl)\/?$/i.test(location.pathname)) history.replaceState(null, '', isTL ? '/tl' : '/coach');
+  } catch(e) {}
 }
 
 // ========== UTILITY ==========
@@ -5309,11 +5596,18 @@ document.querySelectorAll('.modal-overlay').forEach(m => {
 
 // ========== INIT ==========
 (async function() {
+  applyTheme(CUR_THEME);
+  loadTheme();
   const p = new URLSearchParams(location.search);
-  if (p.get('role') === 'coach') {
+  // Masuk Coach/TL lewat alamat /coach atau /tl (rewrite di vercel.json); ?role=coach tetap didukung
+  const path = location.pathname.replace(/\/+$/, '').toLowerCase();
+  const wantTL = path === '/tl' || p.get('role') === 'tl';
+  if (wantTL || path === '/coach' || p.get('role') === 'coach') {
+    if (wantTL) coachRole = 'tl';
     document.getElementById('pageL').style.display = 'none';
     document.getElementById('pageC').style.display = 'block';
-    try { history.replaceState(null, '', location.pathname); } catch(e) {}
+    try { if (location.search) history.replaceState(null, '', location.pathname); } catch(e) {}
+    syncCoachRoleUI();
     await loadCoachData();
     startCoachPolling(); // Auto-sync attendance tiap 60s
   } else {
