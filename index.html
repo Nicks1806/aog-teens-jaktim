@@ -365,7 +365,21 @@ table.att .tlabel{font-size:12px;color:var(--muted);font-weight:600}
 .mcfoot .btn{min-height:30px;font-size:12px;padding:0 8px}
 @media (max-width:520px){.mgrid{grid-template-columns:1fr}}
 /* Kartu ringkas anak CG (tab Detail) */
-.kgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.kgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.dsum{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:18px}
+.dsum-c{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px;display:flex;flex-direction:column;gap:8px;min-width:0;box-shadow:0 1px 3px rgba(0,0,0,.03)}
+.dsum-c .lbl{font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:1px}
+.dsum-row{display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+.dsum-row b{font-family:var(--display);font-weight:400;font-size:40px;line-height:.9;color:var(--ink)}
+.dsum-unit{font-size:12px;color:#999;margin-right:auto;padding-bottom:3px}
+.dsum-c small{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dsum-bar{height:6px;border-radius:6px;background:#f0f0ed;overflow:hidden;margin-top:6px}
+.dsum-bar i{display:block;height:100%;border-radius:6px;background:var(--grad)}
+.kc-info{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);min-width:0;margin-top:-4px}
+.kc-info svg{flex:none;opacity:.6}
+.kc-info span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kc-info.none{color:#bbb}
+@media (max-width:1100px){.dsum{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .kgrid .addcard{min-height:150px}
 .kcard{position:relative;display:flex;flex-direction:column;gap:14px;text-align:left;background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;cursor:pointer;min-width:0;font:inherit;color:inherit;box-shadow:0 1px 3px rgba(0,0,0,.03);transition:border-color .15s,box-shadow .15s,transform .15s}
 .kcard:hover{border-color:#d9d2ff;box-shadow:0 8px 24px rgba(108,92,231,.12);transform:translateY(-1px)}
@@ -834,6 +848,10 @@ html.vt .tab-content.active{animation:none}
   .donut{padding:12px;border-radius:14px}
   .kcard{padding:14px;gap:12px;border-radius:14px}
   .kc-pct{font-size:32px}
+  .dsum{gap:8px;margin-bottom:12px}
+  .dsum-c{padding:12px;border-radius:14px;gap:6px}
+  .dsum-row b{font-size:30px}
+  .dsum-row svg{width:80px;height:30px}
   .modal-box{padding:18px;border-radius:18px}
   .md-sec{margin-top:16px}
   .md-foot .btn{min-height:38px}
@@ -1016,7 +1034,7 @@ html.vt .tab-content.active{animation:none}
     <button type="button" class="backcoach" id="dBackCoach" onclick="goBack()" style="display:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Kembali ke Coach</button>
     <nav class="navlist" aria-label="Tab CG"><button type="button" class="nav app-tab on" data-tab="absensi" aria-current="page" onclick="sTab('absensi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M9 15l2 2 4-4"/></svg><span>Absensi</span></button><button type="button" class="nav app-tab" data-tab="detail" onclick="sTab('detail',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c1.9.7 3.1 2.4 3.5 5.2"/></svg><span>Detail CG</span></button><button type="button" class="nav app-tab" data-tab="visi" onclick="sTab('visi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span>Visi CG</span></button><button type="button" class="nav app-tab" data-tab="pelayanan" onclick="sTab('pelayanan',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"/></svg><span>Pelayanan</span></button><button type="button" class="nav app-tab" data-tab="milestone" onclick="sTab('milestone',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4h11l-2 4 2 4H5"/></svg><span>Milestone</span></button><button type="button" class="nav app-tab" data-tab="events" onclick="sTab('events',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4z"/><path d="M14 7v10"/></svg><span>Events</span></button></nav>
     <div class="sidetheme"><small>The year of</small><b>Unity</b><span>&amp; Open Heavens</span></div>
-    <div class="profile"><span class="ava" id="dAva" aria-hidden="true">A</span><div style="flex:1;min-width:0"><b id="nN"></b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v35</span></span></span></div><button type="button" class="exit" onclick="goBack()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
+    <div class="profile"><span class="ava" id="dAva" aria-hidden="true">A</span><div style="flex:1;min-width:0"><b id="nN"></b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v36</span></span></span></div><button type="button" class="exit" onclick="goBack()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
   </aside>
   <div class="main">
     <header class="mtop">
@@ -1059,7 +1077,7 @@ html.vt .tab-content.active{animation:none}
     <div class="rolesw" role="group" aria-label="Peran"><button type="button" id="roleCoachBtn" class="on" aria-pressed="true" onclick="switchRole('coach')">Coach</button><button type="button" id="roleTLBtn" aria-pressed="false" onclick="switchRole('tl')">TL</button></div>
     <nav class="navlist" id="coachTabs" aria-label="Tab Coach"><button type="button" class="nav app-tab on" data-tab="c-overview" aria-current="page" onclick="sCoachTab('c-overview',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"/></svg><span>Overview</span></button><button type="button" class="nav app-tab" data-tab="c-absensi" onclick="sCoachTab('c-absensi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M9 15l2 2 4-4"/></svg><span>Absensi</span></button><button type="button" class="nav app-tab" data-tab="c-milestone" onclick="sCoachTab('c-milestone',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4h11l-2 4 2 4H5"/></svg><span>Milestone</span></button><button type="button" class="nav app-tab" data-tab="c-visi" onclick="sCoachTab('c-visi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span>Visi</span></button><button type="button" class="nav app-tab" data-tab="c-events" onclick="sCoachTab('c-events',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4z"/><path d="M14 7v10"/></svg><span>Events</span></button></nav>
     <button type="button" class="sidetheme editable" onclick="openThemeEdit()" aria-label="Edit tema tahun ini" title="Klik untuk edit tema"><small>The year of</small><b>Unity</b><span>&amp; Open Heavens</span><i class="st-edit" aria-hidden="true">Edit</i></button>
-    <div class="profile"><span class="ava" id="cAva" aria-hidden="true">C</span><div style="flex:1;min-width:0"><b id="cWho">Coach</b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v35</span></span></span></div><button type="button" class="exit" onclick="goBackCoach()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
+    <div class="profile"><span class="ava" id="cAva" aria-hidden="true">C</span><div style="flex:1;min-width:0"><b id="cWho">Coach</b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v36</span></span></span></div><button type="button" class="exit" onclick="goBackCoach()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
   </aside>
   <div class="main">
     <header class="mtop">
@@ -2799,6 +2817,22 @@ function renderDetailGrid() {
     '<button type="button" class="btn sm" onclick="exportDetailPDF(\'cgl\')" title="Export No HP, Alamat, Milestone, dll">'+icon('down',16)+'Detail PDF</button>'+
     '<button type="button" class="btn sm primary" onclick="openModal(\'addMemberModal\')">'+icon('plus',16)+'Tambah member</button></div></div>';
 
+  // ── Ringkasan CG ──
+  const stats = sortedMembers.map(m => ({ m, st: memberAttStats(m), ms: MS_FIELDS.filter(f => m[f]).length }));
+  const withRec = stats.filter(x => x.st.rec);
+  const avgPct = withRec.length ? Math.round(withRec.reduce((a, x) => a + x.st.pct, 0) / withRec.length) : 0;
+  const risk = stats.filter(x => x.st.atRisk);
+  const msTotal = stats.reduce((a, x) => a + x.ms, 0), msMax = stats.length * 8;
+  const msPct = msMax ? Math.round(msTotal / msMax * 100) : 0;
+  const incomplete = stats.filter(x => !String(x.m.wa||'').trim() || !String(x.m.lahir||'').trim() || !String(x.m.sekolah||'').trim() || !(String(x.m.kelurahan||'').trim() || String(x.m.kecamatan||'').trim()));
+  const nameList = (arr) => arr.slice(0, 3).map(x => esc(String(x.m.nama||'').split(' ')[0])).join(', ') + (arr.length > 3 ? ' +' + (arr.length - 3) : '');
+  html += '<div class="dsum">';
+  html += '<div class="dsum-c"><span class="lbl">Rata-rata hadir</span><div class="dsum-row"><b style="color:'+(withRec.length?pctColorOf(avgPct):'#bbb')+'">'+(withRec.length?avgPct+'%':'–')+'</b>'+sparkSVG(cgMonthlyPts().slice(-6), pctColorOf(avgPct), 110, 36)+'</div><small>tren 6 bulan terakhir</small></div>';
+  html += '<div class="dsum-c"><span class="lbl">Perlu follow-up</span><div class="dsum-row"><b style="color:'+(risk.length?'var(--A)':'var(--H)')+'">'+risk.length+'</b><span class="dsum-unit">anak</span></div><small>'+(risk.length ? 'Kehadiran &lt; 50%: ' + nameList(risk) : 'Semua kehadiran aman')+'</small></div>';
+  html += '<div class="dsum-c"><span class="lbl">Milestone CG</span><div class="dsum-row"><b>'+msPct+'%</b><span class="dsum-unit">'+msTotal+'/'+msMax+'</span></div><span class="dsum-bar"><i style="width:'+msPct+'%"></i></span></div>';
+  html += '<div class="dsum-c"><span class="lbl">Data belum lengkap</span><div class="dsum-row"><b style="color:'+(incomplete.length?'var(--S)':'var(--H)')+'">'+incomplete.length+'</b><span class="dsum-unit">anak</span></div><small>'+(incomplete.length ? 'WA / lahir / sekolah / alamat: ' + nameList(incomplete) : 'Semua data lengkap')+'</small></div>';
+  html += '</div>';
+
   html += '<div class="kgrid">';
   sortedMembers.forEach(m => {
     const st = memberAttStats(m);
@@ -2807,6 +2841,10 @@ function renderDetailGrid() {
     html += '<button type="button" class="kcard'+(st.atRisk?' risk':'')+'" onclick="openCGLMember('+m.id+')" aria-label="Lihat detail '+esc(m.nama)+'">';
     html += '<div class="kc-top"><span class="ava'+(st.atRisk?' risk':'')+'" aria-hidden="true">'+initialOf(m.nama)+'</span>';
     html += '<span class="kc-name"><b>'+esc(m.nama)+'</b>'+rolePill(m.status)+'</span><span class="kc-go" aria-hidden="true">'+icon('right',16)+'</span></div>';
+    // Data lama kadang menulis kelas di kolom sekolah ("... - Kelas 11") → jangan tampil dobel
+    const kelasTxt = (m.kelas && !/kelas/i.test(m.sekolah || '')) ? 'Kelas ' + m.kelas : '';
+    const sek = [m.sekolah, kelasTxt].filter(x => String(x||'').trim()).join(' · ');
+    html += '<div class="kc-info'+(sek?'':' none')+'" title="'+esc(sek)+'">'+icon('book',14)+'<span>'+esc(sek || 'Sekolah belum diisi')+'</span></div>';
     html += '<div class="kc-mid"><span class="kc-pct" style="color:'+(st.rec?pctColorOf(st.pct):'#bbb')+'">'+(st.rec?st.pct+'%':'–')+'<small>hadir</small></span>';
     html += '<span class="kc-trend">' + memberSparkSVG(m, st.pct) + '<span class="kc-strip" title="8 absensi terakhir">';
     for (let k = 0; k < 8 - last.length; k++) html += '<i class="X"></i>';
@@ -2840,9 +2878,22 @@ function memberMonthlyPts(m) {
 
 // Mini chart garis di kartu anak: tren % hadir 6 bulan terakhir
 function memberSparkSVG(m, pct) {
-  const pts = memberMonthlyPts(m).slice(-6);
-  const W = 116, H = 38, P = 4;
-  const c = pts.length ? pctColorOf(pct) : '#d4d4d0';
+  return sparkSVG(memberMonthlyPts(m).slice(-6), pctColorOf(pct), 116, 38);
+}
+// % hadir per bulan seluruh CG aktif (gabungan semua member)
+function cgMonthlyPts() {
+  const months = [];
+  DATES.forEach(d => {
+    const code = String(d.month_code || '').trim().toUpperCase() || '?';
+    let cur = months[months.length - 1];
+    if (!cur || cur.code !== code) { cur = { code, h: 0, f: 0 }; months.push(cur); }
+    MEMBERS.forEach(m => { const st = ATTENDANCE[m.id+'_'+d.id]; if (st) { cur.f++; if (st === 'H') cur.h++; } });
+  });
+  return months.filter(x => x.f).map(x => ({ lbl: x.code.charAt(0) + x.code.slice(1).toLowerCase(), v: Math.round(x.h / x.f * 100), n: x.f }));
+}
+function sparkSVG(pts, color, W, H) {
+  const P = 4;
+  const c = pts.length ? color : '#d4d4d0';
   const y = v => (P + (H - 2 * P) * (1 - v / 100)).toFixed(1);
   let line, xs;
   if (pts.length <= 1) {
