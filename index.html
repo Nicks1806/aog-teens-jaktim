@@ -35,9 +35,10 @@ h1,h2,h3{font-family:var(--display)}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
 /* Landing */
-.landing{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:var(--side);position:relative;overflow:hidden}
-.landing:before{content:"";position:absolute;width:720px;height:720px;border-radius:50%;background:#33267A;top:-320px;right:-240px;pointer-events:none}
-.landing:after{content:"";position:absolute;width:420px;height:420px;border-radius:50%;background:#2C2270;bottom:-200px;left:-140px;pointer-events:none}
+/* Lingkaran dekorasi pakai background (bukan pseudo-element + overflow:hidden) supaya panel dropdown tidak terpotong dan halaman tetap bisa di-scroll */
+.landing{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;position:relative;
+  background:radial-gradient(circle 360px at calc(100% - 120px) 40px,#33267A 99.6%,transparent 100%),radial-gradient(circle 210px at 70px calc(100% - 10px),#2C2270 99.6%,transparent 100%),var(--side)}
+html:has(#pageL:not([style*="none"])) body{background:var(--side)}
 .lcard{position:relative;z-index:1;width:100%;max-width:440px;background:var(--card);border-radius:28px;padding:36px 32px;display:flex;flex-direction:column;gap:22px;box-shadow:0 30px 80px rgba(10,6,40,.35);animation:tabFadeIn .25s ease}
 .theme small{display:block;font-size:12px;font-weight:600;letter-spacing:1.6px;text-transform:uppercase;color:var(--muted)}
 .theme b{display:block;font-family:var(--display);font-weight:800;font-size:44px;line-height:1;letter-spacing:-1px;color:var(--side)}
@@ -449,7 +450,8 @@ table.att .tlabel{font-size:12px;color:var(--muted);font-weight:600}
 .hbar i{display:block;height:100%;border-radius:8px}
 .card.pending{margin-bottom:24px;border-color:var(--Sbr);background:linear-gradient(180deg,#FFFBF2,#fff 60%)}
 .chartcard{margin-bottom:24px}
-#tab-absensi .chartcard{margin:24px 0 0}
+.stack{display:flex;flex-direction:column;gap:24px}
+.stack>.chartcard{margin:0}
 @media (max-width:640px){.hbar{display:none}.acc-h{gap:10px;padding:14px}}
 /* Coach Milestone */
 .heat{border-collapse:separate;border-spacing:4px;width:100%;min-width:520px}
@@ -1738,7 +1740,9 @@ function setCGDropdownOpen(open) {
   if (btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
   if (open) {
     const o = panel.querySelector('.ddopt[aria-selected="true"]') || panel.querySelector('.ddopt');
-    if (o) o.focus();
+    if (o) o.focus({ preventScroll: true });
+    // Pastikan seluruh panel kelihatan (layar pendek / HP)
+    setTimeout(() => panel.scrollIntoView({ block: 'nearest' }), 30);
   }
 }
 
@@ -2133,7 +2137,7 @@ function renderAbsensi() {
     return (a.nama||'').localeCompare(b.nama||'');
   });
 
-  let card = '<section class="card wide abs-card"><div class="chead"><div><h2>Absensi</h2><div class="sub">Klik kotak untuk ganti status: H → I → S → A → kosong</div></div>'+
+  let card = '<section class="card abs-card"><div class="chead"><div><h2>Absensi</h2><div class="sub">Klik kotak untuk ganti status: H → I → S → A → kosong</div></div>'+
     '<div class="actions"><button type="button" class="btn sm" onclick="exportCGAttendanceCSV()">'+icon('down',16)+'Absensi CSV</button><button type="button" class="btn sm" onclick="exportCGAttendancePDF()">'+icon('down',16)+'Absensi PDF</button></div></div>';
   if (mobile) card += buildMonthNavHeader(DATES, active.month, active.year, active.label, datesView.length);
 
@@ -2193,7 +2197,7 @@ function renderAbsensi() {
   }).filter(x => x.tot > 1 && x.p < 75).sort((x,y) => x.p - y.p);
   let side = '<section class="card"><div class="chead" style="margin-bottom:4px"><h2>Perlu perhatian</h2><span class="pill" style="background:var(--Ab);color:var(--A)">'+risk.length+' anggota</span></div><div class="sub">Kehadiran di bawah 75%</div>';
   if (risk.length) {
-    side += risk.slice(0,5).map(x => {
+    side += risk.slice(0,4).map(x => {
       const wa = waLinkOf(x.m.wa);
       return '<div class="lrow"><span class="ava risk" aria-hidden="true">'+initialOf(x.m.nama)+'</span><div class="grow"><b>'+esc(x.m.nama)+'</b><small>'+x.p+'% hadir · '+x.a+'× alpa</small></div>'+
         (wa ? '<a class="btn sm wa" href="'+wa+'" target="_blank" rel="noopener">Hubungi</a>' : '')+'</div>';
@@ -2207,7 +2211,8 @@ function renderAbsensi() {
       return '<div class="prog"><span class="pl">'+MS_LABELS[i]+'</span><span class="tr"><i style="width:'+Math.round(d/n*100)+'%"></i></span><span class="v">'+d+'/'+MEMBERS.length+'</span></div>'; }).join('')+'</section>';
   side += '<section class="card" id="absEvMini">'+absEventsMiniHTML()+'</section>';
 
-  el.innerHTML = '<div class="cols">'+card+'<div class="narrow">'+side+'</div></div>' + buildAttendanceLineChart(MEMBERS, DATES, ATTENDANCE);
+  // Grafik tren di kolom kiri (bawah tabel) supaya tidak ada ruang kosong di samping kartu kanan
+  el.innerHTML = '<div class="cols"><div class="wide stack">'+card+buildAttendanceLineChart(MEMBERS, DATES, ATTENDANCE)+'</div><div class="narrow">'+side+'</div></div>';
 }
 
 function goTab(id) { sTab(id); }
