@@ -634,6 +634,12 @@ html{scrollbar-gutter:stable}
 .st-edit{position:absolute;top:8px;right:8px;font-style:normal;font-size:11px;font-weight:700;color:#6C5CE7;opacity:0;transition:opacity .15s}
 .sidetheme.editable:hover .st-edit,.sidetheme.editable:focus-visible .st-edit{opacity:1}
 @media (hover:none){.st-edit{opacity:1}}
+@media (max-width:880px){
+  .phead.dhead{flex-wrap:nowrap;align-items:flex-start;gap:12px}
+  .phead.dhead>div:first-child{flex:1;min-width:0}
+  .phead.dhead>.actions{width:auto;flex:none}
+  #cTop>.kpi:last-child:nth-child(4){grid-column:1/-1}
+}
 .regall{display:inline-flex;align-items:center;height:44px;padding:0 18px;border-radius:24px;background:var(--grad);color:#fff;font-size:13px;font-weight:700;box-shadow:0 4px 12px rgba(108,92,231,.3)}
 .card,.kpi,.mcard,.evcard,.acc,.cgcard,.donut,.section{border-radius:16px}
 .card,.kpi,.mcard,.evcard,.acc,.cgcard,.donut{box-shadow:0 1px 3px rgba(0,0,0,.03)}
@@ -914,7 +920,7 @@ html{scrollbar-gutter:stable}
       <button type="button" onclick="goBack()" aria-label="Keluar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button>
     </header>
     <main class="content">
-      <header class="phead">
+      <header class="phead dhead">
         <div><div class="crumb" id="dCrumb"></div><h1 id="dTitle">Rekap Absensi</h1><div class="meta"><span id="nB"></span> <span id="hC">0</span> anggota · <span id="hS"></span> · <span id="hL"></span></div></div>
         <div class="actions"><button type="button" class="iconbtn notif-bell" onclick="toggleNotif()" aria-label="Notifikasi"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg></button></div>
       </header>
@@ -3360,6 +3366,14 @@ async function addPelMonth() {
 async function addPelWeek() {
   const dateInput = document.getElementById('pelNewDate');
   if (!dateInput || !dateInput.value) { alert('Pilih tanggal dulu'); return; }
+  // Cegah salah pilih tanggal (mis. 1 Jan masuk ke bulan April)
+  const moMap = {januari:1,februari:2,maret:3,april:4,mei:5,juni:6,juli:7,agustus:8,september:9,oktober:10,november:11,desember:12};
+  const mp = String(CUR_PEL_MONTH || '').trim().split(/\s+/);
+  const selMo = moMap[(mp[0] || '').toLowerCase()], selYr = parseInt(mp[1]);
+  const [dy, dm] = dateInput.value.split('-').map(Number);
+  if (selMo && selYr && (dm !== selMo || dy !== selYr)) {
+    if (!confirm('Tanggal ' + fmtWeekLabel(dateInput.value) + ' ' + dy + ' bukan di bulan ' + CUR_PEL_MONTH + '.\n\nTetap tambahkan ke ' + CUR_PEL_MONTH + '?')) return;
+  }
   // Save first role to create the week in DB (pakai role pertama supaya week muncul di pills)
   const roles = await getPelRolesAsync();
   if (roles.length) {
@@ -4332,11 +4346,24 @@ async function renderCoachOverview() {
 // \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
 // DISTRIBUSI WILAYAH \u2014 filter chip kecamatan + kelurahan
 // \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
+// Kunci grup: huruf kecil tanpa spasi, supaya "Kramat Jati" = "Kramatjati" = "kramat jati" (data DB tidak diubah)
+const _WIL_LABEL = {};
+function _titleCase(s) {
+  return String(s||'').trim().toLowerCase().split(/\s+/).map(w => w.charAt(0).toUpperCase()+w.slice(1)).join(' ');
+}
 function normWilayah(s) {
-  return String(s||'').trim().toLowerCase().replace(/\s+/g,' ');
+  const key = String(s||'').toLowerCase().replace(/\s+/g,'');
+  if (key) {
+    const lab = _titleCase(s);
+    const cur = _WIL_LABEL[key];
+    // Label tampilan: pilih versi dengan spasi terbanyak ("Kramat Jati" > "Kramatjati")
+    if (!cur || lab.split(' ').length > cur.split(' ').length) _WIL_LABEL[key] = lab;
+  }
+  return key;
 }
 function titleCaseWilayah(s) {
-  return String(s||'').trim().toLowerCase().split(/\s+/).map(w => w.charAt(0).toUpperCase()+w.slice(1)).join(' ');
+  const key = String(s||'').toLowerCase().replace(/\s+/g,'');
+  return _WIL_LABEL[key] || _titleCase(s);
 }
 
 // Filter state
