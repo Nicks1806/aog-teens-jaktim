@@ -1149,7 +1149,8 @@ async function checkNewVersion(force) {
   _VER_LAST_CHECK = Date.now();
   try {
     const cur = (document.querySelector('[title="App version"]') || {}).textContent || '';
-    const res = await fetch('/?vcheck=' + Date.now(), { cache: 'no-store' });
+    // Tanpa query string: service worker meng-cache tiap URL unik → cukup '/' (no-store = selalu ke server)
+    const res = await fetch('/', { cache: 'no-store' });
     if (!res.ok) return;
     const m = (await res.text()).match(/App version">(v\d+)</);
     if (m && cur && m[1] !== cur.trim()) showUpdateBanner(m[1]);
