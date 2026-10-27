@@ -125,6 +125,7 @@ h1,h2,h3{font-family:var(--display)}
 .visibanner small{display:block;font-family:Inter,sans-serif;font-size:12px;font-weight:600;letter-spacing:1.4px;text-transform:uppercase;color:#CFC9F2;margin-bottom:6px}
 .visibanner .vb-misi{font-family:Inter,sans-serif;font-size:13px;font-weight:500;color:#CFC9F2;line-height:1.55;margin-top:10px;white-space:pre-wrap}
 
+.dtop{display:flex;flex-direction:column;gap:24px}
 .tab-content{display:none}
 .tab-content.active{display:block;animation:tabFadeIn .18s ease}
 
@@ -356,6 +357,160 @@ textarea.modal-input{line-height:1.5}
 .input:focus,.select:focus,.textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
 .field{display:flex;flex-direction:column;gap:8px}
 
+/* ══════════ REDESIGN — tab Absensi & elemen bersama tab ══════════ */
+.dot{padding:0;font-family:inherit;line-height:1}
+.tblwrap{overflow-x:auto;margin:0 -6px;padding:0 6px}
+table.att{border-collapse:separate;border-spacing:0}
+table.att th{font-size:12px;font-weight:600;color:var(--muted);padding:0 3px 8px;border-bottom:0}
+table.att td{padding:3px;border-bottom:0}
+table.att tbody tr td{padding-top:4px;padding-bottom:4px}
+table.att .name-cell{padding-right:14px;min-width:180px}
+table.att tfoot td{border-top:1px solid var(--line2);padding-top:10px;font-size:13px;text-align:center}
+table.att tfoot td b{display:block;font-weight:700}
+table.att .tlabel{font-size:12px;color:var(--muted);font-weight:600}
+.mem{display:flex;align-items:center;gap:10px}
+.mem b{display:block;font-size:14px;font-weight:600;line-height:1.25}
+.mem .ava{width:36px;height:36px}
+.ava.risk{background:var(--Ab);color:var(--A)}
+.rpill{display:inline-block;margin-top:3px;font-size:11px;font-weight:600;padding:1px 8px;border-radius:20px;background:var(--accent-soft);color:var(--accent-ink)}
+.rpill.cgl{background:var(--Hb);color:var(--H)}
+.rpill.sponsor{background:var(--Ib);color:var(--I)}
+.rpill.member{background:var(--accent-soft);color:var(--accent-ink)}
+.rpill.simpatisan{background:var(--Sb);color:var(--S)}
+.rpill.vip{background:var(--Ab);color:var(--A)}
+.pct{font-family:var(--display);font-weight:700;font-size:18px;line-height:1}
+.pctcol{text-align:right !important;padding-left:12px !important;white-space:nowrap}
+.pctsub{display:block;font-size:11px;color:var(--muted);font-weight:500;margin-top:2px}
+.monthnav{display:flex;align-items:center;gap:10px;background:var(--faint);border-radius:14px;padding:6px;margin-bottom:14px}
+.monthnav .mn-mid{flex:1;text-align:center}
+.monthnav .mn-mid b{display:block;font-size:15px}
+.monthnav .mn-mid small{font-size:12px;color:var(--muted)}
+.monthnav .iconbtn:disabled{opacity:.35;cursor:not-allowed}
+.lrow.plain{background:transparent;padding:8px 0}
+.evd{width:52px;flex:none;border-radius:12px;display:flex;flex-direction:column;align-items:center;padding:8px 0;line-height:1.1}
+.evd small{font-size:11px;font-weight:600}
+.evd b{font-family:var(--display);font-size:20px}
+.btn.wa{color:var(--H);background:var(--Hb);border-color:var(--Hbr)}
+.chartcard svg{max-width:none}
+/* Detail CG */
+.tabbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.mcard{background:#fff;border:1px solid var(--line);border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.mcard .top{display:flex;align-items:center;gap:12px}
+.mcard .top .ava{width:44px;height:44px;font-size:16px}
+.mname{width:100%;border:0;border-bottom:1px dashed transparent;background:transparent;font-family:var(--display);font-weight:700;font-size:16px;color:var(--ink);padding:2px 0;outline:none}
+.mname:hover{border-bottom-color:var(--line)}
+.mname:focus{border-bottom-color:var(--accent)}
+.info{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.info label{display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
+.info input{height:38px;border:1px solid var(--line2);border-radius:10px;padding:0 10px;font-size:13px;text-transform:none;letter-spacing:0;color:var(--ink);background:#FCFBFE;min-width:0}
+.info input:focus{outline:none;border-color:var(--accent);background:#fff}
+.addcard{border:1.5px dashed #CFCAE3;background:transparent;border-radius:20px;min-height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--accent-ink);font-weight:600;font-size:14px;cursor:pointer}
+.addcard:hover{background:#fff}
+.role-btn{min-height:32px;font-size:12px;padding:0 12px;border-radius:20px;font-weight:700;border:0;cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.role-btn:hover{opacity:1;transform:none;filter:brightness(.97)}
+.role-btn.cgl{background:var(--Hb);color:var(--H)}
+.role-btn.sponsor{background:var(--Ib);color:var(--I)}
+.role-btn.member{background:var(--accent-soft);color:var(--accent-ink)}
+.role-btn.simpatisan{background:var(--Sb);color:var(--S)}
+.role-btn.vip{background:var(--Ab);color:var(--A)}
+.role-menu{border:1px solid var(--line);border-radius:14px;padding:6px;box-shadow:0 12px 30px rgba(36,28,92,.15);min-width:160px}
+.role-opt{width:100%;min-height:40px;border:0;background:transparent;border-radius:10px;font-size:13px;font-weight:600;color:var(--ink);text-align:left;padding:0 12px}
+.role-opt:hover{background:var(--faint)}
+.role-opt.cgl .rdot{background:var(--H)}.role-opt.sponsor .rdot{background:var(--I)}.role-opt.member .rdot{background:var(--accent)}.role-opt.simpatisan .rdot{background:var(--S)}.role-opt.vip .rdot{background:var(--A)}
+.ms-chips{gap:6px}
+.msc{min-height:32px;padding:0 11px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center}
+.msc.done{background:var(--Hb);color:var(--H);border:1px solid var(--Hbr)}
+.msc.pending{background:#fff;color:var(--muted);border:1px solid var(--line)}
+.msc:hover{filter:brightness(.97)}
+@media (max-width:520px){.info{grid-template-columns:1fr}.mgrid{grid-template-columns:1fr}}
+/* Visi CG */
+.visi-box{background:var(--side);color:#fff;border-radius:20px;padding:28px;margin-bottom:24px}
+.visi-box small{font-size:12px;font-weight:600;letter-spacing:1.4px;text-transform:uppercase;color:#CFC9F2}
+.visi-box textarea{width:100%;background:transparent;border:0;border-bottom:1px dashed rgba(255,255,255,.25);color:#fff;font-family:var(--display);font-weight:700;font-size:26px;line-height:1.3;resize:vertical;padding:10px 0;margin-top:6px;min-height:60px}
+.visi-box textarea::placeholder{color:rgba(255,255,255,.45)}
+.visi-box textarea:focus{outline:none;border-bottom-color:var(--gold)}
+.misiview{cursor:text;border-radius:12px;min-height:40px}
+.misiview:hover{background:#FAF9FC}
+.misi{display:flex;align-items:flex-start;gap:12px;padding:12px 4px;border-bottom:1px dashed var(--line)}
+.misi:last-child{border-bottom:0}
+.misi .n{width:28px;height:28px;border-radius:8px;background:var(--gold);color:var(--side);font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex:none}
+.misi .mt{flex:1;font-size:14px;line-height:1.55;padding-top:4px}
+.misi-empty{display:flex;align-items:center;justify-content:center;gap:8px;padding:18px;color:var(--muted);font-size:13px;border:1.5px dashed var(--line);border-radius:14px}
+.x{width:36px;height:36px;border-radius:10px;border:0;background:transparent;color:var(--muted);display:inline-flex;align-items:center;justify-content:center;flex:none;cursor:pointer}
+.x:hover{background:var(--Ab);color:var(--A)}
+.plan{padding:12px;border:1px solid var(--line2);border-radius:14px;margin-top:10px;display:flex;flex-direction:column;gap:8px}
+.plan-top{display:flex;align-items:center;gap:8px}
+.plan-top b{flex:1;min-width:0;font-size:14px}
+.plan-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.dev-select,.dev-date{min-height:36px;border:1px solid var(--line);border-radius:10px;padding:0 10px;font-size:13px;background:#fff;color:var(--ink)}
+@media (max-width:880px){.visi-box textarea{font-size:21px}.visi-box{padding:20px}}
+/* Pelayanan */
+.select.sm,.input.sm{min-height:36px;height:36px;border-radius:10px;font-size:13px;padding:0 10px;width:auto}
+.weeks{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding-bottom:4px}
+.wk{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:12px;background:#fff;overflow:hidden}
+.wk-main{min-height:40px;padding:0 12px;border:0;background:transparent;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer}
+.wk-ic{width:32px;min-height:40px;border:0;background:transparent;color:var(--muted);display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
+.wk-ic:hover{color:var(--ink);background:var(--faint)}
+.wk.on{background:var(--side);border-color:var(--side)}
+.wk.on .wk-main{color:#fff}
+.wk.on .wk-ic{color:var(--side-muted)}
+.wk.on .wk-ic:hover{color:#fff;background:rgba(255,255,255,.1)}
+.wkadd{display:inline-flex;gap:6px;align-items:center;margin-left:auto}
+.pel-h{font-size:16px;font-weight:700;margin:20px 0 6px}
+.pel{display:grid;grid-template-columns:200px 1fr;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line2)}
+.pel:last-of-type{border-bottom:0}
+.pel-role{display:flex;align-items:center;gap:10px}
+.pel-role b{font-size:14px}
+.pel-role .ic{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex:none}
+.pel-asg{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.asg{display:inline-flex;align-items:center;gap:2px;min-height:32px;padding:0 4px 0 12px;border-radius:20px;font-size:13px;font-weight:600}
+.asg button{width:28px;height:28px;border:0;background:transparent;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;opacity:.7}
+.asg button:hover{opacity:1;background:rgba(255,255,255,.6)}
+.pel-add-wrap{position:relative;display:inline-block}
+.asg-add{min-height:32px;padding:0 12px;border:1px dashed;border-radius:20px;background:transparent;font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:4px;cursor:pointer}
+.asg-add:hover{background:#fff}
+.pel-dd-panel{position:absolute;top:calc(100% + 6px);left:0;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 24px 60px rgba(36,28,92,.22);min-width:240px;max-height:300px;overflow-y:auto;z-index:50;padding:6px}
+@media (max-width:880px){.pel{grid-template-columns:1fr}.wkadd{margin-left:0}}
+/* Milestone */
+.chip.big{min-height:40px;padding:0 16px;font-size:13px}
+.donuts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (min-width:1180px){.donuts{grid-template-columns:repeat(8,minmax(0,1fr))}}
+@media (max-width:520px){.donuts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.donut{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.donut svg{display:block}
+.donut b{font-size:13px}
+.donut small{font-size:12px;color:var(--muted)}
+.msrow{flex-wrap:wrap}
+.msname{width:180px;min-width:0}
+.msname b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:520px){.msname{width:auto;flex:1}}
+/* Events */
+.sechead{font-size:18px;font-weight:700;margin:24px 0 12px}
+.tabbar+.sechead{margin-top:8px}
+.evcard{display:flex;gap:16px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:12px;flex-wrap:wrap}
+.evcard.past{opacity:.6}
+.evcard .grow{flex:1;min-width:200px}
+.evcard .grow>b{font-size:15px;display:block}
+.evcard p{margin:4px 0 0;font-size:13px;color:var(--muted)}
+.evpills{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.ev-note{font-size:13px;color:var(--ink);line-height:1.5;white-space:pre-wrap;margin-top:8px}
+.ev-note.clamp{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.evimg{display:block;max-width:100%;max-height:220px;object-fit:cover;border-radius:12px;margin-top:10px}
+.evbtns{display:flex;gap:6px}
+.evbtns button{width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center;color:var(--muted);cursor:pointer}
+.evbtns button:hover{color:var(--ink);border-color:#CFCAE3}
+.evbtns .wa{color:var(--H);border-color:var(--Hbr);background:var(--Hb)}
+.evbtns .del:hover{color:var(--A);border-color:var(--Abr);background:var(--Ab)}
+.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:520px){.formgrid{grid-template-columns:1fr}.evbtns{width:100%;justify-content:flex-end}}
+.rbadge{font-size:11px;padding:2px 9px;border-radius:20px;font-weight:600;border:0}
+.rbadge.cgl{background:var(--Hb);color:var(--H)}
+.rbadge.sponsor{background:var(--Ib);color:var(--I)}
+.rbadge.member{background:var(--accent-soft);color:var(--accent-ink)}
+.rbadge.simpatisan{background:var(--Sb);color:var(--S)}
+.rbadge.vip{background:var(--Ab);color:var(--A)}
+
 /* HP: input ≥16px supaya iOS tidak auto-zoom (zoom manual sekarang diizinkan) */
 @media (max-width:880px){
   .side{display:none}
@@ -534,6 +689,7 @@ textarea.modal-input{line-height:1.5}
         <div><div class="crumb" id="dCrumb"></div><h1 id="dTitle">Rekap Absensi</h1><div class="meta"><span id="nB"></span> <span id="hC">0</span> anggota · <span id="hS"></span> · <span id="hL"></span></div></div>
         <div class="actions"><button type="button" class="iconbtn notif-bell" onclick="toggleNotif()" aria-label="Notifikasi"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg></button></div>
       </header>
+      <div class="dtop" id="dTop">
       <div class="visibanner" id="regionVisiBanner" style="display:none"></div>
       <div class="grid-kpi">
         <div class="kpi hero"><div class="lbl">Rata-rata kehadiran</div><div class="num"><span id="dAvg">0</span><small>%</small></div><div class="track"><i id="dAvgBar" style="width:0%"></i></div><div class="foot" id="dAvgFoot" style="color:#CFC9F2;font-weight:500">dari 0 catatan</div></div>
@@ -541,6 +697,7 @@ textarea.modal-input{line-height:1.5}
         <div class="kpi"><div class="lbl">Izin<span class="badge c-I">I</span></div><div class="num" id="sI">0</div><div class="foot" style="color:var(--I)"><span id="sIp">0%</span> dari total</div></div>
         <div class="kpi"><div class="lbl">Sakit<span class="badge c-S">S</span></div><div class="num" id="sS">0</div><div class="foot" style="color:var(--S)"><span id="sSp">0%</span> dari total</div></div>
         <div class="kpi"><div class="lbl">Alpa<span class="badge c-A">A</span></div><div class="num" id="sA">0</div><div class="foot" style="color:var(--A)"><span id="sAp">0%</span> dari total</div></div>
+      </div>
       </div>
     <div class="tab-content active" id="tab-absensi"><div class="loading-msg">Memuat...</div></div>
     <div class="tab-content" id="tab-detail"><div class="loading-msg">Memuat...</div></div>
@@ -581,7 +738,7 @@ textarea.modal-input{line-height:1.5}
           <button type="button" class="iconbtn notif-bell" onclick="toggleNotif()" aria-label="Notifikasi"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg></button>
         </div>
       </header>
-      <div class="grid-kpi">
+      <div class="grid-kpi" id="cTop">
         <div class="kpi hero"><div class="lbl">Rata-rata kehadiran</div><div class="num" id="csAvgHadir">-</div><div class="track"><i id="csAvgBar" style="width:0%"></i></div></div>
         <div class="kpi"><div class="lbl">Total anggota</div><div class="num" id="csTotalMbr">0</div><div class="foot" style="color:var(--accent-ink)" id="csRegLabel">-</div></div>
         <div class="kpi"><div class="lbl">At risk (&lt;50%)</div><div class="num" id="csAtRisk">0</div><div class="foot" style="color:var(--A)">perlu di-follow up</div></div>
@@ -1247,6 +1404,27 @@ const CAT_ICON = {msj:'📖',cgt:'👥',ct:'🏕️',ibadah:'⛪',outreach:'🌏
 const CAT_COLOR = {msj:'#7c3aed',cgt:'#0f766e',ct:'#b45309',ibadah:'#16a34a',outreach:'#6C5CE7',other:'#6b7280',birthday:'#ec4899',event:'#2563eb',retreat:'#0e7490',reminder:'#d97706'};
 function catColor(cat){ return CAT_COLOR[(cat||'').toLowerCase()] || '#2563eb'; }
 function catLabel(cat){ const k=(cat||'').toLowerCase(); return (CAT_ICON[k]||'')+' '+(CAT_LABEL[k]||cat||'Event'); }
+// Redesign: palet kategori event (latar, teks) + label tanpa emoji untuk UI
+const CAT_STYLE = {msj:['#EEEAFB','#4B35C9'],cgt:['#EEEAFB','#4B35C9'],ct:['#E7F6EC','#166534'],retreat:['#E7F6EC','#166534'],ibadah:['#E8EFFE','#1D4ED8'],outreach:['#FEF3DC','#9A4A06'],event:['#FCE7F3','#BE185D'],birthday:['#FCE7F3','#BE185D'],reminder:['#F3F2EE','#5F5C6B'],other:['#F3F2EE','#5F5C6B']};
+function catStyle(cat){ return CAT_STYLE[(cat||'').toLowerCase()] || ['#F3F2EE','#5F5C6B']; }
+function catText(cat){ const k=(cat||'').toLowerCase(); return CAT_LABEL[k] || cat || 'Event'; }
+function initialOf(name){ return esc(String(name||'').trim().charAt(0).toUpperCase() || '?'); }
+function pctColorOf(p){ return p >= 75 ? 'var(--H)' : p >= 50 ? 'var(--S)' : 'var(--A)'; }
+function rolePill(status){ return '<span class="rpill '+roleCls(status)+'">'+esc(roleLabel(status))+'</span>'; }
+function waLinkOf(no){
+  let d = String(no||'').replace(/\D/g,'');
+  if (!d) return '';
+  if (d.startsWith('0')) d = '62' + d.slice(1);
+  else if (d.startsWith('8')) d = '62' + d;
+  return 'https://wa.me/' + d;
+}
+const MONTH_SHORT_ID = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Ags','Sep','Okt','Nov','Des'];
+function evDateBlock(dateStr, cat){
+  const d = dateStr ? parseLocalDate(dateStr) : null;
+  const st = catStyle(cat);
+  if (!d) return '<div class="evd" style="background:'+st[0]+';color:'+st[1]+'"><small>TBA</small><b>–</b></div>';
+  return '<div class="evd" style="background:'+st[0]+';color:'+st[1]+'"><small>'+MONTH_SHORT_ID[d.getMonth()].toUpperCase()+'</small><b>'+String(d.getDate()).padStart(2,'0')+'</b></div>';
+}
 
 // Auto-cleanup: hapus event yang sudah lewat (end date < hari ini)
 async function cleanupPastEvents() {
@@ -1281,13 +1459,72 @@ function eventCountdownBadge(dateStart, dateEnd) {
     if (dEnd) { dEnd.setHours(0,0,0,0); const diffE = Math.round((dEnd - today) / 86400000); if (diffE >= 0) diff = 0; }
   }
   let txt, bg, col;
-  if (diff < 0)      { txt = Math.abs(diff)+' hari lalu'; bg='#f3f4f6'; col='#6b7280'; }
-  else if (diff===0) { txt = 'HARI INI';                  bg='#fce7f3'; col='#be185d'; }
-  else if (diff===1) { txt = 'Besok';                     bg='#fef3c7'; col='#92400e'; }
-  else if (diff<=7)  { txt = diff+' hari lagi';           bg='#fef3c7'; col='#92400e'; }
-  else if (diff<=30) { txt = diff+' hari lagi';           bg='#dbeafe'; col='#1e40af'; }
-  else               { txt = diff+' hari lagi';           bg='#f3f4f6'; col='#6b7280'; }
-  return '<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:'+bg+';color:'+col+';margin-left:8px;white-space:nowrap">'+txt+'</span>';
+  if (diff < 0)      { txt = Math.abs(diff)+' hari lalu'; bg='var(--faint)'; col='var(--muted)'; }
+  else if (diff===0) { txt = 'Hari ini';                  bg='#FCE7F3'; col='#BE185D'; }
+  else if (diff===1) { txt = 'Besok';                     bg='var(--Sb)'; col='var(--S)'; }
+  else if (diff<=7)  { txt = diff+' hari lagi';           bg='var(--Sb)'; col='var(--S)'; }
+  else if (diff<=30) { txt = diff+' hari lagi';           bg='var(--Ib)'; col='var(--I)'; }
+  else               { txt = diff+' hari lagi';           bg='var(--faint)'; col='var(--muted)'; }
+  return '<span class="pill" style="background:'+bg+';color:'+col+'">'+txt+'</span>';
+}
+
+// ===== Kartu event (dipakai tab Events CGL & Coach) =====
+function evScopeLabel(ev, fallback) {
+  if (ev.region === 'all') return 'Global · Semua Jaktim';
+  if (ev.region === 'jaktim1') return 'Semua CG Jaktim 1';
+  if (ev.region === 'jaktim2') return 'Semua CG Jaktim 2';
+  return fallback || 'Semua CG';
+}
+function evIsPast(ev) {
+  const ds = ev.date_end || ev.date_start;
+  const d = ds ? parseLocalDate(ds) : null;
+  if (!d) return false;
+  const t = new Date(); t.setHours(0,0,0,0); d.setHours(0,0,0,0);
+  return d < t;
+}
+function evCardHTML(ev, evId, scopeLabel, scopeColor, canDelete) {
+  const st = catStyle(ev.cat);
+  const note = ev.note || '';
+  const noteEsc = esc(note).replace(/\n/g, '<br>');
+  const isLong = note.length > 150 || (note.match(/\n/g) || []).length > 2;
+  const img = ev.image || '';
+  const dateRange = ev.date_start && ev.date_end && ev.date_end !== ev.date_start ? esc(ev.date_start)+' → '+esc(ev.date_end) : esc(ev.date_start || ev.date_end || 'Tanpa tanggal');
+  const nid = 'evtxt_'+evId;
+  let h = '<article class="evcard'+(evIsPast(ev)?' past':'')+'" id="ev_'+evId+'">';
+  h += evDateBlock(ev.date_start || ev.date_end, ev.cat);
+  h += '<div class="grow"><b>'+esc(ev.name||'')+'</b><p>'+dateRange+'</p>';
+  if (img) h += '<img class="evimg" src="'+esc(img)+'" alt="Gambar event '+esc(ev.name||'')+'" onerror="this.style.display=\'none\'">';
+  if (note) {
+    if (isLong) {
+      h += '<div class="ev-note clamp" id="'+nid+'">'+noteEsc+'</div>';
+      h += '<button type="button" class="linkbtn" style="min-height:32px;font-size:13px" data-exp="0" onclick="(function(b){var n=document.getElementById(\''+nid+'\');var exp=b.dataset.exp===\'1\';n.classList.toggle(\'clamp\',exp);b.textContent=exp?\'Baca selengkapnya\':\'Sembunyikan\';b.dataset.exp=exp?\'0\':\'1\';})(this)">Baca selengkapnya</button>';
+    } else {
+      h += '<div class="ev-note" id="'+nid+'">'+noteEsc+'</div>';
+    }
+  }
+  h += '<div class="evpills"><span class="pill" style="background:'+st[0]+';color:'+st[1]+'">'+esc(catText(ev.cat))+'</span>'+eventCountdownBadge(ev.date_start || ev.date_end, ev.date_end);
+  if (scopeLabel) h += '<span class="pill" style="background:var(--accent-soft);color:'+(scopeColor||'var(--accent-ink)')+'">'+esc(scopeLabel)+'</span>';
+  h += '</div></div>';
+  h += '<div class="evbtns">';
+  h += '<button type="button" onclick="copyEventText(\''+evId+'\')" aria-label="Salin info event" title="Salin teks">'+icon('copy',18)+'</button>';
+  h += '<button type="button" class="wa" onclick="broadcastEvent(\''+evId+'\')" aria-label="Bagikan ke WhatsApp" title="Broadcast WhatsApp">'+icon('wa',18)+'</button>';
+  h += '<button type="button" onclick="openEditEvent(\''+evId+'\')" aria-label="Edit event" title="Edit">'+icon('edit',18)+'</button>';
+  if (canDelete !== false) h += '<button type="button" class="del" onclick="deleteEventCard(\''+evId+'\')" aria-label="Hapus event" title="Hapus">'+icon('trash',18)+'</button>';
+  h += '</div></article>';
+  return h;
+}
+function birthdayCardHTML(m, sub, cgLabel, cgColor) {
+  let txt;
+  if (m._daysLeft === 0) txt = 'Hari ini';
+  else if (m._daysLeft === 1) txt = 'Besok';
+  else txt = m._daysLeft+' hari lagi';
+  const soon = m._daysLeft <= 7;
+  let h = '<article class="evcard"><div class="evd" style="background:#FCE7F3;color:#BE185D"><small>'+esc(String(m._dateLabel).split(' ')[1]||'').toUpperCase()+'</small><b>'+esc(String(m._dateLabel).split(' ')[0]||'')+'</b></div>';
+  h += '<div class="grow"><b>Ulang tahun '+esc(m.nama)+'</b><p>Ke-'+m._turnAge+' · '+esc(sub)+'</p>';
+  h += '<div class="evpills"><span class="pill" style="background:#FCE7F3;color:#BE185D">Ulang tahun</span><span class="pill" style="background:'+(soon?'var(--Sb)':'var(--faint)')+';color:'+(soon?'var(--S)':'var(--muted)')+'">'+txt+'</span>';
+  if (cgLabel) h += '<span class="pill" style="background:var(--faint);color:'+(cgColor||'var(--muted)')+'">'+esc(cgLabel)+'</span>';
+  h += '</div></div></article>';
+  return h;
 }
 let EV_FILTER = 'all';
 function setEventFilter(key,btn){ EV_FILTER = key; renderEvents(false); }
@@ -1733,9 +1970,9 @@ function buildAttendanceLineChart(members, dates, attMap) {
   // Kalau semua null, jangan tampilin
   if (!points.some(p => p.pct !== null)) return '';
 
-  const W = Math.max(560, dates.length * 56);
+  const W = Math.max(560, dates.length * 60);
   const H = 200;
-  const padL = 32, padR = 14, padT = 28, padB = 34;
+  const padL = 38, padR = 18, padT = 34, padB = 34;
   const innerW = W - padL - padR;
   const innerH = H - padT - padB;
   const stepX = dates.length > 1 ? innerW / (dates.length - 1) : 0;
@@ -1745,8 +1982,8 @@ function buildAttendanceLineChart(members, dates, attMap) {
   let grid = '';
   [0,25,50,75,100].forEach(v => {
     const y = yFor(v);
-    grid += `<line x1="${padL}" y1="${y}" x2="${W-padR}" y2="${y}" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="${v===0?0:'3 3'}"/>`;
-    grid += `<text x="${padL-6}" y="${y+3}" text-anchor="end" font-size="9" fill="#9ca3af" font-family="Inter">${v}%</text>`;
+    grid += `<line x1="${padL}" y1="${y}" x2="${W-padR}" y2="${y}" stroke="#ECEAF3" stroke-width="1" stroke-dasharray="${v===0?0:'3 3'}"/>`;
+    grid += `<text x="${padL-6}" y="${y+3}" text-anchor="end" font-size="11" fill="#5F5C6B" font-family="Inter">${v}%</text>`;
   });
 
   // Line path (skip null)
@@ -1776,10 +2013,10 @@ function buildAttendanceLineChart(members, dates, attMap) {
     if (p.pct === null) return;
     const x = padL + i * stepX;
     const y = yFor(p.pct);
-    const color = p.pct >= 75 ? '#16a34a' : p.pct >= 50 ? '#d97706' : '#dc2626';
+    const color = p.pct >= 75 ? '#166534' : p.pct >= 50 ? '#9A4A06' : '#B91C1C';
     dots += `<circle cx="${x}" cy="${y}" r="4.5" fill="#fff" stroke="${color}" stroke-width="2.5"/>`;
-    dots += `<text x="${x}" y="${y-20}" text-anchor="middle" font-size="9" font-weight="700" fill="${color}" font-family="Inter">${p.pct}%</text>`;
-    dots += `<text x="${x}" y="${y-10}" text-anchor="middle" font-size="8" font-weight="600" fill="#6b7280" font-family="Inter">${p.hadir}/${p.total}</text>`;
+    dots += `<text x="${x}" y="${y-22}" text-anchor="middle" font-size="11" font-weight="700" fill="${color}" font-family="Inter">${p.pct}%</text>`;
+    dots += `<text x="${x}" y="${y-10}" text-anchor="middle" font-size="11" font-weight="500" fill="#5F5C6B" font-family="Inter">${p.hadir}/${p.total}</text>`;
   });
 
   // X-axis labels
@@ -1787,33 +2024,30 @@ function buildAttendanceLineChart(members, dates, attMap) {
   points.forEach((p, i) => {
     const x = padL + i * stepX;
     const lbl = String(p.label).split(/\s+/).slice(0,2).join(' '); // shorten: "3 Jan" style
-    xLabels += `<text x="${x}" y="${H-14}" text-anchor="middle" font-size="9" fill="#6b7280" font-family="Inter">${lbl}</text>`;
+    xLabels += `<text x="${x}" y="${H-14}" text-anchor="middle" font-size="11" fill="#5F5C6B" font-family="Inter">${lbl}</text>`;
   });
 
   // Rata-rata
   const validPts = points.filter(p => p.pct !== null);
   const avgPct = validPts.length ? Math.round(validPts.reduce((s,p)=>s+p.pct,0)/validPts.length) : 0;
-  const avgColor = avgPct >= 75 ? '#16a34a' : avgPct >= 50 ? '#d97706' : '#dc2626';
+  const avgColor = avgPct >= 75 ? '#166534' : avgPct >= 50 ? '#9A4A06' : '#B91C1C';
 
-  return `<div style="background:linear-gradient(135deg,#faf5ff 0%,#ffffff 100%);border:1px solid var(--g5);border-radius:14px;padding:14px 16px;margin-bottom:16px">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-      <div>
-        <div style="font-size:10px;font-weight:700;letter-spacing:1.2px;color:var(--g3);text-transform:uppercase">📈 Progress Kehadiran per Minggu</div>
-        <div style="font-size:10px;color:var(--g4);margin-top:2px">Persentase member yang hadir tiap ibadah</div>
-      </div>
-      <div style="text-align:right"><div style="font-family:'Instrument Serif',serif;font-size:24px;color:${avgColor};line-height:1">${avgPct}%</div><div style="font-size:9px;color:var(--g4);letter-spacing:.5px">RATA-RATA</div></div>
+  return `<section class="card chartcard">
+    <div class="chead">
+      <div><h2>Tren kehadiran per minggu</h2><div class="sub">% anggota hadir tiap ibadah (anggota baru dihitung sejak pertama hadir)</div></div>
+      <div style="text-align:right"><div class="pct" style="font-size:26px;color:${avgColor}">${avgPct}%</div><div class="sub" style="margin:0">rata-rata</div></div>
     </div>
-    <div style="overflow-x:auto;margin:0 -4px">
-      <svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="display:block">
-        <defs><linearGradient id="attFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#6C5CE7" stop-opacity=".25"/><stop offset="100%" stop-color="#6C5CE7" stop-opacity="0"/></linearGradient></defs>
+    <div class="tblwrap">
+      <svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="display:block" role="img" aria-label="Grafik persentase kehadiran per ibadah">
+        <defs><linearGradient id="attFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#5B45E0" stop-opacity=".18"/><stop offset="100%" stop-color="#5B45E0" stop-opacity="0"/></linearGradient></defs>
         ${grid}
         ${areaPath ? '<path d="'+areaPath+'" fill="url(#attFill)"/>' : ''}
-        ${path ? '<path d="'+path+'" fill="none" stroke="#6C5CE7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>' : ''}
+        ${path ? '<path d="'+path+'" fill="none" stroke="#5B45E0" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>' : ''}
         ${dots}
         ${xLabels}
       </svg>
     </div>
-  </div>`;
+  </section>`;
 }
 
 // ── Mobile month filter helpers ─────────────────────────────
@@ -1846,12 +2080,10 @@ function buildMonthNavHeader(allDates, activeMonth, activeYear, label, viewCount
   const sortedMonths = [...monthsAvail].sort((a,b) => a - b);
   const hasPrev = sortedMonths.some(m => m < activeMonth);
   const hasNext = sortedMonths.some(m => m > activeMonth);
-  const btnStyle = 'padding:8px 16px;border-radius:10px;border:0;background:#fff;font-weight:700;color:#6C5CE7;cursor:pointer;font-size:14px;box-shadow:0 1px 3px rgba(0,0,0,.06)';
-  const disStyle = ';opacity:.35;cursor:not-allowed;pointer-events:none';
-  return '<div style="display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,#faf5ff,#f5f0ff);border:1px solid #e4dcff;border-radius:12px;padding:10px 12px;margin-bottom:12px">'+
-         '<button onclick="changeMobileMonth(-1)" style="'+btnStyle+(hasPrev?'':disStyle)+'">‹</button>'+
-         '<div style="text-align:center;flex:1"><div style="font-weight:700;font-size:14px;color:var(--g1)">'+label+' '+activeYear+'</div><div style="font-size:10px;color:var(--g4);margin-top:2px">'+viewCount+' ibadah</div></div>'+
-         '<button onclick="changeMobileMonth(1)" style="'+btnStyle+(hasNext?'':disStyle)+'">›</button>'+
+  return '<div class="monthnav">'+
+         '<button type="button" class="iconbtn" onclick="changeMobileMonth(-1)" aria-label="Bulan sebelumnya"'+(hasPrev?'':' disabled')+'>'+icon('left')+'</button>'+
+         '<div class="mn-mid"><b>'+label+' '+activeYear+'</b><small>'+viewCount+' ibadah</small></div>'+
+         '<button type="button" class="iconbtn" onclick="changeMobileMonth(1)" aria-label="Bulan berikutnya"'+(hasNext?'':' disabled')+'>'+icon('right')+'</button>'+
          '</div>';
 }
 
@@ -1860,29 +2092,6 @@ function renderAbsensi() {
   const mobile = isMobileScreen();
   const active = getActiveMonth();
   const datesView = mobile ? DATES.filter(d => parseLabelToMonth(d.label) === active.month) : DATES;
-
-  let html = '';
-  if (mobile) {
-    html += buildMonthNavHeader(DATES, active.month, active.year, active.label, datesView.length);
-  }
-  html += '<div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:10px">';
-  html += '<button onclick="exportCGAttendanceCSV()" style="padding:8px 14px;border-radius:10px;border:1.5px solid #16a34a;background:linear-gradient(135deg,#f0fdf4,#dcfce7);color:#16a34a;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.3px;box-shadow:0 2px 6px rgba(22,163,74,.1);transition:all .2s" onmouseover="this.style.transform=\'translateY(-1px)\'" onmouseout="this.style.transform=\'\'" title="Export tabel kehadiran ke CSV">📊 Absensi CSV</button>';
-  html += '<button onclick="exportCGAttendancePDF()" style="padding:8px 14px;border-radius:10px;border:1.5px solid #dc2626;background:linear-gradient(135deg,#fef2f2,#fee2e2);color:#dc2626;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.3px;box-shadow:0 2px 6px rgba(220,38,38,.1);transition:all .2s" onmouseover="this.style.transform=\'translateY(-1px)\'" onmouseout="this.style.transform=\'\'" title="Export tabel kehadiran ke PDF">📄 Absensi PDF</button>';
-  html += '</div>';
-
-  // Line chart: % hadir per minggu — selalu full data (tidak ikut filter mobile)
-  html += buildAttendanceLineChart(MEMBERS, DATES, ATTENDANCE);
-
-  // Empty state untuk mobile kalau bulan aktif tidak ada ibadah
-  if (mobile && datesView.length === 0) {
-    html += '<div style="text-align:center;padding:32px 16px;background:#fafafa;border-radius:12px;color:var(--g3)">Belum ada ibadah di '+active.label+' '+active.year+'.<br><span style="font-size:11px;color:var(--g4)">Klik ‹ atau › untuk pindah bulan</span></div>';
-    el.innerHTML = html;
-    return;
-  }
-
-  html += '<div style="overflow-x:auto"><table class="t"><thead><tr><th>Nama</th>';
-  datesView.forEach(d => { html += '<th>' + (d.label||d.id) + '</th>'; });
-  html += '<th>% Hadir</th></tr></thead><tbody>';
 
   // Sort by role: CGL > Sponsor > Member > Simpatisan > VIP
   const ROLE_ORDER = {'cgl':0,'leader':0,'sponsor':1,'member':2,'simpatisan':3,'vip':4};
@@ -1893,56 +2102,105 @@ function renderAbsensi() {
     return (a.nama||'').localeCompare(b.nama||'');
   });
 
-  // Per-date column totals + grand totals (basis = datesView)
-  const dateHadirCounts = datesView.map(d => MEMBERS.filter(m => ATTENDANCE[m.id+'_'+d.id]==='H').length);
-  // Denominator = total member (bukan cuma yg ter-record). Member belum diisi = dianggap tidak hadir.
-  // Kalau TIDAK ADA record sama sekali di tanggal itu → 0 (tanggal belum diisi siapapun)
-  const dateTotalCounts = datesView.map(d => {
-    const anyRecord = MEMBERS.some(m => ATTENDANCE[m.id+'_'+d.id]);
-    return anyRecord ? MEMBERS.length : 0;
-  });
+  let card = '<section class="card wide abs-card"><div class="chead"><div><h2>Absensi</h2><div class="sub">Klik kotak untuk ganti status: H → I → S → A → kosong</div></div>'+
+    '<div class="actions"><button type="button" class="btn sm" onclick="exportCGAttendanceCSV()">'+icon('down',16)+'Absensi CSV</button><button type="button" class="btn sm" onclick="exportCGAttendancePDF()">'+icon('down',16)+'Absensi PDF</button></div></div>';
+  if (mobile) card += buildMonthNavHeader(DATES, active.month, active.year, active.label, datesView.length);
 
-  sortedMembers.forEach(m => {
-    const hadirCount = datesView.filter(d => ATTENDANCE[m.id+'_'+d.id]==='H').length;
-    const totalDates = datesView.filter(d => ATTENDANCE[m.id+'_'+d.id]).length || 1;
-    const pct = Math.round(hadirCount / totalDates * 100);
-    const pctColor = pct >= 75 ? 'var(--green)' : pct >= 50 ? 'var(--orange)' : 'var(--red)';
-    const atRisk = pct < 50 && totalDates > 1;
-
-    html += '<tr' + (atRisk ? ' style="border-left:3px solid var(--red)"' : '') + '>';
-    html += '<td class="name-cell"' + (atRisk ? ' style="color:var(--red)"' : '') + '>' + esc(m.nama) + '<span class="role-tag">' + esc(m.status) + '</span></td>';
-
-    datesView.forEach(d => {
-      const st = ATTENDANCE[m.id+'_'+d.id] || null;
-      const cls = st || 'X';
-      const label = st || '-';
-      html += '<td><span class="dot ' + cls + '" data-mid="'+m.id+'" data-did="'+d.id+'" onclick="cycleDot(this,' + m.id + ',\'' + d.id + '\')">' + label + '</span></td>';
+  if (mobile && datesView.length === 0) {
+    card += '<div class="empty">Belum ada ibadah di '+active.label+' '+active.year+'.<br>Pakai tombol panah untuk pindah bulan.</div>';
+  } else if (!MEMBERS.length) {
+    card += '<div class="empty">Belum ada anggota di CG ini.</div>';
+  } else {
+    // Per-date column totals + grand totals (basis = datesView)
+    const dateHadirCounts = datesView.map(d => MEMBERS.filter(m => ATTENDANCE[m.id+'_'+d.id]==='H').length);
+    // Denominator = total member (bukan cuma yg ter-record). Member belum diisi = dianggap tidak hadir.
+    // Kalau TIDAK ADA record sama sekali di tanggal itu → 0 (tanggal belum diisi siapapun)
+    const dateTotalCounts = datesView.map(d => {
+      const anyRecord = MEMBERS.some(m => ATTENDANCE[m.id+'_'+d.id]);
+      return anyRecord ? MEMBERS.length : 0;
     });
 
-    html += '<td><div class="pbar"><div class="pbar-track"><div class="pbar-fill" style="width:'+pct+'%;background:'+pctColor+'"></div></div><span class="pbar-val" style="color:'+pctColor+'">'+hadirCount+'/'+totalDates+' &middot; '+pct+'%</span></div></td>';
-    html += '</tr>';
-  });
+    let t = '<div class="tblwrap"><table class="t att"><thead><tr><th scope="col">Anggota</th>';
+    datesView.forEach(d => { t += '<th scope="col">' + esc(d.label||d.id) + '</th>'; });
+    t += '<th scope="col" class="pctcol">Hadir</th></tr></thead><tbody>';
 
-  // Total row: count hadir per-tanggal (basis = datesView)
-  html += '<tr style="background:linear-gradient(180deg,#fafafa,#f5f5f5);border-top:2px solid var(--g4);font-weight:700">';
-  html += '<td style="font-weight:700;color:var(--g2);font-size:11px;letter-spacing:.5px;text-transform:uppercase">Total Hadir</td>';
-  datesView.forEach((d, i) => {
-    const h = dateHadirCounts[i];
-    const t = dateTotalCounts[i];
-    const pctCol = t ? Math.round(h/t*100) : 0;
-    const col = pctCol >= 75 ? 'var(--green)' : pctCol >= 50 ? 'var(--orange)' : 'var(--red)';
-    html += '<td style="text-align:center;font-size:10px"><div style="font-weight:700;color:'+col+';line-height:1.1">'+h+'/'+t+'</div><div style="font-size:9px;color:var(--g4);font-weight:500">'+pctCol+'%</div></td>';
-  });
-  const grandHadir = dateHadirCounts.reduce((s,n)=>s+n,0);
-  const grandTotal = dateTotalCounts.reduce((s,n)=>s+n,0) || 1;
-  const grandPct = Math.round(grandHadir/grandTotal*100);
-  const grandCol = grandPct >= 75 ? 'var(--green)' : grandPct >= 50 ? 'var(--orange)' : 'var(--red)';
-  html += '<td style="text-align:center;font-size:11px"><div style="font-weight:800;color:'+grandCol+'">'+grandHadir+'/'+grandTotal+'</div><div style="font-size:9px;color:var(--g4)">'+grandPct+'%</div></td>';
-  html += '</tr>';
+    sortedMembers.forEach(m => {
+      const hadirCount = datesView.filter(d => ATTENDANCE[m.id+'_'+d.id]==='H').length;
+      const totalDates = datesView.filter(d => ATTENDANCE[m.id+'_'+d.id]).length || 1;
+      const pct = Math.round(hadirCount / totalDates * 100);
+      const atRisk = pct < 50 && totalDates > 1;
+      t += '<tr><td class="name-cell"><div class="mem"><span class="ava'+(atRisk?' risk':'')+'" aria-hidden="true">'+initialOf(m.nama)+'</span><div><b'+(atRisk?' style="color:var(--A)"':'')+'>'+esc(m.nama)+'</b>'+rolePill(m.status)+'</div></div></td>';
+      datesView.forEach(d => {
+        const st = ATTENDANCE[m.id+'_'+d.id] || null;
+        t += '<td><button type="button" class="dot ' + (st || 'X') + '" data-mid="'+m.id+'" data-did="'+d.id+'" onclick="cycleDot(this,' + m.id + ',\'' + d.id + '\')">' + (st || '-') + '</button></td>';
+      });
+      t += '<td class="pctcol"><span class="pct" style="color:'+pctColorOf(pct)+'">'+pct+'%</span><small class="pctsub">'+hadirCount+'/'+totalDates+'</small></td></tr>';
+    });
 
-  html += '</tbody></table></div>';
-  html += '<div style="font-size:10px;color:var(--g4);margin-top:10px;text-align:right">klik status untuk edit</div>';
-  el.innerHTML = html;
+    // Total row: count hadir per-tanggal (basis = datesView)
+    t += '</tbody><tfoot><tr><td class="name-cell tlabel">Total hadir</td>';
+    datesView.forEach((d, i) => {
+      const h = dateHadirCounts[i], tt = dateTotalCounts[i];
+      const pc = tt ? Math.round(h/tt*100) : 0;
+      t += '<td><b style="color:'+(tt?pctColorOf(pc):'var(--muted)')+'">'+h+'/'+tt+'</b><small class="pctsub">'+pc+'%</small></td>';
+    });
+    const grandHadir = dateHadirCounts.reduce((s,n)=>s+n,0);
+    const grandTotal = dateTotalCounts.reduce((s,n)=>s+n,0) || 1;
+    const grandPct = Math.round(grandHadir/grandTotal*100);
+    t += '<td class="pctcol"><span class="pct" style="color:'+pctColorOf(grandPct)+'">'+grandPct+'%</span><small class="pctsub">'+grandHadir+'/'+grandTotal+'</small></td></tr></tfoot></table></div>';
+    card += t;
+    card += '<div class="legend">'+[['H','Hadir'],['I','Izin'],['S','Sakit'],['A','Alpa'],['X','Kosong']].map(x=>'<span><i class="c-'+x[0]+'"></i>'+x[1]+'</span>').join('')+'</div>';
+  }
+  card += '</section>';
+
+  // Kartu samping: perlu perhatian (<75% dari semua tanggal), milestone, event mendatang
+  const risk = MEMBERS.map(m => {
+    const h = DATES.filter(d => ATTENDANCE[m.id+'_'+d.id]==='H').length;
+    const tot = DATES.filter(d => ATTENDANCE[m.id+'_'+d.id]).length;
+    const a = DATES.filter(d => ATTENDANCE[m.id+'_'+d.id]==='A').length;
+    return { m, p: tot ? Math.round(h/tot*100) : 0, tot, a };
+  }).filter(x => x.tot > 1 && x.p < 75).sort((x,y) => x.p - y.p);
+  let side = '<section class="card"><div class="chead" style="margin-bottom:4px"><h2>Perlu perhatian</h2><span class="pill" style="background:var(--Ab);color:var(--A)">'+risk.length+' anggota</span></div><div class="sub">Kehadiran di bawah 75%</div>';
+  if (risk.length) {
+    side += risk.slice(0,5).map(x => {
+      const wa = waLinkOf(x.m.wa);
+      return '<div class="lrow"><span class="ava risk" aria-hidden="true">'+initialOf(x.m.nama)+'</span><div class="grow"><b>'+esc(x.m.nama)+'</b><small>'+x.p+'% hadir · '+x.a+'× alpa</small></div>'+
+        (wa ? '<a class="btn sm wa" href="'+wa+'" target="_blank" rel="noopener">Hubungi</a>' : '')+'</div>';
+    }).join('');
+  } else {
+    side += '<div class="lrow"><div class="grow"><b>Semua aman</b><small>Tidak ada anggota di bawah 75%.</small></div></div>';
+  }
+  side += '</section>';
+  side += '<section class="card"><div class="chead"><h2>Progress milestone</h2><button type="button" class="linkbtn" onclick="goTab(\'milestone\')">Lihat semua</button></div>'+
+    MS_FIELDS.map((f,i) => { const d = MEMBERS.filter(m => m[f]).length; const n = MEMBERS.length || 1;
+      return '<div class="prog"><span class="pl">'+MS_LABELS[i]+'</span><span class="tr"><i style="width:'+Math.round(d/n*100)+'%"></i></span><span class="v">'+d+'/'+MEMBERS.length+'</span></div>'; }).join('')+'</section>';
+  side += '<section class="card" id="absEvMini">'+absEventsMiniHTML()+'</section>';
+
+  el.innerHTML = '<div class="cols">'+card+'<div class="narrow">'+side+'</div></div>' + buildAttendanceLineChart(MEMBERS, DATES, ATTENDANCE);
+}
+
+function goTab(id) { sTab(id); }
+
+function absEventsMiniHTML() {
+  let h = '<div class="chead" style="margin-bottom:4px"><h2>Event mendatang</h2><button type="button" class="linkbtn" onclick="goTab(\'events\')">Semua</button></div>';
+  if (!_CACHED_CG_EVENTS) return h + '<div class="sub">Memuat event…</div>';
+  const today = new Date(); today.setHours(0,0,0,0);
+  const up = (_CACHED_CG_EVENTS || []).map(ev => {
+    const d = ev.date_start ? parseLocalDate(ev.date_start) : null;
+    const e = ev.date_end ? parseLocalDate(ev.date_end) : d;
+    if (d) d.setHours(0,0,0,0); if (e) e.setHours(0,0,0,0);
+    return {ev, d, e};
+  }).filter(x => x.d && x.e && x.e >= today).sort((a,b) => a.d - b.d).slice(0,3);
+  if (!up.length) return h + '<div class="sub">Belum ada event mendatang.</div>';
+  return h + up.map(x => {
+    const days = Math.round((x.d - today)/864e5);
+    const when = days <= 0 ? (days < 0 ? 'Sedang berlangsung' : 'Hari ini') : days === 1 ? 'Besok' : days + ' hari lagi';
+    return '<div class="lrow plain">'+evDateBlock(x.ev.date_start, x.ev.cat)+'<div class="grow"><b>'+esc(x.ev.name||'')+'</b><small>'+esc(catText(x.ev.cat))+' · '+when+'</small></div></div>';
+  }).join('');
+}
+function fillAbsEventsMini() {
+  const box = document.getElementById('absEvMini');
+  if (box) box.innerHTML = absEventsMiniHTML();
 }
 
 const _DOT_SAVING = {};
@@ -2086,54 +2344,56 @@ async function renderDetail() {
     return (a.nama||'').localeCompare(b.nama||'');
   });
 
-  let html = '';
-  // Export buttons (CGL Detail tab) — label jelas: Detail member (bukan absensi)
-  html += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;justify-content:flex-end;align-items:center">';
-  html += '<span style="font-size:10px;color:var(--g4);font-weight:600;letter-spacing:.3px;text-transform:uppercase;margin-right:4px">Export Detail Member</span>';
-  html += '<button onclick="exportDetailCSV(\'cgl\')" style="padding:7px 13px;border-radius:9px;border:1.5px solid #16a34a;background:linear-gradient(135deg,#f0fdf4,#dcfce7);color:#16a34a;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.3px;box-shadow:0 2px 6px rgba(22,163,74,.1);transition:all .2s" onmouseover="this.style.transform=\'translateY(-1px)\'" onmouseout="this.style.transform=\'\'" title="Export No HP, Alamat, Milestone, dll">📊 Detail CSV</button>';
-  html += '<button onclick="exportDetailPDF(\'cgl\')" style="padding:7px 13px;border-radius:9px;border:1.5px solid #dc2626;background:linear-gradient(135deg,#fef2f2,#fee2e2);color:#dc2626;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.3px;box-shadow:0 2px 6px rgba(220,38,38,.1);transition:all .2s" onmouseover="this.style.transform=\'translateY(-1px)\'" onmouseout="this.style.transform=\'\'" title="Export No HP, Alamat, Milestone, dll">📄 Detail PDF</button>';
-  html += '</div>';
+  let html = '<div class="tabbar"><div class="sub" style="margin:0">'+MEMBERS.length+' anggota · klik kolom untuk edit, tersimpan otomatis</div>'+
+    '<div class="actions"><button type="button" class="btn sm" onclick="exportDetailCSV(\'cgl\')" title="Export No HP, Alamat, Milestone, dll">'+icon('down',16)+'Detail CSV</button>'+
+    '<button type="button" class="btn sm" onclick="exportDetailPDF(\'cgl\')" title="Export No HP, Alamat, Milestone, dll">'+icon('down',16)+'Detail PDF</button>'+
+    '<button type="button" class="btn sm primary" onclick="openModal(\'addMemberModal\')">'+icon('plus',16)+'Tambah member</button></div></div>';
 
+  html += '<div class="mgrid">';
+  const fieldInput = (m, field, label, ph, type) => '<label>'+label+'<input type="'+(type||'text')+'" value="' + esc(m[field]||'') + '" data-mid="'+m.id+'" data-field="'+field+'" placeholder="'+(ph||'Belum diisi')+'" onblur="saveMemberField(this)"></label>';
   sortedMembers.forEach(m => {
     const hadirCount = DATES.filter(d => ATTENDANCE[m.id+'_'+d.id]==='H').length;
     const totalDates = DATES.filter(d => ATTENDANCE[m.id+'_'+d.id]).length || 1;
     const pct = Math.round(hadirCount / totalDates * 100);
     const atRisk = pct < 50 && totalDates > 1;
     const memberRoleCls = roleCls(m.status); // whitelist (kalau status aneh, fallback ke 'member')
+    const msDone = MS_FIELDS.filter(f => m[f]).length;
 
-    html += '<div class="dcard"' + (atRisk ? ' style="border-left:3px solid var(--red)"' : '') + '>';
-    html += '<div class="dcard-top">';
-    html += '<input type="text" value="' + esc(m.nama) + '" class="dcard-name" data-mid="'+m.id+'" data-field="nama" style="border:none;background:transparent;outline:none;font-weight:600;font-size:14px;flex:1;min-width:0;border-bottom:1px dashed transparent" onfocus="this.style.borderBottomColor=\'var(--purple)\'" onblur="this.style.borderBottomColor=\'transparent\';saveMemberField(this)">';
-    html += '<div class="role-wrap"><button class="role-btn '+memberRoleCls+'" onclick="this.nextElementSibling.classList.toggle(\'show\')">'+esc(m.status)+'</button>';
+    html += '<article class="mcard">';
+    html += '<div class="top"><span class="ava'+(atRisk?' risk':'')+'" aria-hidden="true">'+initialOf(m.nama)+'</span>';
+    html += '<div style="flex:1;min-width:0"><input type="text" value="' + esc(m.nama) + '" class="mname" aria-label="Nama" data-mid="'+m.id+'" data-field="nama" onblur="saveMemberField(this)">';
+    html += '<div class="sub" style="margin-top:2px">'+msDone+'/8 milestone · <span style="color:'+pctColorOf(pct)+';font-weight:600">'+pct+'% hadir</span></div></div>';
+    html += '<div class="role-wrap"><button type="button" class="role-btn '+memberRoleCls+'" aria-haspopup="true" onclick="this.nextElementSibling.classList.toggle(\'show\')">'+esc(m.status)+'</button>';
     html += '<div class="role-menu">';
     ['CGL','Sponsor','Member','Simpatisan','VIP'].forEach(r => {
-      html += '<div class="role-opt '+r.toLowerCase()+'" onclick="pickRole(this,\''+r.toLowerCase()+'\',\''+r+'\','+m.id+')"><span class="rdot"></span>'+r+'</div>';
+      html += '<button type="button" class="role-opt '+r.toLowerCase()+'" onclick="pickRole(this,\''+r.toLowerCase()+'\',\''+r+'\','+m.id+')"><span class="rdot"></span>'+r+'</button>';
     });
     html += '</div></div></div>';
 
-    html += '<div class="dgrid">';
-    html += '<span>\ud83d\udcf1 <input type="text" value="' + esc(m.wa||'') + '" data-mid="'+m.id+'" data-field="wa" style="border:none;background:transparent;font-size:11px;color:var(--g2);outline:none;border-bottom:1px dashed transparent;width:120px" onfocus="this.style.borderBottomColor=\'var(--purple)\'" onblur="this.style.borderBottomColor=\'transparent\';saveMemberField(this)"></span>';
-    html += '<span>\ud83c\udf82 <input type="text" value="' + esc(m.lahir||'') + '" data-mid="'+m.id+'" data-field="lahir" style="border:none;background:transparent;font-size:11px;color:var(--g2);outline:none;border-bottom:1px dashed transparent;width:90px" onfocus="this.style.borderBottomColor=\'var(--purple)\'" onblur="this.style.borderBottomColor=\'transparent\';saveMemberField(this)"></span>';
-    html += '<span>\ud83c\udfeb <input type="text" value="' + esc(m.sekolah||'') + '" data-mid="'+m.id+'" data-field="sekolah" placeholder="Sekolah" style="border:none;background:transparent;font-size:11px;color:var(--g2);outline:none;border-bottom:1px dashed transparent;min-width:80px;width:100px" onfocus="this.style.borderBottomColor=\'var(--purple)\'" onblur="this.style.borderBottomColor=\'transparent\';saveMemberField(this)"> <input type="text" value="' + esc(m.kelas||'') + '" data-mid="'+m.id+'" data-field="kelas" placeholder="Kelas" style="border:none;background:transparent;font-size:11px;color:var(--g2);outline:none;border-bottom:1px dashed transparent;width:50px" onfocus="this.style.borderBottomColor=\'var(--purple)\'" onblur="this.style.borderBottomColor=\'transparent\';saveMemberField(this)"></span>';
-    html += '<span>\ud83d\udccd <input type="text" value="' + esc(m.kelurahan||'') + '" data-mid="'+m.id+'" data-field="kelurahan" placeholder="Kelurahan" style="border:none;background:transparent;font-size:11px;color:var(--g2);outline:none;border-bottom:1px dashed transparent;min-width:80px;width:100px" onfocus="this.style.borderBottomColor=\'var(--purple)\'" onblur="this.style.borderBottomColor=\'transparent\';saveMemberField(this)"> <input type="text" value="' + esc(m.kecamatan||'') + '" data-mid="'+m.id+'" data-field="kecamatan" placeholder="Kecamatan" style="border:none;background:transparent;font-size:11px;color:var(--g2);outline:none;border-bottom:1px dashed transparent;min-width:80px;width:100px" onfocus="this.style.borderBottomColor=\'var(--purple)\'" onblur="this.style.borderBottomColor=\'transparent\';saveMemberField(this)"></span>';
+    if (atRisk) html += '<div class="pill" style="background:var(--Ab);color:var(--A);align-self:flex-start">Kehadiran '+pct+'% · perlu follow-up</div>';
+
+    html += '<div class="info">';
+    html += fieldInput(m,'wa','WhatsApp','08xxx');
+    html += fieldInput(m,'lahir','Tanggal lahir','DD/MM/YYYY');
+    html += fieldInput(m,'sekolah','Sekolah');
+    html += fieldInput(m,'kelas','Kelas');
+    html += fieldInput(m,'kelurahan','Kelurahan');
+    html += fieldInput(m,'kecamatan','Kecamatan');
     html += '</div>';
 
-    if (atRisk) html += '<div style="font-size:11px;color:var(--red);font-weight:600;margin-bottom:6px">\u26a0\ufe0f Kehadiran '+pct+'% \u00b7 Perlu follow-up</div>';
-
-    html += '<div style="font-size:10px;color:var(--g3);margin:8px 0 4px">Milestone <span style="font-size:9px;color:var(--g4)">(klik untuk ubah)</span></div>';
-    html += '<div class="ms-chips">';
+    html += '<div><div class="flabel" style="margin-bottom:8px">Milestone <span style="font-weight:500">· klik untuk ubah</span></div><div class="ms-chips">';
     MS_FIELDS.forEach((f, i) => {
       const done = m[f] ? true : false;
-      html += '<span class="msc ' + (done?'done':'pending') + '" style="cursor:pointer" onclick="toggleMilestone(this,'+m.id+',\''+f+'\',' + (done?'true':'false') + ')">' + MS_LABELS[i] + (done?' \u2713':'') + '</span>';
+      html += '<button type="button" class="msc ' + (done?'done':'pending') + '" onclick="toggleMilestone(this,'+m.id+',\''+f+'\',' + (done?'true':'false') + ')">' + MS_LABELS[i] + (done?' ✓':'') + '</button>';
     });
-    html += '</div>';
+    html += '</div></div>';
 
-    html += '<textarea class="note" placeholder="Catatan CGL..." data-mid="'+m.id+'" onblur="saveMemberNotes(this)">' + esc(memberNotes[m.id]||'') + '</textarea>';
-    html += '<div style="text-align:right;margin-top:6px"><button onclick="deleteMember('+m.id+',\''+jsEsc(m.nama)+'\')" style="padding:4px 12px;border:1px solid #fecaca;border-radius:8px;background:#fff;color:#dc2626;font-size:10px;font-weight:600;cursor:pointer;opacity:.6;transition:all .15s" onmouseover="this.style.opacity=1;this.style.background=\'#fef2f2\'" onmouseout="this.style.opacity=.6;this.style.background=\'#fff\'">Hapus Member</button></div>';
-    html += '</div>';
+    html += '<label class="field"><span class="flabel">Catatan CGL</span><textarea class="textarea" style="min-height:70px" placeholder="Tulis catatan…" data-mid="'+m.id+'" onblur="saveMemberNotes(this)">' + esc(memberNotes[m.id]||'') + '</textarea></label>';
+    html += '<div style="display:flex;justify-content:flex-end"><button type="button" class="btn sm ghost danger" onclick="deleteMember('+m.id+',\''+jsEsc(m.nama)+'\')">'+icon('trash',16)+'Hapus member</button></div>';
+    html += '</article>';
   });
 
-  html += '<button class="pel-add" style="width:100%;padding:14px;text-align:center;border:2px dashed var(--g5);border-radius:12px;font-size:13px;font-weight:600;color:var(--purple)" onclick="openModal(\'addMemberModal\')">+ Tambah Member Baru</button>';
+  html += '<button type="button" class="addcard" onclick="openModal(\'addMemberModal\')">'+icon('plus',28)+'Tambah member</button></div>';
   el.innerHTML = html;
 }
 
@@ -2309,29 +2569,26 @@ async function renderVisiCG() {
   const vision = visionData.visi || '';
   const mission = visionData.misi || '';
 
-  let html = '<div class="vcard"><div class="vlabel">Visi CG</div><textarea class="vedit" id="visiText" onblur="saveVisiCG(\'visi\')">' + esc(vision) + '</textarea></div>';
+  let html = '<div class="visi-box"><small>Visi CG</small><label class="sr" for="visiText">Visi CG</label><textarea id="visiText" rows="2" placeholder="Tulis visi CG…" onblur="saveVisiCG(\'visi\')">' + esc(vision) + '</textarea></div>';
 
   // Misi card — display formatted list + click to edit
   const cglMisiLines = parseMissionLines(mission);
-  html += '<div class="vcard" style="background:linear-gradient(135deg,#fffbeb,#fff)">';
-  html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">';
-  html += '<div class="vlabel" style="margin:0;display:flex;align-items:center;gap:6px"><div style="width:22px;height:22px;border-radius:7px;background:linear-gradient(135deg,#f59e0b,#d97706);display:flex;align-items:center;justify-content:center"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><line x1="4" y1="22" x2="4" y2="15"/><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/></svg></div>Misi Semester Ini</div>';
-  if (cglMisiLines.length) html += '<span style="font-size:9px;font-weight:700;color:#92400e;background:#fef3c7;padding:2px 8px;border-radius:8px">'+cglMisiLines.length+' poin</span>';
-  html += '</div>';
-  html += '<div id="cglMisi_view" style="cursor:text;min-height:30px" onclick="showCGLMisiEdit()">' + renderMisiList(cglMisiLines) + '</div>';
-  html += '<textarea id="misiText" class="vedit" style="display:none;min-height:130px;font-size:13px;line-height:1.7;background:#fffbeb;border-color:#fbbf24;font-family:Inter,sans-serif" onblur="hideCGLMisiEdit()" placeholder="Tulis misi (satu poin per baris)\n1. Contoh misi pertama\n2. Contoh misi kedua">'+esc(mission)+'</textarea>';
-  html += '</div>';
+  html += '<div class="cols"><section class="card wide" style="flex-basis:420px">';
+  html += '<div class="chead"><div><h2>Misi semester ini</h2><div class="sub">Klik daftar untuk edit · satu poin per baris</div></div><span class="pill" id="cglMisiCount" style="background:#FFF4D1;color:#7A5300'+(cglMisiLines.length?'':';display:none')+'">'+cglMisiLines.length+' poin</span></div>';
+  html += '<div id="cglMisi_view" class="misiview" role="button" tabindex="0" onclick="showCGLMisiEdit()" onkeydown="if(event.key===\'Enter\')showCGLMisiEdit()">' + renderMisiList(cglMisiLines) + '</div>';
+  html += '<textarea id="misiText" class="textarea" style="display:none;min-height:150px" onblur="hideCGLMisiEdit()" placeholder="Tulis misi (satu poin per baris)\n1. Contoh misi pertama\n2. Contoh misi kedua">'+esc(mission)+'</textarea>';
+  html += '</section>';
 
   // Dev plan
-  html += '<div class="section" style="margin-top:16px"><div class="section-title">\ud83d\udcc8 Rencana Pengembangan Member</div>';
-  html += '<div style="font-size:11px;color:var(--g3);margin-bottom:12px">Pilih member yang akan dikembangkan ke posisi baru dan tentukan deadline</div>';
+  html += '<section class="card narrow" style="display:block"><div class="chead" style="margin-bottom:6px"><h2>Rencana pengembangan</h2><button type="button" class="btn sm" onclick="addDevPlanRow()">'+icon('plus',16)+'Tambah</button></div>';
+  html += '<div class="sub">Member yang dikembangkan ke posisi baru + deadline</div>';
   html += '<div id="devPlanRows">';
   const devPlan = await loadDevPlans(CUR_CG, CUR_REGION);
   devPlan.forEach((d, i) => {
     html += buildDevRow(d, i);
   });
-  html += '</div>';
-  html += '<button class="pel-add" style="margin-top:10px" onclick="addDevPlanRow()">+ Tambah member</button></div>';
+  if (!devPlan.length) html += '<div class="empty" style="margin-top:12px">Belum ada rencana pengembangan.</div>';
+  html += '</div></section></div>';
   el.innerHTML = html;
 }
 
@@ -2341,12 +2598,22 @@ function buildDevRow(d, i) {
   const targetRole = roleLabel(d.target_status || d.target || 'Sponsor');
   const curCls = roleCls(currentRole);
   const rowId = d.id || '';
-  return '<div class="dev-row"><div class="dev-name">' + esc(memberName) + '</div>' +
-    '<span class="dev-current rbadge ' + curCls + '">' + esc(currentRole) + '</span>' +
-    '<span style="font-size:11px;color:var(--g3)">\u2192</span>' +
-    '<select class="dev-select" data-idx="'+i+'"><option value="CGL"'+(targetRole==='CGL'?' selected':'')+'>Target: CGL</option><option value="Sponsor"'+(targetRole==='Sponsor'?' selected':'')+'>Target: Sponsor</option><option value="Member"'+(targetRole==='Member'?' selected':'')+'>Target: Member</option></select>' +
-    '<input type="date" class="dev-date" value="' + (d.deadline||'') + '" data-idx="'+i+'">' +
-    (rowId ? '<button onclick="removeDevPlan('+rowId+')" style="background:none;border:none;cursor:pointer;color:var(--red);font-size:14px;padding:2px 6px" title="Hapus">&times;</button>' : '') +
+  let due = '';
+  if (d.deadline) {
+    const dl = parseLocalDate(d.deadline);
+    if (dl) {
+      const today = new Date(); today.setHours(0,0,0,0); dl.setHours(0,0,0,0);
+      const n = Math.round((dl - today)/864e5);
+      const col = n < 0 ? ['var(--Ab)','var(--A)'] : n <= 14 ? ['var(--Sb)','var(--S)'] : ['var(--faint)','var(--muted)'];
+      due = '<span class="pill" style="background:'+col[0]+';color:'+col[1]+'">'+(n<0?'Lewat '+(-n)+' hari':n===0?'Hari ini':n+' hari lagi')+'</span>';
+    }
+  }
+  return '<div class="plan"><div class="plan-top"><b>' + esc(memberName) + '</b>' + due +
+    (rowId ? '<button type="button" class="x" onclick="removeDevPlan('+rowId+')" aria-label="Hapus rencana '+esc(memberName)+'">'+icon('x',16)+'</button>' : '') + '</div>' +
+    '<div class="plan-row"><span class="dev-current rbadge ' + curCls + '">' + esc(currentRole) + '</span>' +
+    '<span aria-hidden="true" style="color:var(--muted)">'+icon('right',14)+'</span>' +
+    '<select class="dev-select" data-idx="'+i+'" aria-label="Target"><option value="CGL"'+(targetRole==='CGL'?' selected':'')+'>Target: CGL</option><option value="Sponsor"'+(targetRole==='Sponsor'?' selected':'')+'>Target: Sponsor</option><option value="Member"'+(targetRole==='Member'?' selected':'')+'>Target: Member</option></select>' +
+    '<input type="date" class="dev-date" value="' + (d.deadline||'') + '" data-idx="'+i+'" aria-label="Deadline"></div>' +
     '</div>';
 }
 
@@ -2442,8 +2709,7 @@ async function hideCGLMisiEdit() {
     view.innerHTML = renderMisiList(lines);
     view.style.display = '';
     edit.style.display = 'none';
-    const card = edit.parentElement;
-    const counter = card ? card.querySelector('span[style*="fef3c7"]') : null;
+    const counter = document.getElementById('cglMisiCount');
     if (counter) {
       if (lines.length) { counter.textContent = lines.length + ' poin'; counter.style.display = ''; }
       else counter.style.display = 'none';
@@ -2504,84 +2770,62 @@ async function renderPelayanan() {
 
   let html = '';
 
-  // ── Month selector row ──
-  html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px">';
-  html += '<div style="display:flex;align-items:center;gap:8px">';
-  html += '<span style="font-size:11px;font-weight:600;letter-spacing:1px;color:var(--g3);text-transform:uppercase">Bulan:</span>';
-  html += '<select class="pel-select" id="pelMonth" onchange="switchPelMonth(this.value)" style="min-width:140px;padding:8px 28px 8px 12px;font-size:12px;border-radius:10px;font-weight:600">';
+  // ── Jadwal: bulan + minggu + petugas ──
+  html += '<section class="card">';
+  html += '<div class="chead"><div><h2>Jadwal pelayanan</h2><div class="sub">Pilih bulan & minggu, lalu atur siapa yang bertugas</div></div>';
+  html += '<div class="actions"><label class="sr" for="pelMonth">Bulan</label><select class="select sm" id="pelMonth" onchange="switchPelMonth(this.value)">';
   months.forEach(m => { html += '<option value="'+esc(m)+'"'+(m===CUR_PEL_MONTH?' selected':'')+'>'+esc(m)+'</option>'; });
-  html += '</select>';
-  html += '<button class="pel-add" onclick="addPelMonth()" style="padding:8px 12px;font-size:11px">+ Bulan</button>';
-  html += '</div></div>';
+  html += '</select><button type="button" class="btn sm" onclick="addPelMonth()">'+icon('plus',16)+'Bulan</button></div></div>';
 
-  // ── Schedule section ──
-  html += '<div class="section" style="border-radius:14px;background:linear-gradient(135deg,#faf5ff,#ffffff);border:1px solid #e9e3ff">';
-  html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">';
-  html += '<div class="section-title" style="margin-bottom:0">Jadwal Pelayanan</div>';
-  html += '<div style="display:flex;align-items:center;gap:6px">';
-  html += '<input type="date" id="pelNewDate" style="padding:6px 10px;border:1px solid var(--g5);border-radius:8px;font-size:11px;font-family:\'Inter\',sans-serif">';
-  html += '<button class="pel-add" onclick="addPelWeek()" style="padding:6px 10px;font-size:11px">+ Minggu</button></div></div>';
-
-  // Week pills
-  html += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;align-items:center">';
+  // Week pills + tambah minggu
+  html += '<div class="weeks" role="group" aria-label="Pilih minggu">';
   if (weeks.length === 0) {
-    html += '<span style="font-size:11px;color:var(--g4);font-style:italic">Belum ada minggu — tambahkan dengan tombol "+ Minggu"</span>';
+    html += '<span class="sub" style="margin:0">Belum ada minggu — tambahkan lewat tombol "Minggu".</span>';
   }
   weeks.forEach(w => {
     const active = w === CUR_PEL_WEEK;
-    const label = fmtWeekLabel(w);
-    html += '<div style="display:inline-flex;align-items:center;gap:4px;padding:4px 6px 4px 12px;border-radius:14px;'
-      + (active ? 'background:var(--purple);color:#fff;font-weight:600' : 'background:#fff;border:1px solid var(--g5);color:var(--g3);font-weight:500')
-      + ';font-size:10px">';
-    html += '<span style="cursor:pointer" onclick="switchPelWeek(\''+esc(w)+'\')">'+esc(label)+'</span>';
-    html += '<button onclick="editPelWeek(\''+esc(w)+'\')" style="background:none;border:none;cursor:pointer;color:'+(active?'#fff':'var(--g4)')+';padding:2px;font-size:10px;line-height:1" title="Edit tanggal">&#9998;</button>';
-    html += '<button onclick="deletePelWeek(\''+esc(w)+'\')" style="background:none;border:none;cursor:pointer;color:'+(active?'#fff':'var(--g4)')+';padding:2px;font-size:11px;line-height:1" title="Hapus">&times;</button>';
-    html += '</div>';
+    html += '<div class="wk'+(active?' on':'')+'"><button type="button" class="wk-main" aria-pressed="'+active+'" onclick="switchPelWeek(\''+esc(w)+'\')">'+esc(fmtWeekLabel(w))+'</button>'+
+      '<button type="button" class="wk-ic" onclick="editPelWeek(\''+esc(w)+'\')" aria-label="Edit tanggal '+esc(fmtWeekLabel(w))+'" title="Edit tanggal">'+icon('edit',14)+'</button>'+
+      '<button type="button" class="wk-ic" onclick="deletePelWeek(\''+esc(w)+'\')" aria-label="Hapus minggu '+esc(fmtWeekLabel(w))+'" title="Hapus">'+icon('x',14)+'</button></div>';
   });
+  html += '<div class="wkadd"><label class="sr" for="pelNewDate">Tanggal minggu baru</label><input type="date" id="pelNewDate" class="input sm"><button type="button" class="btn sm" onclick="addPelWeek()">'+icon('plus',16)+'Minggu</button></div>';
   html += '</div>';
 
   // ── Role assignments for active week ──
   if (CUR_PEL_WEEK) {
-    html += '<div style="display:flex;flex-direction:column;gap:8px">';
+    html += '<h3 class="pel-h">Petugas '+esc(fmtWeekLabel(CUR_PEL_WEEK))+'</h3>';
     roles.forEach(r => {
       const saved = weekAssignments[r.name] || '';
       const assignees = saved ? String(saved).split(',').map(s => s.trim()).filter(Boolean) : [];
       const assignedSet = new Set(assignees);
       const roleKey = esc(r.name);
-      html += '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--white);border-radius:10px;border:1px solid var(--g6);flex-wrap:wrap">';
-      // Avatar
-      html += '<div style="width:28px;height:28px;border-radius:7px;background:'+r.bg+';display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:'+r.color+';letter-spacing:.3px;flex-shrink:0">'+esc(r.abbr)+'</div>';
-      // Role name
-      html += '<div style="flex:0 0 auto;min-width:80px;font-weight:600;font-size:12px">'+esc(r.name)+'</div>';
-      // Assignees container (grows to fill)
-      html += '<div style="flex:1;display:flex;flex-wrap:wrap;gap:4px;align-items:center;justify-content:flex-end;min-width:180px">';
+      html += '<div class="pel">';
+      html += '<div class="pel-role"><span class="ic" style="background:'+r.bg+';color:'+r.color+'">'+esc(r.abbr)+'</span><b>'+esc(r.name)+'</b></div>';
+      html += '<div class="pel-asg">';
       assignees.forEach(name => {
-        html += '<span style="display:inline-flex;align-items:center;gap:2px;padding:3px 3px 3px 9px;background:'+r.bg+';color:'+r.color+';border-radius:12px;font-size:10.5px;font-weight:600;line-height:1.2">'+esc(name)+'<button onclick="removePelAssignee(\''+jsEsc(roleKey)+'\',\''+jsEsc(name)+'\')" style="background:none;border:0;cursor:pointer;color:'+r.color+';opacity:.65;font-size:13px;line-height:1;padding:0 4px 0 2px;border-radius:50%" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.65" title="Hapus">&times;</button></span>';
+        html += '<span class="asg" style="background:'+r.bg+';color:'+r.color+'">'+esc(name)+'<button type="button" onclick="removePelAssignee(\''+jsEsc(roleKey)+'\',\''+jsEsc(name)+'\')" aria-label="Hapus '+esc(name)+' dari '+esc(r.name)+'" style="color:'+r.color+'">'+icon('x',14)+'</button></span>';
       });
-      // "+" add button (styled wrapper with hidden select overlay)
-      // "+" add button — custom popover (bukan native select, biar UI konsisten)
+      // "+" add button — custom popover (panel harus tepat setelah tombol: dipakai deteksi klik di luar)
       const ddId = 'peldd_'+esc(r.name).replace(/[^a-zA-Z0-9]/g,'_');
-      html += '<span style="position:relative;display:inline-block">';
-      html += '<button type="button" onclick="togglePelDD(\''+ddId+'\',event)" style="padding:3px 10px;background:transparent;border:1px dashed '+r.color+'55;border-radius:12px;color:'+r.color+';font-size:11px;font-weight:700;cursor:pointer;opacity:.85;transition:all .15s" onmouseover="this.style.opacity=1;this.style.background=\''+r.bg+'\'" onmouseout="this.style.opacity=.85;this.style.background=\'transparent\'">+ Tambah</button>';
-      html += '<div id="'+ddId+'" class="pel-dd-panel" style="display:none;position:absolute;top:calc(100% + 6px);right:0;background:#fff;border:1px solid '+r.color+'44;border-radius:12px;box-shadow:0 12px 28px rgba(0,0,0,.14);min-width:220px;max-height:280px;overflow-y:auto;z-index:50">';
+      html += '<span class="pel-add-wrap">';
+      html += '<button type="button" class="asg-add" onclick="togglePelDD(\''+ddId+'\',event)" style="color:'+r.color+';border-color:'+r.color+'66">'+icon('plus',14)+'Petugas</button>';
+      html += '<div id="'+ddId+'" class="pel-dd-panel" style="display:none">';
       const avail = MEMBERS.filter(m => !assignedSet.has(m.nama));
       if (avail.length === 0) {
-        html += '<div style="padding:14px;font-size:11px;color:var(--g4);font-style:italic;text-align:center">Semua member sudah di-assign</div>';
+        html += '<div class="ddempty">Semua member sudah di-assign</div>';
       } else {
         avail.forEach(m => {
-          const initial = String(m.nama||'?').trim().slice(0,1).toUpperCase();
-          html += '<div onclick="addPelAssignee(\''+jsEsc(roleKey)+'\',\''+jsEsc(m.nama)+'\');closePelDD(\''+ddId+'\')" style="display:flex;align-items:center;gap:10px;padding:9px 12px;cursor:pointer;border-bottom:1px solid #f5f0ff;transition:background .12s" onmouseover="this.style.background=\''+r.bg+'\'" onmouseout="this.style.background=\'\'"><div style="width:26px;height:26px;border-radius:50%;background:'+r.bg+';color:'+r.color+';display:flex;align-items:center;justify-content:center;font-weight:800;font-size:10px;border:1.5px solid '+r.color+'66;flex-shrink:0">'+esc(initial)+'</div><div style="flex:1;min-width:0"><div style="font-weight:600;font-size:12px;color:var(--g1);line-height:1.2">'+esc(m.nama)+'</div><div style="font-size:9px;color:var(--g4);margin-top:1px">'+esc(m.status||'Member')+'</div></div></div>';
+          html += '<button type="button" class="ddopt" onclick="addPelAssignee(\''+jsEsc(roleKey)+'\',\''+jsEsc(m.nama)+'\');closePelDD(\''+ddId+'\')"><span class="ava" aria-hidden="true" style="background:'+r.bg+';color:'+r.color+'">'+initialOf(m.nama)+'</span><span class="ddtxt"><b style="font-size:14px">'+esc(m.nama)+'</b><small>'+esc(m.status||'Member')+'</small></span></button>';
         });
       }
       html += '</div></span>';
       html += '</div></div>';
     });
-    html += '</div>';
-    html += '<button class="pel-add" style="margin-top:10px;width:100%;padding:8px;border-radius:10px;font-size:11px" onclick="addPelRole()">+ Tambah Role Custom</button>';
+    html += '<button type="button" class="btn sm" style="margin-top:14px" onclick="addPelRole()">'+icon('plus',16)+'Tambah role custom</button>';
   } else {
-    html += '<div style="font-size:11px;color:var(--g4);font-style:italic;text-align:center;padding:16px 0">Tambahkan minggu untuk mulai assign pelayanan</div>';
+    html += '<div class="empty" style="margin-top:14px">Tambahkan minggu untuk mulai assign pelayanan.</div>';
   }
-  html += '</div>'; // end schedule section
+  html += '</section>';
 
   // ── Statistics ──
   // Compute stats across current month
@@ -2609,88 +2853,52 @@ async function renderPelayanan() {
 
   const maxRoleCount = Math.max(1, ...Object.values(roleCounts));
 
-  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;margin-top:14px">';
-
-  // ── Distribusi Jenis (bar chart) ──
-  html += '<div class="section" style="border-radius:14px;margin-bottom:0">';
-  html += '<div class="section-title" style="margin-bottom:12px">Distribusi Jenis</div>';
+  html += '<div class="cols" style="margin-top:24px">';
+  // ── Distribusi Jenis ──
+  html += '<section class="card wide" style="flex-basis:420px"><div class="chead"><h2>Distribusi jenis</h2><span class="sub" style="margin:0">'+esc(CUR_PEL_MONTH)+'</span></div>';
   if (weeks.length === 0) {
-    html += '<div style="font-size:11px;color:var(--g3)">Data akan muncul setelah pelayanan disimpan.</div>';
+    html += '<div class="sub">Data akan muncul setelah pelayanan disimpan.</div>';
   } else {
-    html += '<div style="display:flex;flex-direction:column;gap:8px">';
     roles.forEach(r => {
       const cnt = roleCounts[r.name] || 0;
       const pct = Math.round(cnt / maxRoleCount * 100);
-      html += '<div>';
-      html += '<div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:3px"><span style="font-weight:600;color:'+r.color+'">'+esc(r.name)+'</span><span style="color:var(--g3)">'+cnt+'x</span></div>';
-      html += '<div style="height:6px;background:var(--g6);border-radius:3px;overflow:hidden"><div style="width:'+pct+'%;height:100%;background:'+r.color+';border-radius:3px;transition:width .3s"></div></div>';
-      html += '</div>';
+      html += '<div class="prog"><span class="pl" style="width:110px;color:'+r.color+'">'+esc(r.name)+'</span><span class="tr"><i style="width:'+pct+'%;background:'+r.color+'"></i></span><span class="v">'+cnt+'×</span></div>';
     });
-    html += '</div>';
   }
-  html += '</div>';
+  html += '</section>';
 
   // ── Sering Pelayanan (top 3) ──
-  html += '<div class="section" style="border-radius:16px;margin-bottom:0;background:linear-gradient(135deg,#f0fdf4 0%,#fff 65%,#fff 100%);border:1px solid #bbf7d0;box-shadow:0 4px 20px rgba(22,163,74,.05)">';
-  html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><div style="width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px">\u2605</div><div><div style="font-weight:700;font-size:13px;color:#166534;letter-spacing:.2px">Top Pelayanan</div><div style="font-size:10px;color:#16a34a;opacity:.7;margin-top:1px">Member paling sering melayani</div></div></div>';
+  html += '<section class="card narrow" style="display:block"><div class="chead" style="margin-bottom:4px"><h2>Paling sering melayani</h2></div><div class="sub">Top 3 bulan ini</div>';
   const sorted = Object.entries(memberCounts).filter(e => e[1] > 0).sort((a,b) => b[1]-a[1]).slice(0,3);
   if (sorted.length === 0) {
-    html += '<div style="font-size:11px;color:var(--g3);font-style:italic;padding:8px 0">Data akan muncul setelah pelayanan disimpan.</div>';
+    html += '<div class="sub" style="margin-top:12px">Data akan muncul setelah pelayanan disimpan.</div>';
   } else {
-    const medals = ['#f59e0b','#94a3b8','#cd7f32'];
-    const medalBg = ['#fffbeb','#f1f5f9','#fef3c7'];
-    const medalLabels = ['1','2','3'];
-    html += '<div style="display:flex;flex-direction:column;gap:6px">';
     sorted.forEach((entry, idx) => {
       const name = entry[0];
       const cnt = entry[1];
       const rls = (memberRoles[name] || []).join(', ');
-      html += '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#fff;border-radius:10px;border:1px solid '+medals[idx]+'33;transition:all .15s" onmouseover="this.style.transform=\'translateX(2px)\';this.style.boxShadow=\'0 2px 8px '+medals[idx]+'33\'" onmouseout="this.style.transform=\'\';this.style.boxShadow=\'none\'">';
-      html += '<div style="width:32px;height:32px;border-radius:50%;background:'+medalBg[idx]+';color:'+medals[idx]+';display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;border:2px solid '+medals[idx]+';flex-shrink:0">'+medalLabels[idx]+'</div>';
-      html += '<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:12px;color:var(--g1);line-height:1.2">'+esc(name)+'</div><div style="font-size:10px;color:var(--g4);margin-top:2px;letter-spacing:.3px">'+esc(rls || 'Belum ada role')+'</div></div>';
-      html += '<span style="background:#dcfce7;color:#15803d;padding:4px 10px;border-radius:14px;font-size:10px;font-weight:700;letter-spacing:.3px">'+cnt+'\u00d7</span>';
-      html += '</div>';
+      html += '<div class="lrow"><span class="ava" aria-hidden="true" style="'+(idx===0?'background:var(--gold);color:var(--side)':'')+'">'+(idx+1)+'</span><div class="grow"><b>'+esc(name)+'</b><small>'+esc(rls || 'Belum ada role')+'</small></div><span class="pill" style="background:var(--Hb);color:var(--H)">'+cnt+'×</span></div>';
     });
-    html += '</div>';
   }
-  html += '</div>';
-  html += '</div>'; // end stats grid
+  html += '</section></div>';
 
   // ── Belum Pernah / Jarang Pelayanan ──
   const jarang = MEMBERS.filter(m => (memberCounts[m.nama] || 0) <= 2).sort((a,b) => (memberCounts[a.nama]||0) - (memberCounts[b.nama]||0));
   if (jarang.length > 0 && weeks.length > 0) {
-    html += '<div class="section" style="border-radius:16px;background:linear-gradient(135deg,#fef2f2 0%,#fff 65%,#fff 100%);border:1px solid #fecaca;box-shadow:0 4px 20px rgba(220,38,38,.05)">';
-    // Header dengan icon + counter
-    html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">';
-    html += '<div style="display:flex;align-items:center;gap:10px"><div style="width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,#dc2626,#ef4444);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px">\u26A0</div>';
-    html += '<div><div style="font-weight:700;font-size:13px;color:#991b1b;letter-spacing:.2px">Belum Pernah / Jarang Pelayanan</div><div style="font-size:10px;color:#dc2626;opacity:.7;margin-top:1px">Member yang perlu di-follow up untuk pelayanan</div></div></div>';
-    html += '<span style="font-family:\'Instrument Serif\',serif;font-size:24px;color:#dc2626;line-height:1">'+jarang.length+'</span>';
-    html += '</div>';
-    // List
-    html += '<div style="display:flex;flex-direction:column;gap:6px">';
+    html += '<section class="card" style="margin-top:24px"><div class="chead" style="margin-bottom:4px"><h2>Belum pernah / jarang pelayanan</h2><span class="pill" style="background:var(--Ab);color:var(--A)">'+jarang.length+' anggota</span></div><div class="sub">Member yang perlu diajak pelayanan</div>';
+    html += '<div class="mgrid" style="grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px;margin-top:6px">';
     jarang.forEach(m => {
       const cnt = memberCounts[m.nama] || 0;
-      const dotColor = cnt === 0 ? '#dc2626' : cnt === 1 ? '#f59e0b' : '#fb923c';
-      const dotBg = cnt === 0 ? '#fef2f2' : cnt === 1 ? '#fffbeb' : '#fff7ed';
-      const badgeBg = cnt === 0 ? '#fee2e2' : cnt === 1 ? '#fef3c7' : '#ffedd5';
-      const initial = String(m.nama||'?').trim().slice(0,1).toUpperCase();
-      html += '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#fff;border-radius:10px;border:1px solid '+dotColor+'22;transition:all .15s" onmouseover="this.style.transform=\'translateX(2px)\';this.style.boxShadow=\'0 2px 8px '+dotColor+'22\'" onmouseout="this.style.transform=\'\';this.style.boxShadow=\'none\'">';
-      // Avatar dot dengan inisial
-      html += '<div style="width:32px;height:32px;border-radius:50%;background:'+dotBg+';color:'+dotColor+';display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;border:2px solid '+dotColor+';flex-shrink:0">'+esc(initial)+'</div>';
-      // Nama + status
-      html += '<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:12px;color:var(--g1);line-height:1.2">'+esc(m.nama)+'</div><div style="font-size:10px;color:var(--g4);margin-top:2px;letter-spacing:.3px">'+esc(m.status || 'Member')+'</div></div>';
-      // Counter pill
-      html += '<span style="background:'+badgeBg+';color:'+dotColor+';padding:4px 10px;border-radius:14px;font-size:10px;font-weight:700;letter-spacing:.3px">'+cnt+'\u00d7</span>';
-      html += '</div>';
+      const col = cnt === 0 ? ['var(--Ab)','var(--A)'] : ['var(--Sb)','var(--S)'];
+      html += '<div class="lrow" style="margin:0"><span class="ava" aria-hidden="true" style="background:'+col[0]+';color:'+col[1]+'">'+initialOf(m.nama)+'</span><div class="grow"><b>'+esc(m.nama)+'</b><small>'+esc(m.status || 'Member')+'</small></div><span class="pill" style="background:'+col[0]+';color:'+col[1]+'">'+cnt+'×</span></div>';
     });
-    html += '</div></div>';
+    html += '</div></section>';
   }
 
   // ── Monthly recap table ──
   if (weeks.length > 0) {
-    html += '<div class="section" style="border-radius:14px">';
-    html += '<div class="section-title" style="margin-bottom:10px">Rekap Bulanan — '+esc(CUR_PEL_MONTH)+'</div>';
-    html += '<div style="overflow-x:auto">';
+    html += '<section class="card" style="margin-top:24px"><div class="chead"><h2>Rekap bulanan</h2><span class="sub" style="margin:0">'+esc(CUR_PEL_MONTH)+'</span></div>';
+    html += '<div class="tblwrap">';
     html += '<table class="t"><thead><tr><th style="text-align:left">Nama</th>';
     weeks.forEach(w => { html += '<th>'+esc(fmtWeekLabel(w))+'</th>'; });
     html += '<th>Total</th></tr></thead><tbody>';
@@ -2710,16 +2918,16 @@ async function renderPelayanan() {
         total += assigned.length;
         if (assigned.length) {
           const abbrs = assigned.map(rn => { const found = roles.find(r => r.name === rn); return found ? found.abbr : rn.substring(0,2).toUpperCase(); });
-          html += '<td style="font-size:10px;font-weight:600;color:var(--purple)">'+abbrs.join(', ')+'</td>';
+          html += '<td style="font-size:12px;font-weight:700;color:var(--accent-ink)">'+esc(abbrs.join(', '))+'</td>';
         } else {
-          html += '<td style="font-size:10px;color:var(--g4)">&ndash;</td>';
+          html += '<td style="color:var(--muted)">&ndash;</td>';
         }
       });
-      const tColor = total >= 3 ? '#16a34a' : total >= 1 ? '#2563eb' : '#dc2626';
+      const tColor = total >= 3 ? 'var(--H)' : total >= 1 ? 'var(--I)' : 'var(--A)';
       html += '<td style="font-weight:700;color:'+tColor+'">'+total+'</td>';
       html += '</tr>';
     });
-    html += '</tbody></table></div></div>';
+    html += '</tbody></table></div></section>';
   }
 
   el.innerHTML = html;
@@ -2898,6 +3106,12 @@ async function addPelRole() {
 }
 
 // ========== MILESTONE TAB ==========
+function msDonut(p, color) {
+  const C = 2*Math.PI*28;
+  return '<svg width="76" height="76" viewBox="0 0 76 76" aria-hidden="true"><circle cx="38" cy="38" r="28" fill="none" stroke="#F0EEF6" stroke-width="9"/><circle cx="38" cy="38" r="28" fill="none" stroke="'+color+'" stroke-width="9" stroke-linecap="round" stroke-dasharray="'+(p/100*C).toFixed(1)+' '+C.toFixed(1)+'" transform="rotate(-90 38 38)"/><text x="38" y="43" text-anchor="middle" font-family="Bricolage Grotesque, sans-serif" font-weight="800" font-size="15" fill="#17151F">'+p+'%</text></svg>';
+}
+function msColor(i) { return i < 3 ? '#5B45E0' : i < 6 ? '#0F766E' : '#C2410C'; }
+
 function renderMilestone() {
   const el = document.getElementById('tab-milestone');
   const total = MEMBERS.length || 1;
@@ -2912,73 +3126,33 @@ function renderMilestone() {
   let html = '';
 
   // Filter chips
-  // Filter chips - more granular
   const filters = [
-    {key:'all', label:'Semua', cls:''},
-    {key:'msj1', label:'MSJ 1', cls:''},
-    {key:'msj2', label:'MSJ 2', cls:''},
-    {key:'msj3', label:'MSJ 3', cls:''},
-    {key:'cgt1', label:'CGT 1', cls:''},
-    {key:'cgt2', label:'CGT 2', cls:''},
-    {key:'cgt3', label:'CGT 3', cls:''},
-    {key:'baptis_air', label:'B. Air', cls:''},
-    {key:'baptis_roh', label:'B. Roh', cls:''}
+    {key:'all', label:'Semua'},
+    {key:'msj1', label:'MSJ 1'},
+    {key:'msj2', label:'MSJ 2'},
+    {key:'msj3', label:'MSJ 3'},
+    {key:'cgt1', label:'CGT 1'},
+    {key:'cgt2', label:'CGT 2'},
+    {key:'cgt3', label:'CGT 3'},
+    {key:'baptis_air', label:'B. Air'},
+    {key:'baptis_roh', label:'B. Roh'}
   ];
-  html += '<div class="filter-chips" style="margin-bottom:16px;flex-wrap:wrap">';
+  html += '<div class="filter-chips" role="group" aria-label="Filter milestone">';
   filters.forEach(f => {
     const active = (MS_FILTER||'all')===f.key;
-    html += '<span class="chip '+f.cls+(active?' on':'')+'" onclick="setMilestoneFilter(\''+f.key+'\')">'+f.label+'</span>';
+    html += '<button type="button" class="chip big'+(active?' on':'')+'" aria-pressed="'+active+'" onclick="setMilestoneFilter(\''+f.key+'\')">'+f.label+'</button>';
   });
   html += '</div>';
 
-  // Hero
-  const heroDash = Math.round(avgPct / 100 * 97.4);
-  html += '<div style="background:linear-gradient(135deg,#6C5CE7,#a855f7);border-radius:18px;padding:18px 20px;margin-bottom:14px;color:#fff;box-shadow:0 8px 24px rgba(108,92,231,.25);display:flex;align-items:center;justify-content:space-between">';
-  html += '<div><div style="font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;opacity:.85">Rata-rata Milestone</div>';
-  html += '<div style="font-family:\'Instrument Serif\',serif;font-size:38px;line-height:1">'+avgPct+'%</div>';
-  html += '<div style="font-size:11px;opacity:.85;margin-top:2px">'+total+' member \u00b7 '+avgPer+'/8 milestone rata-rata</div></div>';
-  html += '<div style="position:relative;width:64px;height:64px"><svg viewBox="0 0 36 36" style="transform:rotate(-90deg)"><circle cx="18" cy="18" r="15.5" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="3"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="#fff" stroke-width="3" stroke-dasharray="'+heroDash+' 97.4" stroke-linecap="round"/></svg></div></div>';
-
-  // Donut stats
-  const donutItems = [
-    {field:'msj1',label:'MSJ 1',color:'var(--green)',stroke:'#16a34a',grad:'linear-gradient(135deg,#f0fdf4,#dcfce7)',border:'#bbf7d0'},
-    {field:'msj2',label:'MSJ 2',color:'var(--blue)',stroke:'#2563eb',grad:'linear-gradient(135deg,#eff6ff,#dbeafe)',border:'#bfdbfe'},
-    {field:'cgt1',label:'CGT 1',color:'#0f766e',stroke:'#0f766e',grad:'linear-gradient(135deg,#f0fdfa,#ccfbf1)',border:'#99f6e4'},
-    {field:'baptis_air',label:'B. Air',color:'#7c3aed',stroke:'#7c3aed',grad:'linear-gradient(135deg,#faf5ff,#ede9fe)',border:'#ddd6fe'}
-  ];
-
-  html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px">';
-  donutItems.forEach(d => {
-    const cnt = counts[d.field];
+  // Ringkasan + donut per milestone
+  html += '<div class="grid-kpi" style="margin-bottom:16px"><div class="kpi hero"><div class="lbl">Rata-rata milestone</div><div class="num">'+avgPct+'<small>%</small></div><div class="track"><i style="width:'+avgPct+'%"></i></div><div class="foot" style="color:#CFC9F2;font-weight:500">'+MEMBERS.length+' anggota · '+avgPer+'/8 rata-rata</div></div></div>';
+  html += '<div class="donuts">';
+  MS_FIELDS.forEach((f, i) => {
+    const cnt = counts[f];
     const pct = Math.round(cnt/total*100);
-    const dash = Math.round(pct/100*97.4);
-    html += '<div style="background:'+d.grad+';border-radius:14px;padding:14px 10px;text-align:center;border:1px solid '+d.border+';transition:transform .15s;cursor:pointer" onmouseover="this.style.transform=\'translateY(-2px)\'" onmouseout="this.style.transform=\'\'">';
-    html += '<div style="position:relative;width:56px;height:56px;margin:0 auto 6px"><svg viewBox="0 0 36 36" style="transform:rotate(-90deg)"><circle cx="18" cy="18" r="15.5" fill="none" stroke="rgba(0,0,0,.08)" stroke-width="3"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="'+d.stroke+'" stroke-width="3" stroke-dasharray="'+dash+' 97.4" stroke-linecap="round"/></svg>';
-    html += '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:\'Instrument Serif\',serif;font-size:18px;color:'+d.color+'">'+cnt+'</div></div>';
-    html += '<div style="font-size:10px;font-weight:700;letter-spacing:1px;color:'+d.color+'">'+d.label+'</div>';
-    html += '<div style="font-size:9px;color:var(--g4);margin-top:2px">'+pct+'% selesai</div></div>';
+    html += '<div class="donut">'+msDonut(pct, msColor(i))+'<b>'+MS_LABELS[i]+'</b><small>'+cnt+' dari '+MEMBERS.length+'</small></div>';
   });
   html += '</div>';
-
-  // Secondary bars
-  const barItems = [
-    {field:'msj3',label:'MSJ 3',color:'var(--purple)',grad:'linear-gradient(90deg,#7c3aed,#a78bfa)'},
-    {field:'cgt2',label:'CGT 2',color:'var(--blue)',grad:'linear-gradient(90deg,#2563eb,#60a5fa)'},
-    {field:'cgt3',label:'CGT 3',color:'var(--orange)',grad:'linear-gradient(90deg,#d97706,#fbbf24)'},
-    {field:'baptis_roh',label:'B. Roh',color:'var(--green)',grad:'linear-gradient(90deg,#16a34a,#34d399)'}
-  ];
-  html += '<div style="background:var(--white);border:1px solid var(--g5);border-radius:14px;padding:14px;margin-bottom:20px">';
-  html += '<div style="font-size:9px;font-weight:700;letter-spacing:1.2px;color:var(--g3);margin-bottom:10px;text-transform:uppercase">Progress Lainnya (dari '+total+' member)</div>';
-  html += '<div style="display:flex;flex-direction:column;gap:8px">';
-  barItems.forEach(b => {
-    const cnt = counts[b.field];
-    const w = Math.round(cnt/total*100);
-    html += '<div style="display:flex;align-items:center;gap:10px"><span style="font-size:10px;font-weight:600;color:'+b.color+';min-width:48px">'+b.label+'</span><div style="flex:1;height:10px;background:var(--g6);border-radius:10px;overflow:hidden"><div style="width:'+w+'%;height:100%;background:'+b.grad+';border-radius:10px"></div></div><span style="font-size:11px;font-weight:700;color:'+b.color+';min-width:32px;text-align:right">'+cnt+'/'+total+'</span></div>';
-  });
-  html += '</div></div>';
-
-  // Per-member cards
-  html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><div style="font-size:11px;font-weight:700;letter-spacing:1.2px;color:var(--g3);text-transform:uppercase">\ud83d\udc65 Progress per Member</div><span style="font-size:10px;color:var(--g4)">Sorted by progress</span></div>';
 
   let memberProgress = MEMBERS.map(m => {
     const done = MS_FIELDS.filter(f => m[f]).length;
@@ -2991,27 +3165,22 @@ function renderMilestone() {
     memberProgress = memberProgress.filter(m => !m[MS_FILTER] && (!prereq[MS_FILTER] || m[prereq[MS_FILTER]]));
   }
 
+  const filtLabel = (filters.find(f => f.key === (MS_FILTER||'all')) || {}).label;
+  html += '<section class="card" style="margin-top:24px"><div class="chead"><div><h2>Progress per anggota</h2><div class="sub">'+(MS_FILTER && MS_FILTER!=='all' ? 'Belum '+esc(filtLabel)+' (yang sudah memenuhi syarat sebelumnya)' : 'Urut dari progress tertinggi')+' · klik chip untuk ubah</div></div><span class="pill" style="background:var(--faint);color:var(--muted)">'+memberProgress.length+' anggota</span></div>';
+  if (!memberProgress.length) html += '<div class="empty">Tidak ada anggota untuk filter ini.</div>';
   memberProgress.forEach(m => {
     const pct = m.msPct;
-    const pctColor = pct >= 75 ? 'var(--green)' : pct >= 50 ? 'var(--blue)' : pct >= 25 ? 'var(--orange)' : 'var(--red)';
-    const gradColor = pct >= 75 ? 'linear-gradient(90deg,#16a34a,#34d399)' : pct >= 50 ? 'linear-gradient(90deg,#2563eb,#60a5fa)' : pct >= 25 ? 'linear-gradient(90deg,#d97706,#fbbf24)' : 'var(--red)';
-    const bgPill = pct >= 75 ? 'linear-gradient(135deg,#f0fdf4,#dcfce7)' : pct >= 50 ? 'linear-gradient(135deg,#eff6ff,#dbeafe)' : pct >= 25 ? 'linear-gradient(135deg,#fffbeb,#fef3c7)' : 'linear-gradient(135deg,#fef2f2,#ffe4e6)';
     const atRisk = pct === 0;
-
-    html += '<div style="background:var(--white);border:1px solid '+(atRisk?'#fecaca':'var(--g5)')+';border-radius:14px;padding:16px;margin-bottom:12px;overflow:hidden;position:relative'+(atRisk?';border-left:4px solid var(--red)':'')+'">';
-    if (pct > 0) html += '<div style="position:absolute;top:0;left:0;width:'+pct+'%;height:3px;background:'+gradColor+'"></div>';
-    html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px"><div>';
-    html += '<div style="font-weight:600;font-size:14px'+(atRisk?';color:var(--red)':'')+'">'+esc(m.nama)+'</div>';
-    html += '<div style="font-size:10px;color:'+(atRisk?'var(--red)':'var(--g4)')+'">'+esc(m.status)+(atRisk?' \u00b7 \u26a0\ufe0f Perlu follow-up':'')+'</div></div>';
-    html += '<div style="background:'+bgPill+';padding:6px 14px;border-radius:20px"><span style="font-family:\'Instrument Serif\',serif;font-size:20px;color:'+pctColor+'">'+pct+'%</span></div></div>';
-    html += '<div style="height:6px;background:var(--g6);border-radius:6px;overflow:hidden;margin-bottom:10px"><div style="width:'+pct+'%;height:100%;background:'+gradColor+';border-radius:6px"></div></div>';
-    html += '<div class="ms-chips">';
+    html += '<div class="lrow msrow"><span class="ava'+(atRisk?' risk':'')+'" aria-hidden="true">'+initialOf(m.nama)+'</span>';
+    html += '<div class="msname"><b>'+esc(m.nama)+'</b><small>'+m.msDone+'/8 selesai · '+esc(m.status||'Member')+'</small></div>';
+    html += '<div class="ms-chips grow">';
     MS_FIELDS.forEach((f, i) => {
       const done = m[f] ? true : false;
-      html += '<span class="msc '+(done?'done':'pending')+'" style="padding:4px 10px;border-radius:8px;cursor:pointer" onclick="toggleMilestone(this,'+m.id+',\''+f+'\','+(done?'true':'false')+')">'+MS_LABELS[i]+(done?' \u2713':'')+'</span>';
+      html += '<button type="button" class="msc '+(done?'done':'pending')+'" onclick="toggleMilestone(this,'+m.id+',\''+f+'\','+(done?'true':'false')+')">'+MS_LABELS[i]+(done?' ✓':'')+'</button>';
     });
     html += '</div></div>';
   });
+  html += '</section>';
 
   el.innerHTML = html;
 }
@@ -3030,6 +3199,7 @@ async function renderEvents(forceRefetch) {
     _CACHED_CG_EVENTS = await loadCGEventsForCG(CUR_CG, CUR_REGION);
   }
   const cgEvents = _CACHED_CG_EVENTS || [];
+  fillAbsEventsMini();
 
   // Birthdays from members - calculate next occurrence + days left
   function parseBirthday(s){
@@ -3064,59 +3234,18 @@ async function renderEvents(forceRefetch) {
     {key:'birthday',label:'Birthday'},
     {key:'outreach',label:'Outreach'}
   ];
-  let html = '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:8px"><div class="filter-chips" style="margin:0;flex-wrap:wrap">';
+  let html = '<div class="tabbar"><div class="filter-chips" role="group" aria-label="Filter event" style="margin:0">';
   evCats.forEach(c => {
-    html += '<span class="chip '+(EV_FILTER===c.key?'on':'')+'" onclick="setEventFilter(\''+c.key+'\')">'+c.label+'</span>';
+    html += '<button type="button" class="chip'+(EV_FILTER===c.key?' on':'')+'" aria-pressed="'+(EV_FILTER===c.key)+'" onclick="setEventFilter(\''+c.key+'\')">'+c.label+'</button>';
   });
   html += '</div>';
-  html += '<button onclick="openAddEventModal()" style="padding:8px 14px;border-radius:10px;border:1.5px solid #6C5CE7;background:linear-gradient(135deg,#6C5CE7,#8B5CF6);color:#fff;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.3px;box-shadow:0 4px 12px rgba(108,92,231,.25);transition:all .2s" onmouseover="this.style.transform=\'translateY(-1px)\'" onmouseout="this.style.transform=\'\'">+ Tambah Event</button>';
+  html += '<button type="button" class="btn primary" onclick="openAddEventModal()">'+icon('plus',18)+'Tambah event</button>';
   html += '</div>';
 
   // Filter helper
   function passFilter(ev){
     if (EV_FILTER==='all') return true;
     return (ev.cat||'').toLowerCase() === EV_FILTER;
-  }
-
-  // Render helper for event card
-  function buildEventCard(ev, isShared, displayAsShared) {
-    const cColor = catColor(ev.cat);
-    const evId = isShared ? 'shared_'+(ev.id||'') : 'cg_'+(ev.id||'');
-    // displayAsShared: tampilkan badge "Semua CG" meski evId pakai 'cg_' prefix
-    // (untuk cg_events dengan is_shared=true yg masih disimpan di tabel cg_events)
-    const showSharedBadge = isShared || displayAsShared || ev.is_shared;
-    const note = ev.note || '';
-    const noteEsc = esc(note).replace(/\n/g, '<br>');
-    const isLong = note.length > 150 || (note.match(/\n/g) || []).length > 2;
-    const img = ev.image || '';
-    let cardHtml = '<div class="ev-card" style="border-left-color:'+cColor+';padding:14px;margin-bottom:12px" id="ev_'+evId+'">';
-    cardHtml += '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px">';
-    const dateRange = ev.date_start && ev.date_end && ev.date_end !== ev.date_start ? esc(ev.date_start)+' → '+esc(ev.date_end) : esc(ev.date_start || ev.date_end || 'Tanpa tanggal');
-    cardHtml += '<div style="flex:1"><div style="display:flex;align-items:center;flex-wrap:wrap"><span class="ev-date">'+dateRange+'</span>'+eventCountdownBadge(ev.date_start || ev.date_end, ev.date_end)+'</div><div class="ev-name">'+esc(ev.name||'')+'</div></div>';
-    cardHtml += '<div style="display:flex;gap:4px">';
-    cardHtml += '<button onclick="copyEventText(\''+evId+'\')" title="Copy text" class="ev-btn ev-btn-copy"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>';
-    cardHtml += '<button onclick="broadcastEvent(\''+evId+'\')" title="Broadcast WhatsApp" class="ev-btn ev-btn-wa"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413"/></svg></button>';
-    cardHtml += '<button onclick="openEditEvent(\''+evId+'\')" title="Edit" class="ev-btn ev-btn-edit"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>';
-    if (ev.id) cardHtml += '<button onclick="deleteEventCard(\''+evId+'\')" title="Hapus" class="ev-btn ev-btn-del"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>';
-    cardHtml += '</div></div>';
-    if (img) cardHtml += '<div style="margin:8px 0"><img src="'+esc(img)+'" alt="event" style="max-width:100%;border-radius:8px;max-height:200px;object-fit:cover" onerror="this.style.display=\'none\'"></div>';
-    if (isLong) {
-      cardHtml += '<div class="ev-note" id="evtxt_'+evId+'" style="white-space:pre-wrap;line-height:1.4;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">'+noteEsc+'</div>';
-      cardHtml += '<button onclick="(function(b){var n=document.getElementById(\'evtxt_'+evId+'\');var exp=b.dataset.exp===\'1\';if(exp){n.style.webkitLineClamp=\'3\';n.style.display=\'-webkit-box\';b.textContent=\'Baca selengkapnya\';b.dataset.exp=\'0\';}else{n.style.webkitLineClamp=\'unset\';n.style.display=\'block\';b.textContent=\'Sembunyikan\';b.dataset.exp=\'1\';}})(this)" data-exp="0" style="background:none;border:none;color:var(--purple);font-size:11px;font-weight:600;cursor:pointer;padding:4px 0 0;margin-top:2px">Baca selengkapnya</button>';
-    } else {
-      cardHtml += '<div class="ev-note" id="evtxt_'+evId+'" style="white-space:pre-wrap;line-height:1.4">'+noteEsc+'</div>';
-    }
-    cardHtml += '<div style="margin-top:8px"><span class="ev-cat" style="background:rgba(0,0,0,.05);color:'+cColor+'">'+catLabel(ev.cat)+'</span>';
-    if (showSharedBadge) {
-      // Scope: Global (region=all), region-scoped (region=jaktim1/2), atau default 'Semua CG'
-      let scopeLabel = 'Semua CG';
-      if (ev.region === 'all') scopeLabel = 'Global · Semua Jaktim';
-      else if (ev.region === 'jaktim1') scopeLabel = 'Semua CG Jaktim 1';
-      else if (ev.region === 'jaktim2') scopeLabel = 'Semua CG Jaktim 2';
-      cardHtml += '<span class="ev-cat" style="background:rgba(108,92,231,.06);color:var(--purple);margin-left:4px">'+scopeLabel+'</span>';
-    }
-    cardHtml += '</div></div>';
-    return cardHtml;
   }
 
   // Stash events for copy/broadcast functions
@@ -3129,40 +3258,23 @@ async function renderEvents(forceRefetch) {
   const ownCGEvents = cgEvents.filter(e => !e.is_shared);
 
   // Shared events (dari table 'events' + cg_events is_shared=true)
-  html += '<div style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--g3);margin-bottom:10px;margin-top:4px">📢 Event Semua CG</div>';
-  ALL_EVENTS.filter(passFilter).forEach(ev => { html += buildEventCard(ev, true); });
-  // cg_events rows dengan is_shared=true → pakai 'cg_' prefix (buat edit/delete ke tabel cg_events) tapi tampil badge "Semua CG"
-  sharedCGEvents.filter(passFilter).forEach(ev => { html += buildEventCard(ev, false, true); });
+  html += '<h2 class="sechead">Event semua CG</h2>';
+  ALL_EVENTS.filter(passFilter).forEach(ev => { html += evCardHTML(ev, 'shared_'+(ev.id||''), evScopeLabel(ev), null, !!ev.id); });
+  // cg_events rows dengan is_shared=true → pakai 'cg_' prefix (buat edit/delete ke tabel cg_events) tapi tampil badge scope
+  sharedCGEvents.filter(passFilter).forEach(ev => { html += evCardHTML(ev, 'cg_'+(ev.id||''), evScopeLabel(ev), null, !!ev.id); });
   if (ALL_EVENTS.length === 0 && sharedCGEvents.length === 0) {
-    html += '<div style="font-size:11px;color:var(--g4);font-style:italic;margin-bottom:10px">Belum ada event shared</div>';
+    html += '<div class="empty">Belum ada event untuk semua CG.</div>';
   }
 
   // CG events (own CG only, non-shared)
-  html += '<div style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--g3);margin:20px 0 10px">📋 Event CG Ini</div>';
-  if (ownCGEvents.length === 0) html += '<div style="font-size:11px;color:var(--g4);font-style:italic;margin-bottom:10px">Belum ada event khusus CG ini</div>';
-  ownCGEvents.filter(passFilter).forEach(ev => { html += buildEventCard(ev, false); });
+  html += '<h2 class="sechead">Event CG ini</h2>';
+  if (ownCGEvents.length === 0) html += '<div class="empty">Belum ada event khusus CG ini.</div>';
+  ownCGEvents.filter(passFilter).forEach(ev => { html += evCardHTML(ev, 'cg_'+(ev.id||''), null, null, !!ev.id); });
 
   // Birthdays - sorted by upcoming, with days countdown
   if (birthdays.length > 0) {
-    html += '<div style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--g3);margin:20px 0 10px">🎂 Ulang Tahun Member</div>';
-    birthdays.forEach(m => {
-      let badgeText, badgeBg, badgeColor;
-      if (m._daysLeft === 0) { badgeText='HARI INI! 🎉'; badgeBg='#fce7f3'; badgeColor='#be185d'; }
-      else if (m._daysLeft === 1) { badgeText='Besok'; badgeBg='#fce7f3'; badgeColor='#be185d'; }
-      else if (m._daysLeft <= 7) { badgeText=m._daysLeft+' hari lagi'; badgeBg='#fef3c7'; badgeColor='#92400e'; }
-      else if (m._daysLeft <= 30) { badgeText=m._daysLeft+' hari lagi'; badgeBg='#dbeafe'; badgeColor='#1e40af'; }
-      else { badgeText=m._daysLeft+' hari lagi'; badgeBg='#f3f4f6'; badgeColor='#6b7280'; }
-
-      html += '<div class="ev-card" style="border-left-color:#f472b6;display:flex;justify-content:space-between;align-items:center;gap:12px">';
-      html += '<div style="flex:1">';
-      html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span class="ev-date" style="margin:0">'+esc(m._dateLabel)+'</span><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:'+badgeBg+';color:'+badgeColor+'">'+badgeText+'</span></div>';
-      html += '<div class="ev-name">🎂 '+esc(m.nama)+'</div>';
-      html += '<div class="ev-note">Ulang tahun ke-'+m._turnAge+' · '+esc(m.status||'Member')+'</div>';
-      html += '<span class="ev-cat" style="background:rgba(244,114,182,.08);color:#ec4899;margin-top:6px;display:inline-block">Birthday</span>';
-      html += '</div>';
-      html += '<div style="text-align:center;min-width:70px"><div style="font-family:\'Instrument Serif\',serif;font-size:32px;line-height:1;color:#ec4899">'+m._daysLeft+'</div><div style="font-size:9px;color:var(--g4);letter-spacing:.5px">HARI</div></div>';
-      html += '</div>';
-    });
+    html += '<h2 class="sechead">Ulang tahun member</h2>';
+    birthdays.forEach(m => { html += birthdayCardHTML(m, m.status||'Member'); });
   }
 
   el.innerHTML = html;
@@ -3374,6 +3486,7 @@ function setDTabUI(id) {
     t.classList.toggle('on', on);
     if (on) t.setAttribute('aria-current','page'); else t.removeAttribute('aria-current');
   });
+  const top = document.getElementById('dTop'); if (top) top.style.display = id === 'absensi' ? '' : 'none';
   const title = CGL_TAB_TITLES[id] || '';
   const h = document.getElementById('dTitle'); if (h) h.textContent = title;
   const c = document.getElementById('dCrumb');
@@ -3623,6 +3736,7 @@ function setCTabUI(id) {
   });
   const regLbl = coachRole === 'tl' ? 'semua region' : (coachReg === 'jaktim2' ? 'Jaktim 2' : 'Jaktim 1');
   const titles = {'c-overview':'Overview ' + regLbl,'c-absensi':'Absensi per CG','c-milestone':'Milestone per CG','c-visi':'Visi semua CG','c-events':'Events'};
+  const cTop = document.getElementById('cTop'); if (cTop) cTop.style.display = id === 'c-overview' ? '' : 'none';
   const who = coachRole === 'tl' ? 'Team Leader' : 'Coach';
   const h = document.getElementById('coachHeroH'); if (h) h.textContent = titles[id] || '';
   const c = document.getElementById('cCrumb'); if (c) c.innerHTML = 'Halo, ' + who + ' · <b>' + esc(titles[id] || '') + '</b>';
@@ -4786,14 +4900,9 @@ function parseMissionLines(text) {
 // Render misi sebagai list numbered yang cantik
 function renderMisiList(lines) {
   if (!lines || !lines.length) {
-    return '<div style="font-size:11px;color:var(--g4);font-style:italic;padding:10px 0;text-align:center;display:flex;align-items:center;justify-content:center;gap:6px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Klik untuk tulis misi (satu poin per baris)</div>';
+    return '<div class="misi-empty">'+icon('edit',16)+'Klik untuk tulis misi (satu poin per baris)</div>';
   }
-  return lines.map((l, i) =>
-    '<div style="display:flex;gap:10px;padding:8px 0;'+(i<lines.length-1?'border-bottom:1px dashed #fde68a':'')+';align-items:flex-start">'
-    + '<div style="flex-shrink:0;width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#fef3c7,#fde68a);color:#92400e;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;letter-spacing:-.5px">'+(i+1)+'</div>'
-    + '<div style="flex:1;font-size:12.5px;line-height:1.55;color:var(--g1);padding-top:2px">'+esc(l)+'</div>'
-    + '</div>'
-  ).join('');
+  return lines.map((l, i) => '<div class="misi"><span class="n">'+(i+1)+'</span><span class="mt">'+esc(l)+'</span></div>').join('');
 }
 // Switch ke edit mode: hide view, show textarea, focus
 function showMisiEdit(misiId) {
@@ -5043,69 +5152,27 @@ async function renderCoachEvents(forceRefetch) {
     {key:'outreach',label:'Outreach'}
   ];
   // Header: filter chips + tombol Tambah Event
-  let html = '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:8px"><div class="filter-chips" style="margin:0">';
+  let html = '<div class="tabbar"><div class="filter-chips" role="group" aria-label="Filter event" style="margin:0">';
   filters.forEach(f => {
-    html += '<span class="chip '+(COACH_EV_FILTER===f.key?'on':'')+'" onclick="setCoachEventFilter(\''+f.key+'\')">'+f.label+'</span>';
+    html += '<button type="button" class="chip'+(COACH_EV_FILTER===f.key?' on':'')+'" aria-pressed="'+(COACH_EV_FILTER===f.key)+'" onclick="setCoachEventFilter(\''+f.key+'\')">'+f.label+'</button>';
   });
   html += '</div>';
-  html += '<button onclick="openCoachAddEvent()" style="padding:8px 14px;border-radius:10px;border:1.5px solid #6C5CE7;background:linear-gradient(135deg,#6C5CE7,#8B5CF6);color:#fff;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.3px;box-shadow:0 4px 12px rgba(108,92,231,.25);transition:all .2s" onmouseover="this.style.transform=\'translateY(-1px)\'" onmouseout="this.style.transform=\'\'">+ Tambah Event</button>';
+  html += '<button type="button" class="btn primary" onclick="openCoachAddEvent()">'+icon('plus',18)+'Tambah event</button>';
   html += '</div>';
 
   const passFilter = (ev) => COACH_EV_FILTER==='all' ? true : (String(ev.cat||'').toLowerCase() === COACH_EV_FILTER);
 
-  // Inline card builder with action buttons (copy, WA, edit, delete)
-  const buildCard = (ev, isShared, leftColor, cgLabel) => {
-    const cColor = ev.cat === 'Ibadah' ? 'var(--green)' : ev.cat === 'Outreach' ? 'var(--purple)' : ev.cat === 'Birthday' ? '#ec4899' : 'var(--blue)';
-    const evId = isShared ? 'shared_'+ev.id : 'cg_'+ev.id;
-    const note = ev.note || '';
-    const noteEsc = esc(note).replace(/\n/g, '<br>');
-    const img = ev.image || '';
-    // Note truncation: kalau > 220 char, tampil singkat + Lihat selengkapnya
-    const isLong = note.length > 150 || (note.match(/\n/g) || []).length > 2;
-    let h = '<div class="ev-card" style="border-left-color:'+(leftColor||cColor)+';padding:14px;margin-bottom:12px">';
-    h += '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px">';
-    const dateRange = ev.date_start && ev.date_end && ev.date_end !== ev.date_start ? esc(ev.date_start)+' → '+esc(ev.date_end) : esc(ev.date_start || ev.date_end || 'Tanpa tanggal');
-    // Countdown pakai date_start kalau ada, fallback ke date_end (supaya event tanpa date_start tetap punya countdown)
-    h += '<div style="flex:1"><div style="display:flex;align-items:center;flex-wrap:wrap"><span class="ev-date">'+dateRange+'</span>'+eventCountdownBadge(ev.date_start || ev.date_end, ev.date_end)+'</div><div class="ev-name">'+esc(ev.name||'')+'</div></div>';
-    h += '<div style="display:flex;gap:4px">';
-    h += '<button onclick="copyEventText(\''+evId+'\')" title="Copy text" class="ev-btn ev-btn-copy"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>';
-    h += '<button onclick="broadcastEvent(\''+evId+'\')" title="Broadcast WhatsApp" class="ev-btn ev-btn-wa"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413"/></svg></button>';
-    h += '<button onclick="openEditEvent(\''+evId+'\')" title="Edit" class="ev-btn ev-btn-edit"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>';
-    h += '<button onclick="deleteEventCard(\''+evId+'\')" title="Hapus" class="ev-btn ev-btn-del"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>';
-    h += '</div></div>';
-    if (img) h += '<div style="margin:8px 0"><img src="'+esc(img)+'" alt="event" style="max-width:100%;border-radius:8px;max-height:200px;object-fit:cover" onerror="this.style.display=\'none\'"></div>';
-    // Collapsible note (style WhatsApp): clamp ke 3 baris, klik tombol → expand inline
-    if (isLong) {
-      const nid = 'note_'+evId;
-      h += '<div class="ev-note" id="'+nid+'" style="white-space:pre-wrap;line-height:1.4;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">'+noteEsc+'</div>';
-      h += '<button onclick="(function(b){var n=document.getElementById(\''+nid+'\');var exp=b.dataset.exp===\'1\';if(exp){n.style.webkitLineClamp=\'3\';n.style.display=\'-webkit-box\';b.textContent=\'Baca selengkapnya\';b.dataset.exp=\'0\';}else{n.style.webkitLineClamp=\'unset\';n.style.display=\'block\';b.textContent=\'Sembunyikan\';b.dataset.exp=\'1\';}})(this)" data-exp="0" style="background:none;border:none;color:var(--purple);font-size:11px;font-weight:600;cursor:pointer;padding:4px 0 0;margin-top:2px">Baca selengkapnya</button>';
-    } else {
-      h += '<div class="ev-note" style="white-space:pre-wrap;line-height:1.4">'+noteEsc+'</div>';
-    }
-    h += '<div style="margin-top:8px"><span class="ev-cat" style="background:rgba(0,0,0,.05);color:'+cColor+'">'+esc(ev.cat||'')+'</span>';
-    // Scope label: kalau is_shared, decode dari region. Else pakai cgLabel.
-    let scopeLabel = cgLabel || 'Semua CG';
-    if (ev.is_shared || isShared) {
-      if (ev.region === 'all') scopeLabel = 'Global · Semua Jaktim';
-      else if (ev.region === 'jaktim1') scopeLabel = 'Semua CG Jaktim 1';
-      else if (ev.region === 'jaktim2') scopeLabel = 'Semua CG Jaktim 2';
-    }
-    h += '<span class="ev-cat" style="background:rgba(108,92,231,.06);color:var(--purple);margin-left:4px">'+esc(scopeLabel)+'</span>';
-    h += '</div></div>';
-    return h;
-  };
-
   // Shared events from events table (global)
-  html += '<div style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--g3);margin-bottom:10px;margin-top:4px">Event Semua CG</div>';
-  ALL_EVENTS.filter(passFilter).forEach(ev => { html += buildCard(ev, true, null, 'Semua CG'); });
-  sharedEvents.filter(passFilter).forEach(ev => { html += buildCard(ev, false, null, 'Semua CG'); });
+  html += '<h2 class="sechead">Event semua CG</h2>';
+  ALL_EVENTS.filter(passFilter).forEach(ev => { html += evCardHTML(ev, 'shared_'+ev.id, evScopeLabel(ev, 'Semua CG')); });
+  sharedEvents.filter(passFilter).forEach(ev => { html += evCardHTML(ev, 'cg_'+ev.id, evScopeLabel(ev, 'Semua CG')); });
 
   // Per-CG events
-  html += '<div style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--g3);margin:20px 0 10px">Event per CG</div>';
+  html += '<h2 class="sechead">Event per CG</h2>';
   cgs.forEach(cg => {
     const cgEvents = perCGEvents[cg] || [];
-    const color = CG_COLORS[cg] || '#7c3aed';
-    cgEvents.filter(passFilter).forEach(ev => { html += buildCard(ev, false, color, cg); });
+    const color = CG_COLORS[cg] || '#5B45E0';
+    cgEvents.filter(passFilter).forEach(ev => { html += evCardHTML(ev, 'cg_'+ev.id, cg, color); });
   });
 
   // Birthdays (read-only) \u2014 dengan countdown badge + sorted by upcoming
@@ -5138,39 +5205,21 @@ async function renderCoachEvents(forceRefetch) {
     });
     allBirthdays.sort((a,b) => a._daysLeft - b._daysLeft);
 
-    allBirthdays.forEach(m => {
-      let badgeText, badgeBg, badgeColor;
-      if (m._daysLeft === 0)      { badgeText='HARI INI! \ud83c\udf89'; badgeBg='#fce7f3'; badgeColor='#be185d'; }
-      else if (m._daysLeft === 1) { badgeText='Besok';        badgeBg='#fce7f3'; badgeColor='#be185d'; }
-      else if (m._daysLeft <= 7)  { badgeText=m._daysLeft+' hari lagi'; badgeBg='#fef3c7'; badgeColor='#92400e'; }
-      else if (m._daysLeft <= 30) { badgeText=m._daysLeft+' hari lagi'; badgeBg='#dbeafe'; badgeColor='#1e40af'; }
-      else                        { badgeText=m._daysLeft+' hari lagi'; badgeBg='#f3f4f6'; badgeColor='#6b7280'; }
-
-      html += '<div class="ev-card" style="border-left-color:#f472b6;display:flex;justify-content:space-between;align-items:center;gap:12px">';
-      html += '<div style="flex:1">';
-      html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap"><span class="ev-date" style="margin:0">'+esc(m._dateLabel)+'</span><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:'+badgeBg+';color:'+badgeColor+';white-space:nowrap">'+badgeText+'</span></div>';
-      html += '<div class="ev-name">\ud83c\udf82 '+esc(m.nama)+'</div>';
-      html += '<div class="ev-note">Ulang tahun ke-'+m._turnAge+' \u00b7 Member '+esc(m._cg)+'</div>';
-      html += '<div style="margin-top:6px"><span class="ev-cat" style="background:rgba(244,114,182,.08);color:#ec4899">Birthday</span><span class="ev-cat" style="background:rgba(0,0,0,.05);color:'+m._color+';margin-left:4px">'+esc(m._cg)+'</span></div>';
-      html += '</div>';
-      html += '<div style="text-align:center;min-width:70px;flex-shrink:0"><div style="font-family:\'Instrument Serif\',serif;font-size:32px;line-height:1;color:#ec4899">'+m._daysLeft+'</div><div style="font-size:9px;color:var(--g4);letter-spacing:.5px">HARI</div></div>';
-      html += '</div>';
-    });
+    if (allBirthdays.length) html += '<h2 class="sechead">Ulang tahun member</h2>';
+    allBirthdays.forEach(m => { html += birthdayCardHTML(m, 'Member '+m._cg, m._cg, m._color); });
   }
 
-  // Add event form
-  html += '<div style="background:linear-gradient(135deg,#faf5ff,#f5f0ff);border:2px dashed #c4b5fd;border-radius:14px;padding:16px;margin-top:16px">';
-  html += '<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--purple);margin-bottom:10px">\u2795 Tambah Event Baru</div>';
-  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">';
-  html += '<input type="text" id="coachEvName" placeholder="Nama event" style="padding:8px 10px;border:1px solid var(--g5);border-radius:8px;font-size:12px;font-family:\'Inter\',sans-serif">';
-  html += '<input type="date" id="coachEvDate" style="padding:8px 10px;border:1px solid var(--g5);border-radius:8px;font-size:12px;font-family:\'Inter\',sans-serif"></div>';
-  html += '<textarea id="coachEvNote" placeholder="Catatan event..." style="width:100%;padding:8px 10px;border:1px solid var(--g5);border-radius:8px;font-size:12px;font-family:\'Inter\',sans-serif;resize:vertical;min-height:40px;margin-bottom:8px"></textarea>';
-  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">';
-  html += '<select class="cgl-select" id="coachEvCat" style="padding:8px 28px 8px 10px;font-size:12px;border-radius:8px"><option value="Ibadah">Ibadah</option><option value="CG Event">CG Event</option><option value="Birthday">Birthday</option><option value="Outreach">Outreach</option></select>';
-  html += '<select class="cgl-select" id="coachEvTarget" style="padding:8px 28px 8px 10px;font-size:12px;border-radius:8px"><option value="all">Semua CG (shared)</option>';
-  getCGsForRegion('all').forEach(cg => { html += '<option value="'+cg+'">'+cg+'</option>'; });
-  html += '</select></div>';
-  html += '<button class="btn-purple" style="width:100%" onclick="saveCoachEvent()">\ud83d\udcbe Simpan Event</button></div>';
+  // Add event form (cepat)
+  html += '<section class="card" style="margin-top:24px"><div class="chead"><h2>Tambah event cepat</h2></div>';
+  html += '<div class="formgrid">';
+  html += '<label class="field"><span class="flabel">Nama event</span><input type="text" id="coachEvName" class="input" placeholder="Contoh: Gabungan CG"></label>';
+  html += '<label class="field"><span class="flabel">Tanggal</span><input type="date" id="coachEvDate" class="input"></label>';
+  html += '<label class="field"><span class="flabel">Kategori</span><select class="select" id="coachEvCat"><option value="Ibadah">Ibadah</option><option value="CG Event">CG Event</option><option value="Birthday">Birthday</option><option value="Outreach">Outreach</option></select></label>';
+  html += '<label class="field"><span class="flabel">Target</span><select class="select" id="coachEvTarget"><option value="all">Semua CG (shared)</option>';
+  getCGsForRegion('all').forEach(cg => { html += '<option value="'+esc(cg)+'">'+esc(cg)+'</option>'; });
+  html += '</select></label></div>';
+  html += '<label class="field" style="margin-top:12px"><span class="flabel">Catatan</span><textarea id="coachEvNote" class="textarea" placeholder="Catatan event…" style="min-height:70px"></textarea></label>';
+  html += '<div style="display:flex;justify-content:flex-end;margin-top:14px"><button type="button" class="btn primary" onclick="saveCoachEvent()">Simpan event</button></div></section>';
 
   el.innerHTML = html;
 }
