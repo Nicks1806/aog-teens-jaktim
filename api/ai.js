@@ -100,7 +100,8 @@ module.exports = async function handler(req, res) {
 
   const t0 = Date.now();
   const KEY = process.env.GEMINI_API_KEY;               // Gemini = cadangan
-  const CLAUDE_KEY = process.env.ANTHROPIC_API_KEY;     // Claude = utama (kalau diisi)
+  // Buang spasi / tanda kutip / baris baru yang ikut tersalin saat mengisi env var di Vercel
+  const CLAUDE_KEY = String(process.env.ANTHROPIC_API_KEY || '').trim().replace(/^['"]+|['"]+$/g, '').trim(); // Claude = utama (kalau diisi)
   const CLAUDE_MODEL = process.env.CLAUDE_MODEL || 'claude-sonnet-5-5';
   const PIN = process.env.AI_PIN;
   const MODEL = process.env.GEMINI_MODEL || 'gemini-3.5-flash';
@@ -115,8 +116,9 @@ module.exports = async function handler(req, res) {
   if (PIN && String(body.pin || '') !== String(PIN)) return send(res, 401, { error: 'Kode akses AI salah.' });
 
   // Diagnosa: daftar model yang tersedia untuk key ini (hanya nama model, tanpa data rahasia)
+  const claudeInfo = { aktif: !!CLAUDE_KEY, model: CLAUDE_MODEL, format: !CLAUDE_KEY ? 'kosong' : (/^sk-ant-api\d*-/.test(CLAUDE_KEY) ? 'API key (benar)' : 'BUKAN API key — awalan ' + CLAUDE_KEY.slice(0, 10) + '…'), panjang: CLAUDE_KEY.length };
   if (body.action === 'models') {
-    if (!KEY) return send(res, 200, { claude: { aktif: !!CLAUDE_KEY, model: CLAUDE_MODEL }, current: null, models: [] });
+    if (!KEY) return send(res, 200, { claude: claudeInfo, current: null, models: [] });
     try {
       const ctrl = new AbortController(); const timer = setTimeout(() => ctrl.abort(), 15000);
       const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=200', { headers: { 'x-goog-api-key': KEY }, signal: ctrl.signal });
@@ -124,7 +126,7 @@ module.exports = async function handler(req, res) {
       const data = await r.json().catch(() => ({}));
       if (!r.ok) return send(res, 502, { error: (data.error && data.error.message) || ('HTTP ' + r.status) });
       const models = (data.models || []).filter(m => (m.supportedGenerationMethods || []).includes('generateContent')).map(m => String(m.name || '').replace(/^models\//, ''));
-      return send(res, 200, { claude: { aktif: !!CLAUDE_KEY, model: CLAUDE_MODEL }, current: MODEL, models });
+      return send(res, 200, { claude: claudeInfo, current: MODEL, models });
     } catch (e) { return send(res, 502, { error: 'Gagal mengambil daftar model.' }); }
   }
 
