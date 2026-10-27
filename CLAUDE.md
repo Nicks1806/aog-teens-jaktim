@@ -1,6 +1,6 @@
 # AOG Teens Jaktim — CG Dashboard (Absensi + Management)
 
-**Current version:** v54 · **Last updated:** 27 Oktober 2026
+**Current version:** v55 · **Last updated:** 27 Oktober 2026
 
 ## Project Overview
 Single-file web app untuk tracking attendance, pelayanan, milestone, events, visi, dan distribusi wilayah CG untuk AOG Teens Jakarta Timur. Dipakai oleh ~54 member, 9 CG Leaders, 2 Coach, dan 1 Team Leader secara bersamaan saat ibadah hari Minggu.
@@ -278,8 +278,8 @@ Edit index.html locally (+ file lain kalau perlu)
 ```
 
 **Version bump pattern setiap push code:**
-1. `index.html` — cari `App version">v54` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
-2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v54'` → naikkan sama
+1. `index.html` — cari `App version">v55` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
+2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v55'` → naikkan sama
 
 ---
 
@@ -291,7 +291,7 @@ Edit index.html locally (+ file lain kalau perlu)
 - **JANGAN pakai npm/node** — pure vanilla JS
 - **JANGAN buat file README.md atau dokumentasi baru** kecuali diminta
 - `vercel.json` hanya berisi `rewrites` untuk `/coach`, `/tl`, dan `/teen-NN` — jangan tambah build setting
-- **Pengecualian single-file:** `api/ai.js` = Vercel Serverless Function (CommonJS, tanpa npm) proxy AI. **Claude utama** (`ANTHROPIC_API_KEY`, `CLAUDE_MODEL` opsional default `claude-sonnet-5-5`; Messages API via `fetch` karena proyek tanpa npm, `anthropic-version: 2026-10-21`, `output_config.effort: 'low'`, prompt caching system + data, Absen dari foto pakai `output_config.format` json_schema `ABSEN_SCHEMA`) → kalau key kosong / error / timeout 25 dtk (foto 35) / refusal → otomatis **Gemini cadangan** (respons berisi `note`). Pilihan Nick 27 Okt 2026: Claude utama + Gemini cadangan, Sonnet 5.5. Env var Gemini: `GEMINI_API_KEY`, `AI_PIN` (opsional — kosong = tanpa kode akses; Nick memilih tanpa kode, 27 Okt 2026), `GEMINI_MODEL` (opsional, default `gemini-3.5-flash`; cadangan otomatis `gemini-flash-latest` → `gemini-3.8-flash` → `gemini-flash-lite-latest` kalau sibuk/dipensiunkan/timeout 20 dtk; `gemini-2.5-flash` sudah tidak tersedia untuk user baru). Diagnosa: POST `/api/ai` `{"action":"models"}` → daftar model untuk key itu. **JANGAN** taruh API key di `index.html`/repo. System prompt ada di server (`SYSTEM_PROMPT`), rate limit 15/menit per IP
+- **Pengecualian single-file:** `api/ai.js` = Vercel Serverless Function (CommonJS, tanpa npm) proxy AI. **Claude utama** (`ANTHROPIC_API_KEY`, `CLAUDE_MODEL` opsional default `claude-sonnet-5-5`; Messages API via `fetch` karena proyek tanpa npm, `anthropic-version: 2026-10-21`, `output_config.effort: 'low'`, prompt caching system + data, Absen dari foto pakai `output_config.format` json_schema `ABSEN_SCHEMA`) → kalau key kosong / error / timeout 25 dtk (foto 35) / refusal → otomatis **Gemini cadangan** (respons berisi `note`). Pilihan Nick 27 Okt 2026: Claude utama + Gemini cadangan, Sonnet 5.5. **Sejak v55 mode Auto: Gemini untuk pertanyaan tanpa data pribadi (dicek Claude Haiku 5.5 kalau berisi angka/data, env opsional `CLAUDE_CHECK_MODEL`), Claude Sonnet untuk pertanyaan yang butuh data pribadi.** Env var Gemini: `GEMINI_API_KEY`, `AI_PIN` (opsional — kosong = tanpa kode akses; Nick memilih tanpa kode, 27 Okt 2026), `GEMINI_MODEL` (opsional, default `gemini-3.5-flash`; cadangan otomatis `gemini-flash-latest` → `gemini-3.8-flash` → `gemini-flash-lite-latest` kalau sibuk/dipensiunkan/timeout 20 dtk; `gemini-2.5-flash` sudah tidak tersedia untuk user baru). Diagnosa: POST `/api/ai` `{"action":"models"}` → daftar model untuk key itu. **JANGAN** taruh API key di `index.html`/repo. System prompt ada di server (`SYSTEM_PROMPT`), rate limit 15/menit per IP
 - Pindah tab pakai `smoothSwap()` (View Transitions + `skipTransition()` pengaman 450ms) — jangan hapus pengamannya
 - HP ≤600px: blok CSS "mode rapat" di akhir `<style>`; input Android 14px, iOS tetap 16px (anti auto-zoom)
 
@@ -394,6 +394,7 @@ Edit index.html locally (+ file lain kalau perlu)
 | v29 | **Distribusi Wilayah** — filter kecamatan + kelurahan di Coach/TL Overview |
 | v30 | Wilayah filter hardening (escape + reset state + count consistency) |
 | v31 | **27 bug fixes** — attendance stats inflate, data corruption (sekolah/kelas split), XSS (PDF export), error handling (21 Supabase ops), TEEN 25 color map, reconnect race guard, undo sync, milestone prereq, visi TOCTOU fix |
+| v55 | **AI Auto pintar-hemat** (keputusan Nick): `aiRoute()` — pertanyaan yang butuh data pribadi (`AI_PRIV_RE`: no HP/WA, alamat, wilayah, lahir/ultah/umur, sekolah/kelas, catatan…) → `provider:auto` (Claude dulu) + `private`; selain itu → `provider:gemini-first` + `check:true` tanpa data pribadi. Server: Gemini dulu (Claude cadangan); jawaban Gemini yang berisi angka/tabel/blok data dicek **Claude Haiku 5.5** (`CLAUDE_CHECK_MODEL`, `checkWithClaude`, `CHECK_RULES`) → event `checking` → `checked` (label "dicek Claude") atau `fix` (jawaban diganti, label "diperbaiki Claude"). Pilihan Claude/Gemini manual Coach/TL tetap |
 | v54 | Dashboard CGL: pilihan AI (Auto/Claude/Gemini) disembunyikan, selalu **Auto** (`aiOnCGLPage()` di `aiGetProv`); pilihan tetap untuk Coach/TL |
 | v53 | **Daftar lagu PAW** di jawaban AI: blok ```lagu {judul, lagu:[{judul, artis, tipe P/W/S}]}``` → kartu (`aiLaguHTML`) dengan tombol **Lirik** (link pencarian YouTube "judul artis lyrics") & **Spotify** (pencarian) — sengaja link pencarian, bukan URL video (tidak rusak / tidak dikarang AI); lirik tidak ditulis (hak cipta). Salin/WA ikut link lirik (`aiLaguText`) |
 | v52 | Saran pertanyaan CGL "Ide sharing & game" → "Ide game & ice breaking" (aturan Training AI: materi sharing/SM → cek CGSM di aplikasi GMS) |

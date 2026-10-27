@@ -189,7 +189,10 @@ module.exports = async function handler(req, res) {
   const hasImage = parts.length > 1;
   const wantJSON = body.json === true; // mis. Absen dari foto → jawaban JSON murni
   // Pilihan pengguna: auto = Claude lalu Gemini cadangan; claude / gemini = hanya itu
-  const prov = ['claude', 'gemini'].includes(body.provider) ? body.provider : 'auto';
+  const prov = ['claude', 'gemini', 'gemini-first'].includes(body.provider) ? body.provider : 'auto';
+  const claudeFirst = prov !== 'gemini-first';
+  const CHECK_MODEL = process.env.CLAUDE_CHECK_MODEL || 'claude-haiku-5-5'; // pengecek jawaban Gemini (murah)
+  const wantCheck = body.check === true && prov === 'gemini-first' && !!CLAUDE_KEY && !hasImage;
   const useClaude = !!CLAUDE_KEY && prov !== 'gemini';
   const useGemini = !!KEY && prov !== 'claude';
   const noAI = note => send(res, 502, Object.assign({ error: prov === 'claude' ? (CLAUDE_KEY ? 'Claude sedang tidak bisa menjawab. Coba lagi, atau pilih AI "Auto".' : 'Claude belum aktif. Pilih AI "Auto" atau "Gemini".') : (prov === 'gemini' && !KEY ? 'Gemini belum aktif. Pilih AI "Auto".' : 'AI tidak bisa dihubungi. Coba lagi sebentar lagi.') }, note ? { note } : {}));
@@ -331,8 +334,31 @@ module.exports = async function handler(req, res) {
     if (!got) return { status: 502, msg: 'AI tidak memberi jawaban (' + (finish || '-') + ')' };
     return { ok: true, finish };
   };
+  // Pengecek: Claude (Haiku) memeriksa jawaban Gemini yang berisi angka/data → 'OK' atau versi yang sudah dibetulkan
+  const CHECK_RULES = 'TUGAS KHUSUS: kamu PEMERIKSA jawaban asisten lain untuk pertanyaan di bawah. Bandingkan angka, nama, tanggal, persentase, dan fakta di JAWABAN dengan DATA & PENGETAHUAN. Kalau tidak ada kesalahan fakta (gaya bahasa boleh beda), balas tepat satu kata: OK. Kalau ada yang salah atau dikarang, tulis ULANG jawaban lengkap yang sudah benar dengan format yang sama (markdown dan blok ```chart/```absen/```ubah/```struktur/```lagu tetap dipakai persis formatnya), tanpa menyebut bahwa kamu memeriksa. Kalau penilaian butuh konteks percakapan sebelumnya yang tidak ada, balas OK.';
+  const needsCheck = t => /\d/.test(t) || /```(absen|ubah|chart|struktur)/i.test(t) || /\|[^\n]*\|/.test(t);
+  const checkWithClaude = async (answer) => {
+    const tmr = withTimer(20000, 20000);
+    try {
+      const r = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST', signal: tmr.signal, headers: CLAUDE_HEADERS,
+        body: JSON.stringify({
+          model: CHECK_MODEL, max_tokens: 8000,
+          system: [{ type: 'text', text: SYSTEM_TEXT + '\n\n' + CHECK_RULES }],
+          messages: [{ role: 'user', content: [{ type: 'text', text: 'DATA DASHBOARD TERBARU (JSON):\n' + context + '\n\nPERTANYAAN:\n' + question + '\n\nJAWABAN YANG DICEK:\n' + answer }] }],
+          output_config: { effort: 'low' }
+        })
+      });
+      const data = await r.json().catch(() => ({}));
+      if (!r.ok) { console.warn('[api/ai] cek claude gagal', r.status, data.error && data.error.message); return {}; }
+      const t = (data.content || []).filter(x => x && x.type === 'text').map(x => x.text || '').join('').trim();
+      if (/^ok[.!]?$/i.test(t)) return { ok: true, model: data.model || CHECK_MODEL };
+      if (t.length > 20 && data.stop_reason !== 'max_tokens') return { fix: t, model: data.model || CHECK_MODEL };
+      return {};
+    } catch (e) { return {}; } finally { tmr.stop(); }
+  };
   const streamAnswer = async () => {
-    let started = false, note = '';
+    let started = false, note = '', full = '';
     const emit = obj => {
       if (!started) {
         started = true;
@@ -343,37 +369,50 @@ module.exports = async function handler(req, res) {
       }
       res.write(JSON.stringify(obj) + '\n');
     };
-    const text = t => emit({ t });
-    if (useClaude) {
+    const text = t => { full += t; emit({ t }); };
+    const tryClaude = async () => {
       const c = await streamClaude(text);
-      if (c.ok) { emit({ done: true, model: c.model, finish: c.finish }); return res.end(); }
-      if (started) { emit({ error: 'Jawaban terputus — coba tanya lagi.' }); return res.end(); }
-      note = 'Claude: ' + c.err; // belum ada teks terkirim → aman pindah ke Gemini
-      console.warn('[api/ai] claude stream gagal, pakai Gemini', note);
-    }
-    if (!useGemini) return noAI(note);
-    const queue = [MODEL].concat(FALLBACK_MODELS), tried = [];
-    let lastErr = 'AI tidak bisa dihubungi.';
-    while (queue.length && Date.now() - t0 < 55000) {
-      const model = queue.shift();
-      if (!model || tried.includes(model)) continue;
-      tried.push(model);
-      let r = await streamGemini(model, true, text);
-      if (!r.ok && !started && r.status === 400 && /thinking/i.test(r.msg || '')) r = await streamGemini(model, false, text);
-      if (r.ok) { emit(Object.assign({ done: true, model, finish: r.finish }, note ? { note } : {})); return res.end(); }
-      if (started) { emit({ error: 'Jawaban terputus — coba tanya lagi.' }); return res.end(); }
-      lastErr = r.msg ? 'AI menolak permintaan: ' + String(r.msg).slice(0, 200) : (r.err === 'timeout' ? 'AI terlalu lama menjawab.' : 'Gagal menghubungi AI.');
-      const sug = r.msg && /use (?:models\/)?([a-z0-9][a-z0-9.\-]*)/i.exec(r.msg);
-      if (sug && sug[1]) queue.unshift(sug[1]);
-      const retriable = !r.msg || [404, 429, 500, 503].includes(r.status) || /high demand|overloaded|unavailable|no longer available|not found|try again/i.test(r.msg);
-      if (!retriable) break;
-    }
-    return send(res, 502, Object.assign({ error: lastErr.replace(/[.\s]*$/, '.') + ' Coba lagi sebentar lagi.', tried }, note ? { note } : {}));
+      if (c.ok) { emit(Object.assign({ done: true, model: c.model, finish: c.finish }, note ? { note } : {})); res.end(); return 'done'; }
+      if (started) { emit({ error: 'Jawaban terputus — coba tanya lagi.' }); res.end(); return 'done'; }
+      note = (note ? note + ' · ' : '') + 'Claude: ' + c.err; // belum ada teks terkirim → aman pindah
+      console.warn('[api/ai] claude stream gagal', note);
+      return 'fail';
+    };
+    const tryGemini = async () => {
+      const queue = [MODEL].concat(FALLBACK_MODELS), tried = [];
+      while (queue.length && Date.now() - t0 < 50000) {
+        const model = queue.shift();
+        if (!model || tried.includes(model)) continue;
+        tried.push(model);
+        let r = await streamGemini(model, true, text);
+        if (!r.ok && !started && r.status === 400 && /thinking/i.test(r.msg || '')) r = await streamGemini(model, false, text);
+        if (r.ok) {
+          // Jawaban berisi angka/data → dicek Claude (sisa waktu cukup)
+          if (wantCheck && needsCheck(full) && Date.now() - t0 < 38000) {
+            emit({ checking: true });
+            const chk = await checkWithClaude(full);
+            if (chk.fix) emit({ fix: chk.fix, checker: chk.model });
+            else if (chk.ok) emit({ checked: chk.model });
+          }
+          emit(Object.assign({ done: true, model, finish: r.finish }, note ? { note } : {})); res.end(); return 'done';
+        }
+        if (started) { emit({ error: 'Jawaban terputus — coba tanya lagi.' }); res.end(); return 'done'; }
+        note = (note ? note + ' · ' : '') + 'Gemini ' + model + ': ' + (r.msg || r.err || 'gagal').slice(0, 120);
+        const sug = r.msg && /use (?:models\/)?([a-z0-9][a-z0-9.\-]*)/i.exec(r.msg);
+        if (sug && sug[1]) queue.unshift(sug[1]);
+        const retriable = !r.msg || [404, 429, 500, 503].includes(r.status) || /high demand|overloaded|unavailable|no longer available|not found|try again/i.test(r.msg);
+        if (!retriable) break;
+      }
+      return 'fail';
+    };
+    const order = claudeFirst ? [useClaude && tryClaude, useGemini && tryGemini] : [useGemini && tryGemini, useClaude && tryClaude];
+    for (const step of order) { if (step && (await step()) === 'done') return; }
+    return noAI(note);
   };
   if (body.stream === true && !wantJSON) return streamAnswer();
 
   let claudeNote = '';
-  if (useClaude) {
+  if (useClaude && claudeFirst) {
     let c = await callClaude(wantJSON);
     if (!c.text && wantJSON && c.status === 400) c = await callClaude(false); // format JSON ditolak → prompt saja
     if (c.text) return send(res, 200, { text: c.text, model: c.model, finish: c.finish });
@@ -382,7 +421,7 @@ module.exports = async function handler(req, res) {
   }
   if (!useGemini) return noAI(claudeNote);
 
-  // Gemini (cadangan): model utama, lalu cadangan kalau sibuk / dipensiunkan / timeout (maks ±55 dtk total sejak request masuk)
+  // Gemini (cadangan, atau utama kalau gemini-first): model utama, lalu cadangan kalau sibuk / dipensiunkan / timeout (maks ±55 dtk total sejak request masuk)
   const queue = [MODEL].concat(FALLBACK_MODELS);
   const tried = [];
   let lastErr = 'AI tidak bisa dihubungi.', lastStatus = 502;
@@ -414,6 +453,10 @@ module.exports = async function handler(req, res) {
     if (sug && sug[1]) queue.unshift(sug[1]);
     const retriable = [404, 429, 500, 503].includes(r.status) || /high demand|overloaded|unavailable|no longer available|not found|try again/i.test(msg);
     if (!retriable) break; // mis. key salah → tidak perlu coba model lain
+  }
+  if (useClaude && !claudeFirst) { // gemini-first: Gemini gagal → Claude
+    const c = await callClaude(wantJSON);
+    if (c.text) return send(res, 200, { text: c.text, model: c.model, finish: c.finish, note: 'Gemini: ' + lastErr });
   }
   return send(res, lastStatus, Object.assign({ error: lastErr.replace(/[.\s]*$/, '.') + ' Coba lagi sebentar lagi.', tried }, claudeNote ? { note: claudeNote } : {}));
 };

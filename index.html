@@ -881,6 +881,8 @@ html.vt .tab-content.active{animation:none}
 .ai-chart{margin:10px 0 12px;background:#fafaf8;max-width:720px}
 .ai-img-btn{display:inline-flex;align-items:center;gap:5px;margin-top:8px;font:inherit;font-size:12px;color:#6C5CE7;background:#fff;border:1px solid #e4dcff;border-radius:9px;padding:4px 10px;cursor:pointer}
 .ai-img-btn:hover{border-color:#6C5CE7}
+.ai-checking{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12px;color:var(--muted)}
+.ai-checking .ai-dots{transform:scale(.7);transform-origin:left center}
 .ai-lagu{margin:10px 0 12px;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:#fafaf8;max-width:620px}
 .lg-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px dashed var(--line)}
 .lg-row:first-of-type{border-top:0}
@@ -1281,7 +1283,7 @@ html.vt .tab-content.active{animation:none}
     <button type="button" class="backcoach" id="dBackCoach" onclick="goBack()" style="display:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Kembali ke Coach</button>
     <nav class="navlist" aria-label="Tab CG"><button type="button" class="nav app-tab on" data-tab="absensi" aria-current="page" onclick="sTab('absensi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M9 15l2 2 4-4"/></svg><span>Absensi</span></button><button type="button" class="nav app-tab" data-tab="detail" onclick="sTab('detail',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c1.9.7 3.1 2.4 3.5 5.2"/></svg><span>Detail CG</span></button><button type="button" class="nav app-tab" data-tab="visi" onclick="sTab('visi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span>Visi CG</span></button><button type="button" class="nav app-tab" data-tab="pelayanan" onclick="sTab('pelayanan',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"/></svg><span>Pelayanan</span></button><button type="button" class="nav app-tab" data-tab="milestone" onclick="sTab('milestone',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4h11l-2 4 2 4H5"/></svg><span>Milestone</span></button><button type="button" class="nav app-tab" data-tab="events" onclick="sTab('events',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4z"/><path d="M14 7v10"/></svg><span>Events</span></button><button type="button" class="nav app-tab ai-nav" data-tab="ai" onclick="sTab('ai',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg><span>Tanya AI</span></button></nav>
     <div class="sidetheme"><small>The year of</small><b>Unity</b><span>&amp; Open Heavens</span></div>
-    <div class="profile"><span class="ava" id="dAva" aria-hidden="true">A</span><div style="flex:1;min-width:0"><b id="nN"></b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v54</span></span></span></div><button type="button" class="exit" onclick="goBack()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
+    <div class="profile"><span class="ava" id="dAva" aria-hidden="true">A</span><div style="flex:1;min-width:0"><b id="nN"></b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v55</span></span></span></div><button type="button" class="exit" onclick="goBack()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
   </aside>
   <div class="main">
     <header class="mtop">
@@ -1325,7 +1327,7 @@ html.vt .tab-content.active{animation:none}
     <div class="rolesw" role="group" aria-label="Peran"><button type="button" id="roleCoachBtn" class="on" aria-pressed="true" onclick="switchRole('coach')">Coach</button><button type="button" id="roleTLBtn" aria-pressed="false" onclick="switchRole('tl')">TL</button></div>
     <nav class="navlist" id="coachTabs" aria-label="Tab Coach"><button type="button" class="nav app-tab on" data-tab="c-overview" aria-current="page" onclick="sCoachTab('c-overview',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"/></svg><span>Overview</span></button><button type="button" class="nav app-tab" data-tab="c-absensi" onclick="sCoachTab('c-absensi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M9 15l2 2 4-4"/></svg><span>Absensi</span></button><button type="button" class="nav app-tab" data-tab="c-milestone" onclick="sCoachTab('c-milestone',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4h11l-2 4 2 4H5"/></svg><span>Milestone</span></button><button type="button" class="nav app-tab" data-tab="c-visi" onclick="sCoachTab('c-visi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span>Visi</span></button><button type="button" class="nav app-tab" data-tab="c-events" onclick="sCoachTab('c-events',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4z"/><path d="M14 7v10"/></svg><span>Events</span></button><button type="button" class="nav app-tab ai-nav" data-tab="c-ai" onclick="sCoachTab('c-ai',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg><span>Tanya AI</span></button></nav>
     <button type="button" class="sidetheme editable" onclick="openThemeEdit()" aria-label="Edit tema tahun ini" title="Klik untuk edit tema"><small>The year of</small><b>Unity</b><span>&amp; Open Heavens</span><i class="st-edit" aria-hidden="true">Edit</i></button>
-    <div class="profile"><span class="ava" id="cAva" aria-hidden="true">C</span><div style="flex:1;min-width:0"><b id="cWho">Coach</b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v54</span></span></span></div><button type="button" class="exit" onclick="goBackCoach()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
+    <div class="profile"><span class="ava" id="cAva" aria-hidden="true">C</span><div style="flex:1;min-width:0"><b id="cWho">Coach</b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v55</span></span></span></div><button type="button" class="exit" onclick="goBackCoach()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
   </aside>
   <div class="main">
     <header class="mtop">
@@ -5013,12 +5015,18 @@ function aiOnCGLPage() { return document.getElementById('pageD')?.style.display 
 function aiGetProv() { if (aiOnCGLPage()) return 'auto'; try { const v = localStorage.getItem(AI_PROV_KEY); return v === 'claude' || v === 'gemini' ? v : 'auto'; } catch(e) { return 'auto'; } }
 function aiSetProv(v) {
   try { localStorage.setItem(AI_PROV_KEY, v); } catch(e) {}
-  toast(v === 'gemini' ? 'AI: Gemini — data pribadi anak tidak dikirim' : v === 'claude' ? 'AI: Claude saja' : 'AI: Auto (Claude, cadangan Gemini)');
+  toast(v === 'gemini' ? 'AI: Gemini — data pribadi anak tidak dikirim' : v === 'claude' ? 'AI: Claude saja' : 'AI: Auto — Gemini (dicek Claude), data pribadi pakai Claude');
 }
 function aiProvSelectHTML() {
   const v = aiGetProv();
   return '<label class="sr" for="aiProv">Pilih AI</label><select id="aiProv" class="ai-prov" onchange="aiSetProv(this.value)" title="Pilih AI yang menjawab">' +
     [['auto', 'Auto'], ['claude', 'Claude'], ['gemini', 'Gemini']].map(o => '<option value="' + o[0] + '"' + (o[0] === v ? ' selected' : '') + '>' + o[1] + '</option>').join('') + '</select>';
+}
+// Auto: pertanyaan yang butuh data pribadi → Claude; selain itu → Gemini (+ dicek Claude kalau berisi angka/data)
+const AI_PRIV_RE = /(no\.?\s*(hp|wa|telp|tlp)|nomor|whats\s?app|\bwa\b|telp|telepon|kontak|hubungi|alamat|rumah|tinggal|domisili|kelurahan|kecamatan|wilayah|daerah|terdekat|kunjung|visit|lahir|ulang\s?tahun|ultah|umur|usia|sekolah|kelas|\bsmp\b|\bsma\b|\bsmk\b|catatan|data diri|data pribadi|detail anak|profil)/i;
+function aiNeedsPrivate(q) {
+  const lastUser = [..._AI.msgs].reverse().find(m => m.role === 'user' && m.text !== q);
+  return AI_PRIV_RE.test(q) || (/^(dia|nya|itu|yang tadi|lalu|terus|kalau)\b/i.test(q.trim()) && lastUser && AI_PRIV_RE.test(lastUser.text));
 }
 function aiModelName(m) { m = String(m || ''); return /claude/i.test(m) ? 'Claude' : /gemini/i.test(m) ? 'Gemini' : ''; }
 
@@ -6039,7 +6047,7 @@ function aiMountChat(mode) {
           (aiMicSupported() ? '<button type="button" class="ai-mic" id="aiMic" onclick="aiMic()" aria-label="Tanya pakai suara" title="Tanya pakai suara">' + icon('mic', 20) + '</button>' : '') +
           '<button type="submit" class="ai-send" id="aiSend" aria-label="Kirim pertanyaan">' + icon('right', 20) + '</button>' +
         '</form>' +
-        '<div class="ai-note">Dikirim ke AI setiap bertanya: ' + (cgl ? 'data anak-anak ' + esc(CUR_CG || '') + ' saja (nama, status, riwayat absensi, milestone, pelayanan, rencana), visi/misi & event' : 'nama, CG, status, riwayat absensi, milestone, pelayanan, rencana pengembangan, visi/misi & event terbaru') + '. Data pribadi (no HP, alamat, tanggal lahir, sekolah, catatan CGL) hanya dikirim ke Claude — tidak ke Gemini. Foto yang kamu kirim juga dibaca AI. Riwayat chat tersimpan di HP ini.</div>' +
+        '<div class="ai-note">Dikirim ke AI setiap bertanya: ' + (cgl ? 'data anak-anak ' + esc(CUR_CG || '') + ' saja (nama, status, riwayat absensi, milestone, pelayanan, rencana), visi/misi & event' : 'nama, CG, status, riwayat absensi, milestone, pelayanan, rencana pengembangan, visi/misi & event terbaru') + '. Pertanyaan biasa dijawab Gemini (yang berisi angka/data dicek Claude); data pribadi (no HP, alamat, tanggal lahir, sekolah, catatan CGL) hanya dikirim ke Claude — tidak ke Gemini. Foto yang kamu kirim juga dibaca AI. Riwayat chat tersimpan di HP ini.</div>' +
       '</div>' +
     '</section>';
   if (!_AI.msgs.length) aiLoadChat();
@@ -6071,7 +6079,7 @@ function aiRender() {
     if (m.role === 'user') return '<div class="ai-m user"><div class="ai-b">' + (m.img && /^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(m.img) ? '<img class="ai-thumb" src="' + m.img + '" alt="Foto">' : (m.foto ? '<span class="ai-foto">' + icon('image', 13) + 'foto</span>' : '')) + esc(m.text).replace(/\n/g, '<br>') + '</div></div>';
     if (m.live) return '<div class="ai-m bot live"><span class="ai-av" aria-hidden="true">' + icon('spark', 16) + '</span><div class="grow" style="min-width:0"><div class="ai-b">' + aiLiveHTML(m.text) + '</div></div></div>';
     return '<div class="ai-m bot' + (m.err ? ' err' : '') + '"><span class="ai-av" aria-hidden="true">' + icon('spark', 16) + '</span><div class="grow" style="min-width:0"><div class="ai-b">' + aiFormat(m.text) + '</div>' +
-      (m.err ? '' : '<div class="ai-acts"><button type="button" onclick="aiCopy(' + i + ')">' + icon('copy', 13) + 'Salin</button><button type="button" onclick="aiWA(' + i + ')">' + icon('wa', 13) + 'Kirim WA</button>' + (aiModelName(m.model) ? '<span class="ai-by">dijawab ' + aiModelName(m.model) + '</span>' : '') + '</div>') + '</div></div>';
+      (m.err ? '' : '<div class="ai-acts"><button type="button" onclick="aiCopy(' + i + ')">' + icon('copy', 13) + 'Salin</button><button type="button" onclick="aiWA(' + i + ')">' + icon('wa', 13) + 'Kirim WA</button>' + (aiModelName(m.model) ? '<span class="ai-by">dijawab ' + aiModelName(m.model) + (m.checked === 'ok' ? ' · dicek Claude' : m.checked === 'fixed' ? ' · diperbaiki Claude' : '') + '</span>' : '') + '</div>') + '</div></div>';
   }).join('') + (_AI.busy && !(_AI.msgs.length && _AI.msgs[_AI.msgs.length - 1].live) ? '<div class="ai-m bot"><span class="ai-av" aria-hidden="true">' + icon('spark', 16) + '</span><div class="ai-b"><span class="ai-dots" aria-label="AI sedang menjawab"><span></span><span></span><span></span></span></div></div>' : '');
   box.scrollTop = box.scrollHeight;
 }
@@ -6210,8 +6218,15 @@ function aiPaintLive(msg) {
   const b = box && box.querySelector('.ai-m.bot.live .ai-b');
   if (!b) return;
   const near = box.scrollHeight - box.scrollTop - box.clientHeight < 120;
-  b.innerHTML = aiLiveHTML(msg.text);
+  b.innerHTML = aiLiveHTML(msg.text) + (msg.checking ? '<div class="ai-checking">' + AI_DOTS + 'sedang dicek Claude…</div>' : '');
   if (near) box.scrollTop = box.scrollHeight;
+}
+// Tentukan AI per pertanyaan (pilihan Coach/TL dihormati; Auto = pintar hemat)
+function aiRoute(q, extra) {
+  const p = aiGetProv();
+  if (p === 'gemini') return { provider: 'gemini' };
+  if (p === 'claude') return { provider: 'claude', private: buildAIPrivate(extra) };
+  return aiNeedsPrivate(q) ? { provider: 'auto', private: buildAIPrivate(extra) } : { provider: 'gemini-first', check: true };
 }
 async function aiReadStream(r) {
   const msg = { role: 'model', text: '', live: true };
@@ -6230,13 +6245,16 @@ async function aiReadStream(r) {
         if (!line) continue;
         let j; try { j = JSON.parse(line); } catch(e) { continue; }
         if (typeof j.t === 'string') msg.text += j.t;
+        if (j.checking) msg.checking = true;
+        if (typeof j.fix === 'string' && j.fix.trim()) { msg.text = j.fix; msg.checked = 'fixed'; msg.checking = false; }
+        if (j.checked) { msg.checked = 'ok'; msg.checking = false; }
         if (j.done) fin = j;
         if (j.error) err = j.error;
       }
       if (!queued) { queued = true; setTimeout(() => { queued = false; aiPaintLive(msg); }, 60); } // maks ±16x/detik
     }
   } catch(e) { console.error('[aiReadStream]', e); err = err || 'Koneksi terputus — coba tanya lagi.'; }
-  delete msg.live;
+  delete msg.live; delete msg.checking;
   if (fin && fin.model) msg.model = fin.model;
   if (!fin && !err) err = 'Jawaban terputus — coba tanya lagi.';
   if (fin && fin.finish === 'MAX_TOKENS') msg.text += '\n\n*(Jawaban terpotong — ketik "lanjutkan" untuk meneruskan.)*';
@@ -6259,7 +6277,7 @@ async function aiAsk(qOverride) {
   try {
     const extra = await aiRefreshData();
     const context = buildAIContext(extra);
-    const r = await fetch('/api/ai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.assign({ pin, question: q, context, history, stream: true, notes: extra.notes || '', provider: aiGetProv() }, aiGetProv() === 'gemini' ? {} : { private: buildAIPrivate(extra) }, img ? { image: { mimeType: img.mimeType, data: img.data } } : {})) });
+    const r = await fetch('/api/ai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.assign({ pin, question: q, context, history, stream: true, notes: extra.notes || '' }, aiRoute(q, extra), img ? { image: { mimeType: img.mimeType, data: img.data } } : {})) });
     // Server mengalirkan jawaban (NDJSON) → tampil sambil diketik. Error / server lama → JSON biasa.
     const streaming = r.ok && /ndjson/i.test(r.headers.get('content-type') || '') && r.body && r.body.getReader;
     let data = {};
