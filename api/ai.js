@@ -3,7 +3,7 @@
 // Environment variables (Vercel → Settings → Environment Variables):
 //   GEMINI_API_KEY  (wajib)  — key Gemini, JANGAN ditaruh di index.html / repo
 //   AI_PIN          (opsional) — kalau diisi, Coach/TL wajib memasukkan kode akses; kosong = tanpa kode
-//   GEMINI_MODEL    (opsional, default 'gemini-flash-latest' — alias Flash terbaru)
+//   GEMINI_MODEL    (opsional, default 'gemini-3.5-flash' — paling stabil saat dicek 27 Okt 2026)
 // Kalau Google menolak model dan menyarankan model lain ("use models/xxx"), otomatis dicoba ulang sekali.
 
 const SYSTEM_PROMPT = [
@@ -22,7 +22,7 @@ const SYSTEM_PROMPT = [
 ].join('\n');
 
 // Model cadangan kalau model utama sibuk ("high demand") / dipensiunkan / timeout
-const FALLBACK_MODELS = ['gemini-3.8-flash', 'gemini-3.5-flash', 'gemini-flash-lite-latest'];
+const FALLBACK_MODELS = ['gemini-flash-latest', 'gemini-3.8-flash', 'gemini-flash-lite-latest'];
 
 // Rate limit sederhana per IP (per instance — cukup untuk mencegah pemakaian berlebihan)
 const HITS = new Map();
@@ -55,7 +55,7 @@ module.exports = async function handler(req, res) {
 
   const KEY = process.env.GEMINI_API_KEY;
   const PIN = process.env.AI_PIN;
-  const MODEL = process.env.GEMINI_MODEL || 'gemini-flash-latest';
+  const MODEL = process.env.GEMINI_MODEL || 'gemini-3.5-flash';
   if (!KEY) return send(res, 503, { error: 'AI belum aktif: GEMINI_API_KEY belum diisi di Vercel.' });
 
   const ip = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'unknown';
