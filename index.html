@@ -561,6 +561,33 @@ table.att .tlabel{font-size:12px;color:var(--muted);font-weight:600}
 .fu-names{flex:1;font-size:13px;line-height:1.6}
 .fu-sep{color:var(--muted);margin:0 6px}
 .mstable td{text-align:center}
+/* Modal & dialog */
+.mfields{display:flex;flex-direction:column;gap:14px}
+.mfields .modal-input{margin:0}
+.mrow{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.mfoot{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+.modal-box .mfoot .btn{min-width:96px}
+.ap .modal-input{margin:0}
+.dpgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;max-height:280px;overflow-y:auto;padding:2px}
+.dpopt{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--line);border-radius:14px;background:#fff;text-align:left;cursor:pointer;min-width:0}
+.dpopt:hover{border-color:#CFCAE3;background:var(--faint)}
+.dpopt.sel{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 0 3px var(--accent-soft)}
+.csresults{padding:6px}
+.csresults .ddopt{min-height:52px}
+.md-head{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+.md-head .sub{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.md-info{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.md-info div{padding:12px;background:#FAF9FC;border-radius:12px;min-width:0}
+.md-info span{display:block;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
+.md-info b{font-size:14px;font-weight:600;word-break:break-word}
+.md-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:12px}
+.md-stats div{text-align:center;padding:12px 6px;border-radius:12px;border:1px solid}
+.md-stats b{display:block;font-family:var(--display);font-size:24px;font-weight:800;line-height:1}
+.md-stats span{font-size:12px;font-weight:600}
+.md-hist{display:flex;flex-wrap:wrap;gap:6px;max-height:220px;overflow-y:auto;padding:10px;background:#FAF9FC;border-radius:12px}
+.md-hist div{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:52px}
+.md-hist small{font-size:11px;color:var(--muted)}
+@media (max-width:520px){.mrow,.md-info,.dpgrid{grid-template-columns:1fr}.md-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.modal-box{padding:22px}}
 /* Coach Visi */
 .accpills{display:flex;gap:4px;flex:none}
 .cv-body{display:flex;flex-direction:column;gap:16px}
@@ -613,99 +640,109 @@ table.att .tlabel{font-size:12px;color:var(--muted);font-weight:600}
 
 <!-- ADD MEMBER MODAL -->
 <div class="modal-overlay" id="addMemberModal">
-  <div class="modal-box">
-    <div class="modal-title">+ Tambah Member Baru</div>
-    <input class="modal-input" id="newNama" placeholder="Nama lengkap">
-    <select class="modal-input" id="newStatus">
-      <option value="Member">Member</option><option value="Sponsor">Sponsor</option><option value="Simpatisan">Simpatisan</option><option value="VIP">VIP</option><option value="CGL">CGL</option>
-    </select>
-    <input class="modal-input" id="newWa" placeholder="No. WA (08xxx)">
-    <input class="modal-input" id="newLahir" type="date" placeholder="Tanggal lahir">
-    <input class="modal-input" id="newSekolah" placeholder="Sekolah">
-    <input class="modal-input" id="newKelas" placeholder="Kelas">
-    <input class="modal-input" id="newKelurahan" placeholder="Kelurahan">
-    <input class="modal-input" id="newKecamatan" placeholder="Kecamatan">
-    <div style="display:flex;gap:8px;margin-top:10px">
-      <button class="btn-purple" style="flex:1" onclick="saveNewMember()">Simpan</button>
-      <button class="pel-add" style="flex:1;padding:10px" onclick="closeModal('addMemberModal')">Batal</button>
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="addMemberTitle">
+    <div class="modal-title" id="addMemberTitle">Tambah member</div>
+    <div class="mfields">
+      <label class="field"><span class="flabel">Nama lengkap</span><input class="modal-input" id="newNama" placeholder="Nama lengkap"></label>
+      <label class="field"><span class="flabel">Peran</span><select class="modal-input" id="newStatus">
+        <option value="Member">Member</option><option value="Sponsor">Sponsor</option><option value="Simpatisan">Simpatisan</option><option value="VIP">VIP</option><option value="CGL">CGL</option>
+      </select></label>
+      <div class="mrow">
+        <label class="field"><span class="flabel">No. WhatsApp</span><input class="modal-input" id="newWa" inputmode="tel" placeholder="08xxx"></label>
+        <label class="field"><span class="flabel">Tanggal lahir</span><input class="modal-input" id="newLahir" type="date"></label>
+      </div>
+      <div class="mrow">
+        <label class="field"><span class="flabel">Sekolah</span><input class="modal-input" id="newSekolah" placeholder="Sekolah"></label>
+        <label class="field"><span class="flabel">Kelas</span><input class="modal-input" id="newKelas" placeholder="Kelas"></label>
+      </div>
+      <div class="mrow">
+        <label class="field"><span class="flabel">Kelurahan</span><input class="modal-input" id="newKelurahan" placeholder="Kelurahan"></label>
+        <label class="field"><span class="flabel">Kecamatan</span><input class="modal-input" id="newKecamatan" placeholder="Kecamatan"></label>
+      </div>
+    </div>
+    <div class="mfoot">
+      <button type="button" class="btn" onclick="closeModal('addMemberModal')">Batal</button>
+      <button type="button" class="btn primary" onclick="saveNewMember()">Simpan</button>
     </div>
   </div>
 </div>
 
 <!-- ADD CG EVENT MODAL -->
 <div class="modal-overlay" id="addCGEventModal">
-  <div class="modal-box" style="max-width:480px">
-    <div class="modal-title">+ Tambah Event CG</div>
-    <input class="modal-input" id="evName" placeholder="Nama event">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-      <div><label style="display:block;font-size:11px;color:var(--g3);margin-bottom:4px;font-weight:600">Tanggal mulai (opsional)</label><input class="modal-input" id="evDate" type="date" style="margin:0"></div>
-      <div><label style="display:block;font-size:11px;color:var(--g3);margin-bottom:4px;font-weight:600">Tanggal selesai (opsional)</label><input class="modal-input" id="evDateEnd" type="date" style="margin:0"></div>
-    </div>
-    <select class="modal-input" id="evCat">
-      <option value="msj">📖 MSJ</option>
-      <option value="cgt">👥 CGT</option>
-      <option value="ct">🏕️ CT</option>
-      <option value="ibadah">⛪ Ibadah</option>
-      <option value="outreach">🌏 Outreach</option>
-      <option value="retreat">🏕️ Retreat</option>
-      <option value="event">📌 Event</option>
-      <option value="birthday">🎂 Ulang Tahun</option>
-      <option value="reminder">🔔 Pengingat</option>
-      <option value="other">📌 Lainnya</option>
-    </select>
-    <textarea class="modal-input" id="evNote" placeholder="Catatan / deskripsi event..." style="min-height:90px;resize:vertical"></textarea>
-
-    <!-- Target (hanya muncul di Coach/TL context) -->
-    <div id="evTargetWrap" style="display:none;margin-top:8px">
-      <label style="display:block;font-size:11px;color:var(--g3);margin-bottom:6px">🎯 Target</label>
-      <select class="modal-input" id="evTarget"><option value="all">Semua CG (shared)</option></select>
-    </div>
-
-    <!-- Image upload/URL -->
-    <div style="margin-top:8px">
-      <label style="display:block;font-size:11px;color:var(--g3);margin-bottom:6px">📷 Gambar (opsional)</label>
-      <input type="file" id="evImageFile" accept="image/*" onchange="handleEvImage(event)" style="display:none">
-      <div style="display:flex;gap:6px">
-        <button type="button" class="pel-add" style="flex:1;padding:8px;font-size:11px" onclick="document.getElementById('evImageFile').click()">📎 Pilih dari device</button>
-        <input class="modal-input" id="evImageUrl" placeholder="atau paste URL gambar..." style="flex:2;margin:0">
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="evModalTitle" style="max-width:500px">
+    <div class="modal-title" id="evModalTitle">Tambah event CG</div>
+    <div class="mfields">
+      <label class="field"><span class="flabel">Nama event</span><input class="modal-input" id="evName" placeholder="Contoh: Gabungan CG"></label>
+      <div class="mrow">
+        <label class="field"><span class="flabel">Tanggal mulai (opsional)</span><input class="modal-input" id="evDate" type="date"></label>
+        <label class="field"><span class="flabel">Tanggal selesai (opsional)</span><input class="modal-input" id="evDateEnd" type="date"></label>
       </div>
-      <div id="evImagePreview" style="margin-top:8px"></div>
-    </div>
+      <label class="field"><span class="flabel">Kategori</span><select class="modal-input" id="evCat">
+        <option value="msj">MSJ</option>
+        <option value="cgt">CGT</option>
+        <option value="ct">CT</option>
+        <option value="ibadah">Ibadah</option>
+        <option value="outreach">Outreach</option>
+        <option value="retreat">Retreat</option>
+        <option value="event">Event</option>
+        <option value="birthday">Ulang Tahun</option>
+        <option value="reminder">Pengingat</option>
+        <option value="other">Lainnya</option>
+      </select></label>
+      <label class="field"><span class="flabel">Catatan / deskripsi</span><textarea class="modal-input" id="evNote" placeholder="Lokasi, jam, info lain…" style="min-height:96px;resize:vertical"></textarea></label>
 
-    <div style="display:flex;gap:8px;margin-top:14px">
-      <button class="btn-purple" style="flex:1" onclick="saveCGEvent()">Simpan</button>
-      <button class="pel-add" style="flex:1;padding:10px" onclick="closeModal('addCGEventModal')">Batal</button>
+      <!-- Target (hanya muncul di Coach/TL context) -->
+      <label class="field" id="evTargetWrap" style="display:none"><span class="flabel">Target</span>
+        <select class="modal-input" id="evTarget"><option value="all">Semua CG (shared)</option></select>
+      </label>
+
+      <!-- Image upload/URL -->
+      <div class="field"><span class="flabel">Gambar (opsional)</span>
+        <input type="file" id="evImageFile" accept="image/*" onchange="handleEvImage(event)" style="display:none">
+        <div class="mrow" style="grid-template-columns:auto 1fr">
+          <button type="button" class="btn" onclick="document.getElementById('evImageFile').click()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/></svg>Pilih file</button>
+          <input class="modal-input" id="evImageUrl" aria-label="URL gambar" placeholder="atau tempel URL gambar…" style="margin:0">
+        </div>
+        <div id="evImagePreview"></div>
+      </div>
+    </div>
+    <div class="mfoot">
+      <button type="button" class="btn" onclick="closeModal('addCGEventModal')">Batal</button>
+      <button type="button" class="btn primary" onclick="saveCGEvent()">Simpan</button>
     </div>
   </div>
 </div>
 
 <!-- Dev Plan Modal -->
 <div class="modal-overlay" id="devPlanModal">
-  <div class="modal-box" style="max-width:480px">
-    <div class="modal-title">📈 Tambah Rencana Pengembangan</div>
-    <div style="font-size:11px;color:var(--g3);margin-bottom:10px">Pilih member yang akan dikembangkan:</div>
-    <div id="devPlanMemberGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;max-height:280px;overflow-y:auto;margin-bottom:14px;padding:4px"></div>
-    <div style="font-size:11px;color:var(--g3);margin-bottom:6px;margin-top:4px">Target:</div>
-    <select class="modal-input" id="devPlanTarget" style="margin-bottom:10px">
-      <option value="CGL">CGL</option>
-      <option value="Sponsor" selected>Sponsor</option>
-      <option value="Member">Member</option>
-    </select>
-    <div style="font-size:11px;color:var(--g3);margin-bottom:6px">Deadline (opsional):</div>
-    <input type="date" class="modal-input" id="devPlanDeadline" style="margin-bottom:12px">
-    <div style="display:flex;gap:8px;margin-top:8px">
-      <button class="btn-purple" style="flex:1" onclick="confirmDevPlan()">💾 Simpan</button>
-      <button class="pel-add" style="flex:1;padding:10px" onclick="closeModal('devPlanModal')">Batal</button>
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="devPlanTitle" style="max-width:500px">
+    <div class="modal-title" id="devPlanTitle">Tambah rencana pengembangan</div>
+    <div class="mfields">
+      <div class="field"><span class="flabel">Pilih member yang akan dikembangkan</span>
+        <div id="devPlanMemberGrid" class="dpgrid" role="listbox" aria-label="Member"></div>
+      </div>
+      <div class="mrow">
+        <label class="field"><span class="flabel">Target</span><select class="modal-input" id="devPlanTarget">
+          <option value="CGL">CGL</option>
+          <option value="Sponsor" selected>Sponsor</option>
+          <option value="Member">Member</option>
+        </select></label>
+        <label class="field"><span class="flabel">Deadline (opsional)</span><input type="date" class="modal-input" id="devPlanDeadline"></label>
+      </div>
+    </div>
+    <div class="mfoot">
+      <button type="button" class="btn" onclick="closeModal('devPlanModal')">Batal</button>
+      <button type="button" class="btn primary" onclick="confirmDevPlan()">Simpan</button>
     </div>
   </div>
 </div>
 
 <!-- Member Detail Modal (Coach search) -->
 <div class="modal-overlay" id="memberDetailModal">
-  <div class="modal-box" style="max-width:720px;max-height:90vh;overflow-y:auto">
+  <div class="modal-box" role="dialog" aria-modal="true" aria-label="Detail member" style="max-width:720px">
     <div id="memberDetailBody"></div>
-    <div style="display:flex;gap:8px;margin-top:14px">
-      <button class="pel-add" style="flex:1;padding:10px" onclick="closeModal('memberDetailModal')">Tutup</button>
+    <div class="mfoot">
+      <button type="button" class="btn" onclick="closeModal('memberDetailModal')">Tutup</button>
     </div>
   </div>
 </div>
@@ -1678,7 +1715,21 @@ function toast(msg) {
   setTimeout(() => t.classList.remove('show'), 2000);
 }
 
-function openModal(id) { document.getElementById(id).classList.add('show'); }
+function openModal(id) {
+  const m = document.getElementById(id);
+  m.classList.add('show');
+  setTimeout(() => {
+    const f = m.querySelector('input:not([type=hidden]):not([type=file]),select,textarea');
+    if (f && !m.contains(document.activeElement)) f.focus();
+  }, 40);
+}
+// Esc menutup modal yang sedang terbuka
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Escape') return;
+  if (e.target && e.target.id === '__asyncPromptInput') return; // asyncPrompt tangani Esc sendiri
+  const open = [...document.querySelectorAll('.modal-overlay.show:not(.ap)')].pop();
+  if (open) open.classList.remove('show');
+});
 function closeModal(id) { document.getElementById(id).classList.remove('show'); }
 
 // ========== LANDING ==========
@@ -2689,34 +2740,19 @@ function addDevPlanRow() {
   // Buka modal + populate grid member
   __SELECTED_DEV_MEMBER = null;
   const grid = document.getElementById('devPlanMemberGrid');
-  const roleColor = (st) => {
-    const s = (st||'member').toLowerCase();
-    if (s==='cgl'||s==='leader') return {bg:'#fff3e0', border:'#fb923c', color:'#c2410c'};
-    if (s==='sponsor') return {bg:'#e8eaf6', border:'#6366f1', color:'#3730a3'};
-    if (s==='simpatisan') return {bg:'#fce4ec', border:'#ec4899', color:'#9f1239'};
-    if (s==='vip') return {bg:'#f3e5f5', border:'#a855f7', color:'#6b21a8'};
-    return {bg:'#f4f4f5', border:'#a1a1aa', color:'#3f3f46'};
-  };
   grid.innerHTML = '';
   MEMBERS.forEach(m => {
-    const c = roleColor(m.status);
-    const card = document.createElement('div');
-    card.style.cssText = 'padding:10px 12px;border:2px solid '+c.border+'33;background:'+c.bg+';border-radius:10px;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;gap:4px';
-    card.innerHTML = '<div style="font-weight:600;font-size:12px;color:'+c.color+';line-height:1.2">'+esc(m.nama)+'</div><span style="font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:'+c.color+';align-self:flex-start;padding:2px 8px;border-radius:10px;background:#fff">'+esc(m.status||'Member')+'</span>';
-    card.onmouseover = () => { card.style.transform='translateY(-2px)'; card.style.boxShadow='0 4px 12px rgba(0,0,0,.1)'; };
-    card.onmouseout = () => { if (__SELECTED_DEV_MEMBER?.id !== m.id) { card.style.transform=''; card.style.boxShadow=''; card.style.borderColor=c.border+'33'; } };
+    const card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'dpopt';
+    card.setAttribute('role','option');
+    card.setAttribute('aria-selected','false');
+    card.innerHTML = '<span class="ava" aria-hidden="true">'+initialOf(m.nama)+'</span><span class="ddtxt"><b style="font-size:14px">'+esc(m.nama)+'</b><small>'+esc(m.status||'Member')+'</small></span>';
     card.onclick = () => {
       __SELECTED_DEV_MEMBER = m;
-      // Reset others
-      Array.from(grid.children).forEach((c2,i) => {
-        const m2 = MEMBERS[i]; const cc = roleColor(m2.status);
-        c2.style.borderColor = cc.border+'33';
-        c2.style.boxShadow = '';
-        c2.style.transform = '';
-      });
-      card.style.borderColor = c.border;
-      card.style.boxShadow = '0 4px 14px '+c.border+'55';
-      card.style.transform = 'translateY(-2px)';
+      Array.from(grid.children).forEach(c2 => { c2.classList.remove('sel'); c2.setAttribute('aria-selected','false'); });
+      card.classList.add('sel');
+      card.setAttribute('aria-selected','true');
     };
     grid.appendChild(card);
   });
@@ -3395,11 +3431,11 @@ function openEditEvent(evId) {
   document.getElementById('evNote').value = ev.note || '';
   document.getElementById('evImageUrl').value = ev.image && ev.image.startsWith('http') ? ev.image : '';
   if (ev.image) {
-    document.getElementById('evImagePreview').innerHTML = '<img src="'+esc(ev.image)+'" style="max-width:100%;max-height:140px;border-radius:8px;border:1px solid var(--g5)">';
+    document.getElementById('evImagePreview').innerHTML = '<img src="'+esc(ev.image)+'" style="max-width:100%;max-height:160px;border-radius:12px;border:1px solid var(--line);margin-top:8px">';
     if (!ev.image.startsWith('http')) window.__evImageDataUrl = ev.image;
   }
   // Update modal title and button
-  document.querySelector('#addCGEventModal .modal-title').textContent = '✏️ Edit Event';
+  document.querySelector('#addCGEventModal .modal-title').textContent = 'Edit event';
   openModal('addCGEventModal');
 }
 
@@ -3460,7 +3496,7 @@ async function saveCGEvent() {
 
   // Reset form & state
   window.__editingEventId = null;
-  document.querySelector('#addCGEventModal .modal-title').textContent = '+ Tambah Event CG';
+  document.querySelector('#addCGEventModal .modal-title').textContent = 'Tambah event CG';
   document.getElementById('evName').value = '';
   document.getElementById('evDate').value = '';
   document.getElementById('evDateEnd').value = '';
@@ -3477,7 +3513,7 @@ async function saveCGEvent() {
 // Reset edit mode when opening modal via "+ Tambah Event CG" button
 function openAddEventModal() {
   window.__editingEventId = null;
-  document.querySelector('#addCGEventModal .modal-title').textContent = '+ Tambah Event CG';
+  document.querySelector('#addCGEventModal .modal-title').textContent = 'Tambah event CG';
   document.getElementById('evName').value = '';
   document.getElementById('evDate').value = '';
   document.getElementById('evDateEnd').value = '';
@@ -3493,7 +3529,7 @@ function openAddEventModal() {
 function openCoachAddEvent() {
   window.__editingEventId = null;
   window.__coachEventCtx = true;
-  document.querySelector('#addCGEventModal .modal-title').textContent = '+ Tambah Event';
+  document.querySelector('#addCGEventModal .modal-title').textContent = 'Tambah event';
   document.getElementById('evName').value = '';
   document.getElementById('evDate').value = '';
   document.getElementById('evDateEnd').value = '';
@@ -3505,14 +3541,14 @@ function openCoachAddEvent() {
   const sel = document.getElementById('evTarget');
   let html = '';
   // Level 1: Global (semua CG di Jaktim 1 + Jaktim 2)
-  html += '<option value="all">🌐 Semua CG (Jaktim 1 + Jaktim 2)</option>';
+  html += '<option value="all">Global — semua CG (Jaktim 1 + Jaktim 2)</option>';
   // Level 2: Per region
   if (coachRole === 'tl') {
-    html += '<option value="region:jaktim1">📍 Semua CG Jaktim 1</option>';
-    html += '<option value="region:jaktim2">📍 Semua CG Jaktim 2</option>';
+    html += '<option value="region:jaktim1">Semua CG Jaktim 1</option>';
+    html += '<option value="region:jaktim2">Semua CG Jaktim 2</option>';
   } else {
     const rlbl = coachReg === 'jaktim1' ? 'Jaktim 1' : 'Jaktim 2';
-    html += '<option value="region:'+coachReg+'">📍 Semua CG '+rlbl+'</option>';
+    html += '<option value="region:'+coachReg+'">Semua CG '+rlbl+'</option>';
   }
   // Level 3: Per CG spesifik
   const cgs = coachRole === 'tl' ? getCGsForRegion('all') : getCGsForRegion(coachReg);
@@ -3531,7 +3567,7 @@ function handleEvImage(e) {
   const reader = new FileReader();
   reader.onload = function(ev) {
     window.__evImageDataUrl = ev.target.result;
-    document.getElementById('evImagePreview').innerHTML = '<img src="'+ev.target.result+'" style="max-width:100%;max-height:140px;border-radius:8px;border:1px solid var(--g5)">';
+    document.getElementById('evImagePreview').innerHTML = '<img src="'+ev.target.result+'" style="max-width:100%;max-height:160px;border-radius:12px;border:1px solid var(--line);margin-top:8px">';
     document.getElementById('evImageUrl').value = '';
   };
   reader.readAsDataURL(file);
@@ -3585,18 +3621,15 @@ function handleCoachSearch(q) {
   const matches = scope.filter(m => String(m.nama||'').toLowerCase().includes(query)).slice(0, 12);
 
   if (matches.length === 0) {
-    results.innerHTML = '<div style="padding:14px;text-align:center;font-size:11px;color:var(--g4);font-style:italic">Tidak ada member ditemukan</div>';
+    results.innerHTML = '<div class="ddempty">Tidak ada member ditemukan</div>';
   } else {
-    results.innerHTML = matches.map(m => {
-      const color = CG_COLORS[m.cg] || '#7c3aed';
-      const bg = CG_BG[m.cg] || '#faf5ff';
-      return '<div onmousedown="event.preventDefault();showMemberDetail('+m.id+')" ontouchend="event.preventDefault();showMemberDetail('+m.id+')" style="display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;border-bottom:1px solid #f5f0ff;transition:background .12s" onmouseover="this.style.background=\''+bg+'\'" onmouseout="this.style.background=\'\'">' +
-        '<div style="width:30px;height:30px;border-radius:50%;background:'+bg+';color:'+color+';display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;border:1.5px solid '+color+'55">'+esc(String(m.nama||'?').trim().slice(0,1).toUpperCase())+'</div>' +
-        '<div style="flex:1;min-width:0">' +
-          '<div style="font-weight:600;font-size:12px;color:var(--g1);line-height:1.2">'+esc(m.nama)+'</div>' +
-          '<div style="font-size:10px;color:var(--g4);margin-top:2px">'+esc(m.cg)+' · '+esc(m.status||'Member')+'</div>' +
-        '</div>' +
-      '</div>';
+    results.innerHTML = '<div class="ddhead">'+matches.length+' hasil</div>' + matches.map(m => {
+      const color = CG_COLORS[m.cg] || '#5B45E0';
+      const bg = CG_BG[m.cg] || '#EEEAFB';
+      return '<button type="button" class="ddopt" onmousedown="event.preventDefault();showMemberDetail('+m.id+')" ontouchend="event.preventDefault();showMemberDetail('+m.id+')" onclick="showMemberDetail('+m.id+')">' +
+        '<span class="ava" aria-hidden="true" style="background:'+bg+';color:'+color+'">'+initialOf(m.nama)+'</span>' +
+        '<span class="ddtxt"><b style="font-size:14px">'+esc(m.nama)+'</b><small>'+esc(m.cg)+' · '+esc(m.status||'Member')+'</small></span>' +
+      '</button>';
     }).join('');
   }
   results.style.display = 'block';
@@ -3638,58 +3671,47 @@ function showMemberDetail(memberId) {
   const msDone = msFields.filter(f => m[f[0]]).length;
 
   let html = '';
-  // Header with CG color gradient
-  html += '<div style="background:linear-gradient(135deg,'+color+','+color+'cc);margin:-20px -20px 16px;padding:20px;border-radius:14px 14px 0 0">';
-  html += '<div style="display:flex;align-items:center;gap:14px">';
-  html += '<div style="width:56px;height:56px;border-radius:14px;background:rgba(255,255,255,.25);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px;backdrop-filter:blur(4px)">'+esc(initial)+'</div>';
-  html += '<div style="flex:1"><div style="font-weight:700;font-size:18px;color:#fff;line-height:1.2">'+esc(m.nama)+'</div>';
-  html += '<div style="font-size:11px;color:rgba(255,255,255,.85);margin-top:4px">'+esc(m.cg)+' · '+esc(m.status||'Member')+' · '+(safeRegion==='jaktim1'?'Jaktim 1':'Jaktim 2')+'</div></div>';
-  html += '<div style="text-align:right"><div style="font-family:\'Instrument Serif\',serif;font-size:32px;color:#fff;line-height:1">'+pct+'%</div><div style="font-size:9px;color:rgba(255,255,255,.75);letter-spacing:.5px">KEHADIRAN</div></div>';
-  html += '</div></div>';
+  html += '<div class="md-head"><span class="cgnum" style="width:56px;height:56px;font-size:20px;border-radius:16px;background:'+bg+';color:'+color+'">'+esc(initial)+'</span>';
+  html += '<div style="flex:1;min-width:0"><h2 class="modal-title" style="margin:0">'+esc(m.nama)+'</h2><div class="sub"><span class="pill" style="background:'+bg+';color:'+color+'">'+esc(m.cg)+'</span> '+esc(m.status||'Member')+' · '+(safeRegion==='jaktim1'?'Jaktim 1':'Jaktim 2')+'</div></div>';
+  html += '<div style="text-align:right"><div class="pct" style="font-size:32px;color:'+pctColorOf(pct)+'">'+pct+'%</div><div class="sub" style="margin:0">kehadiran</div></div></div>';
 
   // Info grid
-  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;font-size:11px">';
+  html += '<div class="md-info">';
   const infoItems = [
-    ['📱', 'WA', m.wa || '-'],
-    ['🎂', 'Lahir', m.lahir || '-'],
-    ['🏫', 'Sekolah', (m.sekolah || '-') + (m.kelas ? ' · Kelas '+m.kelas : '')],
-    ['📍', 'Lokasi', (m.kelurahan || '-') + (m.kecamatan ? ', '+m.kecamatan : '')]
+    ['WhatsApp', m.wa || '-'],
+    ['Tanggal lahir', m.lahir || '-'],
+    ['Sekolah', (m.sekolah || '-') + (m.kelas ? ' · Kelas '+m.kelas : '')],
+    ['Alamat', (m.kelurahan || '-') + (m.kecamatan ? ', '+m.kecamatan : '')]
   ];
-  infoItems.forEach(([icon, label, val]) => {
-    html += '<div style="padding:10px 12px;background:var(--g6);border-radius:10px"><div style="font-size:9px;font-weight:700;letter-spacing:.5px;color:var(--g4);text-transform:uppercase;margin-bottom:3px">'+icon+' '+label+'</div><div style="color:var(--g1);font-weight:500">'+esc(val)+'</div></div>';
+  infoItems.forEach(([label, val]) => {
+    html += '<div><span>'+label+'</span><b>'+esc(val)+'</b></div>';
   });
   html += '</div>';
 
   // Attendance stats cards
-  html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px">';
-  [['Hadir',hCount,'#16a34a','#f0fdf4'],['Izin',iCount,'#2563eb','#eff6ff'],['Sakit',sCount,'#d97706','#fffbeb'],['Alpa',aCount,'#dc2626','#fef2f2']].forEach(([label,cnt,col,b])=>{
-    html += '<div style="text-align:center;padding:10px 6px;background:'+b+';border-radius:10px"><div style="font-family:\'Instrument Serif\',serif;font-size:22px;color:'+col+';line-height:1">'+cnt+'</div><div style="font-size:9px;color:var(--g3);letter-spacing:.5px;margin-top:2px">'+label+'</div></div>';
+  html += '<div class="md-stats">';
+  [['Hadir',hCount,'H'],['Izin',iCount,'I'],['Sakit',sCount,'S'],['Alpa',aCount,'A']].forEach(([label,cnt,k])=>{
+    html += '<div class="c-'+k+'"><b>'+cnt+'</b><span>'+label+'</span></div>';
   });
   html += '</div>';
 
   // Milestone checklist
-  html += '<div style="margin-bottom:14px"><div style="font-size:11px;font-weight:700;letter-spacing:.5px;color:var(--g3);text-transform:uppercase;margin-bottom:8px">Milestone <span style="font-weight:500;color:var(--g4)">('+msDone+'/8)</span></div>';
-  html += '<div style="display:flex;flex-wrap:wrap;gap:6px">';
+  html += '<div class="field" style="margin-top:16px"><span class="flabel">Milestone ('+msDone+'/8)</span><div class="ms-chips">';
   msFields.forEach(([f, l]) => {
     const done = !!m[f];
-    html += '<span style="padding:5px 12px;border-radius:12px;font-size:10.5px;font-weight:600;'+(done?'background:#dcfce7;color:#166534;border:1px solid #86efac':'background:#fef2f2;color:#991b1b;border:1px solid #fecaca')+'">'+(done?'✓ ':'✗ ')+l+'</span>';
+    html += '<span class="msc '+(done?'done':'pending')+'" style="cursor:default">'+l+(done?' ✓':'')+'</span>';
   });
   html += '</div></div>';
 
   // Attendance timeline (kompak, dates + status dots)
   if (cgDates.length > 0) {
-    html += '<div><div style="font-size:11px;font-weight:700;letter-spacing:.5px;color:var(--g3);text-transform:uppercase;margin-bottom:8px">Riwayat Kehadiran ('+totalRecorded+' tercatat)</div>';
-    html += '<div style="background:#fafafa;border-radius:10px;padding:10px;max-height:220px;overflow-y:auto">';
-    html += '<div style="display:flex;flex-wrap:wrap;gap:4px">';
+    html += '<div class="field" style="margin-top:16px"><span class="flabel">Riwayat kehadiran ('+totalRecorded+' tercatat)</span>';
+    html += '<div class="md-hist">';
     cgDates.forEach(d => {
       const st = ALL_ATTENDANCE[m.id+'_'+d.id] || null;
-      const cls = st || 'X';
-      html += '<div style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 6px;background:#fff;border:1px solid var(--g6);border-radius:8px;min-width:52px">';
-      html += '<span class="dot '+cls+'" style="width:24px;height:24px;font-size:10px">'+(st||'-')+'</span>';
-      html += '<span style="font-size:8px;color:var(--g4);letter-spacing:.3px">'+esc(String(d.label||'').slice(0,7))+'</span>';
-      html += '</div>';
+      html += '<div><span class="dot '+(st || 'X')+'" style="width:30px;height:30px;font-size:12px;border-radius:9px;cursor:default">'+(st||'-')+'</span><small>'+esc(String(d.label||'').slice(0,7))+'</small></div>';
     });
-    html += '</div></div></div>';
+    html += '</div></div>';
   }
 
   document.getElementById('memberDetailBody').innerHTML = html;
@@ -5244,13 +5266,14 @@ function jsEsc(s) { return String(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'
 function asyncPrompt(label, defaultVal) {
   return new Promise(resolve => {
     const overlay = document.createElement('div');
-    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
-    overlay.innerHTML = '<div style="background:#fff;border-radius:16px;padding:20px;width:100%;max-width:360px;box-shadow:0 20px 60px rgba(0,0,0,.2)">' +
-      '<div style="font-weight:700;font-size:14px;color:var(--g1);margin-bottom:12px">'+esc(label)+'</div>' +
-      '<input type="text" id="__asyncPromptInput" value="'+esc(defaultVal||'')+'" style="width:100%;padding:12px 14px;border:2px solid #e4dcff;border-radius:10px;font-size:13px;font-family:Inter,sans-serif;outline:none;transition:border-color .15s" onfocus="this.style.borderColor=\'#6C5CE7\'" onblur="this.style.borderColor=\'#e4dcff\'">' +
-      '<div style="display:flex;gap:8px;margin-top:14px">' +
-      '<button id="__apOk" style="flex:1;padding:10px;border:none;border-radius:10px;background:linear-gradient(135deg,#6C5CE7,#8B5CF6);color:#fff;font-weight:700;font-size:13px;cursor:pointer">OK</button>' +
-      '<button id="__apCancel" style="flex:1;padding:10px;border:1px solid var(--g5);border-radius:10px;background:#fff;color:var(--g3);font-weight:600;font-size:13px;cursor:pointer">Batal</button>' +
+    overlay.className = 'modal-overlay show ap';
+    overlay.style.zIndex = '9999';
+    overlay.innerHTML = '<div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="__apTitle" style="max-width:380px">' +
+      '<div class="modal-title" id="__apTitle" style="font-size:18px">'+esc(label)+'</div>' +
+      '<input type="text" id="__asyncPromptInput" class="modal-input" value="'+esc(defaultVal||'')+'">' +
+      '<div class="mfoot">' +
+      '<button type="button" id="__apCancel" class="btn">Batal</button>' +
+      '<button type="button" id="__apOk" class="btn primary">OK</button>' +
       '</div></div>';
     document.body.appendChild(overlay);
     const inp = document.getElementById('__asyncPromptInput');
@@ -5265,7 +5288,7 @@ function asyncPrompt(label, defaultVal) {
 
 // Shimmer skeleton loader untuk tab yang lagi loading data
 function tabSkeleton(rows = 4) {
-  let h = '<div style="padding:14px 4px">';
+  let h = '<div>';
   for (let i = 0; i < rows; i++) {
     const w1 = 55 + Math.floor(Math.random()*30);
     const w2 = 35 + Math.floor(Math.random()*40);
