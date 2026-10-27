@@ -1,6 +1,6 @@
 # AOG Teens Jaktim — CG Dashboard (Absensi + Management)
 
-**Current version:** v40 · **Last updated:** 27 Oktober 2026
+**Current version:** v41 · **Last updated:** 27 Oktober 2026
 
 ## Project Overview
 Single-file web app untuk tracking attendance, pelayanan, milestone, events, visi, dan distribusi wilayah CG untuk AOG Teens Jakarta Timur. Dipakai oleh ~54 member, 9 CG Leaders, 2 Coach, dan 1 Team Leader secara bersamaan saat ibadah hari Minggu.
@@ -278,8 +278,8 @@ Edit index.html locally (+ file lain kalau perlu)
 ```
 
 **Version bump pattern setiap push code:**
-1. `index.html` — cari `App version">v40` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
-2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v40'` → naikkan sama
+1. `index.html` — cari `App version">v41` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
+2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v41'` → naikkan sama
 
 ---
 
@@ -394,6 +394,7 @@ Edit index.html locally (+ file lain kalau perlu)
 | v29 | **Distribusi Wilayah** — filter kecamatan + kelurahan di Coach/TL Overview |
 | v30 | Wilayah filter hardening (escape + reset state + count consistency) |
 | v31 | **27 bug fixes** — attendance stats inflate, data corruption (sekolah/kelas split), XSS (PDF export), error handling (21 Supabase ops), TEEN 25 color map, reconnect race guard, undo sync, milestone prereq, visi TOCTOU fix |
+| v41 | Tanya AI: konteks berisi angka siap pakai (persen per bulan per CG & anak, 3 ibadah terakhir, terakhir hadir, bulan_ini) supaya AI tidak salah periode/hitung |
 | v40 | Tanya AI: jawaban ringkas default + petunjuk kalau terpotong (`finish: MAX_TOKENS`), formatter (nomor asli, sub-poin, garis, miring), sapaan/cakupan ikut ganti Coach↔TL & region (`aiScopeChanged`) |
 | v39 | Tanya AI lebar penuh; `api/ai.js` timeout per panggilan + model cadangan + diagnosa model |
 | v38 | **Tab Tanya AI** (Coach/TL) via Gemini: `api/ai.js` (key & kode akses di Vercel env), data terbaru dikirim tiap pertanyaan tanpa data pribadi, saran pertanyaan, salin / kirim WA, render tabel & daftar |
