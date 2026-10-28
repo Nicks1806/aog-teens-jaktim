@@ -1,6 +1,6 @@
 # AOG Teens Jaktim — CG Dashboard (Absensi + Management)
 
-**Current version:** v61 · **Last updated:** 27 Oktober 2026
+**Current version:** v62 · **Last updated:** 27 Oktober 2026
 
 ## Project Overview
 Single-file web app untuk tracking attendance, pelayanan, milestone, events, visi, dan distribusi wilayah CG untuk AOG Teens Jakarta Timur. Dipakai oleh ~54 member, 9 CG Leaders, 2 Coach, dan 1 Team Leader secara bersamaan saat ibadah hari Minggu.
@@ -278,8 +278,8 @@ Edit index.html locally (+ file lain kalau perlu)
 ```
 
 **Version bump pattern setiap push code:**
-1. `index.html` — cari `App version">v61` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
-2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v61'` → naikkan sama
+1. `index.html` — cari `App version">v62` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
+2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v62'` → naikkan sama
 
 ---
 
@@ -291,7 +291,7 @@ Edit index.html locally (+ file lain kalau perlu)
 - **JANGAN pakai npm/node** — pure vanilla JS
 - **JANGAN buat file README.md atau dokumentasi baru** kecuali diminta
 - `vercel.json` hanya berisi `rewrites` untuk `/coach`, `/tl`, dan `/teen-NN` — jangan tambah build setting
-- **Pengecualian single-file:** `api/ai.js` = Vercel Serverless Function (CommonJS, tanpa npm) proxy AI. **Claude utama** (`ANTHROPIC_API_KEY`, `CLAUDE_MODEL` opsional default `claude-sonnet-5-5`; Messages API via `fetch` karena proyek tanpa npm, `anthropic-version: 2026-10-21`, `output_config.effort: 'low'`, prompt caching system + data, Absen dari foto pakai `output_config.format` json_schema `ABSEN_SCHEMA`) → kalau key kosong / error / timeout 25 dtk (foto 35) / refusal → otomatis **Gemini cadangan** (respons berisi `note`). Pilihan Nick 27 Okt 2026: Claude utama + Gemini cadangan, Sonnet 5.5. **Sejak v55 mode Auto: Gemini untuk pertanyaan tanpa data pribadi (dicek Claude Haiku 5.5 kalau berisi angka/data, env opsional `CLAUDE_CHECK_MODEL`), Claude Sonnet untuk pertanyaan yang butuh data pribadi.** Env var Gemini: `GEMINI_API_KEY`, `AI_PIN` (opsional — kosong = tanpa kode akses; Nick memilih tanpa kode, 27 Okt 2026), `GEMINI_MODEL` (opsional, default `gemini-3.5-flash`; cadangan otomatis `gemini-flash-latest` → `gemini-3.8-flash` → `gemini-flash-lite-latest` kalau sibuk/dipensiunkan/timeout 20 dtk; `gemini-2.5-flash` sudah tidak tersedia untuk user baru). Diagnosa: POST `/api/ai` `{"action":"models"}` → daftar model untuk key itu. **JANGAN** taruh API key di `index.html`/repo. System prompt ada di server (`SYSTEM_PROMPT`), rate limit 15/menit per IP
+- **Pengecualian single-file:** `api/ai.js` = Vercel Serverless Function (CommonJS, tanpa npm) proxy AI. **Claude utama** (`ANTHROPIC_API_KEY`, `CLAUDE_MODEL` opsional default `claude-sonnet-5-5`; Messages API via `fetch` karena proyek tanpa npm, `anthropic-version: 2026-10-21`, `output_config.effort: 'low'`, prompt caching system + data, Absen dari foto pakai `output_config.format` json_schema `ABSEN_SCHEMA`) → kalau key kosong / error / timeout 25 dtk (foto 35) / refusal → otomatis **Gemini cadangan** (respons berisi `note`). Pilihan Nick 27 Okt 2026: Claude utama + Gemini cadangan, Sonnet 5.5. **Sejak v55 mode Auto: Gemini untuk pertanyaan tanpa data pribadi (dicek Claude Haiku 5.5 kalau berisi angka/data, env opsional `CLAUDE_CHECK_MODEL`), Claude Sonnet untuk pertanyaan yang butuh data pribadi.** Env var Gemini: `GEMINI_API_KEY`, `AI_PIN` (opsional — kosong = tanpa kode akses; Nick memilih tanpa kode, 27 Okt 2026), `GEMINI_MODEL` (opsional, default `gemini-3.5-flash`; cadangan otomatis `gemini-flash-latest` → `gemini-3.8-flash` → `gemini-flash-lite-latest` kalau sibuk/dipensiunkan/timeout 20 dtk; `gemini-2.5-flash` sudah tidak tersedia untuk user baru). Diagnosa: POST `/api/ai` `{"action":"models"}` → daftar model untuk key itu. **JANGAN** taruh API key di `index.html`/repo. System prompt ada di server (`SYSTEM_PROMPT`), rate limit 60/menit per IP (v62)
 - Pindah tab pakai `smoothSwap()` (View Transitions + `skipTransition()` pengaman 450ms) — jangan hapus pengamannya
 - HP ≤600px: blok CSS "mode rapat" di akhir `<style>`; input Android 14px, iOS tetap 16px (anti auto-zoom)
 
@@ -395,6 +395,7 @@ Edit index.html locally (+ file lain kalau perlu)
 | v29 | **Distribusi Wilayah** — filter kecamatan + kelurahan di Coach/TL Overview |
 | v30 | Wilayah filter hardening (escape + reset state + count consistency) |
 | v31 | **27 bug fixes** — attendance stats inflate, data corruption (sekolah/kelas split), XSS (PDF export), error handling (21 Supabase ops), TEEN 25 color map, reconnect race guard, undo sync, milestone prereq, visi TOCTOU fix |
+| v62 | Rate limit `/api/ai` 15 → **60/menit per IP** (WiFi gereja & operator seluler berbagi IP saat ibadah). **Training AI anti-timpa**: `saveAINotes` cek isi DB dulu — kalau sudah diubah Coach/TL lain sejak modal dibuka, simpan dibatalkan (teks tetap di kotak) |
 | v61 | **Fix tombol suara tidak bisa diklik**: tombol ber-id `aiMic` ada di dalam `<form>`, sehingga di handler inline `aiMic()` merujuk ke tombol itu sendiri (named form control), bukan fungsi → `onclick="window.aiMic()"`. **ATURAN: handler inline di dalam form jangan memakai nama fungsi yang sama dengan id/name elemen di form itu** (atau panggil lewat `window.`). Mikrofon: status selalu di-reset setelah error (`aiMicReset`, beberapa HP tidak memanggil onend), pengaman macet 1,5 dtk & maks 20 dtk, placeholder "Mendengarkan…", pesan error jelas (`AI_MIC_ERR`), tombol selalu tampil |
 | v60 | Label "dijawab Gemini/Claude" di bawah jawaban AI dihapus. Panel chat: tinggi dihitung ulang saat ada perubahan ukuran (ResizeObserver body/.phead/.mtop, fonts.ready, load) + cek ringan tiap 1 dtk saat tab AI terbuka (`aiFitHeight` skip kalau sudah pas); batas bawah = atas bottom nav kecuali keyboard terbuka (selisih >150px) → tidak ada celah di HP asli |
 | v59 | HP: celah di bawah panel chat AI hilang — `aiFitHeight` memakai posisi nyata bottom nav (`getBoundingClientRect().top`) sebagai batas (jarak 10px), `.content` padding-bawah 0 khusus tab AI (≤880px) |

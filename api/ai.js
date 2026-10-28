@@ -96,7 +96,7 @@ const FALLBACK_MODELS = ['gemini-flash-latest', 'gemini-3.8-flash', 'gemini-flas
 // Rate limit sederhana per IP (per instance — cukup untuk mencegah pemakaian berlebihan)
 const HITS = new Map();
 function rateLimited(ip) {
-  const now = Date.now(), win = 60 * 1000, max = 15;
+  const now = Date.now(), win = 60 * 1000, max = 60; // 60/menit per IP: WiFi gereja & operator seluler sering berbagi 1 IP
   const arr = (HITS.get(ip) || []).filter(t => now - t < win);
   arr.push(now);
   HITS.set(ip, arr);
