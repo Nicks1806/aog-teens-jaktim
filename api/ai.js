@@ -267,7 +267,7 @@ module.exports = async function handler(req, res) {
   const KEY = process.env.GEMINI_API_KEY;               // Gemini = cadangan
   // Buang spasi / tanda kutip / baris baru yang ikut tersalin saat mengisi env var di Vercel
   const CLAUDE_KEY = String(process.env.ANTHROPIC_API_KEY || '').trim().replace(/^['"]+|['"]+$/g, '').trim(); // Claude = utama (kalau diisi)
-  const CLAUDE_MODEL = process.env.CLAUDE_MODEL || 'claude-sonnet-5-5';
+  let CLAUDE_MODEL = process.env.CLAUDE_MODEL || 'claude-sonnet-5-5'; // bisa diganti Haiku lewat tab Pemakaian AI (claude_model)
   const PIN = process.env.AI_PIN;
   const MODEL = process.env.GEMINI_MODEL || 'gemini-3.5-flash';
   const GROQ_KEY = String(process.env.GROQ_API_KEY || '').trim().replace(/^['"]+|['"]+$/g, '').trim();
@@ -366,6 +366,8 @@ module.exports = async function handler(req, res) {
   // Batas pemakaian (diatur Coach Jaktim 1 di tab Pemakaian AI). 0 / kosong = tanpa batas.
   let claudeCapped = false;
   const lim = await getLimits();
+  // Model Claude utama dipilih Coach Jaktim 1 di tab Pemakaian AI: 'sonnet' (default) / 'haiku' (lebih murah)
+  if (lim && lim.claude_model === 'haiku') CLAUDE_MODEL = process.env.CLAUDE_CHECK_MODEL || 'claude-haiku-5-5';
   if (lim) {
     const today = encodeURIComponent(wibStart('day'));
     if (lim.harian > 0) { const n = await countUsage('created_at=gte.' + today); if (n !== null && n >= lim.harian) return send(res, 429, { error: 'Batas pemakaian AI hari ini (' + lim.harian + ' pertanyaan) sudah tercapai. Coba lagi besok.' }); }

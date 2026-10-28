@@ -1,6 +1,6 @@
 # AOG Teens Jaktim — CG Dashboard (Absensi + Management)
 
-**Current version:** v69 · **Last updated:** 28 Oktober 2026
+**Current version:** v70 · **Last updated:** 28 Oktober 2026
 
 ## Project Overview
 Single-file web app untuk tracking attendance, pelayanan, milestone, events, visi, dan distribusi wilayah CG untuk AOG Teens Jakarta Timur. Dipakai oleh ~54 member, 9 CG Leaders, 2 Coach, dan 1 Team Leader secara bersamaan saat ibadah hari Minggu.
@@ -279,8 +279,8 @@ Edit index.html locally (+ file lain kalau perlu)
 ```
 
 **Version bump pattern setiap push code:**
-1. `index.html` — cari `App version">v69` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
-2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v69'` → naikkan sama
+1. `index.html` — cari `App version">v70` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
+2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v70'` → naikkan sama
 
 ---
 
@@ -396,6 +396,7 @@ Edit index.html locally (+ file lain kalau perlu)
 | v29 | **Distribusi Wilayah** — filter kecamatan + kelurahan di Coach/TL Overview |
 | v30 | Wilayah filter hardening (escape + reset state + count consistency) |
 | v31 | **27 bug fixes** — attendance stats inflate, data corruption (sekolah/kelas split), XSS (PDF export), error handling (21 Supabase ops), TEEN 25 color map, reconnect race guard, undo sync, milestone prereq, visi TOCTOU fix |
+| v70 | **Pilihan model Claude** di tab Pemakaian AI (kartu "Model Claude", `saveClaudeModel` → `aiSaveSettings({claude_model:'sonnet'|'haiku'})` di JSON `__AI_LIMITS__`, simpan langsung saat diklik, tampil rata-rata biaya/pertanyaan 30 hari). Server: `CLAUDE_MODEL` = Haiku (`CLAUDE_CHECK_MODEL`) kalau `claude_model === 'haiku'` — berlaku untuk pertanyaan data pribadi, pilihan AI "Claude", dan cadangan; pengecek Gemini tetap Haiku; aktif ±30 dtk (cache `getLimits`). Default/kosong = Sonnet |
 | v69 | Aktivitas terbaru (tab Pemakaian AI) jadi **daftar per hari** (`aiActivityFeed`): avatar inisial berwarna (CGL = warna CG, TL ungu, Coach hijau), nama + peran, fitur, label AI berwarna (Groq oranye, Gemini ungu, Claude kuning) + "×N" + catatan ringan/cadangan, jam. Pertanyaan beruntun (orang & fitur sama, jeda < 10 mnt) digabung 1 baris dengan rentang jam. Kolom pertama tabel angka boleh turun baris |
 | v68 | Tab Pemakaian AI rapi: `usTable(head, rows, text)` — `text=true` (Aktivitas terbaru) semua kolom rata kiri; tabel angka: judul kolom ikut rata kanan. HP (≤600px): Aktivitas terbaru jadi kartu 2 baris (pengguna · waktu / AI · fitur). Label "Claude Haiku" (tanpa "pengecek"), catatan "(ringan)" |
 | v67 | **Pertanyaan ringan → Groq dulu** (gratis, ±0,3 dtk): `isLightQuestion` di `api/ai.js` (ide game/ice breaking, lagu PAW, cara pakai web, GMS/pemimpin, istilah; ragu = jalur data; lanjutan pendek ikut pertanyaan sebelumnya) hanya untuk rute `gemini-first` + fitur `chat` + tanpa foto. Prompt ringkas TANPA data dashboard: aturan inti + blok Training AI relevan (`lightNotes`: pengetahuan umum selalu, blok game/lagu sesuai pertanyaan) + `APP_GUIDE` kalau tanya cara pakai; maks keluar 1.800 token (muat batas gratis 8.000 token/menit). Groq membalas `PERLU_DATA` kalau ternyata butuh data → 12 huruf awal ditahan, lalu jalur biasa (Gemini → …). Groq gagal/limit → jalur biasa. Tidak dicek Haiku. Log `note: ringan`, route `… · ringan` |
