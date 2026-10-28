@@ -1,6 +1,6 @@
 # AOG Teens Jaktim — CG Dashboard (Absensi + Management)
 
-**Current version:** v59 · **Last updated:** 27 Oktober 2026
+**Current version:** v60 · **Last updated:** 27 Oktober 2026
 
 ## Project Overview
 Single-file web app untuk tracking attendance, pelayanan, milestone, events, visi, dan distribusi wilayah CG untuk AOG Teens Jakarta Timur. Dipakai oleh ~54 member, 9 CG Leaders, 2 Coach, dan 1 Team Leader secara bersamaan saat ibadah hari Minggu.
@@ -278,8 +278,8 @@ Edit index.html locally (+ file lain kalau perlu)
 ```
 
 **Version bump pattern setiap push code:**
-1. `index.html` — cari `App version">v59` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
-2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v59'` → naikkan sama
+1. `index.html` — cari `App version">v60` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
+2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v60'` → naikkan sama
 
 ---
 
@@ -394,6 +394,7 @@ Edit index.html locally (+ file lain kalau perlu)
 | v29 | **Distribusi Wilayah** — filter kecamatan + kelurahan di Coach/TL Overview |
 | v30 | Wilayah filter hardening (escape + reset state + count consistency) |
 | v31 | **27 bug fixes** — attendance stats inflate, data corruption (sekolah/kelas split), XSS (PDF export), error handling (21 Supabase ops), TEEN 25 color map, reconnect race guard, undo sync, milestone prereq, visi TOCTOU fix |
+| v60 | Label "dijawab Gemini/Claude" di bawah jawaban AI dihapus. Panel chat: tinggi dihitung ulang saat ada perubahan ukuran (ResizeObserver body/.phead/.mtop, fonts.ready, load) + cek ringan tiap 1 dtk saat tab AI terbuka (`aiFitHeight` skip kalau sudah pas); batas bawah = atas bottom nav kecuali keyboard terbuka (selisih >150px) → tidak ada celah di HP asli |
 | v59 | HP: celah di bawah panel chat AI hilang — `aiFitHeight` memakai posisi nyata bottom nav (`getBoundingClientRect().top`) sebagai batas (jarak 10px), `.content` padding-bawah 0 khusus tab AI (≤880px) |
 | v58 | HP (≤600px): chat AI tanpa avatar (jawaban selebar layar), tombol input 40px, placeholder "Tanya AI…"; header halaman tanpa breadcrumb & badge CG (sudah ada di bar atas), lonceng sejajar judul; **bottom nav lebar tombol mengikuti label** (`flex:1 1 auto` — "Pelayanan"/"Milestone" tidak menempel) |
 | v57 | Tanya AI: **panel setinggi layar** (`aiFitHeight` → CSS var `--ai-h`, hitung ulang saat resize / keyboard HP via `visualViewport` / pindah tab) → halaman tidak naik-turun, hanya isi pesan yang di-scroll (`overscroll-behavior: contain`); kolom baca terpusat maks ±860px; tombol "ke pesan terbaru" (`aiDown`/`aiToBottom`); HP: judul halaman disembunyikan di tab AI (`:has()`), header CGL disembunyikan, baris tombol chat tidak terpecah. CSS blok "Tanya AI (v57)" di akhir `<style>` utama (BUKAN di template PDF `openPrintWindow`) |
