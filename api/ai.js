@@ -150,6 +150,11 @@ async function costSince(iso) {
 const wibStart = unit => { const n = new Date(Date.now() + 7 * 3600e3); return new Date(Date.UTC(n.getUTCFullYear(), n.getUTCMonth(), unit === 'month' ? 1 : n.getUTCDate()) - 7 * 3600e3).toISOString(); };
 
 // Model cadangan kalau model utama sibuk ("high demand") / dipensiunkan / timeout
+// Model Gemini yang sedang kena limit (kuota habis / sibuk) diistirahatkan sementara → pertanyaan langsung ke Claude Haiku
+const GEM_COOL = new Map();
+const isLimitErr = (status, msg) => status === 429 || /quota|exceeded|rate.?limit|resource.?exhausted|high demand|overloaded|try again later/i.test(String(msg || ''));
+const coolGemini = (model, msg) => GEM_COOL.set(model, Date.now() + (/quota|exceeded|exhausted/i.test(String(msg || '')) ? 5 * 60e3 : 60e3));
+const geminiCooling = model => (GEM_COOL.get(model) || 0) > Date.now();
 const FALLBACK_MODELS = ['gemini-flash-latest', 'gemini-3.8-flash', 'gemini-flash-lite-latest'];
 
 // Rate limit sederhana per IP (per instance — cukup untuk mencegah pemakaian berlebihan)
@@ -281,6 +286,7 @@ module.exports = async function handler(req, res) {
   const wantCheck = body.check === true && prov === 'gemini-first' && !!CLAUDE_KEY && !hasImage;
   const useClaude = !!CLAUDE_KEY && prov !== 'gemini';
   const useGemini = !!KEY && prov !== 'claude';
+  const useHaiku = !!CLAUDE_KEY && prov !== 'claude'; // cadangan murah kalau Gemini kena limit
   const noAI = note => send(res, 502, Object.assign({ error: prov === 'claude' ? (CLAUDE_KEY ? 'Claude sedang tidak bisa menjawab. Coba lagi, atau pilih AI "Auto".' : 'Claude belum aktif. Pilih AI "Auto" atau "Gemini".') : (prov === 'gemini' && !KEY ? 'Gemini belum aktif. Pilih AI "Auto".' : 'AI tidak bisa dihubungi. Coba lagi sebentar lagi.') }, note ? { note } : {}));
 
   const geminiBody = think => JSON.stringify({
@@ -307,7 +313,7 @@ module.exports = async function handler(req, res) {
 
   // ── Claude (utama): Messages API lewat fetch (proyek tanpa npm). Gagal apa pun → lanjut ke Gemini ──
   const imgData = hasImage ? parts[1].inlineData : null;
-  const claudeBody = (useFormat, stream) => {
+  const claudeBody = (useFormat, stream, mdl) => {
     const msgs = [];
     const push = (role, blocks) => {
       const last = msgs[msgs.length - 1];
@@ -327,7 +333,7 @@ module.exports = async function handler(req, res) {
     const output_config = { effort: 'low' }; // chat & ekstraksi: low = cepat, tetap teliti
     if (useFormat) output_config.format = { type: 'json_schema', schema: ABSEN_SCHEMA };
     return JSON.stringify({
-      model: CLAUDE_MODEL,
+      model: mdl || CLAUDE_MODEL,
       max_tokens: 12000,
       stream: !!stream,
       system: [{ type: 'text', text: SYSTEM_CLAUDE, cache_control: { type: 'ephemeral' } }],
@@ -336,7 +342,7 @@ module.exports = async function handler(req, res) {
     });
   };
   const CLAUDE_HEADERS = { 'Content-Type': 'application/json', 'x-api-key': CLAUDE_KEY, 'anthropic-version': '2026-10-21' };
-  const callClaude = async (useFormat) => {
+  const callClaude = async (useFormat, mdl) => {
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), hasImage ? 35000 : 25000);
     try {
@@ -344,7 +350,7 @@ module.exports = async function handler(req, res) {
         method: 'POST',
         signal: ctrl.signal,
         headers: CLAUDE_HEADERS,
-        body: claudeBody(useFormat, false)
+        body: claudeBody(useFormat, false, mdl)
       });
       const data = await r.json().catch(() => ({}));
       lastUsage = cUsage(data.usage);
@@ -353,7 +359,7 @@ module.exports = async function handler(req, res) {
       // Baca blok berdasarkan type (blok thinking bisa ada di depan)
       const text = (data.content || []).filter(b => b && b.type === 'text').map(b => b.text || '').join('').trim();
       if (!text) return { err: 'jawaban kosong (' + (data.stop_reason || '-') + ')' };
-      return { text, model: data.model || CLAUDE_MODEL, finish: data.stop_reason === 'max_tokens' ? 'MAX_TOKENS' : 'STOP' };
+      return { text, model: data.model || mdl || CLAUDE_MODEL, finish: data.stop_reason === 'max_tokens' ? 'MAX_TOKENS' : 'STOP' };
     } catch (e) {
       return { err: e && e.name === 'AbortError' ? 'timeout' : 'gagal terhubung' };
     } finally { clearTimeout(timer); }
@@ -384,11 +390,11 @@ module.exports = async function handler(req, res) {
       }
     }
   };
-  const streamClaude = async (emit) => {
+  const streamClaude = async (emit, mdl) => {
     const tmr = withTimer(hasImage ? 35000 : 25000, 25000);
-    let model = CLAUDE_MODEL, stop = '', got = false, err = '', usage = {};
+    let model = mdl || CLAUDE_MODEL, stop = '', got = false, err = '', usage = {};
     try {
-      const r = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', signal: tmr.signal, headers: CLAUDE_HEADERS, body: claudeBody(false, true) });
+      const r = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', signal: tmr.signal, headers: CLAUDE_HEADERS, body: claudeBody(false, true, mdl) });
       if (!r.ok) { const d = await r.json().catch(() => ({})); return { err: 'HTTP ' + r.status + ' ' + String((d.error && d.error.message) || '').slice(0, 160) }; }
       await readSSE(r, ev => {
         if (ev.type === 'message_start' && ev.message && ev.message.usage) usage = cUsage(ev.message.usage);
@@ -472,11 +478,14 @@ module.exports = async function handler(req, res) {
       return 'fail';
     };
     const tryGemini = async () => {
+      // Gemini utama sedang istirahat karena limit → langsung ke Haiku tanpa mencoba Gemini lain
+      if (useHaiku && geminiCooling(MODEL)) { note = (note ? note + ' · ' : '') + 'Gemini istirahat (limit)'; return 'fail'; }
       const queue = [MODEL].concat(FALLBACK_MODELS), tried = [];
       while (queue.length && Date.now() - t0 < 50000) {
         const model = queue.shift();
         if (!model || tried.includes(model)) continue;
         tried.push(model);
+        if (geminiCooling(model)) { note = (note ? note + ' · ' : '') + 'Gemini ' + model + ': istirahat (limit)'; continue; }
         let r = await streamGemini(model, true, text);
         if (!r.ok && !started && r.status === 400 && /thinking/i.test(r.msg || '')) r = await streamGemini(model, false, text);
         USE.push({ model, kind: r.ok ? 'jawab' : 'gagal', u: lastUsage }); lastUsage = null;
@@ -493,6 +502,7 @@ module.exports = async function handler(req, res) {
         }
         if (started) { emit({ error: 'Jawaban terputus — coba tanya lagi.' }); res.end(); return 'done'; }
         note = (note ? note + ' · ' : '') + 'Gemini ' + model + ': ' + (r.msg || r.err || 'gagal').slice(0, 120);
+        if (isLimitErr(r.status, r.msg)) { coolGemini(model, r.msg); if (useHaiku) break; } // limit → langsung Haiku
         const sug = r.msg && /use (?:models\/)?([a-z0-9][a-z0-9.\-]*)/i.exec(r.msg);
         if (sug && sug[1]) queue.unshift(sug[1]);
         const retriable = !r.msg || [404, 429, 500, 503].includes(r.status) || /high demand|overloaded|unavailable|no longer available|not found|try again/i.test(r.msg);
@@ -500,7 +510,16 @@ module.exports = async function handler(req, res) {
       }
       return 'fail';
     };
-    const order = claudeFirst ? [useClaude && tryClaude, useGemini && tryGemini] : [useGemini && tryGemini, useClaude && tryClaude];
+    const tryHaiku = async () => {
+      const c = await streamClaude(text, CHECK_MODEL);
+      USE.push({ model: c.model || CHECK_MODEL, kind: c.ok ? 'jawab' : 'gagal', u: lastUsage, note: 'cadangan Gemini' }); lastUsage = null;
+      if (c.ok) { emit(Object.assign({ done: true, model: c.model || CHECK_MODEL, finish: c.finish }, note ? { note } : {})); res.end(); return 'done'; }
+      if (started) { emit({ error: 'Jawaban terputus — coba tanya lagi.' }); res.end(); return 'done'; }
+      note = (note ? note + ' · ' : '') + 'Haiku: ' + c.err;
+      return 'fail';
+    };
+    // Urutan: Auto (data pribadi) = Sonnet → Gemini → Haiku · Gemini dulu = Gemini → Haiku → Sonnet
+    const order = claudeFirst ? [useClaude && tryClaude, useGemini && tryGemini, useHaiku && tryHaiku] : [useGemini && tryGemini, useHaiku && tryHaiku, useClaude && tryClaude];
     for (const step of order) { if (step && (await step()) === 'done') return; }
     return noAI(note);
   };
@@ -521,10 +540,12 @@ module.exports = async function handler(req, res) {
   const queue = [MODEL].concat(FALLBACK_MODELS);
   const tried = [];
   let lastErr = 'AI tidak bisa dihubungi.', lastStatus = 502;
+  if (useHaiku && geminiCooling(MODEL)) { queue.length = 0; lastErr = 'Gemini istirahat (limit)'; } // langsung ke Haiku
   while (queue.length && Date.now() - t0 < 55000) {
     const model = queue.shift();
     if (!model || tried.includes(model)) continue;
     tried.push(model);
+    if (geminiCooling(model)) continue; // sedang istirahat karena limit
     let out;
     try {
       out = await callGemini(model, true); // berpikir ringkas → jauh lebih cepat
@@ -548,10 +569,17 @@ module.exports = async function handler(req, res) {
     // Google menyarankan model pengganti → coba itu dulu
     const sug = /use (?:models\/)?([a-z0-9][a-z0-9.\-]*)/i.exec(msg);
     if (sug && sug[1]) queue.unshift(sug[1]);
+    if (isLimitErr(r.status, msg)) { coolGemini(model, msg); if (useHaiku) break; } // limit → langsung Haiku
     const retriable = [404, 429, 500, 503].includes(r.status) || /high demand|overloaded|unavailable|no longer available|not found|try again/i.test(msg);
     if (!retriable) break; // mis. key salah → tidak perlu coba model lain
   }
-  if (useClaude && !claudeFirst) { // gemini-first: Gemini gagal → Claude
+  if (useHaiku) { // Gemini kena limit / gagal → Claude Haiku (murah)
+    let h = await callClaude(wantJSON, CHECK_MODEL);
+    if (!h.text && wantJSON && h.status === 400) h = await callClaude(false, CHECK_MODEL);
+    USE.push({ model: h.model || CHECK_MODEL, kind: h.text ? 'jawab' : 'gagal', u: lastUsage, note: 'cadangan Gemini' }); lastUsage = null;
+    if (h.text) return send(res, 200, { text: h.text, model: h.model || CHECK_MODEL, finish: h.finish, note: 'Gemini: ' + lastErr });
+  }
+  if (useClaude && !claudeFirst) { // gemini-first: Gemini & Haiku gagal → Claude Sonnet
     const c = await callClaude(wantJSON);
     USE.push({ model: c.model || CLAUDE_MODEL, kind: c.text ? 'jawab' : 'gagal', u: lastUsage }); lastUsage = null;
     if (c.text) return send(res, 200, { text: c.text, model: c.model, finish: c.finish, note: 'Gemini: ' + lastErr });
