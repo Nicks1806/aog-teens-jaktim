@@ -1,6 +1,6 @@
 # AOG Teens Jaktim — CG Dashboard (Absensi + Management)
 
-**Current version:** v65 · **Last updated:** 27 Oktober 2026
+**Current version:** v66 · **Last updated:** 28 Oktober 2026
 
 ## Project Overview
 Single-file web app untuk tracking attendance, pelayanan, milestone, events, visi, dan distribusi wilayah CG untuk AOG Teens Jakarta Timur. Dipakai oleh ~54 member, 9 CG Leaders, 2 Coach, dan 1 Team Leader secara bersamaan saat ibadah hari Minggu.
@@ -279,8 +279,8 @@ Edit index.html locally (+ file lain kalau perlu)
 ```
 
 **Version bump pattern setiap push code:**
-1. `index.html` — cari `App version">v65` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
-2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v65'` → naikkan sama
+1. `index.html` — cari `App version">v66` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
+2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v66'` → naikkan sama
 
 ---
 
@@ -396,6 +396,7 @@ Edit index.html locally (+ file lain kalau perlu)
 | v29 | **Distribusi Wilayah** — filter kecamatan + kelurahan di Coach/TL Overview |
 | v30 | Wilayah filter hardening (escape + reset state + count consistency) |
 | v31 | **27 bug fixes** — attendance stats inflate, data corruption (sekolah/kelas split), XSS (PDF export), error handling (21 Supabase ops), TEEN 25 color map, reconnect race guard, undo sync, milestone prereq, visi TOCTOU fix |
+| v66 | **Groq = cadangan gratis** (`GROQ_API_KEY` di Vercel, opsional `GROQ_MODEL`, `GROQ_PRICE_IN/OUT` kalau berbayar). Hanya pertanyaan umum: menerima persis yang diterima Gemini (tanpa `private`, tanpa foto). Urutan: gemini-first = Gemini → Groq → Haiku → Sonnet; Auto (data pribadi) = Sonnet → Gemini → Groq → Haiku; pilih Gemini = Gemini → Groq → Haiku; pilih Claude = Sonnet saja. Jawaban Groq berangka juga dicek Haiku. Paket gratis Groq membatasi token/menit → error 413 dibaca batasnya (`GROQ_TPM`) lalu model itu dilewati untuk data sebesar itu; 429 → istirahat sesuai "try again in" (`GROQ_COOL`); 401 → Groq dimatikan 5 mnt. Log model `groq/<model>`, biaya Rp0. Diagnosa `{"action":"models"}` menampilkan `groq` (daftar model + TPM tercatat) |
 | v65 | Tab Pemakaian AI: **siapa yang memakai** — "Sedang memakai AI" (15 menit terakhir), "Aktivitas terbaru" (30 pertanyaan: waktu, pengguna, fitur, AI; isi pertanyaan tidak disimpan), nama per peran (`aiWho`: CGL dari `cg_info.leader`, TL/Coach dari pengaturan `nama` di JSON `__AI_LIMITS__`, default Bro Justin / Nickcllauss / Maritza). Pengaturan disimpan lewat `aiSaveSettings` (baca → gabung → simpan, batas & nama tidak saling hapus). Tanpa login: yang tercatat peran/CG, bukan akun |
 | v64 | Fix: menu "Pemakaian AI" ikut tampil di TL & Coach Jaktim 2 — atribut `hidden` kalah oleh `display:flex` tombol nav → `.app-tab[hidden]{display:none !important}`. **Saat menyembunyikan elemen ber-class yang memasang `display`, cek computed style, bukan hanya atribut `hidden`** |
 | v63+ | `api/ai.js`: **Gemini kena limit → langsung Claude Haiku** (`isLimitErr`: 429 / quota / high demand). Model Gemini yang kena limit diistirahatkan per instance (`GEM_COOL`: kuota 5 mnt, sibuk 1 mnt); selama model utama istirahat, Gemini dilewati sama sekali. Urutan: gemini-first = Gemini → Haiku → Sonnet; Auto (data pribadi) = Sonnet → Gemini → Haiku; pilih Gemini = Gemini → Haiku; pilih Claude = Sonnet saja. Berlaku juga non-stream (ringkasan anak, ucapan, absen foto). Latar: key Gemini paket gratis sering "exceeded your current quota" |

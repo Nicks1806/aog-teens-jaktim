@@ -4,6 +4,8 @@
 //   GEMINI_API_KEY  (wajib)  — key Gemini, JANGAN ditaruh di index.html / repo
 //   AI_PIN          (opsional) — kalau diisi, Coach/TL wajib memasukkan kode akses; kosong = tanpa kode
 //   GEMINI_MODEL    (opsional, default 'gemini-3.5-flash' — paling stabil saat dicek 27 Okt 2026)
+//   GROQ_API_KEY    (opsional) — Groq = cadangan gratis untuk pertanyaan UMUM saja (data pribadi tidak pernah dikirim)
+//   GROQ_MODEL      (opsional) — model Groq utama; GROQ_PRICE_IN / GROQ_PRICE_OUT (USD/MTok) kalau pakai paket berbayar
 // Kalau Google menolak model dan menyarankan model lain ("use models/xxx"), otomatis dicoba ulang sekali.
 
 const SYSTEM_PROMPT = [
@@ -97,6 +99,7 @@ const SB_KEY = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6Ikp
 const KURS = Number(process.env.KURS_IDR) || 16500; // perkiraan Rp per USD
 // Harga perkiraan (USD per 1 juta token): in, out, cache read, cache write
 const PRICE = [
+  [/^groq\//i, { in: Number(process.env.GROQ_PRICE_IN) || 0, out: Number(process.env.GROQ_PRICE_OUT) || 0, cr: 0, cw: 0 }], // paket gratis = Rp0
   [/claude-opus/i, { in: 4, out: 20, cr: 0.4, cw: 5 }],
   [/claude-sonnet/i, { in: 2, out: 10, cr: 0.2, cw: 2.5 }],
   [/claude-haiku/i, { in: 0.1, out: 0.5, cr: 0.01, cw: 0.125 }],
@@ -156,6 +159,26 @@ const isLimitErr = (status, msg) => status === 429 || /quota|exceeded|rate.?limi
 const coolGemini = (model, msg) => GEM_COOL.set(model, Date.now() + (/quota|exceeded|exhausted/i.test(String(msg || '')) ? 5 * 60e3 : 60e3));
 const geminiCooling = model => (GEM_COOL.get(model) || 0) > Date.now();
 const FALLBACK_MODELS = ['gemini-flash-latest', 'gemini-3.8-flash', 'gemini-flash-lite-latest'];
+// Groq (model terbuka, API mirip OpenAI). Paket gratis membatasi token per menit (TPM) → data besar ditolak (413);
+// batas yang terbaca dari pesan error diingat per model, jadi berikutnya langsung dilewati tanpa membuang waktu.
+const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
+const GROQ_FALLBACK = ['openai/gpt-oss-120b', 'llama-3.3-70b-versatile', 'meta-llama/llama-4-scout-17b-16e-instruct'];
+const GROQ_MAX_OUT = 4096;
+const GROQ_COOL = new Map(), GROQ_TPM = new Map();
+const groqFail = (model, status, msg) => {
+  msg = String(msg || '');
+  const lim = /tokens per minute[\s\S]*?Limit:? *(\d+)/i.exec(msg);
+  if (status === 413 && lim) GROQ_TPM.set(model, +lim[1]); // terlalu besar untuk model ini → model berikutnya
+  else if (status === 401 || status === 403) GROQ_COOL.set('*', Date.now() + 5 * 60e3); // key salah / diblokir
+  else if (status === 404 || /decommission|does not exist|not found/i.test(msg)) GROQ_COOL.set(model, Date.now() + 60 * 60e3);
+  else if (status === 429 || status === 413) {
+    const m = /try again in (?:(\d+)m)?([\d.]+)?s?/i.exec(msg);
+    const ms = m ? ((+m[1] || 0) * 60 + (+m[2] || 0)) * 1000 + 1000 : 60e3;
+    GROQ_COOL.set(model, Date.now() + Math.min(Math.max(ms, 5000), 10 * 60e3));
+  }
+};
+const groqCooling = model => (GROQ_COOL.get('*') || 0) > Date.now() || (GROQ_COOL.get(model) || 0) > Date.now();
+const oUsage = u => ({ in: (u && u.prompt_tokens) || 0, out: (u && u.completion_tokens) || 0, cr: (u && u.prompt_tokens_details && u.prompt_tokens_details.cached_tokens) || 0, cw: 0 });
 
 // Rate limit sederhana per IP (per instance — cukup untuk mencegah pemakaian berlebihan)
 const HITS = new Map();
@@ -206,6 +229,8 @@ module.exports = async function handler(req, res) {
   const CLAUDE_MODEL = process.env.CLAUDE_MODEL || 'claude-sonnet-5-5';
   const PIN = process.env.AI_PIN;
   const MODEL = process.env.GEMINI_MODEL || 'gemini-3.5-flash';
+  const GROQ_KEY = String(process.env.GROQ_API_KEY || '').trim().replace(/^['"]+|['"]+$/g, '').trim();
+  const GROQ_MODELS = [...new Set([process.env.GROQ_MODEL].concat(GROQ_FALLBACK).filter(Boolean))];
   if (!KEY && !CLAUDE_KEY) return send(res, 503, { error: 'AI belum aktif: ANTHROPIC_API_KEY / GEMINI_API_KEY belum diisi di Vercel.' });
 
   const ip = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'unknown';
@@ -219,7 +244,18 @@ module.exports = async function handler(req, res) {
   // Diagnosa: daftar model yang tersedia untuk key ini (hanya nama model, tanpa data rahasia)
   const claudeInfo = { aktif: !!CLAUDE_KEY, model: CLAUDE_MODEL, format: !CLAUDE_KEY ? 'kosong' : (/^sk-ant-/.test(CLAUDE_KEY) ? 'format sk-ant (ok)' : 'bukan key Anthropic — awalan ' + CLAUDE_KEY.slice(0, 10) + '…'), panjang: CLAUDE_KEY.length };
   if (body.action === 'models') {
-    if (!KEY) return send(res, 200, { claude: claudeInfo, current: null, models: [] });
+    let groq = { aktif: !!GROQ_KEY, urutan: GROQ_MODELS };
+    if (GROQ_KEY) {
+      try {
+        const ctrl = new AbortController(); const timer = setTimeout(() => ctrl.abort(), 10000);
+        const r = await fetch('https://api.groq.com/openai/v1/models', { headers: { Authorization: 'Bearer ' + GROQ_KEY }, signal: ctrl.signal });
+        clearTimeout(timer);
+        const d = await r.json().catch(() => ({}));
+        groq = r.ok ? Object.assign(groq, { models: (d.data || []).map(m => m.id).sort() }) : Object.assign(groq, { error: (d.error && d.error.message) || ('HTTP ' + r.status) });
+      } catch (e) { groq.error = 'gagal terhubung'; }
+      groq.tpm_tercatat = Object.fromEntries(GROQ_TPM);
+    }
+    if (!KEY) return send(res, 200, { claude: claudeInfo, groq, current: null, models: [] });
     try {
       const ctrl = new AbortController(); const timer = setTimeout(() => ctrl.abort(), 15000);
       const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=200', { headers: { 'x-goog-api-key': KEY }, signal: ctrl.signal });
@@ -227,7 +263,7 @@ module.exports = async function handler(req, res) {
       const data = await r.json().catch(() => ({}));
       if (!r.ok) return send(res, 502, { error: (data.error && data.error.message) || ('HTTP ' + r.status) });
       const models = (data.models || []).filter(m => (m.supportedGenerationMethods || []).includes('generateContent')).map(m => String(m.name || '').replace(/^models\//, ''));
-      return send(res, 200, { claude: claudeInfo, current: MODEL, models });
+      return send(res, 200, { claude: claudeInfo, groq, current: MODEL, models });
     } catch (e) { return send(res, 502, { error: 'Gagal mengambil daftar model.' }); }
   }
 
@@ -287,6 +323,7 @@ module.exports = async function handler(req, res) {
   const useClaude = !!CLAUDE_KEY && prov !== 'gemini';
   const useGemini = !!KEY && prov !== 'claude';
   const useHaiku = !!CLAUDE_KEY && prov !== 'claude'; // cadangan murah kalau Gemini kena limit
+  const useGroq = !!GROQ_KEY && prov !== 'claude' && !hasImage; // cadangan gratis, tanpa data pribadi & tanpa foto
   const noAI = note => send(res, 502, Object.assign({ error: prov === 'claude' ? (CLAUDE_KEY ? 'Claude sedang tidak bisa menjawab. Coba lagi, atau pilih AI "Auto".' : 'Claude belum aktif. Pilih AI "Auto" atau "Gemini".') : (prov === 'gemini' && !KEY ? 'Gemini belum aktif. Pilih AI "Auto".' : 'AI tidak bisa dihubungi. Coba lagi sebentar lagi.') }, note ? { note } : {}));
 
   const geminiBody = think => JSON.stringify({
@@ -431,6 +468,53 @@ module.exports = async function handler(req, res) {
     if (!got) return { status: 502, msg: 'AI tidak memberi jawaban (' + (finish || '-') + ')' };
     return { ok: true, finish };
   };
+  // ── Groq: menerima persis yang diterima Gemini (SYSTEM_TEXT + DATA umum), TIDAK PERNAH data pribadi ──
+  const GROQ_HEADERS = { 'Content-Type': 'application/json', Authorization: 'Bearer ' + GROQ_KEY };
+  const groqMessages = () => {
+    const m = [{ role: 'system', content: SYSTEM_TEXT }, { role: 'user', content: 'DATA DASHBOARD TERBARU (JSON):\n' + context }, { role: 'assistant', content: 'Siap, data sudah saya baca. Silakan bertanya.' }];
+    history.forEach(h => { const t = String((h && h.text) || '').slice(0, 4000); if (t) m.push({ role: h && h.role === 'model' ? 'assistant' : 'user', content: t }); });
+    m.push({ role: 'user', content: question });
+    return m;
+  };
+  const groqEstTok = Math.ceil((SYSTEM_TEXT.length + context.length + question.length + history.reduce((a, h) => a + String((h && h.text) || '').slice(0, 4000).length, 0)) / 3.5) + GROQ_MAX_OUT;
+  const groqSkip = model => groqCooling(model) || (GROQ_TPM.has(model) && groqEstTok > GROQ_TPM.get(model));
+  const groqBody = (model, stream) => JSON.stringify(Object.assign(
+    { model, messages: groqMessages(), temperature: 0.3, max_completion_tokens: GROQ_MAX_OUT, stream: !!stream },
+    /gpt-oss/i.test(model) ? { reasoning_effort: 'low' } : {},
+    wantJSON ? { response_format: { type: 'json_object' } } : {}));
+  const streamGroq = async (model, emit) => {
+    const tmr = withTimer(20000, 20000);
+    let got = false, finish = '', err = '', usage = {};
+    try {
+      const r = await fetch(GROQ_URL, { method: 'POST', signal: tmr.signal, headers: GROQ_HEADERS, body: groqBody(model, true) });
+      if (!r.ok) { const d = await r.json().catch(() => ({})); return { status: r.status, msg: (d.error && d.error.message) || ('HTTP ' + r.status) }; }
+      await readSSE(r, ev => {
+        const u = ev.usage || (ev.x_groq && ev.x_groq.usage); if (u) usage = oUsage(u);
+        const c = ev.choices && ev.choices[0];
+        if (c && c.delta && typeof c.delta.content === 'string' && c.delta.content) { got = true; emit(c.delta.content); }
+        if (c && c.finish_reason) finish = c.finish_reason;
+        if (ev.error) err = String(ev.error.message || 'error').slice(0, 160);
+      }, tmr.kick);
+    } catch (e) { err = e && e.name === 'AbortError' ? 'timeout' : 'gagal terhubung'; }
+    finally { tmr.stop(); lastUsage = usage; }
+    if (err) return { status: 504, msg: err };
+    if (!got) return { status: 502, msg: 'jawaban kosong (' + (finish || '-') + ')' };
+    return { ok: true, finish: finish === 'length' ? 'MAX_TOKENS' : 'STOP' };
+  };
+  const callGroq = async (model) => {
+    const ctrl = new AbortController(); const timer = setTimeout(() => ctrl.abort(), 20000);
+    try {
+      const r = await fetch(GROQ_URL, { method: 'POST', signal: ctrl.signal, headers: GROQ_HEADERS, body: groqBody(model, false) });
+      const d = await r.json().catch(() => ({}));
+      lastUsage = oUsage(d.usage);
+      if (!r.ok) return { status: r.status, msg: (d.error && d.error.message) || ('HTTP ' + r.status) };
+      const c = d.choices && d.choices[0];
+      const text = String((c && c.message && c.message.content) || '').trim();
+      if (!text) return { status: 502, msg: 'jawaban kosong' };
+      return { text, finish: c.finish_reason === 'length' ? 'MAX_TOKENS' : 'STOP' };
+    } catch (e) { return { status: 504, msg: e && e.name === 'AbortError' ? 'timeout' : 'gagal terhubung' }; }
+    finally { clearTimeout(timer); }
+  };
   // Pengecek: Claude (Haiku) memeriksa jawaban Gemini yang berisi angka/data → 'OK' atau versi yang sudah dibetulkan
   const CHECK_RULES = 'TUGAS KHUSUS: kamu PEMERIKSA jawaban asisten lain untuk pertanyaan di bawah. Bandingkan angka, nama, tanggal, persentase, dan fakta di JAWABAN dengan DATA & PENGETAHUAN. Kalau tidak ada kesalahan fakta (gaya bahasa boleh beda), balas tepat satu kata: OK. Kalau ada yang salah atau dikarang, tulis ULANG jawaban lengkap yang sudah benar dengan format yang sama (markdown dan blok ```chart/```absen/```ubah/```struktur/```lagu tetap dipakai persis formatnya), tanpa menyebut bahwa kamu memeriksa. Kalau penilaian butuh konteks percakapan sebelumnya yang tidak ada, balas OK.';
   const needsCheck = t => /\d/.test(t) || /```(absen|ubah|chart|struktur)/i.test(t) || /\|[^\n]*\|/.test(t);
@@ -468,6 +552,15 @@ module.exports = async function handler(req, res) {
       res.write(JSON.stringify(obj) + '\n');
     };
     const text = t => { full += t; emit({ t }); };
+    // Jawaban Gemini/Groq berisi angka/data → dicek Claude Haiku (kalau sisa waktu cukup)
+    const checkFull = async () => {
+      if (!(wantCheck && needsCheck(full) && Date.now() - t0 < 38000)) return;
+      emit({ checking: true });
+      const chk = await checkWithClaude(full);
+      USE.push({ model: chk.model || CHECK_MODEL, kind: 'cek', u: lastUsage, note: chk.fix ? 'diperbaiki' : chk.ok ? 'benar' : 'tidak jelas' }); lastUsage = null;
+      if (chk.fix) emit({ fix: chk.fix, checker: chk.model });
+      else if (chk.ok) emit({ checked: chk.model });
+    };
     const tryClaude = async () => {
       const c = await streamClaude(text);
       USE.push({ model: c.model || CLAUDE_MODEL, kind: c.ok ? 'jawab' : 'gagal', u: lastUsage }); lastUsage = null;
@@ -479,7 +572,7 @@ module.exports = async function handler(req, res) {
     };
     const tryGemini = async () => {
       // Gemini utama sedang istirahat karena limit → langsung ke Haiku tanpa mencoba Gemini lain
-      if (useHaiku && geminiCooling(MODEL)) { note = (note ? note + ' · ' : '') + 'Gemini istirahat (limit)'; return 'fail'; }
+      if ((useHaiku || useGroq) && geminiCooling(MODEL)) { note = (note ? note + ' · ' : '') + 'Gemini istirahat (limit)'; return 'fail'; }
       const queue = [MODEL].concat(FALLBACK_MODELS), tried = [];
       while (queue.length && Date.now() - t0 < 50000) {
         const model = queue.shift();
@@ -490,23 +583,33 @@ module.exports = async function handler(req, res) {
         if (!r.ok && !started && r.status === 400 && /thinking/i.test(r.msg || '')) r = await streamGemini(model, false, text);
         USE.push({ model, kind: r.ok ? 'jawab' : 'gagal', u: lastUsage }); lastUsage = null;
         if (r.ok) {
-          // Jawaban berisi angka/data → dicek Claude (sisa waktu cukup)
-          if (wantCheck && needsCheck(full) && Date.now() - t0 < 38000) {
-            emit({ checking: true });
-            const chk = await checkWithClaude(full);
-            USE.push({ model: chk.model || CHECK_MODEL, kind: 'cek', u: lastUsage, note: chk.fix ? 'diperbaiki' : chk.ok ? 'benar' : 'tidak jelas' }); lastUsage = null;
-            if (chk.fix) emit({ fix: chk.fix, checker: chk.model });
-            else if (chk.ok) emit({ checked: chk.model });
-          }
+          await checkFull();
           emit(Object.assign({ done: true, model, finish: r.finish }, note ? { note } : {})); res.end(); return 'done';
         }
         if (started) { emit({ error: 'Jawaban terputus — coba tanya lagi.' }); res.end(); return 'done'; }
         note = (note ? note + ' · ' : '') + 'Gemini ' + model + ': ' + (r.msg || r.err || 'gagal').slice(0, 120);
-        if (isLimitErr(r.status, r.msg)) { coolGemini(model, r.msg); if (useHaiku) break; } // limit → langsung Haiku
+        if (isLimitErr(r.status, r.msg)) { coolGemini(model, r.msg); if (useHaiku || useGroq) break; } // limit → langsung Groq / Haiku
         const sug = r.msg && /use (?:models\/)?([a-z0-9][a-z0-9.\-]*)/i.exec(r.msg);
         if (sug && sug[1]) queue.unshift(sug[1]);
         const retriable = !r.msg || [404, 429, 500, 503].includes(r.status) || /high demand|overloaded|unavailable|no longer available|not found|try again/i.test(r.msg);
         if (!retriable) break;
+      }
+      return 'fail';
+    };
+    const tryGroq = async () => {
+      for (const model of GROQ_MODELS) {
+        if (Date.now() - t0 > 45000) break;
+        if (groqSkip(model)) continue; // sedang istirahat / data terlalu besar untuk batas model ini
+        const r = await streamGroq(model, text);
+        USE.push({ model: 'groq/' + model, kind: r.ok ? 'jawab' : 'gagal', u: lastUsage, note: 'cadangan Gemini' }); lastUsage = null;
+        if (r.ok) {
+          await checkFull();
+          emit(Object.assign({ done: true, model: 'groq/' + model, finish: r.finish }, note ? { note } : {})); res.end(); return 'done';
+        }
+        if (started) { emit({ error: 'Jawaban terputus — coba tanya lagi.' }); res.end(); return 'done'; }
+        note = (note ? note + ' · ' : '') + 'Groq ' + model + ': ' + String(r.msg || 'gagal').slice(0, 120);
+        groqFail(model, r.status, r.msg);
+        if (r.status === 401 || r.status === 403) break;
       }
       return 'fail';
     };
@@ -518,8 +621,8 @@ module.exports = async function handler(req, res) {
       note = (note ? note + ' · ' : '') + 'Haiku: ' + c.err;
       return 'fail';
     };
-    // Urutan: Auto (data pribadi) = Sonnet → Gemini → Haiku · Gemini dulu = Gemini → Haiku → Sonnet
-    const order = claudeFirst ? [useClaude && tryClaude, useGemini && tryGemini, useHaiku && tryHaiku] : [useGemini && tryGemini, useHaiku && tryHaiku, useClaude && tryClaude];
+    // Urutan: Auto (data pribadi) = Sonnet → Gemini → Groq → Haiku · Gemini dulu = Gemini → Groq → Haiku → Sonnet
+    const order = claudeFirst ? [useClaude && tryClaude, useGemini && tryGemini, useGroq && tryGroq, useHaiku && tryHaiku] : [useGemini && tryGemini, useGroq && tryGroq, useHaiku && tryHaiku, useClaude && tryClaude];
     for (const step of order) { if (step && (await step()) === 'done') return; }
     return noAI(note);
   };
@@ -534,13 +637,13 @@ module.exports = async function handler(req, res) {
     claudeNote = 'Claude: ' + String(c.err || '');
     console.warn('[api/ai] claude gagal, pakai Gemini', claudeNote);
   }
-  if (!useGemini) return noAI(claudeNote);
+  if (!useGemini && !useGroq && !useHaiku) return noAI(claudeNote);
 
   // Gemini (cadangan, atau utama kalau gemini-first): model utama, lalu cadangan kalau sibuk / dipensiunkan / timeout (maks ±55 dtk total sejak request masuk)
-  const queue = [MODEL].concat(FALLBACK_MODELS);
+  const queue = useGemini ? [MODEL].concat(FALLBACK_MODELS) : [];
   const tried = [];
   let lastErr = 'AI tidak bisa dihubungi.', lastStatus = 502;
-  if (useHaiku && geminiCooling(MODEL)) { queue.length = 0; lastErr = 'Gemini istirahat (limit)'; } // langsung ke Haiku
+  if ((useHaiku || useGroq) && geminiCooling(MODEL)) { queue.length = 0; lastErr = 'Gemini istirahat (limit)'; } // langsung ke Groq / Haiku
   while (queue.length && Date.now() - t0 < 55000) {
     const model = queue.shift();
     if (!model || tried.includes(model)) continue;
@@ -569,11 +672,23 @@ module.exports = async function handler(req, res) {
     // Google menyarankan model pengganti → coba itu dulu
     const sug = /use (?:models\/)?([a-z0-9][a-z0-9.\-]*)/i.exec(msg);
     if (sug && sug[1]) queue.unshift(sug[1]);
-    if (isLimitErr(r.status, msg)) { coolGemini(model, msg); if (useHaiku) break; } // limit → langsung Haiku
+    if (isLimitErr(r.status, msg)) { coolGemini(model, msg); if (useHaiku || useGroq) break; } // limit → langsung Groq / Haiku
     const retriable = [404, 429, 500, 503].includes(r.status) || /high demand|overloaded|unavailable|no longer available|not found|try again/i.test(msg);
     if (!retriable) break; // mis. key salah → tidak perlu coba model lain
   }
-  if (useHaiku) { // Gemini kena limit / gagal → Claude Haiku (murah)
+  if (useGroq) { // Gemini kena limit / gagal → Groq (gratis, tanpa data pribadi)
+    for (const model of GROQ_MODELS) {
+      if (Date.now() - t0 > 45000) break;
+      if (groqSkip(model)) continue;
+      const q = await callGroq(model);
+      USE.push({ model: 'groq/' + model, kind: q.text ? 'jawab' : 'gagal', u: lastUsage, note: 'cadangan Gemini' }); lastUsage = null;
+      if (q.text) return send(res, 200, { text: q.text, model: 'groq/' + model, finish: q.finish, note: 'Gemini: ' + lastErr });
+      lastErr += ' · Groq ' + model + ': ' + String(q.msg || '').slice(0, 120);
+      groqFail(model, q.status, q.msg);
+      if (q.status === 401 || q.status === 403) break;
+    }
+  }
+  if (useHaiku) { // Gemini & Groq gagal → Claude Haiku (murah)
     let h = await callClaude(wantJSON, CHECK_MODEL);
     if (!h.text && wantJSON && h.status === 400) h = await callClaude(false, CHECK_MODEL);
     USE.push({ model: h.model || CHECK_MODEL, kind: h.text ? 'jawab' : 'gagal', u: lastUsage, note: 'cadangan Gemini' }); lastUsage = null;
