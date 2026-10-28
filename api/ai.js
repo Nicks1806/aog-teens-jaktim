@@ -81,6 +81,46 @@ const APP_GUIDE = [
   '- Versi: tulisan vXX di pojok; kalau muncul "Versi baru tersedia · Muat ulang", ketuk untuk memperbarui. Perubahan data muncul langsung di HP lain (indikator Live/Offline, tombol Refresh). Data juga tersalin otomatis ke Google Sheets tiap 1 menit (satu arah, dari web ke Sheets).'
 ].join('\n');
 
+// ── Pertanyaan RINGAN = tidak butuh data anak/absensi (ide game, lagu PAW, cara pakai web, GMS/pemimpin, istilah) ──
+// Dijawab Groq dulu dengan prompt ringkas (tanpa DATA dashboard) supaya muat di batas gratis Groq (8.000 token/menit).
+// Ragu → dianggap butuh data (jalur biasa). Groq juga diminta membalas PERLU_DATA kalau ternyata butuh data.
+const LIGHT_TOPIC_RE = /\b(game|games|permainan|main(an)?|ice ?break(er|ing)?|icebreak\w*|seru|lagu|paw|praise|worship|pujian|penyembahan|playlist|gms|gembala|pastor|pdt|gereja|aog|msj|cgt|baptis|sharing|cgsm|istilah|kkr|stb|servolution|lcom|ayat|renungan|tema)\b|apa itu|artinya|maksudnya/i;
+const LIGHT_GUIDE_RE = /\b(cara|caranya|langkah|tutorial|menu|tombol|fitur|aplikasi|web|dashboard|install|notifikasi|export)\b/i;
+const DATA_RE = /\b(absen\w*|hadir|kehadiran|alpa|izin|sakit|persen\w*|rekap|statistik|anak|anak2|member|anggota|teen ?\d+|siapa|berapa|bulan ini|minggu ini|minggu lalu|kemarin|tren|grafik|chart|follow.?up|perhatian|data|ultah|ulang tahun|lahir|petugas|jadwal|milestone|lulus|belum|nama|catat|ubah|ganti|simpan|banding\w*|struktur|bagan|cg (saya|ku|kita|ini)|cg-?ku)\b|%/i;
+const DATA_STRICT_RE = /\b(teen ?\d+|siapa|berapa|persen\w*|rekap|statistik|tren|grafik|bulan ini|minggu ini|minggu lalu)\b|%/i;
+function isLightQuestion(q, history) {
+  q = String(q || '');
+  if (!q.trim()) return false;
+  if (LIGHT_GUIDE_RE.test(q) && /\b(cara|caranya|gimana|bagaimana|langkah|tutorial|di ?mana)\b/i.test(q) && !DATA_STRICT_RE.test(q)) return true; // "cara isi absensi gimana?"
+  // "siapa gembala lokal kita?" — pertanyaan pemimpin (bukan anak/CG tertentu)
+  if (/\b(gembala|pastor|pdt|pemimpin|team leader|tl|coach)\b/i.test(q) && !/\b(anak|member|anggota|teen ?\d+|absen\w*|hadir|cgl|cg)\b/i.test(q)) return true;
+  if (LIGHT_TOPIC_RE.test(q) && !DATA_RE.test(q)) return true;
+  // Pertanyaan lanjutan pendek ("yang lain dong") setelah pertanyaan ringan
+  const prev = (history || []).filter(h => h && h.role !== 'model').slice(-1)[0];
+  return q.length <= 60 && !DATA_RE.test(q) && !!prev && isLightQuestion(String(prev.text || ''), []);
+}
+// Ambil bagian Training AI yang relevan (blok dipisah baris kosong). Pengetahuan umum (GMS, pemimpin, aturan) selalu ikut.
+const GAME_BLOCK_RE = /\b(game|games|ice ?breaker|permainan)\b/i;
+const LAGU_BLOCK_RE = /\b(lagu|paw|praise|worship)\b| — [PWS]\??( |\||$)/i;
+function lightNotes(notes, q, budget) {
+  const blocks = String(notes || '').split(/\n\s*\n/).map(b => b.trim()).filter(Boolean);
+  const isGame = b => GAME_BLOCK_RE.test(b.split('\n')[0]) || /^- .+ — \d+(-\d+)? mnt/m.test(b) && GAME_BLOCK_RE.test(b);
+  const isLagu = b => LAGU_BLOCK_RE.test(b.split('\n')[0]) || (b.match(/ — [PWS]\??/g) || []).length >= 2;
+  const kind = blocks.map(b => isLagu(b) ? 'lagu' : isGame(b) ? 'game' : 'umum');
+  // Blok di bawah judul besar game/lagu ikut kelompok judulnya (mis. "GAME ONLINE", "INTERNASIONAL")
+  let cur = 'umum';
+  blocks.forEach((b, i) => {
+    const head = b.split('\n')[0];
+    if (/^(IDE GAME|LAGU PAW)/i.test(head)) cur = kind[i];
+    else if (kind[i] === 'umum' && cur !== 'umum' && /^[A-Z0-9 &/()\-—,.]+$/.test(head.replace(/\(.*\)/, '').trim())) kind[i] = cur;
+    else if (kind[i] === 'umum') cur = 'umum';
+  });
+  const want = { umum: true, game: /\b(game|games|permainan|main(an)?|ice ?break\w*|icebreak\w*|seru|fun)\b/i.test(q), lagu: /\b(lagu|paw|praise|worship|pujian|penyembahan|playlist|pujian)\b/i.test(q) };
+  let out = '', used = 0;
+  blocks.forEach((b, i) => { if (want[kind[i]] && used + b.length <= budget) { out += b + '\n\n'; used += b.length + 2; } });
+  return out.trim();
+}
+
 // Format jawaban "Absen dari foto" (structured output Claude)
 const ABSEN_SCHEMA = {
   type: 'object', additionalProperties: false, required: ['hasil', 'tidak_cocok', 'catatan'],
@@ -164,6 +204,7 @@ const FALLBACK_MODELS = ['gemini-flash-latest', 'gemini-3.8-flash', 'gemini-flas
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const GROQ_FALLBACK = ['openai/gpt-oss-120b', 'qwen/qwen3.8-27b', 'openai/gpt-oss-20b']; // model chat yang tersedia untuk key ini (cek 28 Okt 2026)
 const GROQ_MAX_OUT = 4096;
+const GROQ_LIGHT_OUT = 1800; // jawaban ringan (token keluar juga dihitung dalam batas token/menit)
 const GROQ_COOL = new Map(), GROQ_TPM = new Map();
 const groqFail = (model, status, msg) => {
   msg = String(msg || '');
@@ -495,27 +536,58 @@ module.exports = async function handler(req, res) {
     return m;
   };
   const groqEstTok = Math.ceil((SYSTEM_TEXT.length + context.length + question.length + history.reduce((a, h) => a + String((h && h.text) || '').slice(0, 4000).length, 0)) / 3.5) + GROQ_MAX_OUT;
-  const groqSkip = model => groqCooling(model) || (GROQ_TPM.has(model) && groqEstTok > GROQ_TPM.get(model));
-  const groqBody = (model, stream) => JSON.stringify(Object.assign(
-    { model, messages: groqMessages(), temperature: 0.3, max_completion_tokens: GROQ_MAX_OUT, stream: !!stream },
+  const groqSkip = (model, est) => groqCooling(model) || (GROQ_TPM.has(model) && (est || groqEstTok) > GROQ_TPM.get(model));
+  // Versi ringan: tanpa DATA dashboard, hanya aturan inti + Training AI yang relevan (+ panduan aplikasi kalau ditanya cara pakai)
+  const isLight = prov === 'gemini-first' && LOGCTX.feature === 'chat' && !hasImage && !wantJSON && isLightQuestion(question, history);
+  const lightMessages = () => {
+    const lagu = SYSTEM_PROMPT.slice(SYSTEM_PROMPT.indexOf('- LAGU / PAW'), SYSTEM_PROMPT.indexOf('- STRUKTUR / BAGAN'));
+    const guide = LIGHT_GUIDE_RE.test(question) || history.some(h => h && h.role !== 'model' && LIGHT_GUIDE_RE.test(String(h.text || '')));
+    const sys = [
+      'Kamu asisten untuk CG Leader (CGL), Coach, dan Team Leader AOG Teens Jakarta Timur (pelayanan remaja GMS Church).',
+      'Aturan:',
+      '- Jawab dalam bahasa Indonesia yang santai, ringkas (maks ±200 kata), dan jelas; pakai poin bila membantu, **tebal** untuk hal penting.',
+      '- Fakta tentang GMS, AOG, pemimpin, acara, dan cara pakai aplikasi HANYA dari PENGETAHUAN di bawah — jangan mengarang nama, tanggal, menu, atau tombol. Kalau tidak ada, bilang belum tahu.',
+      '- Ide game/kegiatan boleh kreatif, utamakan dari daftar di PENGETAHUAN; cocok untuk remaja, tidak mempermalukan.',
+      '- Kamu TIDAK menerima data anggota, absensi, pelayanan, atau milestone. Kalau pertanyaan butuh data itu (nama anak, angka kehadiran, rekap, siapa yang …, jadwal), balas PERSIS satu kata: PERLU_DATA',
+      lagu.trim(),
+      '- Jangan menulis lirik lagu (hak cipta).'
+    ].join('\n');
+    const know = lightNotes(notes, question + ' ' + history.filter(h => h && h.role !== 'model').slice(-2).map(h => String(h.text || '')).join(' '), guide ? 7000 : 11000);
+    const m = [{ role: 'system', content: sys + (know ? '\n\nPENGETAHUAN (dari Coach/TL):\n' + know : '') + (guide ? '\n\n' + APP_GUIDE : '') }];
+    history.slice(-4).forEach(h => { const t = String((h && h.text) || '').slice(0, 1200); if (t) m.push({ role: h && h.role === 'model' ? 'assistant' : 'user', content: t }); });
+    m.push({ role: 'user', content: question });
+    return m;
+  };
+  const lightEstTok = () => Math.ceil(lightMessages().reduce((a, x) => a + x.content.length, 0) / 3) + GROQ_LIGHT_OUT;
+  const groqBody = (model, stream, light) => JSON.stringify(Object.assign(
+    { model, messages: light ? lightMessages() : groqMessages(), temperature: light ? 0.6 : 0.3, max_completion_tokens: light ? GROQ_LIGHT_OUT : GROQ_MAX_OUT, stream: !!stream },
     /gpt-oss/i.test(model) ? { reasoning_effort: 'low' } : {},
     /qwen/i.test(model) ? { reasoning_format: 'hidden' } : {}, // proses berpikir tidak ikut tampil di jawaban
     wantJSON ? { response_format: { type: 'json_object' } } : {}));
-  const streamGroq = async (model, emit) => {
+  const streamGroq = async (model, emit, light) => {
     const tmr = withTimer(20000, 20000);
-    let got = false, finish = '', err = '', usage = {};
+    let got = false, finish = '', err = '', usage = {}, hold = light ? '' : null, needData = false;
+    // Mode ringan: tahan ±12 huruf pertama → kalau isinya PERLU_DATA, belum ada yang terkirim dan jalur biasa dipakai
+    const out = t => {
+      if (hold === null) { got = true; emit(t); return; }
+      hold += t;
+      if (/^\s*PERLU_DATA/i.test(hold)) { needData = true; return; }
+      if (hold.trim().length >= 12 && !/^\s*P(E(R(L(U(_(D(A(T(A)?)?)?)?)?)?)?)?)?\s*$/i.test(hold)) { got = true; const h = hold; hold = null; emit(h); }
+    };
     try {
-      const r = await fetch(GROQ_URL, { method: 'POST', signal: tmr.signal, headers: GROQ_HEADERS, body: groqBody(model, true) });
+      const r = await fetch(GROQ_URL, { method: 'POST', signal: tmr.signal, headers: GROQ_HEADERS, body: groqBody(model, true, light) });
       if (!r.ok) { const d = await r.json().catch(() => ({})); return { status: r.status, msg: (d.error && d.error.message) || ('HTTP ' + r.status) }; }
       await readSSE(r, ev => {
         const u = ev.usage || (ev.x_groq && ev.x_groq.usage); if (u) usage = oUsage(u);
         const c = ev.choices && ev.choices[0];
-        if (c && c.delta && typeof c.delta.content === 'string' && c.delta.content) { got = true; emit(c.delta.content); }
+        if (c && c.delta && typeof c.delta.content === 'string' && c.delta.content && !needData) out(c.delta.content);
         if (c && c.finish_reason) finish = c.finish_reason;
         if (ev.error) err = String(ev.error.message || 'error').slice(0, 160);
       }, tmr.kick);
     } catch (e) { err = e && e.name === 'AbortError' ? 'timeout' : 'gagal terhubung'; }
     finally { tmr.stop(); lastUsage = usage; }
+    if (needData) return { needData: true, msg: 'perlu data' };
+    if (hold && hold.trim() && !err) { got = true; emit(hold); } // jawaban sangat pendek
     if (err) return { status: 504, msg: err };
     if (!got) return { status: 502, msg: 'jawaban kosong (' + (finish || '-') + ')' };
     return { ok: true, finish: finish === 'length' ? 'MAX_TOKENS' : 'STOP' };
@@ -632,6 +704,22 @@ module.exports = async function handler(req, res) {
       }
       return 'fail';
     };
+    const tryGroqLight = async () => {
+      const est = lightEstTok();
+      for (const model of GROQ_MODELS) {
+        if (Date.now() - t0 > 30000) break;
+        if (groqSkip(model, est)) continue;
+        const r = await streamGroq(model, text, true);
+        USE.push({ model: 'groq/' + model, kind: r.ok ? 'jawab' : 'gagal', u: lastUsage, note: r.needData ? 'ringan → perlu data' : 'ringan' }); lastUsage = null;
+        if (r.ok) { emit(Object.assign({ done: true, model: 'groq/' + model, finish: r.finish }, note ? { note } : {})); res.end(); return 'done'; }
+        if (started) { emit({ error: 'Jawaban terputus — coba tanya lagi.' }); res.end(); return 'done'; }
+        if (r.needData) { LOGCTX.route += ' (ringan → data)'; return 'fail'; } // jalur biasa dengan data
+        note = (note ? note + ' · ' : '') + 'Groq ' + model + ': ' + String(r.msg || 'gagal').slice(0, 120);
+        groqFail(model, r.status, r.msg);
+        if (r.status === 401 || r.status === 403) break;
+      }
+      return 'fail';
+    };
     const tryHaiku = async () => {
       const c = await streamClaude(text, CHECK_MODEL);
       USE.push({ model: c.model || CHECK_MODEL, kind: c.ok ? 'jawab' : 'gagal', u: lastUsage, note: 'cadangan Gemini' }); lastUsage = null;
@@ -641,7 +729,9 @@ module.exports = async function handler(req, res) {
       return 'fail';
     };
     // Urutan: Auto (data pribadi) = Sonnet → Gemini → Groq → Haiku · Gemini dulu = Gemini → Groq → Haiku → Sonnet
-    const order = claudeFirst ? [useClaude && tryClaude, useGemini && tryGemini, useGroq && tryGroq, useHaiku && tryHaiku] : [useGemini && tryGemini, useGroq && tryGroq, useHaiku && tryHaiku, useClaude && tryClaude];
+    // Pertanyaan ringan (tanpa data) → Groq ringkas dulu (gratis & cepat), lalu jalur biasa
+    if (isLight) LOGCTX.route += ' · ringan';
+    const order = claudeFirst ? [useClaude && tryClaude, useGemini && tryGemini, useGroq && tryGroq, useHaiku && tryHaiku] : [isLight && useGroq && tryGroqLight, useGemini && tryGemini, useGroq && tryGroq, useHaiku && tryHaiku, useClaude && tryClaude];
     for (const step of order) { if (step && (await step()) === 'done') return; }
     return noAI(note);
   };
@@ -720,3 +810,6 @@ module.exports = async function handler(req, res) {
   }
   return send(res, lastStatus, Object.assign({ error: lastErr.replace(/[.\s]*$/, '.') + ' Coba lagi sebentar lagi.', tried }, claudeNote ? { note: claudeNote } : {}));
 };
+
+module.exports.isLightQuestion = isLightQuestion;
+module.exports.lightNotes = lightNotes;
