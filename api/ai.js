@@ -162,7 +162,7 @@ const FALLBACK_MODELS = ['gemini-flash-latest', 'gemini-3.8-flash', 'gemini-flas
 // Groq (model terbuka, API mirip OpenAI). Paket gratis membatasi token per menit (TPM) → data besar ditolak (413);
 // batas yang terbaca dari pesan error diingat per model, jadi berikutnya langsung dilewati tanpa membuang waktu.
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
-const GROQ_FALLBACK = ['openai/gpt-oss-120b', 'llama-3.3-70b-versatile', 'meta-llama/llama-4-scout-17b-16e-instruct'];
+const GROQ_FALLBACK = ['openai/gpt-oss-120b', 'qwen/qwen3.8-27b', 'openai/gpt-oss-20b']; // model chat yang tersedia untuk key ini (cek 28 Okt 2026)
 const GROQ_MAX_OUT = 4096;
 const GROQ_COOL = new Map(), GROQ_TPM = new Map();
 const groqFail = (model, status, msg) => {
@@ -267,6 +267,24 @@ module.exports = async function handler(req, res) {
     } catch (e) { return send(res, 502, { error: 'Gagal mengambil daftar model.' }); }
   }
 
+  if (body.action === 'groq_test') {
+    if (!GROQ_KEY) return send(res, 200, { groq: 'belum aktif' });
+    const out = [];
+    for (const model of GROQ_MODELS) {
+      const t1 = Date.now();
+      try {
+        const ctrl = new AbortController(); const timer = setTimeout(() => ctrl.abort(), 20000);
+        const r = await fetch(GROQ_URL, { method: 'POST', signal: ctrl.signal, headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + GROQ_KEY },
+          body: JSON.stringify(Object.assign({ model, max_completion_tokens: 300, temperature: 0.3, messages: [{ role: 'system', content: 'Jawab dalam bahasa Indonesia, maksimal 2 kalimat.' }, { role: 'user', content: 'Berikan 1 ide ice breaking singkat untuk kelompok remaja gereja 8 orang.' }] },
+            /gpt-oss/i.test(model) ? { reasoning_effort: 'low' } : {}, /qwen/i.test(model) ? { reasoning_format: 'hidden' } : {})) });
+        clearTimeout(timer);
+        const d = await r.json().catch(() => ({}));
+        out.push({ model, status: r.status, ms: Date.now() - t1, tpm: r.headers.get('x-ratelimit-limit-tokens'), rpd: r.headers.get('x-ratelimit-limit-requests'),
+          jawab: String((d.choices && d.choices[0] && d.choices[0].message && d.choices[0].message.content) || '').slice(0, 300), error: d.error && d.error.message });
+      } catch (e) { out.push({ model, error: e && e.name === 'AbortError' ? 'timeout' : 'gagal terhubung', ms: Date.now() - t1 }); }
+    }
+    return send(res, 200, { groq: out });
+  }
   const question = String(body.question || '').trim().slice(0, 2000);
   if (!question) return send(res, 400, { error: 'Pertanyaan kosong.' });
   LOGCTX.scope = String(body.scope || '').slice(0, 40);
@@ -481,6 +499,7 @@ module.exports = async function handler(req, res) {
   const groqBody = (model, stream) => JSON.stringify(Object.assign(
     { model, messages: groqMessages(), temperature: 0.3, max_completion_tokens: GROQ_MAX_OUT, stream: !!stream },
     /gpt-oss/i.test(model) ? { reasoning_effort: 'low' } : {},
+    /qwen/i.test(model) ? { reasoning_format: 'hidden' } : {}, // proses berpikir tidak ikut tampil di jawaban
     wantJSON ? { response_format: { type: 'json_object' } } : {}));
   const streamGroq = async (model, emit) => {
     const tmr = withTimer(20000, 20000);
