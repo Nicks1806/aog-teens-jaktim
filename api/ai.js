@@ -90,6 +90,65 @@ const ABSEN_SCHEMA = {
   }
 };
 
+// ── Catat pemakaian AI (tabel ai_usage) & batas pemakaian (cg_vision '__AI_LIMITS__') ──
+// Anon key Supabase = kunci publik yang sama dengan di index.html (bukan rahasia); bisa diganti lewat env.
+const SB_URL = process.env.SUPABASE_URL || 'https://gqppviugodokncxezdwd.supabase.co';
+const SB_KEY = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxcHB2aXVnb2Rva25jeGV6ZHdkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4NjIwOTcsImV4cCI6MjA5MDQzODA5N30.w2oUJYWk4yr_tJQuhk0UyxJKwgH1C3FkmJB6CXclSpk';
+const KURS = Number(process.env.KURS_IDR) || 16500; // perkiraan Rp per USD
+// Harga perkiraan (USD per 1 juta token): in, out, cache read, cache write
+const PRICE = [
+  [/claude-opus/i, { in: 4, out: 20, cr: 0.4, cw: 5 }],
+  [/claude-sonnet/i, { in: 2, out: 10, cr: 0.2, cw: 2.5 }],
+  [/claude-haiku/i, { in: 0.1, out: 0.5, cr: 0.01, cw: 0.125 }],
+  [/flash-lite/i, { in: 0.1, out: 0.4, cr: 0.025, cw: 0 }],
+  [/gemini/i, { in: 0.3, out: 2.5, cr: 0.075, cw: 0 }]
+];
+const costOf = (model, u) => {
+  const p = (PRICE.find(([re]) => re.test(model || '')) || [null, { in: 0, out: 0, cr: 0, cw: 0 }])[1];
+  return ((u.in || 0) * p.in + (u.out || 0) * p.out + (u.cr || 0) * p.cr + (u.cw || 0) * p.cw) / 1e6;
+};
+const cUsage = u => ({ in: (u && u.input_tokens) || 0, out: (u && u.output_tokens) || 0, cr: (u && u.cache_read_input_tokens) || 0, cw: (u && u.cache_creation_input_tokens) || 0 });
+const gUsage = m => ({ in: (m && m.promptTokenCount) || 0, out: ((m && m.candidatesTokenCount) || 0) + ((m && m.thoughtsTokenCount) || 0), cr: (m && m.cachedContentTokenCount) || 0, cw: 0 });
+const sbFetch = (path, opt) => {
+  opt = opt || {};
+  const ctrl = new AbortController(); const tm = setTimeout(() => ctrl.abort(), opt.timeout || 4000);
+  return fetch(SB_URL + '/rest/v1/' + path, Object.assign({}, opt, { signal: ctrl.signal, headers: Object.assign({ apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' }, opt.headers || {}) }))
+    .finally(() => clearTimeout(tm));
+};
+async function logUsage(rows) { try { await sbFetch('ai_usage', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify(rows) }); } catch (e) { /* tabel belum ada / jaringan → abaikan */ } }
+let LIMITS_CACHE = { t: 0, v: null };
+async function getLimits() {
+  if (Date.now() - LIMITS_CACHE.t < 30000) return LIMITS_CACHE.v;
+  let v = LIMITS_CACHE.v;
+  try { const r = await sbFetch('cg_vision?cg=eq.__AI_LIMITS__&region=eq.all&select=visi'); const d = await r.json(); v = d && d[0] && d[0].visi ? JSON.parse(d[0].visi) : null; } catch (e) {}
+  LIMITS_CACHE = { t: Date.now(), v };
+  return v;
+}
+// Jumlah pertanyaan (baris kind=jawab) sejak waktu tertentu; null kalau tidak bisa dihitung (tabel belum ada) → limit dilewati
+async function countUsage(q) {
+  try {
+    const r = await sbFetch('ai_usage?select=id&kind=eq.jawab&' + q, { headers: { Prefer: 'count=exact', Range: '0-0' } });
+    if (!r.ok) return null;
+    const n = parseInt(String(r.headers.get('content-range') || '').split('/')[1], 10);
+    return isFinite(n) ? n : null;
+  } catch (e) { return null; }
+}
+async function costSince(iso) {
+  try {
+    let sum = 0;
+    for (let i = 0; i < 10; i++) {
+      const r = await sbFetch('ai_usage?select=cost_usd&created_at=gte.' + encodeURIComponent(iso) + '&order=id', { headers: { Range: (i * 1000) + '-' + (i * 1000 + 999) } });
+      if (!r.ok) return null;
+      const d = await r.json();
+      d.forEach(x => { sum += Number(x.cost_usd) || 0; });
+      if (d.length < 1000) break;
+    }
+    return sum;
+  } catch (e) { return null; }
+}
+// Awal hari / bulan menurut WIB (UTC+7)
+const wibStart = unit => { const n = new Date(Date.now() + 7 * 3600e3); return new Date(Date.UTC(n.getUTCFullYear(), n.getUTCMonth(), unit === 'month' ? 1 : n.getUTCDate()) - 7 * 3600e3).toISOString(); };
+
 // Model cadangan kalau model utama sibuk ("high demand") / dipensiunkan / timeout
 const FALLBACK_MODELS = ['gemini-flash-latest', 'gemini-3.8-flash', 'gemini-flash-lite-latest'];
 
@@ -123,6 +182,19 @@ module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return send(res, 405, { error: 'Gunakan POST' });
 
   const t0 = Date.now();
+  // Catatan pemakaian per panggilan AI → disimpan ke ai_usage tepat sebelum respons selesai
+  const USE = []; let lastUsage = null;
+  const LOGCTX = { scope: '', feature: '', route: '' };
+  const _end = res.end.bind(res); let _logged = false;
+  res.end = (...a) => {
+    if (_logged || !USE.length) return _end(...a);
+    _logged = true;
+    const ms = Date.now() - t0;
+    const rows = USE.map(x => ({ scope: LOGCTX.scope, feature: LOGCTX.feature, route: LOGCTX.route, model: x.model || '', kind: x.kind,
+      input_tokens: (x.u && x.u.in) || 0, output_tokens: (x.u && x.u.out) || 0, cache_read: (x.u && x.u.cr) || 0, cache_write: (x.u && x.u.cw) || 0,
+      cost_usd: +costOf(x.model, x.u || {}).toFixed(6), ok: x.kind !== 'gagal', ms, note: x.note || null }));
+    logUsage(rows).finally(() => _end(...a));
+  };
   const KEY = process.env.GEMINI_API_KEY;               // Gemini = cadangan
   // Buang spasi / tanda kutip / baris baru yang ikut tersalin saat mengisi env var di Vercel
   const CLAUDE_KEY = String(process.env.ANTHROPIC_API_KEY || '').trim().replace(/^['"]+|['"]+$/g, '').trim(); // Claude = utama (kalau diisi)
@@ -156,6 +228,8 @@ module.exports = async function handler(req, res) {
 
   const question = String(body.question || '').trim().slice(0, 2000);
   if (!question) return send(res, 400, { error: 'Pertanyaan kosong.' });
+  LOGCTX.scope = String(body.scope || '').slice(0, 40);
+  LOGCTX.feature = String(body.feature || 'chat').slice(0, 30);
   const context = typeof body.context === 'string' ? body.context.slice(0, 400000) : JSON.stringify(body.context || {}).slice(0, 400000);
   const history = Array.isArray(body.history) ? body.history.slice(-10) : [];
   // "Training": pengetahuan tambahan dari Coach/TL (disimpan di dashboard) → bagian dari system prompt
@@ -189,7 +263,19 @@ module.exports = async function handler(req, res) {
   const hasImage = parts.length > 1;
   const wantJSON = body.json === true; // mis. Absen dari foto → jawaban JSON murni
   // Pilihan pengguna: auto = Claude lalu Gemini cadangan; claude / gemini = hanya itu
-  const prov = ['claude', 'gemini', 'gemini-first'].includes(body.provider) ? body.provider : 'auto';
+  // Batas pemakaian (diatur Coach Jaktim 1 di tab Pemakaian AI). 0 / kosong = tanpa batas.
+  let claudeCapped = false;
+  const lim = await getLimits();
+  if (lim) {
+    const today = encodeURIComponent(wibStart('day'));
+    if (lim.harian > 0) { const n = await countUsage('created_at=gte.' + today); if (n !== null && n >= lim.harian) return send(res, 429, { error: 'Batas pemakaian AI hari ini (' + lim.harian + ' pertanyaan) sudah tercapai. Coba lagi besok.' }); }
+    if (lim.per_cg > 0 && LOGCTX.scope.indexOf('cgl:') === 0) { const n = await countUsage('created_at=gte.' + today + '&scope=eq.' + encodeURIComponent(LOGCTX.scope)); if (n !== null && n >= lim.per_cg) return send(res, 429, { error: 'Batas pemakaian AI untuk ' + LOGCTX.scope.slice(4) + ' hari ini (' + lim.per_cg + ' pertanyaan) sudah tercapai. Coba lagi besok.' }); }
+    if (lim.anggaran_bulan > 0) { const usd = await costSince(wibStart('month')); if (usd !== null && usd * KURS >= lim.anggaran_bulan) return send(res, 429, { error: 'Anggaran AI bulan ini sudah habis. AI aktif lagi bulan depan (atau anggaran dinaikkan di tab Pemakaian AI).' }); }
+    if (lim.claude_harian > 0 && body.provider !== 'gemini' && body.provider !== 'gemini-first') { const n = await countUsage('created_at=gte.' + today + '&model=like.claude-sonnet*'); if (n !== null && n >= lim.claude_harian) claudeCapped = true; }
+  }
+  // Kuota Claude Sonnet habis → jawab pakai Gemini (data pribadi tidak ikut)
+  const prov = claudeCapped ? 'gemini' : (['claude', 'gemini', 'gemini-first'].includes(body.provider) ? body.provider : 'auto');
+  LOGCTX.route = prov + (claudeCapped ? ' (kuota Claude habis)' : '');
   const claudeFirst = prov !== 'gemini-first';
   const CHECK_MODEL = process.env.CLAUDE_CHECK_MODEL || 'claude-haiku-5-5'; // pengecek jawaban Gemini (murah)
   const wantCheck = body.check === true && prov === 'gemini-first' && !!CLAUDE_KEY && !hasImage;
@@ -214,6 +300,7 @@ module.exports = async function handler(req, res) {
         body: geminiBody(think)
       });
       const data = await r.json().catch(() => ({}));
+      lastUsage = gUsage(data.usageMetadata);
       return { r, data, msg: (data && data.error && data.error.message) || ('HTTP ' + r.status) };
     } finally { clearTimeout(timer); }
   };
@@ -260,6 +347,7 @@ module.exports = async function handler(req, res) {
         body: claudeBody(useFormat, false)
       });
       const data = await r.json().catch(() => ({}));
+      lastUsage = cUsage(data.usage);
       if (!r.ok) return { status: r.status, err: 'HTTP ' + r.status + ' ' + String((data.error && data.error.message) || '').slice(0, 160) };
       if (data.stop_reason === 'refusal') return { err: 'refusal' };
       // Baca blok berdasarkan type (blok thinking bisa ada di depan)
@@ -298,18 +386,20 @@ module.exports = async function handler(req, res) {
   };
   const streamClaude = async (emit) => {
     const tmr = withTimer(hasImage ? 35000 : 25000, 25000);
-    let model = CLAUDE_MODEL, stop = '', got = false, err = '';
+    let model = CLAUDE_MODEL, stop = '', got = false, err = '', usage = {};
     try {
       const r = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', signal: tmr.signal, headers: CLAUDE_HEADERS, body: claudeBody(false, true) });
       if (!r.ok) { const d = await r.json().catch(() => ({})); return { err: 'HTTP ' + r.status + ' ' + String((d.error && d.error.message) || '').slice(0, 160) }; }
       await readSSE(r, ev => {
+        if (ev.type === 'message_start' && ev.message && ev.message.usage) usage = cUsage(ev.message.usage);
+        if (ev.type === 'message_delta' && ev.usage && ev.usage.output_tokens != null) usage.out = ev.usage.output_tokens;
         if (ev.type === 'message_start' && ev.message && ev.message.model) model = ev.message.model;
         else if (ev.type === 'content_block_delta' && ev.delta && ev.delta.type === 'text_delta' && ev.delta.text) { got = true; emit(ev.delta.text); }
         else if (ev.type === 'message_delta' && ev.delta && ev.delta.stop_reason) stop = ev.delta.stop_reason;
         else if (ev.type === 'error') err = String((ev.error && ev.error.message) || 'error').slice(0, 160);
       }, tmr.kick);
     } catch (e) { err = e && e.name === 'AbortError' ? 'timeout' : 'gagal terhubung'; }
-    finally { tmr.stop(); }
+    finally { tmr.stop(); lastUsage = usage; }
     if (stop === 'refusal' && !got) return { err: 'refusal' };
     if (err) return { err };
     if (!got) return { err: 'jawaban kosong (' + (stop || '-') + ')' };
@@ -317,19 +407,20 @@ module.exports = async function handler(req, res) {
   };
   const streamGemini = async (model, think, emit) => {
     const tmr = withTimer(hasImage ? 35000 : 20000, 20000);
-    let got = false, finish = '', err = '';
+    let got = false, finish = '', err = '', usage = {};
     try {
       const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(model) + ':streamGenerateContent?alt=sse', {
         method: 'POST', signal: tmr.signal, headers: { 'Content-Type': 'application/json', 'x-goog-api-key': KEY }, body: geminiBody(think)
       });
       if (!r.ok) { const d = await r.json().catch(() => ({})); return { status: r.status, msg: (d && d.error && d.error.message) || ('HTTP ' + r.status) }; }
       await readSSE(r, ev => {
+        if (ev.usageMetadata) usage = gUsage(ev.usageMetadata);
         const c = ev.candidates && ev.candidates[0];
         if (c && c.content && Array.isArray(c.content.parts)) c.content.parts.forEach(p => { if (p.text && !p.thought) { got = true; emit(p.text); } });
         if (c && c.finishReason) finish = c.finishReason;
       }, tmr.kick);
     } catch (e) { err = e && e.name === 'AbortError' ? 'timeout' : 'gagal terhubung'; }
-    finally { tmr.stop(); }
+    finally { tmr.stop(); lastUsage = usage; }
     if (err) return { err, status: 504 };
     if (!got) return { status: 502, msg: 'AI tidak memberi jawaban (' + (finish || '-') + ')' };
     return { ok: true, finish };
@@ -350,6 +441,7 @@ module.exports = async function handler(req, res) {
         })
       });
       const data = await r.json().catch(() => ({}));
+      lastUsage = cUsage(data.usage);
       if (!r.ok) { console.warn('[api/ai] cek claude gagal', r.status, data.error && data.error.message); return {}; }
       const t = (data.content || []).filter(x => x && x.type === 'text').map(x => x.text || '').join('').trim();
       if (/^ok[.!]?$/i.test(t)) return { ok: true, model: data.model || CHECK_MODEL };
@@ -372,6 +464,7 @@ module.exports = async function handler(req, res) {
     const text = t => { full += t; emit({ t }); };
     const tryClaude = async () => {
       const c = await streamClaude(text);
+      USE.push({ model: c.model || CLAUDE_MODEL, kind: c.ok ? 'jawab' : 'gagal', u: lastUsage }); lastUsage = null;
       if (c.ok) { emit(Object.assign({ done: true, model: c.model, finish: c.finish }, note ? { note } : {})); res.end(); return 'done'; }
       if (started) { emit({ error: 'Jawaban terputus — coba tanya lagi.' }); res.end(); return 'done'; }
       note = (note ? note + ' · ' : '') + 'Claude: ' + c.err; // belum ada teks terkirim → aman pindah
@@ -386,11 +479,13 @@ module.exports = async function handler(req, res) {
         tried.push(model);
         let r = await streamGemini(model, true, text);
         if (!r.ok && !started && r.status === 400 && /thinking/i.test(r.msg || '')) r = await streamGemini(model, false, text);
+        USE.push({ model, kind: r.ok ? 'jawab' : 'gagal', u: lastUsage }); lastUsage = null;
         if (r.ok) {
           // Jawaban berisi angka/data → dicek Claude (sisa waktu cukup)
           if (wantCheck && needsCheck(full) && Date.now() - t0 < 38000) {
             emit({ checking: true });
             const chk = await checkWithClaude(full);
+            USE.push({ model: chk.model || CHECK_MODEL, kind: 'cek', u: lastUsage, note: chk.fix ? 'diperbaiki' : chk.ok ? 'benar' : 'tidak jelas' }); lastUsage = null;
             if (chk.fix) emit({ fix: chk.fix, checker: chk.model });
             else if (chk.ok) emit({ checked: chk.model });
           }
@@ -415,6 +510,7 @@ module.exports = async function handler(req, res) {
   if (useClaude && claudeFirst) {
     let c = await callClaude(wantJSON);
     if (!c.text && wantJSON && c.status === 400) c = await callClaude(false); // format JSON ditolak → prompt saja
+    USE.push({ model: c.model || CLAUDE_MODEL, kind: c.text ? 'jawab' : 'gagal', u: lastUsage }); lastUsage = null;
     if (c.text) return send(res, 200, { text: c.text, model: c.model, finish: c.finish });
     claudeNote = 'Claude: ' + String(c.err || '');
     console.warn('[api/ai] claude gagal, pakai Gemini', claudeNote);
@@ -440,6 +536,7 @@ module.exports = async function handler(req, res) {
       console.error('[api/ai] fetch failed', model, e); lastErr = 'Gagal menghubungi AI.'; continue;
     }
     const { r, data, msg } = out;
+    USE.push({ model, kind: r.ok && data.candidates && data.candidates.length ? 'jawab' : 'gagal', u: lastUsage }); lastUsage = null;
     if (r.ok) {
       const cand = data.candidates && data.candidates[0];
       const text = cand && cand.content && Array.isArray(cand.content.parts) ? cand.content.parts.map(p => p.text || '').join('') : '';
@@ -456,6 +553,7 @@ module.exports = async function handler(req, res) {
   }
   if (useClaude && !claudeFirst) { // gemini-first: Gemini gagal → Claude
     const c = await callClaude(wantJSON);
+    USE.push({ model: c.model || CLAUDE_MODEL, kind: c.text ? 'jawab' : 'gagal', u: lastUsage }); lastUsage = null;
     if (c.text) return send(res, 200, { text: c.text, model: c.model, finish: c.finish, note: 'Gemini: ' + lastErr });
   }
   return send(res, lastStatus, Object.assign({ error: lastErr.replace(/[.\s]*$/, '.') + ' Coba lagi sebentar lagi.', tried }, claudeNote ? { note: claudeNote } : {}));

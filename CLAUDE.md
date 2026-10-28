@@ -1,6 +1,6 @@
 # AOG Teens Jaktim — CG Dashboard (Absensi + Management)
 
-**Current version:** v62 · **Last updated:** 27 Oktober 2026
+**Current version:** v63 · **Last updated:** 27 Oktober 2026
 
 ## Project Overview
 Single-file web app untuk tracking attendance, pelayanan, milestone, events, visi, dan distribusi wilayah CG untuk AOG Teens Jakarta Timur. Dipakai oleh ~54 member, 9 CG Leaders, 2 Coach, dan 1 Team Leader secara bersamaan saat ibadah hari Minggu.
@@ -50,6 +50,7 @@ Untuk konteks handoff lengkap ke Claude Code baru, baca `HANDOFF.md`.
 | `cg_custom_roles` | Role pelayanan custom per CG | cg, region, role_name, abbr, color, bg |
 | `member_notes` | Catatan CGL per member | member_id, cgl_note |
 | `coach_notes` | Catatan Coach per CG | cg, region, note |
+| `ai_usage` | Log pemakaian AI (v63, dibuat manual lewat SQL di tab Pemakaian AI) | created_at, scope, feature, route, model, kind (jawab/cek/gagal), input_tokens, output_tokens, cache_read, cache_write, cost_usd, ok, ms, note |
 
 ### Region & CG (Current State)
 - **jaktim1:** 5 CG — TEEN 01, TEEN 06, TEEN 09, TEEN 23, TEEN 25 (baru per v28+)
@@ -278,8 +279,8 @@ Edit index.html locally (+ file lain kalau perlu)
 ```
 
 **Version bump pattern setiap push code:**
-1. `index.html` — cari `App version">v62` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
-2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v62'` → naikkan sama
+1. `index.html` — cari `App version">v63` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
+2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v63'` → naikkan sama
 
 ---
 
@@ -395,6 +396,7 @@ Edit index.html locally (+ file lain kalau perlu)
 | v29 | **Distribusi Wilayah** — filter kecamatan + kelurahan di Coach/TL Overview |
 | v30 | Wilayah filter hardening (escape + reset state + count consistency) |
 | v31 | **27 bug fixes** — attendance stats inflate, data corruption (sekolah/kelas split), XSS (PDF export), error handling (21 Supabase ops), TEEN 25 color map, reconnect race guard, undo sync, milestone prereq, visi TOCTOU fix |
+| v63 | **Tab Pemakaian AI** (`c-usage`, hanya mode **Coach Jaktim 1** — `aiUsageAllowed()`, tanpa login jadi bukan pengaman sungguhan): rekap 30 hari dari tabel **`ai_usage`** (pertanyaan hari/bulan, biaya perkiraan Rp, Gemini vs Claude, dicek/diperbaiki, grafik per hari, per AI / pengguna / fitur) + **batas pemakaian** di `cg_vision` `__AI_LIMITS__` JSON `{harian, per_cg, claude_harian, anggaran_bulan}`. Server `api/ai.js`: catat tiap panggilan AI (token dari `usage`/`usageMetadata`, `costOf` harga perkiraan, kind `jawab`/`cek`/`gagal`, scope & feature dari client) lewat hook `res.end`; cek batas sebelum memanggil AI (429), kuota Claude habis → Gemini tanpa data pribadi. Tabel belum ada → AI tetap jalan, tab menampilkan SQL. Env opsional `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `KURS_IDR` |
 | v62 | Rate limit `/api/ai` 15 → **60/menit per IP** (WiFi gereja & operator seluler berbagi IP saat ibadah). **Training AI anti-timpa**: `saveAINotes` cek isi DB dulu — kalau sudah diubah Coach/TL lain sejak modal dibuka, simpan dibatalkan (teks tetap di kotak) |
 | v61 | **Fix tombol suara tidak bisa diklik**: tombol ber-id `aiMic` ada di dalam `<form>`, sehingga di handler inline `aiMic()` merujuk ke tombol itu sendiri (named form control), bukan fungsi → `onclick="window.aiMic()"`. **ATURAN: handler inline di dalam form jangan memakai nama fungsi yang sama dengan id/name elemen di form itu** (atau panggil lewat `window.`). Mikrofon: status selalu di-reset setelah error (`aiMicReset`, beberapa HP tidak memanggil onend), pengaman macet 1,5 dtk & maks 20 dtk, placeholder "Mendengarkan…", pesan error jelas (`AI_MIC_ERR`), tombol selalu tampil |
 | v60 | Label "dijawab Gemini/Claude" di bawah jawaban AI dihapus. Panel chat: tinggi dihitung ulang saat ada perubahan ukuran (ResizeObserver body/.phead/.mtop, fonts.ready, load) + cek ringan tiap 1 dtk saat tab AI terbuka (`aiFitHeight` skip kalau sudah pas); batas bawah = atas bottom nav kecuali keyboard terbuka (selisih >150px) → tidak ada celah di HP asli |
