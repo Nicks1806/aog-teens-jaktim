@@ -1,6 +1,6 @@
 # AOG Teens Jaktim — CG Dashboard (Absensi + Management)
 
-**Current version:** v63 · **Last updated:** 27 Oktober 2026
+**Current version:** v64 · **Last updated:** 27 Oktober 2026
 
 ## Project Overview
 Single-file web app untuk tracking attendance, pelayanan, milestone, events, visi, dan distribusi wilayah CG untuk AOG Teens Jakarta Timur. Dipakai oleh ~54 member, 9 CG Leaders, 2 Coach, dan 1 Team Leader secara bersamaan saat ibadah hari Minggu.
@@ -279,8 +279,8 @@ Edit index.html locally (+ file lain kalau perlu)
 ```
 
 **Version bump pattern setiap push code:**
-1. `index.html` — cari `App version">v63` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
-2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v63'` → naikkan sama
+1. `index.html` — cari `App version">v64` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
+2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v64'` → naikkan sama
 
 ---
 
@@ -396,6 +396,7 @@ Edit index.html locally (+ file lain kalau perlu)
 | v29 | **Distribusi Wilayah** — filter kecamatan + kelurahan di Coach/TL Overview |
 | v30 | Wilayah filter hardening (escape + reset state + count consistency) |
 | v31 | **27 bug fixes** — attendance stats inflate, data corruption (sekolah/kelas split), XSS (PDF export), error handling (21 Supabase ops), TEEN 25 color map, reconnect race guard, undo sync, milestone prereq, visi TOCTOU fix |
+| v64 | Fix: menu "Pemakaian AI" ikut tampil di TL & Coach Jaktim 2 — atribut `hidden` kalah oleh `display:flex` tombol nav → `.app-tab[hidden]{display:none !important}`. **Saat menyembunyikan elemen ber-class yang memasang `display`, cek computed style, bukan hanya atribut `hidden`** |
 | v63+ | `api/ai.js`: **Gemini kena limit → langsung Claude Haiku** (`isLimitErr`: 429 / quota / high demand). Model Gemini yang kena limit diistirahatkan per instance (`GEM_COOL`: kuota 5 mnt, sibuk 1 mnt); selama model utama istirahat, Gemini dilewati sama sekali. Urutan: gemini-first = Gemini → Haiku → Sonnet; Auto (data pribadi) = Sonnet → Gemini → Haiku; pilih Gemini = Gemini → Haiku; pilih Claude = Sonnet saja. Berlaku juga non-stream (ringkasan anak, ucapan, absen foto). Latar: key Gemini paket gratis sering "exceeded your current quota" |
 | v63 | **Tab Pemakaian AI** (`c-usage`, hanya mode **Coach Jaktim 1** — `aiUsageAllowed()`, tanpa login jadi bukan pengaman sungguhan): rekap 30 hari dari tabel **`ai_usage`** (pertanyaan hari/bulan, biaya perkiraan Rp, Gemini vs Claude, dicek/diperbaiki, grafik per hari, per AI / pengguna / fitur) + **batas pemakaian** di `cg_vision` `__AI_LIMITS__` JSON `{harian, per_cg, claude_harian, anggaran_bulan}`. Server `api/ai.js`: catat tiap panggilan AI (token dari `usage`/`usageMetadata`, `costOf` harga perkiraan, kind `jawab`/`cek`/`gagal`, scope & feature dari client) lewat hook `res.end`; cek batas sebelum memanggil AI (429), kuota Claude habis → Gemini tanpa data pribadi. Tabel belum ada → AI tetap jalan, tab menampilkan SQL. Env opsional `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `KURS_IDR` |
 | v62 | Rate limit `/api/ai` 15 → **60/menit per IP** (WiFi gereja & operator seluler berbagi IP saat ibadah). **Training AI anti-timpa**: `saveAINotes` cek isi DB dulu — kalau sudah diubah Coach/TL lain sejak modal dibuka, simpan dibatalkan (teks tetap di kotak) |
