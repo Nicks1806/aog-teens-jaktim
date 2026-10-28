@@ -1,6 +1,6 @@
 # AOG Teens Jaktim — CG Dashboard (Absensi + Management)
 
-**Current version:** v57 · **Last updated:** 27 Oktober 2026
+**Current version:** v58 · **Last updated:** 27 Oktober 2026
 
 ## Project Overview
 Single-file web app untuk tracking attendance, pelayanan, milestone, events, visi, dan distribusi wilayah CG untuk AOG Teens Jakarta Timur. Dipakai oleh ~54 member, 9 CG Leaders, 2 Coach, dan 1 Team Leader secara bersamaan saat ibadah hari Minggu.
@@ -278,8 +278,8 @@ Edit index.html locally (+ file lain kalau perlu)
 ```
 
 **Version bump pattern setiap push code:**
-1. `index.html` — cari `App version">v57` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
-2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v57'` → naikkan sama
+1. `index.html` — cari `App version">v58` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
+2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v58'` → naikkan sama
 
 ---
 
@@ -394,6 +394,7 @@ Edit index.html locally (+ file lain kalau perlu)
 | v29 | **Distribusi Wilayah** — filter kecamatan + kelurahan di Coach/TL Overview |
 | v30 | Wilayah filter hardening (escape + reset state + count consistency) |
 | v31 | **27 bug fixes** — attendance stats inflate, data corruption (sekolah/kelas split), XSS (PDF export), error handling (21 Supabase ops), TEEN 25 color map, reconnect race guard, undo sync, milestone prereq, visi TOCTOU fix |
+| v58 | HP (≤600px): chat AI tanpa avatar (jawaban selebar layar), tombol input 40px, placeholder "Tanya AI…"; header halaman tanpa breadcrumb & badge CG (sudah ada di bar atas), lonceng sejajar judul; **bottom nav lebar tombol mengikuti label** (`flex:1 1 auto` — "Pelayanan"/"Milestone" tidak menempel) |
 | v57 | Tanya AI: **panel setinggi layar** (`aiFitHeight` → CSS var `--ai-h`, hitung ulang saat resize / keyboard HP via `visualViewport` / pindah tab) → halaman tidak naik-turun, hanya isi pesan yang di-scroll (`overscroll-behavior: contain`); kolom baca terpusat maks ±860px; tombol "ke pesan terbaru" (`aiDown`/`aiToBottom`); HP: judul halaman disembunyikan di tab AI (`:has()`), header CGL disembunyikan, baris tombol chat tidak terpecah. CSS blok "Tanya AI (v57)" di akhir `<style>` utama (BUKAN di template PDF `openPrintWindow`) |
 | v56 | Teks keterangan "Dikirim ke AI setiap bertanya…" di bawah kotak chat dihapus (permintaan Nick) |
 | v55 | **AI Auto pintar-hemat** (keputusan Nick): `aiRoute()` — pertanyaan yang butuh data pribadi (`AI_PRIV_RE`: no HP/WA, alamat, wilayah, lahir/ultah/umur, sekolah/kelas, catatan…) → `provider:auto` (Claude dulu) + `private`; selain itu → `provider:gemini-first` + `check:true` tanpa data pribadi. Server: Gemini dulu (Claude cadangan); jawaban Gemini yang berisi angka/tabel/blok data dicek **Claude Haiku 5.5** (`CLAUDE_CHECK_MODEL`, `checkWithClaude`, `CHECK_RULES`) → event `checking` → `checked` (label "dicek Claude") atau `fix` (jawaban diganti, label "diperbaiki Claude"). Pilihan Claude/Gemini manual Coach/TL tetap |
