@@ -1,6 +1,6 @@
 # AOG Teens Jaktim — CG Dashboard (Absensi + Management)
 
-**Current version:** v55 · **Last updated:** 27 Oktober 2026
+**Current version:** v56 · **Last updated:** 27 Oktober 2026
 
 ## Project Overview
 Single-file web app untuk tracking attendance, pelayanan, milestone, events, visi, dan distribusi wilayah CG untuk AOG Teens Jakarta Timur. Dipakai oleh ~54 member, 9 CG Leaders, 2 Coach, dan 1 Team Leader secara bersamaan saat ibadah hari Minggu.
@@ -278,8 +278,8 @@ Edit index.html locally (+ file lain kalau perlu)
 ```
 
 **Version bump pattern setiap push code:**
-1. `index.html` — cari `App version">v55` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
-2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v55'` → naikkan sama
+1. `index.html` — cari `App version">v56` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
+2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v56'` → naikkan sama
 
 ---
 
@@ -394,6 +394,7 @@ Edit index.html locally (+ file lain kalau perlu)
 | v29 | **Distribusi Wilayah** — filter kecamatan + kelurahan di Coach/TL Overview |
 | v30 | Wilayah filter hardening (escape + reset state + count consistency) |
 | v31 | **27 bug fixes** — attendance stats inflate, data corruption (sekolah/kelas split), XSS (PDF export), error handling (21 Supabase ops), TEEN 25 color map, reconnect race guard, undo sync, milestone prereq, visi TOCTOU fix |
+| v56 | Teks keterangan "Dikirim ke AI setiap bertanya…" di bawah kotak chat dihapus (permintaan Nick) |
 | v55 | **AI Auto pintar-hemat** (keputusan Nick): `aiRoute()` — pertanyaan yang butuh data pribadi (`AI_PRIV_RE`: no HP/WA, alamat, wilayah, lahir/ultah/umur, sekolah/kelas, catatan…) → `provider:auto` (Claude dulu) + `private`; selain itu → `provider:gemini-first` + `check:true` tanpa data pribadi. Server: Gemini dulu (Claude cadangan); jawaban Gemini yang berisi angka/tabel/blok data dicek **Claude Haiku 5.5** (`CLAUDE_CHECK_MODEL`, `checkWithClaude`, `CHECK_RULES`) → event `checking` → `checked` (label "dicek Claude") atau `fix` (jawaban diganti, label "diperbaiki Claude"). Pilihan Claude/Gemini manual Coach/TL tetap |
 | v54 | Dashboard CGL: pilihan AI (Auto/Claude/Gemini) disembunyikan, selalu **Auto** (`aiOnCGLPage()` di `aiGetProv`); pilihan tetap untuk Coach/TL |
 | v53 | **Daftar lagu PAW** di jawaban AI: blok ```lagu {judul, lagu:[{judul, artis, tipe P/W/S}]}``` → kartu (`aiLaguHTML`) dengan tombol **Lirik** (link pencarian YouTube "judul artis lyrics") & **Spotify** (pencarian) — sengaja link pencarian, bukan URL video (tidak rusak / tidak dikarang AI); lirik tidak ditulis (hak cipta). Salin/WA ikut link lirik (`aiLaguText`) |
