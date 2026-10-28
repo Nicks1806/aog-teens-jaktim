@@ -561,7 +561,7 @@ module.exports = async function handler(req, res) {
   };
   const lightEstTok = () => Math.ceil(lightMessages().reduce((a, x) => a + x.content.length, 0) / 3) + GROQ_LIGHT_OUT;
   const groqBody = (model, stream, light) => JSON.stringify(Object.assign(
-    { model, messages: light ? lightMessages() : groqMessages(), temperature: light ? 0.6 : 0.3, max_completion_tokens: light ? GROQ_LIGHT_OUT : GROQ_MAX_OUT, stream: !!stream },
+    { model, messages: light ? lightMessages() : groqMessages(), temperature: light && !/\b(lagu|paw|praise|worship|pujian|penyembahan|playlist)\b/i.test(question) ? 0.6 : 0.2, max_completion_tokens: light ? GROQ_LIGHT_OUT : GROQ_MAX_OUT, stream: !!stream },
     /gpt-oss/i.test(model) ? { reasoning_effort: 'low' } : {},
     /qwen/i.test(model) ? { reasoning_format: 'hidden' } : {}, // proses berpikir tidak ikut tampil di jawaban
     wantJSON ? { response_format: { type: 'json_object' } } : {}));
