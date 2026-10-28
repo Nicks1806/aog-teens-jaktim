@@ -550,7 +550,8 @@ module.exports = async function handler(req, res) {
       '- Ide game/kegiatan boleh kreatif, utamakan dari daftar di PENGETAHUAN; cocok untuk remaja, tidak mempermalukan.',
       '- Kamu TIDAK menerima data anggota, absensi, pelayanan, atau milestone. Kalau pertanyaan butuh data itu (nama anak, angka kehadiran, rekap, siapa yang …, jadwal), balas PERSIS satu kata: PERLU_DATA',
       lagu.trim(),
-      '- Jangan menulis lirik lagu (hak cipta).'
+      '- Jangan menulis lirik lagu (hak cipta).',
+      '- LAGU: pilih HANYA lagu yang tertulis di daftar LAGU PAW pada PENGETAHUAN, judul ditulis persis. Jangan menambah lagu lain. Artis = nama sebelum titik dua di baris lagu itu (mis. "NDC Worship: Tak Terbatas" → artis "NDC Worship"); lagu di bawah judul GMS LIVE → artis "GMS Live". Tipe P/W/S ikuti kode di daftar.'
     ].join('\n');
     const know = lightNotes(notes, question + ' ' + history.filter(h => h && h.role !== 'model').slice(-2).map(h => String(h.text || '')).join(' '), guide ? 7000 : 11000);
     const m = [{ role: 'system', content: sys + (know ? '\n\nPENGETAHUAN (dari Coach/TL):\n' + know : '') + (guide ? '\n\n' + APP_GUIDE : '') }];
