@@ -993,7 +993,7 @@ html.vt .tab-content.active{animation:none}
 .ai-leg span{display:inline-flex;align-items:center;gap:6px}
 .ai-leg i{width:10px;height:10px;border-radius:3px;display:inline-block}
 .ai-mic{width:46px;height:46px;border-radius:14px;border:1px solid var(--line);background:#fff;color:#6C5CE7;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;flex:none}
-.ai-mic.on{background:#fee2e2;border-color:#fca5a5;color:var(--A);animation:aiPulse 1.2s infinite}
+.ai-mic.on{background:var(--A);border-color:var(--A);color:#fff;animation:aiPulse 1.2s infinite}
 @keyframes aiPulse{0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,.35)}50%{box-shadow:0 0 0 6px rgba(220,38,38,0)}}
 .ai-mem{border:1px solid #e4dcff;background:linear-gradient(135deg,#faf8ff,#fff);border-radius:14px;padding:12px 14px}
 .ai-mem-btn{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:12px;padding:10px 14px;background:var(--grad);color:#fff;font:inherit;font-size:13.5px;font-weight:600;cursor:pointer;box-shadow:0 4px 12px rgba(108,92,231,.25)}
@@ -1279,7 +1279,7 @@ html.vt .tab-content.active{animation:none}
       <button type="submit" class="btn primary">Tambah</button>
     </form>
     <label class="flabel" for="aiNotesText" style="display:block;margin:14px 0 6px">Semua yang sudah diajarkan</label>
-    <textarea class="textarea" id="aiNotesText" rows="14" maxlength="20000" oninput="aiNotesCount()"></textarea>
+    <textarea class="textarea" id="aiNotesText" rows="14" maxlength="20000" oninput="window.aiNotesCount()"></textarea>
     <div class="ab-hint" id="aiNotesCount" style="text-align:right;margin-top:6px"></div>
     <div class="mfoot"><button type="button" class="btn" onclick="closeModal('aiNotesModal')">Batal</button><button type="button" class="btn primary" id="aiNotesSave" onclick="saveAINotes()">Simpan</button></div>
   </div>
@@ -1328,7 +1328,7 @@ html.vt .tab-content.active{animation:none}
     <button type="button" class="backcoach" id="dBackCoach" onclick="goBack()" style="display:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Kembali ke Coach</button>
     <nav class="navlist" aria-label="Tab CG"><button type="button" class="nav app-tab on" data-tab="absensi" aria-current="page" onclick="sTab('absensi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M9 15l2 2 4-4"/></svg><span>Absensi</span></button><button type="button" class="nav app-tab" data-tab="detail" onclick="sTab('detail',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c1.9.7 3.1 2.4 3.5 5.2"/></svg><span>Detail CG</span></button><button type="button" class="nav app-tab" data-tab="visi" onclick="sTab('visi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span>Visi CG</span></button><button type="button" class="nav app-tab" data-tab="pelayanan" onclick="sTab('pelayanan',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"/></svg><span>Pelayanan</span></button><button type="button" class="nav app-tab" data-tab="milestone" onclick="sTab('milestone',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4h11l-2 4 2 4H5"/></svg><span>Milestone</span></button><button type="button" class="nav app-tab" data-tab="events" onclick="sTab('events',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4z"/><path d="M14 7v10"/></svg><span>Events</span></button><button type="button" class="nav app-tab ai-nav" data-tab="ai" onclick="sTab('ai',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg><span>Tanya AI</span></button></nav>
     <div class="sidetheme"><small>The year of</small><b>Unity</b><span>&amp; Open Heavens</span></div>
-    <div class="profile"><span class="ava" id="dAva" aria-hidden="true">A</span><div style="flex:1;min-width:0"><b id="nN"></b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v60</span></span></span></div><button type="button" class="exit" onclick="goBack()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
+    <div class="profile"><span class="ava" id="dAva" aria-hidden="true">A</span><div style="flex:1;min-width:0"><b id="nN"></b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v61</span></span></span></div><button type="button" class="exit" onclick="goBack()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
   </aside>
   <div class="main">
     <header class="mtop">
@@ -1372,7 +1372,7 @@ html.vt .tab-content.active{animation:none}
     <div class="rolesw" role="group" aria-label="Peran"><button type="button" id="roleCoachBtn" class="on" aria-pressed="true" onclick="switchRole('coach')">Coach</button><button type="button" id="roleTLBtn" aria-pressed="false" onclick="switchRole('tl')">TL</button></div>
     <nav class="navlist" id="coachTabs" aria-label="Tab Coach"><button type="button" class="nav app-tab on" data-tab="c-overview" aria-current="page" onclick="sCoachTab('c-overview',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"/></svg><span>Overview</span></button><button type="button" class="nav app-tab" data-tab="c-absensi" onclick="sCoachTab('c-absensi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M9 15l2 2 4-4"/></svg><span>Absensi</span></button><button type="button" class="nav app-tab" data-tab="c-milestone" onclick="sCoachTab('c-milestone',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4h11l-2 4 2 4H5"/></svg><span>Milestone</span></button><button type="button" class="nav app-tab" data-tab="c-visi" onclick="sCoachTab('c-visi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span>Visi</span></button><button type="button" class="nav app-tab" data-tab="c-events" onclick="sCoachTab('c-events',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4z"/><path d="M14 7v10"/></svg><span>Events</span></button><button type="button" class="nav app-tab ai-nav" data-tab="c-ai" onclick="sCoachTab('c-ai',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg><span>Tanya AI</span></button></nav>
     <button type="button" class="sidetheme editable" onclick="openThemeEdit()" aria-label="Edit tema tahun ini" title="Klik untuk edit tema"><small>The year of</small><b>Unity</b><span>&amp; Open Heavens</span><i class="st-edit" aria-hidden="true">Edit</i></button>
-    <div class="profile"><span class="ava" id="cAva" aria-hidden="true">C</span><div style="flex:1;min-width:0"><b id="cWho">Coach</b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v60</span></span></span></div><button type="button" class="exit" onclick="goBackCoach()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
+    <div class="profile"><span class="ava" id="cAva" aria-hidden="true">C</span><div style="flex:1;min-width:0"><b id="cWho">Coach</b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v61</span></span></span></div><button type="button" class="exit" onclick="goBackCoach()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
   </aside>
   <div class="main">
     <header class="mtop">
@@ -6143,7 +6143,7 @@ function aiMountChat(mode) {
           '<button type="button" class="ai-mic" onclick="document.getElementById(\'aiFile\').click()" aria-label="Kirim foto ke AI" title="Kirim foto (mis. daftar hadir kertas)">' + icon('image', 20) + '</button>' +
           '<label class="sr" for="aiQ">Pertanyaan</label>' +
           '<textarea id="aiQ" rows="1" placeholder="' + (window.innerWidth <= 600 ? 'Tanya AI…' : 'Tanya apa saja tentang absensi, CG, milestone, event…') + '" onkeydown="aiKey(event)" oninput="aiGrow(this)"></textarea>' +
-          (aiMicSupported() ? '<button type="button" class="ai-mic" id="aiMic" onclick="aiMic()" aria-label="Tanya pakai suara" title="Tanya pakai suara">' + icon('mic', 20) + '</button>' : '') +
+          '<button type="button" class="ai-mic" id="aiMic" onclick="window.aiMic()" aria-label="Tanya pakai suara" title="Tanya pakai suara">' + icon('mic', 20) + '</button>' +
           '<button type="submit" class="ai-send" id="aiSend" aria-label="Kirim pertanyaan">' + icon('right', 20) + '</button>' +
         '</form>' +
       '</div>' +
@@ -6217,19 +6217,55 @@ function aiLoadChat() {
 // Tanya pakai suara (Web Speech API — Chrome/Android/Edge; Safari sebagian)
 let _AI_REC = null;
 function aiMicSupported() { return !!(window.SpeechRecognition || window.webkitSpeechRecognition); }
+// Pesan error mikrofon yang jelas (kode dari Web Speech API)
+const AI_MIC_ERR = {
+  'not-allowed': 'Izin mikrofon ditolak — izinkan mikrofon untuk situs ini di pengaturan browser, lalu coba lagi',
+  'service-not-allowed': 'Input suara tidak tersedia di mode ini — coba buka lewat Chrome/Safari (bukan dari aplikasi lain)',
+  'audio-capture': 'Mikrofon tidak terdeteksi — cek mikrofon HP',
+  'network': 'Input suara butuh internet — cek koneksi',
+  'language-not-supported': 'Bahasa Indonesia belum didukung di browser ini'
+};
+function aiMicReset() {
+  clearTimeout(_AI_REC_T);
+  _AI_REC = null;
+  const btn = document.getElementById('aiMic'), ta = document.getElementById('aiQ');
+  if (btn) { btn.classList.remove('on'); btn.setAttribute('aria-label', 'Tanya pakai suara'); }
+  if (ta && ta.dataset.ph) { ta.placeholder = ta.dataset.ph; delete ta.dataset.ph; }
+}
+let _AI_REC_T = null;
 function aiMic() {
   const btn = document.getElementById('aiMic');
-  if (_AI_REC) { try { _AI_REC.stop(); } catch(e) {} return; }
+  // Sedang mendengarkan → tekan lagi = berhenti (pengaman: kalau browser tidak memberi sinyal selesai, reset paksa)
+  if (_AI_REC) { const r = _AI_REC; try { r.stop(); } catch(e) {} setTimeout(() => { if (_AI_REC === r) aiMicReset(); }, 1500); return; }
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) { toast('Browser ini belum mendukung input suara'); return; }
+  if (!SR) { toast('⚠ Browser ini belum mendukung input suara — coba buka di Chrome'); return; }
   const ta = document.getElementById('aiQ'); if (!ta) return;
-  const rec = new SR();
-  rec.lang = 'id-ID'; rec.interimResults = true; rec.continuous = false;
+  let rec;
+  try { rec = new SR(); } catch(e) { toast('❌ Input suara tidak bisa dipakai di browser ini'); return; }
+  rec.lang = 'id-ID'; rec.interimResults = true; rec.continuous = false; rec.maxAlternatives = 1;
   const base = ta.value ? ta.value.replace(/\s*$/, ' ') : '';
-  rec.onresult = e => { let t = ''; for (let i = 0; i < e.results.length; i++) t += e.results[i][0].transcript; ta.value = base + t; aiGrow(ta); };
-  rec.onerror = e => { if (e.error !== 'aborted' && e.error !== 'no-speech') toast('❌ Mikrofon: ' + (e.error === 'not-allowed' ? 'izin mikrofon ditolak' : e.error)); };
-  rec.onend = () => { _AI_REC = null; if (btn) btn.classList.remove('on'); ta.focus(); };
-  try { rec.start(); _AI_REC = rec; if (btn) btn.classList.add('on'); } catch(e) { toast('❌ Mikrofon tidak bisa dipakai'); }
+  let heard = false;
+  rec.onresult = e => { let t = ''; for (let i = 0; i < e.results.length; i++) t += e.results[i][0].transcript; if (t.trim()) heard = true; ta.value = base + t; aiGrow(ta); };
+  rec.onerror = e => {
+    if (e.error === 'no-speech') toast('Tidak terdengar suara — tekan mikrofon lalu bicara');
+    else if (e.error !== 'aborted') toast('❌ ' + (AI_MIC_ERR[e.error] || ('Mikrofon: ' + e.error)));
+    aiMicReset(); // beberapa browser HP tidak memanggil onend setelah error → jangan sampai tombol "macet"
+  };
+  rec.onend = () => { const was = _AI_REC === rec; aiMicReset(); if (was && heard) ta.focus(); };
+  try {
+    rec.start();
+    _AI_REC = rec;
+    if (btn) { btn.classList.add('on'); btn.setAttribute('aria-label', 'Berhenti mendengarkan'); }
+    if (!ta.dataset.ph) ta.dataset.ph = ta.placeholder;
+    ta.placeholder = 'Mendengarkan… bicara sekarang';
+    toast('Mendengarkan… bicara sekarang');
+    // Pengaman: maksimal 20 detik
+    _AI_REC_T = setTimeout(() => { if (_AI_REC === rec) { try { rec.stop(); } catch(e) {} setTimeout(() => { if (_AI_REC === rec) aiMicReset(); }, 1500); } }, 20000);
+  } catch(e) {
+    console.error('[aiMic]', e);
+    aiMicReset();
+    toast('❌ Mikrofon tidak bisa dipakai — tutup aplikasi lain yang memakai mikrofon lalu coba lagi');
+  }
 }
 
 // ── AI per anak (detail anak, Coach/TL): ringkasan + draft WA personal ──
