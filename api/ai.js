@@ -206,6 +206,7 @@ const GROQ_FALLBACK = ['openai/gpt-oss-120b', 'qwen/qwen3.8-27b', 'openai/gpt-os
 const GROQ_MAX_OUT = 4096;
 const GROQ_LIGHT_OUT = 1800; // jawaban ringan (token keluar juga dihitung dalam batas token/menit)
 const GROQ_COOL = new Map(), GROQ_TPM = new Map();
+const GROQ_TPM_DEFAULT = Number(process.env.GROQ_TPM) || 8000; // batas token/menit paket gratis (cek 28 Okt 2026)
 const groqFail = (model, status, msg) => {
   msg = String(msg || '');
   const lim = /tokens per minute[\s\S]*?Limit:? *(\d+)/i.exec(msg);
@@ -219,6 +220,7 @@ const groqFail = (model, status, msg) => {
   }
 };
 const groqCooling = model => (GROQ_COOL.get('*') || 0) > Date.now() || (GROQ_COOL.get(model) || 0) > Date.now();
+const failNote = m => 'gagal: ' + String(m || 'tidak diketahui').replace(/\s+/g, ' ').slice(0, 140);
 const oUsage = u => ({ in: (u && u.prompt_tokens) || 0, out: (u && u.completion_tokens) || 0, cr: (u && u.prompt_tokens_details && u.prompt_tokens_details.cached_tokens) || 0, cw: 0 });
 
 // Rate limit sederhana per IP (per instance — cukup untuk mencegah pemakaian berlebihan)
@@ -543,7 +545,7 @@ module.exports = async function handler(req, res) {
     return m;
   };
   const groqEstTok = Math.ceil((SYSTEM_TEXT.length + context.length + question.length + history.reduce((a, h) => a + String((h && h.text) || '').slice(0, 4000).length, 0)) / 3.5) + GROQ_MAX_OUT;
-  const groqSkip = (model, est) => groqCooling(model) || (GROQ_TPM.has(model) && (est || groqEstTok) > GROQ_TPM.get(model));
+  const groqSkip = (model, est) => groqCooling(model) || (est || groqEstTok) > (GROQ_TPM.get(model) || GROQ_TPM_DEFAULT);
   // Versi ringan: tanpa DATA dashboard, hanya aturan inti + Training AI yang relevan (+ panduan aplikasi kalau ditanya cara pakai)
   const isLight = prov === 'gemini-first' && LOGCTX.feature === 'chat' && !hasImage && !wantJSON && !(lim && lim.groq_ringan === false) && isLightQuestion(question, history);
   const lightMessages = () => {
@@ -664,7 +666,7 @@ module.exports = async function handler(req, res) {
     };
     const tryClaude = async () => {
       const c = await streamClaude(text);
-      USE.push({ model: c.model || CLAUDE_MODEL, kind: c.ok ? 'jawab' : 'gagal', u: lastUsage }); lastUsage = null;
+      USE.push({ model: c.model || CLAUDE_MODEL, kind: c.ok ? 'jawab' : 'gagal', u: lastUsage, note: c.ok ? undefined : failNote(c.err) }); lastUsage = null;
       if (c.ok) { emit(Object.assign({ done: true, model: c.model, finish: c.finish }, note ? { note } : {})); res.end(); return 'done'; }
       if (started) { emit({ error: 'Jawaban terputus — coba tanya lagi.' }); res.end(); return 'done'; }
       note = (note ? note + ' · ' : '') + 'Claude: ' + c.err; // belum ada teks terkirim → aman pindah
@@ -682,7 +684,7 @@ module.exports = async function handler(req, res) {
         if (geminiCooling(model)) { note = (note ? note + ' · ' : '') + 'Gemini ' + model + ': istirahat (limit)'; continue; }
         let r = await streamGemini(model, true, text);
         if (!r.ok && !started && r.status === 400 && /thinking/i.test(r.msg || '')) r = await streamGemini(model, false, text);
-        USE.push({ model, kind: r.ok ? 'jawab' : 'gagal', u: lastUsage }); lastUsage = null;
+        USE.push({ model, kind: r.ok ? 'jawab' : 'gagal', u: lastUsage, note: r.ok ? undefined : failNote(r.msg || r.err) }); lastUsage = null;
         if (r.ok) {
           await checkFull();
           emit(Object.assign({ done: true, model, finish: r.finish }, note ? { note } : {})); res.end(); return 'done';
@@ -704,7 +706,7 @@ module.exports = async function handler(req, res) {
         if (Date.now() - t0 > 45000) break;
         if (groqSkip(model)) continue; // sedang istirahat / data terlalu besar untuk batas model ini
         const r = await streamGroq(model, text);
-        USE.push({ model: 'groq/' + model, kind: r.ok ? 'jawab' : 'gagal', u: lastUsage, note: 'cadangan Gemini' }); lastUsage = null;
+        USE.push({ model: 'groq/' + model, kind: r.ok ? 'jawab' : 'gagal', u: lastUsage, note: r.ok ? 'cadangan Gemini' : failNote(r.msg) }); lastUsage = null;
         if (r.ok) {
           await checkFull();
           emit(Object.assign({ done: true, model: 'groq/' + model, finish: r.finish }, note ? { note } : {})); res.end(); return 'done';
@@ -777,11 +779,11 @@ module.exports = async function handler(req, res) {
       if (!out.r.ok && out.r.status === 400 && /thinking/i.test(out.msg)) out = await callGemini(model, false);
     }
     catch (e) {
-      if (e && e.name === 'AbortError') { lastErr = 'AI terlalu lama menjawab.'; lastStatus = 504; console.warn('[api/ai] timeout', model); GEM_COOL.set(model, Date.now() + 60e3); if (useHaiku || useGroq) break; continue; }
+      if (e && e.name === 'AbortError') { lastErr = 'AI terlalu lama menjawab.'; lastStatus = 504; console.warn('[api/ai] timeout', model); USE.push({ model, kind: 'gagal', u: null, note: 'gagal: timeout' }); GEM_COOL.set(model, Date.now() + 60e3); if (useHaiku || useGroq) break; continue; }
       console.error('[api/ai] fetch failed', model, e); lastErr = 'Gagal menghubungi AI.'; continue;
     }
     const { r, data, msg } = out;
-    USE.push({ model, kind: r.ok && data.candidates && data.candidates.length ? 'jawab' : 'gagal', u: lastUsage }); lastUsage = null;
+    USE.push({ model, kind: r.ok && data.candidates && data.candidates.length ? 'jawab' : 'gagal', u: lastUsage, note: r.ok ? undefined : failNote(msg) }); lastUsage = null;
     if (r.ok) {
       const cand = data.candidates && data.candidates[0];
       const text = cand && cand.content && Array.isArray(cand.content.parts) ? cand.content.parts.map(p => p.text || '').join('') : '';
