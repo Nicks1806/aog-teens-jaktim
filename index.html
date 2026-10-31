@@ -946,6 +946,19 @@ html.vt .tab-content.active{animation:none}
 .us-model.on .us-radio{border-color:var(--accent)}
 .us-model.on .us-radio::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--accent)}
 @media (max-width:600px){ .us-models{grid-template-columns:1fr} }
+.us-set-l{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin:16px 0 8px}
+.us-set-l:first-of-type{margin-top:4px}
+.us-sws{display:grid;gap:10px}
+.us-sw{position:relative;display:flex;align-items:flex-start;gap:12px;padding:12px 16px;border:1.5px solid var(--line);border-radius:14px;cursor:pointer}
+.us-sw input{position:absolute;opacity:0;width:1px;height:1px}
+.us-sw-t{flex:none;width:38px;height:22px;border-radius:12px;background:#d9d6e3;position:relative;transition:background .15s;margin-top:1px}
+.us-sw-t::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:transform .15s}
+.us-sw input:checked+.us-sw-t{background:var(--accent)}
+.us-sw input:checked+.us-sw-t::after{transform:translateX(16px)}
+.us-sw input:focus-visible+.us-sw-t{outline:2px solid var(--accent);outline-offset:2px}
+.us-sw input:disabled+.us-sw-t{opacity:.6}
+.us-sw b{display:block;font-size:14px;font-weight:600}
+.us-sw small{display:block;font-size:12.5px;color:var(--muted);margin-top:3px;line-height:1.45}
 .us-lims{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
 .us-sql{background:#1c1c1c;color:#e9e6ff;border-radius:12px;padding:14px;font-size:12px;overflow-x:auto;white-space:pre}
 @media (max-width:1100px){ .us-kpis,.us-lims{grid-template-columns:1fr 1fr} }
@@ -1397,7 +1410,7 @@ html.vt .tab-content.active{animation:none}
     <button type="button" class="backcoach" id="dBackCoach" onclick="goBack()" style="display:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Kembali ke Coach</button>
     <nav class="navlist" aria-label="Tab CG"><button type="button" class="nav app-tab on" data-tab="absensi" aria-current="page" onclick="sTab('absensi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M9 15l2 2 4-4"/></svg><span>Absensi</span></button><button type="button" class="nav app-tab" data-tab="detail" onclick="sTab('detail',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c1.9.7 3.1 2.4 3.5 5.2"/></svg><span>Detail CG</span></button><button type="button" class="nav app-tab" data-tab="visi" onclick="sTab('visi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span>Visi CG</span></button><button type="button" class="nav app-tab" data-tab="pelayanan" onclick="sTab('pelayanan',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"/></svg><span>Pelayanan</span></button><button type="button" class="nav app-tab" data-tab="milestone" onclick="sTab('milestone',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4h11l-2 4 2 4H5"/></svg><span>Milestone</span></button><button type="button" class="nav app-tab" data-tab="events" onclick="sTab('events',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4z"/><path d="M14 7v10"/></svg><span>Events</span></button><button type="button" class="nav app-tab ai-nav" data-tab="ai" onclick="sTab('ai',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg><span>Tanya AI</span></button></nav>
     <div class="sidetheme"><small>The year of</small><b>Unity</b><span>&amp; Open Heavens</span></div>
-    <div class="profile"><span class="ava" id="dAva" aria-hidden="true">A</span><div style="flex:1;min-width:0"><b id="nN"></b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v71</span></span></span></div><button type="button" class="exit" onclick="goBack()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
+    <div class="profile"><span class="ava" id="dAva" aria-hidden="true">A</span><div style="flex:1;min-width:0"><b id="nN"></b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v72</span></span></span></div><button type="button" class="exit" onclick="goBack()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
   </aside>
   <div class="main">
     <header class="mtop">
@@ -1441,7 +1454,7 @@ html.vt .tab-content.active{animation:none}
     <div class="rolesw" role="group" aria-label="Peran"><button type="button" id="roleCoachBtn" class="on" aria-pressed="true" onclick="switchRole('coach')">Coach</button><button type="button" id="roleTLBtn" aria-pressed="false" onclick="switchRole('tl')">TL</button></div>
     <nav class="navlist" id="coachTabs" aria-label="Tab Coach"><button type="button" class="nav app-tab on" data-tab="c-overview" aria-current="page" onclick="sCoachTab('c-overview',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"/></svg><span>Overview</span></button><button type="button" class="nav app-tab" data-tab="c-absensi" onclick="sCoachTab('c-absensi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M9 15l2 2 4-4"/></svg><span>Absensi</span></button><button type="button" class="nav app-tab" data-tab="c-milestone" onclick="sCoachTab('c-milestone',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4h11l-2 4 2 4H5"/></svg><span>Milestone</span></button><button type="button" class="nav app-tab" data-tab="c-visi" onclick="sCoachTab('c-visi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span>Visi</span></button><button type="button" class="nav app-tab" data-tab="c-events" onclick="sCoachTab('c-events',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4z"/><path d="M14 7v10"/></svg><span>Events</span></button><button type="button" class="nav app-tab ai-nav" data-tab="c-ai" onclick="sCoachTab('c-ai',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg><span>Tanya AI</span></button><button type="button" class="nav app-tab usage-nav" data-tab="c-usage" hidden onclick="sCoachTab('c-usage',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V11M10 20V5M16 20v-8M22 20H2"/></svg><span>Pemakaian AI</span></button></nav>
     <button type="button" class="sidetheme editable" onclick="openThemeEdit()" aria-label="Edit tema tahun ini" title="Klik untuk edit tema"><small>The year of</small><b>Unity</b><span>&amp; Open Heavens</span><i class="st-edit" aria-hidden="true">Edit</i></button>
-    <div class="profile"><span class="ava" id="cAva" aria-hidden="true">C</span><div style="flex:1;min-width:0"><b id="cWho">Coach</b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v71</span></span></span></div><button type="button" class="exit" onclick="goBackCoach()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
+    <div class="profile"><span class="ava" id="cAva" aria-hidden="true">C</span><div style="flex:1;min-width:0"><b id="cWho">Coach</b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v72</span></span></span></div><button type="button" class="exit" onclick="goBackCoach()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
   </aside>
   <div class="main">
     <header class="mtop">
@@ -6272,13 +6285,23 @@ async function renderAIUsage() {
     '<section class="card"><div class="chead"><h2>Siapa yang memakai</h2></div>' + usTable(['Pengguna', 'Pertanyaan', 'Biaya'], byScope) + '</section>' +
     '<section class="card"><div class="chead"><h2>Fitur</h2></div>' + usTable(['Fitur', 'Pertanyaan'], byFeat) + '</section>' +
   '</div>';
-  const cm = lim.claude_model === 'haiku' ? 'haiku' : 'sonnet';
+  // Pengaturan AI (mode Auto): AI utama, model Claude, cek Haiku, Groq ringan — disimpan langsung saat diklik
+  const cm = lim.claude_model === 'haiku' ? 'haiku' : 'sonnet', au = lim.ai_utama === 'claude' ? 'claude' : 'gemini';
   const avgCost = re => { const l = ans.filter(r => re.test(r.model)); return l.length ? rp(l.reduce((a, r) => a + (Number(r.cost_usd) || 0), 0) / l.length * AI_KURS) : ''; };
-  const mOpt = (key, name, desc, re) => { const c = avgCost(re); return '<button type="button" class="us-model' + (cm === key ? ' on' : '') + '" aria-pressed="' + (cm === key) + '" onclick="saveClaudeModel(\'' + key + '\')">' +
-    '<span class="us-radio" aria-hidden="true"></span><span><b>' + name + '</b><small>' + desc + '</small>' + (c ? '<em>Rata-rata 30 hari: ' + c + ' / pertanyaan</em>' : '') + '</span></button>'; };
-  h += '<section class="card" style="margin-top:16px"><div class="chead"><div><h2>Model Claude</h2><div class="sub">Dipakai untuk pertanyaan yang butuh data pribadi anak, saat pilihan AI "Claude", dan sebagai cadangan. Pengecek jawaban Gemini tetap Haiku.</div></div></div><div class="us-models">' +
-    mOpt('sonnet', 'Claude Sonnet 5.5', 'Paling teliti untuk analisis & data anak. Lebih mahal (±20× Haiku).', /claude-sonnet/i) +
-    mOpt('haiku', 'Claude Haiku 5.5', 'Jauh lebih murah & cepat, sedikit kurang teliti untuk analisis panjang.', /claude-haiku/i) +
+  const opt = (field, key, cur, name, desc, extra) => '<button type="button" class="us-model' + (cur === key ? ' on' : '') + '" aria-pressed="' + (cur === key) + '" onclick="saveAISetting(\'' + field + '\',\'' + key + '\')">' +
+    '<span class="us-radio" aria-hidden="true"></span><span><b>' + name + '</b><small>' + desc + '</small>' + (extra ? '<em>' + extra + '</em>' : '') + '</span></button>';
+  const sw = (field, on, name, desc) => '<label class="us-sw"><input type="checkbox"' + (on ? ' checked' : '') + ' onchange="saveAISetting(\'' + field + '\',this.checked)"><span class="us-sw-t" aria-hidden="true"></span><span><b>' + name + '</b><small>' + desc + '</small></span></label>';
+  const cS = avgCost(/claude-sonnet/i), cH = avgCost(/claude-haiku/i);
+  h += '<section class="card" style="margin-top:16px"><div class="chead"><div><h2>Pengaturan AI</h2><div class="sub">Berlaku untuk mode Auto (semua CGL, dan Coach/TL yang memilih Auto). Pertanyaan yang butuh data pribadi anak selalu dijawab Claude. Aktif ±30 detik setelah diubah.</div></div></div>' +
+    '<div class="us-set-l">AI utama</div><div class="us-models">' +
+    opt('ai_utama', 'gemini', au, 'Gemini utama · Claude cadangan', 'Lebih hemat. Kalau Gemini gagal / limit → Groq → Claude.') +
+    opt('ai_utama', 'claude', au, 'Claude utama · Gemini cadangan', 'Jawaban paling teliti, biaya lebih tinggi. Kalau Claude gagal → Gemini → Groq.') +
+    '</div><div class="us-set-l">Model Claude</div><div class="us-models">' +
+    opt('claude_model', 'sonnet', cm, 'Claude Sonnet 5.5', 'Paling teliti untuk analisis & data anak. Lebih mahal (±20× Haiku).', cS ? 'Rata-rata 30 hari: ' + cS + ' / pertanyaan' : '') +
+    opt('claude_model', 'haiku', cm, 'Claude Haiku 5.5', 'Jauh lebih murah & cepat, sedikit kurang teliti untuk analisis panjang.', cH ? 'Rata-rata 30 hari: ' + cH + ' / pertanyaan' : '') +
+    '</div><div class="us-set-l">Tambahan</div><div class="us-sws">' +
+    sw('cek_haiku', lim.cek_haiku !== false, 'Cek jawaban Gemini dengan Claude Haiku', 'Angka & nama di jawaban Gemini dicek ulang. Lebih akurat, tapi jawaban selesai ±3–9 detik lebih lama.') +
+    sw('groq_ringan', lim.groq_ringan !== false, 'Groq untuk pertanyaan ringan', 'Ide game, lagu PAW, cara pakai aplikasi dijawab Groq (gratis & cepat), tanpa data anak.') +
     '</div></section>';
   const inp = (id, label, v, hint) => '<label class="field"><span class="flabel">' + label + '</span><input class="input" type="number" min="0" step="1" id="' + id + '" value="' + (v > 0 ? v : '') + '" placeholder="0 = tanpa batas"><small class="ab-hint" style="margin:0">' + hint + '</small></label>';
   h += '<section class="card" style="margin-top:16px"><div class="chead"><div><h2>Batas pemakaian</h2><div class="sub">Dicek server sebelum AI dipanggil. Kosong / 0 = tanpa batas.</div></div></div><div class="us-lims">' +
@@ -6314,14 +6337,17 @@ async function saveAIUserNames() {
   toast('\u2713 Nama pengguna disimpan');
   COACH_TAB_RENDERED['c-usage'] = false; renderAIUsage();
 }
-async function saveClaudeModel(key) {
-  if (key !== 'sonnet' && key !== 'haiku') return;
-  const btns = document.querySelectorAll('.us-model');
-  btns.forEach(b => { b.disabled = true; });
-  const error = await aiSaveSettings({ claude_model: key });
-  btns.forEach(b => { b.disabled = false; });
-  if (error) { toast('\u274c Gagal simpan model: ' + String(error.message || 'cek koneksi').slice(0, 80)); console.error('[saveClaudeModel]', error); return; }
-  toast('\u2713 Model Claude: ' + (key === 'haiku' ? 'Haiku' : 'Sonnet') + ' (aktif ±30 detik lagi)');
+const AI_SETTING_OK = { ai_utama: ['gemini', 'claude'], claude_model: ['sonnet', 'haiku'], cek_haiku: [true, false], groq_ringan: [true, false] };
+const AI_SETTING_MSG = { ai_utama: { gemini: 'AI utama: Gemini (Claude cadangan)', claude: 'AI utama: Claude (Gemini cadangan)' }, claude_model: { sonnet: 'Model Claude: Sonnet', haiku: 'Model Claude: Haiku' },
+  cek_haiku: { true: 'Cek Claude Haiku aktif', false: 'Cek Claude Haiku dimatikan' }, groq_ringan: { true: 'Groq untuk pertanyaan ringan aktif', false: 'Groq untuk pertanyaan ringan dimatikan' } };
+async function saveAISetting(field, val) {
+  if (!AI_SETTING_OK[field] || !AI_SETTING_OK[field].includes(val)) return;
+  const ctrls = document.querySelectorAll('.us-model, .us-sw input');
+  ctrls.forEach(b => { b.disabled = true; });
+  const error = await aiSaveSettings({ [field]: val });
+  ctrls.forEach(b => { b.disabled = false; });
+  if (error) { toast('\u274c Gagal simpan pengaturan: ' + String(error.message || 'cek koneksi').slice(0, 80)); console.error('[saveAISetting]', error); COACH_TAB_RENDERED['c-usage'] = false; renderAIUsage(); return; }
+  toast('\u2713 ' + AI_SETTING_MSG[field][val] + ' (aktif ±30 detik lagi)');
   COACH_TAB_RENDERED['c-usage'] = false; renderAIUsage();
 }
 async function saveAILimits() {

@@ -368,19 +368,24 @@ module.exports = async function handler(req, res) {
   const lim = await getLimits();
   // Model Claude utama dipilih Coach Jaktim 1 di tab Pemakaian AI: 'sonnet' (default) / 'haiku' (lebih murah)
   if (lim && lim.claude_model === 'haiku') CLAUDE_MODEL = process.env.CLAUDE_CHECK_MODEL || 'claude-haiku-5-5';
+  // Mode Auto (semua CGL + Coach/TL yang memilih Auto): AI utama diatur di tab Pemakaian AI.
+  // 'gemini' (default) = Gemini utama, Claude cadangan · 'claude' = Claude utama, Gemini cadangan.
+  // Pertanyaan data pribadi selalu Claude dulu (client mengirim provider 'auto'). Pilihan manual Coach/TL tetap dihormati.
+  let reqProv = ['claude', 'gemini', 'gemini-first'].includes(body.provider) ? body.provider : 'auto';
+  if (lim && lim.ai_utama === 'claude' && reqProv === 'gemini-first') reqProv = 'auto';
   if (lim) {
     const today = encodeURIComponent(wibStart('day'));
     if (lim.harian > 0) { const n = await countUsage('created_at=gte.' + today); if (n !== null && n >= lim.harian) return send(res, 429, { error: 'Batas pemakaian AI hari ini (' + lim.harian + ' pertanyaan) sudah tercapai. Coba lagi besok.' }); }
     if (lim.per_cg > 0 && LOGCTX.scope.indexOf('cgl:') === 0) { const n = await countUsage('created_at=gte.' + today + '&scope=eq.' + encodeURIComponent(LOGCTX.scope)); if (n !== null && n >= lim.per_cg) return send(res, 429, { error: 'Batas pemakaian AI untuk ' + LOGCTX.scope.slice(4) + ' hari ini (' + lim.per_cg + ' pertanyaan) sudah tercapai. Coba lagi besok.' }); }
     if (lim.anggaran_bulan > 0) { const usd = await costSince(wibStart('month')); if (usd !== null && usd * KURS >= lim.anggaran_bulan) return send(res, 429, { error: 'Anggaran AI bulan ini sudah habis. AI aktif lagi bulan depan (atau anggaran dinaikkan di tab Pemakaian AI).' }); }
-    if (lim.claude_harian > 0 && body.provider !== 'gemini' && body.provider !== 'gemini-first') { const n = await countUsage('created_at=gte.' + today + '&model=like.claude-sonnet*'); if (n !== null && n >= lim.claude_harian) claudeCapped = true; }
+    if (lim.claude_harian > 0 && reqProv !== 'gemini' && reqProv !== 'gemini-first') { const n = await countUsage('created_at=gte.' + today + '&model=like.claude-sonnet*'); if (n !== null && n >= lim.claude_harian) claudeCapped = true; }
   }
   // Kuota Claude Sonnet habis → jawab pakai Gemini (data pribadi tidak ikut)
-  const prov = claudeCapped ? 'gemini' : (['claude', 'gemini', 'gemini-first'].includes(body.provider) ? body.provider : 'auto');
-  LOGCTX.route = prov + (claudeCapped ? ' (kuota Claude habis)' : '');
+  const prov = claudeCapped ? 'gemini' : reqProv;
+  LOGCTX.route = prov + (claudeCapped ? ' (kuota Claude habis)' : '') + (lim && lim.ai_utama === 'claude' && body.provider === 'gemini-first' ? ' (Claude utama)' : '');
   const claudeFirst = prov !== 'gemini-first';
   const CHECK_MODEL = process.env.CLAUDE_CHECK_MODEL || 'claude-haiku-5-5'; // pengecek jawaban Gemini (murah)
-  const wantCheck = body.check === true && prov === 'gemini-first' && !!CLAUDE_KEY && !hasImage;
+  const wantCheck = body.check === true && prov === 'gemini-first' && !!CLAUDE_KEY && !hasImage && !(lim && lim.cek_haiku === false); // bisa dimatikan supaya lebih cepat
   const useClaude = !!CLAUDE_KEY && prov !== 'gemini';
   const useGemini = !!KEY && prov !== 'claude';
   const useHaiku = !!CLAUDE_KEY && prov !== 'claude'; // cadangan murah kalau Gemini kena limit
@@ -395,7 +400,7 @@ module.exports = async function handler(req, res) {
   const callGemini = async (model, think) => {
     // Batas 20 dtk per panggilan supaya tidak menggantung sampai Vercel timeout
     const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), hasImage ? 35000 : 20000); // baca foto butuh waktu lebih lama
+    const timer = setTimeout(() => ctrl.abort(), hasImage ? 35000 : 15000); // baca foto butuh waktu lebih lama
     try {
       const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(model) + ':generateContent', {
         method: 'POST',
@@ -510,7 +515,7 @@ module.exports = async function handler(req, res) {
     return { ok: true, model, finish: stop === 'max_tokens' ? 'MAX_TOKENS' : 'STOP' };
   };
   const streamGemini = async (model, think, emit) => {
-    const tmr = withTimer(hasImage ? 35000 : 20000, 20000);
+    const tmr = withTimer(hasImage ? 35000 : 12000, 15000); // huruf pertama maks 12 dtk, jeda antar potongan maks 15 dtk
     let got = false, finish = '', err = '', usage = {};
     try {
       const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(model) + ':streamGenerateContent?alt=sse', {
@@ -540,7 +545,7 @@ module.exports = async function handler(req, res) {
   const groqEstTok = Math.ceil((SYSTEM_TEXT.length + context.length + question.length + history.reduce((a, h) => a + String((h && h.text) || '').slice(0, 4000).length, 0)) / 3.5) + GROQ_MAX_OUT;
   const groqSkip = (model, est) => groqCooling(model) || (GROQ_TPM.has(model) && (est || groqEstTok) > GROQ_TPM.get(model));
   // Versi ringan: tanpa DATA dashboard, hanya aturan inti + Training AI yang relevan (+ panduan aplikasi kalau ditanya cara pakai)
-  const isLight = prov === 'gemini-first' && LOGCTX.feature === 'chat' && !hasImage && !wantJSON && isLightQuestion(question, history);
+  const isLight = prov === 'gemini-first' && LOGCTX.feature === 'chat' && !hasImage && !wantJSON && !(lim && lim.groq_ringan === false) && isLightQuestion(question, history);
   const lightMessages = () => {
     const lagu = SYSTEM_PROMPT.slice(SYSTEM_PROMPT.indexOf('- LAGU / PAW'), SYSTEM_PROMPT.indexOf('- STRUKTUR / BAGAN'));
     const guide = LIGHT_GUIDE_RE.test(question) || history.some(h => h && h.role !== 'model' && LIGHT_GUIDE_RE.test(String(h.text || '')));
@@ -613,14 +618,16 @@ module.exports = async function handler(req, res) {
   const CHECK_RULES = 'TUGAS KHUSUS: kamu PEMERIKSA jawaban asisten lain untuk pertanyaan di bawah. Bandingkan angka, nama, tanggal, persentase, dan fakta di JAWABAN dengan DATA & PENGETAHUAN. Kalau tidak ada kesalahan fakta (gaya bahasa boleh beda), balas tepat satu kata: OK. Kalau ada yang salah atau dikarang, tulis ULANG jawaban lengkap yang sudah benar dengan format yang sama (markdown dan blok ```chart/```absen/```ubah/```struktur/```lagu tetap dipakai persis formatnya), tanpa menyebut bahwa kamu memeriksa. Kalau penilaian butuh konteks percakapan sebelumnya yang tidak ada, balas OK.';
   const needsCheck = t => /\d/.test(t) || /```(absen|ubah|chart|struktur)/i.test(t) || /\|[^\n]*\|/.test(t);
   const checkWithClaude = async (answer) => {
-    const tmr = withTimer(20000, 20000);
+    const tmr = withTimer(9000, 9000); // lebih dari 9 dtk → jawaban Gemini dipakai tanpa menunggu cek
     try {
       const r = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST', signal: tmr.signal, headers: CLAUDE_HEADERS,
         body: JSON.stringify({
           model: CHECK_MODEL, max_tokens: 8000,
-          system: [{ type: 'text', text: SYSTEM_TEXT + '\n\n' + CHECK_RULES }],
-          messages: [{ role: 'user', content: [{ type: 'text', text: 'DATA DASHBOARD TERBARU (JSON):\n' + context + '\n\nPERTANYAAN:\n' + question + '\n\nJAWABAN YANG DICEK:\n' + answer }] }],
+          system: [{ type: 'text', text: SYSTEM_TEXT + '\n\n' + CHECK_RULES, cache_control: { type: 'ephemeral' } }],
+          messages: [{ role: 'user', content: [
+            { type: 'text', text: 'DATA DASHBOARD TERBARU (JSON):\n' + context, cache_control: { type: 'ephemeral' } },
+            { type: 'text', text: 'PERTANYAAN:\n' + question + '\n\nJAWABAN YANG DICEK:\n' + answer }] }],
           output_config: { effort: 'low' }
         })
       });
@@ -682,9 +689,11 @@ module.exports = async function handler(req, res) {
         }
         if (started) { emit({ error: 'Jawaban terputus — coba tanya lagi.' }); res.end(); return 'done'; }
         note = (note ? note + ' · ' : '') + 'Gemini ' + model + ': ' + (r.msg || r.err || 'gagal').slice(0, 120);
-        if (isLimitErr(r.status, r.msg)) { coolGemini(model, r.msg); if (useHaiku || useGroq) break; } // limit → langsung Groq / Haiku
+        if (isLimitErr(r.status, r.msg)) coolGemini(model, r.msg);
+        else if (r.status === 504 || r.status >= 500) GEM_COOL.set(model, Date.now() + 60e3); // macet / timeout → istirahat 1 mnt
         const sug = r.msg && /use (?:models\/)?([a-z0-9][a-z0-9.\-]*)/i.exec(r.msg);
         if (sug && sug[1]) queue.unshift(sug[1]);
+        else if (useHaiku || useGroq) break; // ada cadangan → langsung pindah, jangan antre model Gemini lain (dulu bisa ±60 dtk)
         const retriable = !r.msg || [404, 429, 500, 503].includes(r.status) || /high demand|overloaded|unavailable|no longer available|not found|try again/i.test(r.msg);
         if (!retriable) break;
       }
@@ -768,7 +777,7 @@ module.exports = async function handler(req, res) {
       if (!out.r.ok && out.r.status === 400 && /thinking/i.test(out.msg)) out = await callGemini(model, false);
     }
     catch (e) {
-      if (e && e.name === 'AbortError') { lastErr = 'AI terlalu lama menjawab.'; lastStatus = 504; console.warn('[api/ai] timeout', model); continue; }
+      if (e && e.name === 'AbortError') { lastErr = 'AI terlalu lama menjawab.'; lastStatus = 504; console.warn('[api/ai] timeout', model); GEM_COOL.set(model, Date.now() + 60e3); if (useHaiku || useGroq) break; continue; }
       console.error('[api/ai] fetch failed', model, e); lastErr = 'Gagal menghubungi AI.'; continue;
     }
     const { r, data, msg } = out;
@@ -784,7 +793,9 @@ module.exports = async function handler(req, res) {
     // Google menyarankan model pengganti → coba itu dulu
     const sug = /use (?:models\/)?([a-z0-9][a-z0-9.\-]*)/i.exec(msg);
     if (sug && sug[1]) queue.unshift(sug[1]);
-    if (isLimitErr(r.status, msg)) { coolGemini(model, msg); if (useHaiku || useGroq) break; } // limit → langsung Groq / Haiku
+    if (isLimitErr(r.status, msg)) coolGemini(model, msg);
+    else if (r.status >= 500) GEM_COOL.set(model, Date.now() + 60e3);
+    if (!(sug && sug[1]) && (useHaiku || useGroq)) break; // ada cadangan → langsung pindah
     const retriable = [404, 429, 500, 503].includes(r.status) || /high demand|overloaded|unavailable|no longer available|not found|try again/i.test(msg);
     if (!retriable) break; // mis. key salah → tidak perlu coba model lain
   }

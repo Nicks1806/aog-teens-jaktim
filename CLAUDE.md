@@ -1,6 +1,6 @@
 # AOG Teens Jaktim — CG Dashboard (Absensi + Management)
 
-**Current version:** v71 · **Last updated:** 31 Oktober 2026
+**Current version:** v72 · **Last updated:** 1 November 2026
 
 ## Project Overview
 Single-file web app untuk tracking attendance, pelayanan, milestone, events, visi, dan distribusi wilayah CG untuk AOG Teens Jakarta Timur. Dipakai oleh ~54 member, 9 CG Leaders, 2 Coach, dan 1 Team Leader secara bersamaan saat ibadah hari Minggu.
@@ -279,8 +279,8 @@ Edit index.html locally (+ file lain kalau perlu)
 ```
 
 **Version bump pattern setiap push code:**
-1. `index.html` — cari `App version">v71` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
-2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v71'` → naikkan sama
+1. `index.html` — cari `App version">v72` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
+2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v72'` → naikkan sama
 
 ---
 
@@ -396,6 +396,7 @@ Edit index.html locally (+ file lain kalau perlu)
 | v29 | **Distribusi Wilayah** — filter kecamatan + kelurahan di Coach/TL Overview |
 | v30 | Wilayah filter hardening (escape + reset state + count consistency) |
 | v31 | **27 bug fixes** — attendance stats inflate, data corruption (sekolah/kelas split), XSS (PDF export), error handling (21 Supabase ops), TEEN 25 color map, reconnect race guard, undo sync, milestone prereq, visi TOCTOU fix |
+| v72 | **AI lebih cepat**: Gemini gagal/macet → langsung cadangan (Groq/Haiku), tidak antre 3 model Gemini (dulu bisa ±60 dtk, sekarang ±12 dtk); model yang macet/5xx diistirahatkan 1 mnt (`GEM_COOL`); huruf pertama Gemini maks 12 dtk (non-stream 15 dtk); cek Haiku maks 9 dtk + prompt caching (system + data). **Kartu Pengaturan AI** di tab Pemakaian AI (`saveAISetting(field,val)`, whitelist `AI_SETTING_OK`, simpan langsung) → JSON `__AI_LIMITS__`: `ai_utama` ('gemini' default = Gemini utama/Claude cadangan; 'claude' = pertanyaan Auto `gemini-first` diubah server jadi `auto` → Claude dulu), `claude_model` (sonnet/haiku), `cek_haiku` (false = tanpa cek, lebih cepat), `groq_ringan` (false = tanpa Groq ringan). Pertanyaan data pribadi selalu Claude; pilihan manual Coach/TL (Claude/Gemini) tetap dihormati. Batas Claude Sonnet harian dihitung dari provider efektif (`reqProv`) |
 | v71 | Fix: saat AI sedang menulis (streaming), teks panjang / kutipan keluar dari balon chat. Penyebab: balon streaming ber-class `live` bentrok dengan `.live` (indikator Live di sidebar: `white-space:nowrap`, `display:flex`) → class diganti `ai-live` (`.ai-m.bot.ai-live`, dipakai `aiRender` & `aiPaintLive`). **Jangan pakai nama class generik (live, active, on, …) untuk elemen baru tanpa cek aturan CSS global yang sudah ada** |
 | v70 | **Pilihan model Claude** di tab Pemakaian AI (kartu "Model Claude", `saveClaudeModel` → `aiSaveSettings({claude_model:'sonnet'|'haiku'})` di JSON `__AI_LIMITS__`, simpan langsung saat diklik, tampil rata-rata biaya/pertanyaan 30 hari). Server: `CLAUDE_MODEL` = Haiku (`CLAUDE_CHECK_MODEL`) kalau `claude_model === 'haiku'` — berlaku untuk pertanyaan data pribadi, pilihan AI "Claude", dan cadangan; pengecek Gemini tetap Haiku; aktif ±30 dtk (cache `getLimits`). Default/kosong = Sonnet |
 | v69 | Aktivitas terbaru (tab Pemakaian AI) jadi **daftar per hari** (`aiActivityFeed`): avatar inisial berwarna (CGL = warna CG, TL ungu, Coach hijau), nama + peran, fitur, label AI berwarna (Groq oranye, Gemini ungu, Claude kuning) + "×N" + catatan ringan/cadangan, jam. Pertanyaan beruntun (orang & fitur sama, jeda < 10 mnt) digabung 1 baris dengan rentang jam. Kolom pertama tabel angka boleh turun baris |
