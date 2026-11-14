@@ -66,6 +66,7 @@ const APP_GUIDE = [
   '- Tanggal ibadah bulan baru: Coach/TL tab Absensi → tombol "Generate Sabtu [Bulan Tahun]" (menambah semua hari Sabtu bulan berikutnya, aman dari duplikat).',
   '- Pengingat CGL: Coach tab Absensi → bagian "CGL belum input absensi" → "Ingatkan" per CG atau "Ingatkan semua" (notifikasi ke HP CGL yang sudah mengaktifkan notifikasi).',
   '- Tambah anak baru: dashboard CG → tab Detail CG → "Tambah member".',
+  '- Ubah nama CGL, hari & jam CG, dan lokasi CG: buka dashboard CG → di bawah judul halaman (sebelah jadwal & lokasi) tekan tombol "Ubah" → isi → Simpan. Bisa oleh CGL, Coach, atau TL.',
   '- Edit data anak: tab Detail CG → klik kartu anak → ubah nama, no WA, tanggal lahir (pilih tanggal), sekolah, kelas, kelurahan/kecamatan (ada saran), role (CGL/Sponsor/Member/Simpatisan/VIP), milestone, dan catatan CGL. Tersimpan otomatis.',
   '- Anak tidak aktif lagi: di detail anak pilih "Arsipkan" — anak pindah ke ARSIP JAKTIM 1/2, riwayat absensi & milestone tetap aman. "Hapus member" menghapus permanen beserta semua absensi & catatan; sarankan Arsipkan.',
   '- Pindah CG / mengembalikan dari arsip (khusus Coach/TL): ketik nama di kotak "Cari nama member" di header Coach → buka detail anak → bagian "Pindah CG" → pilih CG tujuan → "Pindahkan". Riwayat absensi ikut pindah.',

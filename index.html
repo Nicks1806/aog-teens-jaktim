@@ -111,6 +111,8 @@ h1,h2,h3{font-family:var(--display)}
 .crumb b{color:var(--ink);font-weight:600}
 .phead h1{font-weight:800;font-size:40px;line-height:1.05;letter-spacing:-1px;margin:8px 0}
 .meta{font-size:14px;color:var(--muted);display:flex;flex-wrap:wrap;align-items:center;gap:4px}
+.cginfo-edit{display:inline-flex;align-items:center;gap:4px;margin-left:6px;padding:3px 9px;border:1px solid var(--line);border-radius:20px;background:var(--card);color:var(--muted);font:inherit;font-size:12px;font-weight:600;cursor:pointer;transition:color .15s,border-color .15s}
+.cginfo-edit:hover,.cginfo-edit:focus-visible{color:var(--accent);border-color:#c9c2f5}
 .actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
 .csearch{position:relative}
 .csresults{position:absolute;top:calc(100% + 6px);right:0;left:0;min-width:300px;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 24px 60px rgba(108,92,231,.22);max-height:380px;overflow-y:auto;z-index:100}
@@ -1325,6 +1327,22 @@ html.vt .tab-content.active{animation:none}
   </div>
 </div>
 
+<div class="modal-overlay" id="cgInfoModal">
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="cgInfoTitle" style="max-width:440px">
+    <h2 class="modal-title" id="cgInfoTitle">Info CG</h2>
+    <div class="sub" style="margin-bottom:16px" id="cgInfoSub">Tampil di header dashboard CG, export, dan dipakai AI.</div>
+    <div class="mfields">
+      <label class="field"><span class="flabel">Nama CGL</span><input class="input" id="cgiLeader" maxlength="60" placeholder="Nama CG Leader"></label>
+      <label class="field"><span class="flabel">Hari &amp; jam CG</span><input class="input" id="cgiJadwal" maxlength="60" placeholder="contoh: Senin/Kamis - 17.00"></label>
+      <label class="field"><span class="flabel">Lokasi</span><input class="input" id="cgiLokasi" maxlength="80" placeholder="contoh: JGC (Rumah Stefi)"></label>
+    </div>
+    <div class="mfoot">
+      <button type="button" class="btn" onclick="closeModal('cgInfoModal')">Batal</button>
+      <button type="button" class="btn primary" id="cgInfoSaveBtn" onclick="saveCGInfo()">Simpan</button>
+    </div>
+  </div>
+</div>
+
 <!-- Detail anak CG (CGL, tab Detail) -->
 <div class="modal-overlay" id="cglMemberModal">
   <div class="modal-box" role="dialog" aria-modal="true" aria-label="Detail anak CG" style="max-width:760px">
@@ -1410,7 +1428,7 @@ html.vt .tab-content.active{animation:none}
     <button type="button" class="backcoach" id="dBackCoach" onclick="goBack()" style="display:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Kembali ke Coach</button>
     <nav class="navlist" aria-label="Tab CG"><button type="button" class="nav app-tab on" data-tab="absensi" aria-current="page" onclick="sTab('absensi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M9 15l2 2 4-4"/></svg><span>Absensi</span></button><button type="button" class="nav app-tab" data-tab="detail" onclick="sTab('detail',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c1.9.7 3.1 2.4 3.5 5.2"/></svg><span>Detail CG</span></button><button type="button" class="nav app-tab" data-tab="visi" onclick="sTab('visi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span>Visi CG</span></button><button type="button" class="nav app-tab" data-tab="pelayanan" onclick="sTab('pelayanan',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"/></svg><span>Pelayanan</span></button><button type="button" class="nav app-tab" data-tab="milestone" onclick="sTab('milestone',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4h11l-2 4 2 4H5"/></svg><span>Milestone</span></button><button type="button" class="nav app-tab" data-tab="events" onclick="sTab('events',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4z"/><path d="M14 7v10"/></svg><span>Events</span></button><button type="button" class="nav app-tab ai-nav" data-tab="ai" onclick="sTab('ai',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg><span>Tanya AI</span></button></nav>
     <div class="sidetheme"><small>The year of</small><b>Unity</b><span>&amp; Open Heavens</span></div>
-    <div class="profile"><span class="ava" id="dAva" aria-hidden="true">A</span><div style="flex:1;min-width:0"><b id="nN"></b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v73</span></span></span></div><button type="button" class="exit" onclick="goBack()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
+    <div class="profile"><span class="ava" id="dAva" aria-hidden="true">A</span><div style="flex:1;min-width:0"><b id="nN"></b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v74</span></span></span></div><button type="button" class="exit" onclick="goBack()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
   </aside>
   <div class="main">
     <header class="mtop">
@@ -1420,7 +1438,7 @@ html.vt .tab-content.active{animation:none}
     </header>
     <main class="content">
       <header class="phead dhead">
-        <div><div class="crumb" id="dCrumb"></div><h1 id="dTitle">Rekap Absensi</h1><div class="meta"><span id="nB"></span> <span id="hC">0</span> anggota · <span id="hS"></span> · <span id="hL"></span></div></div>
+        <div><div class="crumb" id="dCrumb"></div><h1 id="dTitle">Rekap Absensi</h1><div class="meta"><span id="nB"></span> <span id="hC">0</span> anggota<span id="hSWrap"> · <span id="hS"></span></span><span id="hLWrap"> · <span id="hL"></span></span><button type="button" class="cginfo-edit" id="hEdit" aria-label="Ubah info CG (CGL, jadwal, lokasi)" onclick="openCGInfoEdit()"></button></div></div>
         <div class="actions"><button type="button" class="iconbtn notif-bell" onclick="toggleNotif()" aria-label="Notifikasi"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg></button></div>
       </header>
       <div class="dtop" id="dTop">
@@ -1454,7 +1472,7 @@ html.vt .tab-content.active{animation:none}
     <div class="rolesw" role="group" aria-label="Peran"><button type="button" id="roleCoachBtn" class="on" aria-pressed="true" onclick="switchRole('coach')">Coach</button><button type="button" id="roleTLBtn" aria-pressed="false" onclick="switchRole('tl')">TL</button></div>
     <nav class="navlist" id="coachTabs" aria-label="Tab Coach"><button type="button" class="nav app-tab on" data-tab="c-overview" aria-current="page" onclick="sCoachTab('c-overview',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"/></svg><span>Overview</span></button><button type="button" class="nav app-tab" data-tab="c-absensi" onclick="sCoachTab('c-absensi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M9 15l2 2 4-4"/></svg><span>Absensi</span></button><button type="button" class="nav app-tab" data-tab="c-milestone" onclick="sCoachTab('c-milestone',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4h11l-2 4 2 4H5"/></svg><span>Milestone</span></button><button type="button" class="nav app-tab" data-tab="c-visi" onclick="sCoachTab('c-visi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span>Visi</span></button><button type="button" class="nav app-tab" data-tab="c-events" onclick="sCoachTab('c-events',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4z"/><path d="M14 7v10"/></svg><span>Events</span></button><button type="button" class="nav app-tab ai-nav" data-tab="c-ai" onclick="sCoachTab('c-ai',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg><span>Tanya AI</span></button><button type="button" class="nav app-tab usage-nav" data-tab="c-usage" hidden onclick="sCoachTab('c-usage',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V11M10 20V5M16 20v-8M22 20H2"/></svg><span>Pemakaian AI</span></button></nav>
     <button type="button" class="sidetheme editable" onclick="openThemeEdit()" aria-label="Edit tema tahun ini" title="Klik untuk edit tema"><small>The year of</small><b>Unity</b><span>&amp; Open Heavens</span><i class="st-edit" aria-hidden="true">Edit</i></button>
-    <div class="profile"><span class="ava" id="cAva" aria-hidden="true">C</span><div style="flex:1;min-width:0"><b id="cWho">Coach</b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v73</span></span></span></div><button type="button" class="exit" onclick="goBackCoach()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
+    <div class="profile"><span class="ava" id="cAva" aria-hidden="true">C</span><div style="flex:1;min-width:0"><b id="cWho">Coach</b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v74</span></span></span></div><button type="button" class="exit" onclick="goBackCoach()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
   </aside>
   <div class="main">
     <header class="mtop">
@@ -2069,6 +2087,58 @@ async function loadTheme() {
   if (!data || !data.visi) return; // belum pernah diedit → pakai default
   try { applyTheme(JSON.parse(data.visi)); } catch(e) { console.warn('[loadTheme] format tidak valid', e); }
 }
+// Info CG (CGL, hari & jam, lokasi) — tabel cg_info, bisa diubah CGL / Coach / TL dari header dashboard CG
+function applyCGInfoUI() {
+  const i = CUR_CG_INFO || {};
+  document.getElementById('hS').textContent = i.hari_jam || '';
+  document.getElementById('hL').textContent = i.lokasi || '';
+  document.getElementById('hSWrap').hidden = !i.hari_jam;
+  document.getElementById('hLWrap').hidden = !i.lokasi;
+  const ed = document.getElementById('hEdit');
+  ed.innerHTML = icon('edit', 13) + '<span>' + (i.hari_jam || i.lokasi ? 'Ubah' : 'Isi jadwal & lokasi') + '</span>';
+  document.getElementById('nN').textContent = i.leader || '';
+}
+function openCGInfoEdit() {
+  if (!CUR_CG) return;
+  const i = CUR_CG_INFO || {};
+  [['cgiLeader', 'leader'], ['cgiJadwal', 'hari_jam'], ['cgiLokasi', 'lokasi']].forEach(([id, f]) => { const el = document.getElementById(id); el.value = i[f] || ''; el.dataset.orig = i[f] || ''; });
+  document.getElementById('cgInfoTitle').textContent = 'Info ' + CUR_CG;
+  openModal('cgInfoModal');
+}
+async function saveCGInfo() {
+  const cg = CUR_CG; if (!cg) return;
+  const F = [['cgiLeader', 'leader'], ['cgiJadwal', 'hari_jam'], ['cgiLokasi', 'lokasi']];
+  const patch = {};
+  F.forEach(([id, f]) => { const el = document.getElementById(id); const v = el.value.trim().replace(/\s+/g, ' '); if (v !== el.dataset.orig) patch[f] = v; });
+  if (!Object.keys(patch).length) { closeModal('cgInfoModal'); return; }
+  if ('leader' in patch && !patch.leader) { toast('❌ Nama CGL tidak boleh kosong'); return; }
+  const btn = document.getElementById('cgInfoSaveBtn'); btn.disabled = true;
+  try {
+    // Baca dulu: kalau kolom yang sama sudah diubah orang lain sejak form dibuka, jangan ditimpa
+    const { data: cur, error: e1 } = await supa.from('cg_info').select('cg,leader,hari_jam,lokasi').eq('cg', cg).maybeSingle();
+    if (e1) throw e1;
+    const clash = cur ? Object.keys(patch).filter(f => (cur[f] || '') !== (document.getElementById(F.find(x => x[1] === f)[0]).dataset.orig)) : [];
+    if (clash.length) {
+      CUR_CG_INFO = Object.assign({}, CUR_CG_INFO, cur); applyCGInfoUI();
+      toast('⚠ Info CG baru saja diubah orang lain — cek lagi isinya lalu simpan ulang');
+      openCGInfoEdit(); return;
+    }
+    const res = cur ? await supa.from('cg_info').update(patch).eq('cg', cg) : await supa.from('cg_info').insert(Object.assign({ cg }, patch));
+    if (res.error) throw res.error;
+    CUR_CG_INFO = Object.assign({}, CUR_CG_INFO, cur || { cg }, patch);
+    if (typeof ALL_CG_INFO !== 'undefined' && Array.isArray(ALL_CG_INFO)) {
+      const k = ALL_CG_INFO.findIndex(x => x.cg === cg);
+      if (k >= 0) ALL_CG_INFO[k] = Object.assign({}, ALL_CG_INFO[k], patch); else ALL_CG_INFO.push(Object.assign({ cg }, patch));
+    }
+    applyCGInfoUI();
+    const regLbl = CUR_REGION === 'jaktim2' ? 'Jaktim 2' : 'Jaktim 1';
+    document.getElementById('dMSub').textContent = (CUR_CG_INFO.leader ? 'CGL ' + CUR_CG_INFO.leader + ' · ' : '') + regLbl;
+    closeModal('cgInfoModal');
+    toast('✓ Info ' + cg + ' disimpan');
+  } catch (e) {
+    toast('❌ Gagal simpan info CG: ' + String((e && e.message) || 'cek koneksi').slice(0, 80)); console.error('[saveCGInfo]', e);
+  } finally { btn.disabled = false; }
+}
 function openThemeEdit() {
   document.getElementById('themeKicker').value = CUR_THEME.kicker;
   document.getElementById('themeTitle').value = CUR_THEME.title;
@@ -2671,8 +2741,7 @@ async function openCGDashboard(cg, opts) {
   document.getElementById('nB').style.cssText = 'padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700;margin-right:4px;background:'+bg+';color:'+color;
   document.getElementById('nN').textContent = CUR_CG_INFO.leader || '';
   document.getElementById('hC').textContent = MEMBERS.length;
-  document.getElementById('hS').textContent = CUR_CG_INFO.hari_jam || '';
-  document.getElementById('hL').textContent = CUR_CG_INFO.lokasi || '';
+  applyCGInfoUI();
   // Shell (sidebar / top bar HP)
   const regLbl = CUR_REGION === 'jaktim2' ? 'Jaktim 2' : 'Jaktim 1';
   document.getElementById('dSideSub').textContent = cg + ' · ' + regLbl;
@@ -7444,7 +7513,7 @@ function exportRegionAttendancePDF(scope) {
     cgMems.forEach(m => cgDates.forEach(d => { const s=ALL_ATTENDANCE[m.id+'_'+d.id]; if (s){t++; if(s==='H')h++;} }));
     const pct = t ? Math.round(h/t*100) : 0;
     body += (idx>0 ? '<div class="page-break"></div>' : '');
-    body += '<div class="cg-header"><div><div class="cg-name">'+cg+'</div><div class="cg-meta">CGL: '+(info.leader||'-')+' · '+cgMems.length+' member · '+(info.hari_jam||'')+' · '+(info.lokasi||'')+'</div></div><div class="cg-pct">'+pct+'%</div></div>';
+    body += '<div class="cg-header"><div><div class="cg-name">'+esc(cg)+'</div><div class="cg-meta">CGL: '+esc(info.leader||'-')+' · '+cgMems.length+' member · '+esc(info.hari_jam||'')+' · '+esc(info.lokasi||'')+'</div></div><div class="cg-pct">'+pct+'%</div></div>';
     body += buildAttendanceTable(cgMems, cgDates, ALL_ATTENDANCE);
   });
 
