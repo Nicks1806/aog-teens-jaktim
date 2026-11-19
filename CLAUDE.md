@@ -1,6 +1,6 @@
 # AOG Teens Jaktim — CG Dashboard (Absensi + Management)
 
-**Current version:** v79 · **Last updated:** 19 November 2026
+**Current version:** v80 · **Last updated:** 19 November 2026
 
 ## Project Overview
 Single-file web app untuk tracking attendance, pelayanan, milestone, events, visi, dan distribusi wilayah CG untuk AOG Teens Jakarta Timur. Dipakai oleh ~54 member, 9 CG Leaders, 2 Coach, dan 1 Team Leader secara bersamaan saat ibadah hari Minggu.
@@ -114,6 +114,8 @@ Header: Rekap CG + Visi Coach (read-only) di kanan. Stats cards: Hadir, Izin, Sa
 - **Line chart SVG accurate** (v25) — denominator hanya count member yang sudah aktif per tanggal (auto-detect via `memberJoinIdx`)
 - **TL chart merge duplicate dates** (v26) — 1 kolom per tanggal (gabungan jaktim1 + jaktim2)
 - Mobile month filter (≤600px)
+- **Desktop: default 3 bulan terakhir** (v80, `absViewDates`; bulan ini + 2 sebelumnya) + tombol "Tampilkan semua (N tanggal)" / "3 bulan terakhir" (`_ABS_SHOW_ALL`, `toggleAbsShowAll`) di tab Absensi CGL & Coach/TL. Persentase per anak, per CG, dan total tetap dihitung dari SEMUA tanggal (statDates/cgDates), hanya kolom yang dipersingkat
+- **Posisi geser tabel dijaga** (v80): `.tblwrap[data-sk]` (`d:CG` / `c:CG`) + `absSaveScroll`/`absRestoreScroll` di sekitar `innerHTML` render; belum digeser / di ujung kanan → tetap di tanggal terbaru. Dulu tiap realtime absensi CGL lain → tabel Coach digambar ulang → scroll balik ke kiri
 - Sticky name column
 - Export **Absensi CSV** (UTF-8 BOM) + **Absensi PDF** (print window)
 
@@ -280,8 +282,8 @@ Edit index.html locally (+ file lain kalau perlu)
 ```
 
 **Version bump pattern setiap push code:**
-1. `index.html` — cari `App version">v79` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
-2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v79'` → naikkan sama
+1. `index.html` — cari `App version">v80` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
+2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v80'` → naikkan sama
 
 ---
 
@@ -402,6 +404,7 @@ Edit index.html locally (+ file lain kalau perlu)
 | v29 | **Distribusi Wilayah** — filter kecamatan + kelurahan di Coach/TL Overview |
 | v30 | Wilayah filter hardening (escape + reset state + count consistency) |
 | v31 | **27 bug fixes** — attendance stats inflate, data corruption (sekolah/kelas split), XSS (PDF export), error handling (21 Supabase ops), TEEN 25 color map, reconnect race guard, undo sync, milestone prereq, visi TOCTOU fix |
+| v80 | **Absensi 3 bulan terakhir + scroll tidak balik ke awal**: tabel desktop default 3 bulan terakhir + tombol Tampilkan semua; posisi geser tabel dijaga saat digambar ulang (realtime/polling) & dibuka di tanggal terbaru |
 | v79 | **Tombol "Absen dari foto" dihapus** (permintaan Nick) dari tab Absensi Coach/TL & CGL + baris panduan di `APP_GUIDE` (`api/ai.js`). Kode `openAbsenFoto`/modal `aiAbsenModal` tetap ada karena dipakai alur isi absensi lewat chat (v48). Kirim foto di chat Tanya AI tetap ada |
 | v78 | **Logo tema tahun**: modal "Tema tahun ini" (klik blok tema di sidebar Coach/TL) bisa upload logo (`themePickLogo` → canvas, PNG/WebP tetap transparan) & hapus logo; logo menggantikan teks THE YEAR OF di landing (`#ltLogo`) dan sidebar (`.st-logo`). Teks "AOG Teens Jaktim 2026" (`#ltTag`) bisa diedit, kosong = tahun otomatis |
 | v77 | **Audit & persiapan 2027**: (1) label tanggal tanpa tahun dibaca 2026 (`parseLabelToYear`, `labelYM`) — dulu mulai Jan 2027 "3 Jan" terbaca 2027 → tombol Generate Sabtu menawarkan Mei 2027, filter bulan HP & navigasi ‹ › campur tahun / tidak bisa mundur ke Des 2026, "CGL belum input" & data AI salah tanggal, urutan chart TL; (2) Pelayanan: bulan diurutkan kronologis + otomatis buka bulan berjalan (dulu bulan pertama yang pernah dibuat); (3) `.vercelignore` — dokumen & Apps Script tidak lagi bisa dibuka publik; dokumen lama dipindah ke `docs/` |
