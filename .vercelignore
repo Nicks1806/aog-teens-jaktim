@@ -1,0 +1,7 @@
+# File yang TIDAK ikut ter-publish ke website (tetap tersimpan di GitHub).
+# Website hanya butuh: index.html, service-worker.js, manifest.json, icon.jpg, vercel.json, api/
+*.md
+docs/
+*.gs
+.claude/
+*.zip

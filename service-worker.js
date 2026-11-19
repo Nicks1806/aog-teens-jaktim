@@ -4,7 +4,7 @@
 // - Supabase API: bypass (langsung ke browser)
 // - Static assets (fonts, CDN, icon): cache-first
 
-const CACHE_NAME = 'aog-absensi-v76';
+const CACHE_NAME = 'aog-absensi-v77';
 const SHELL_URLS = [
   '/manifest.json',
   '/icon.jpg'

@@ -1,6 +1,6 @@
 # AOG Teens Jaktim — CG Dashboard (Absensi + Management)
 
-**Current version:** v76 · **Last updated:** 19 November 2026
+**Current version:** v77 · **Last updated:** 19 November 2026
 
 ## Project Overview
 Single-file web app untuk tracking attendance, pelayanan, milestone, events, visi, dan distribusi wilayah CG untuk AOG Teens Jakarta Timur. Dipakai oleh ~54 member, 9 CG Leaders, 2 Coach, dan 1 Team Leader secara bersamaan saat ibadah hari Minggu.
@@ -8,7 +8,7 @@ Single-file web app untuk tracking attendance, pelayanan, milestone, events, vis
 **URL Production:** https://absenibadahjaktim.vercel.app
 **CGL URL:** https://absenibadahjaktim.vercel.app/teen-01 (slug `cgSlug()`, refresh tetap di dashboard CG) · **Coach URL:** https://absenibadahjaktim.vercel.app/coach · **TL URL:** https://absenibadahjaktim.vercel.app/tl (rewrite di `vercel.json`; `?role=coach` lama tetap jalan)
 
-Untuk konteks handoff lengkap ke Claude Code baru, baca `HANDOFF.md`.
+File ini = sumber utama. Dokumen lama (handoff v31, design v31, SQL cookbook, blueprint Kelapa Gading) ada di folder `docs/` — sebagian sudah usang, cek ke kode kalau ragu.
 
 ---
 
@@ -280,8 +280,8 @@ Edit index.html locally (+ file lain kalau perlu)
 ```
 
 **Version bump pattern setiap push code:**
-1. `index.html` — cari `App version">v76` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
-2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v76'` → naikkan sama
+1. `index.html` — cari `App version">v77` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
+2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v77'` → naikkan sama
 
 ---
 
@@ -292,6 +292,7 @@ Edit index.html locally (+ file lain kalau perlu)
 - **JANGAN tambah build step** — Vercel publish dir `.` (root), no build command
 - **JANGAN pakai npm/node** — pure vanilla JS
 - **JANGAN buat file README.md atau dokumentasi baru** kecuali diminta
+- **`.vercelignore`** (v77): `*.md`, `docs/`, `*.gs`, `.claude/`, `*.zip` TIDAK ikut ter-publish (dulu `/CLAUDE.md`, `/SQL_COOKBOOK.md`, `/google-apps-script.gs` bisa dibuka publik). File baru non-website taruh di `docs/`
 - `vercel.json` hanya berisi `rewrites` untuk `/coach`, `/tl`, dan `/teen-NN` — jangan tambah build setting
 - **Pengecualian single-file:** `api/ai.js` = Vercel Serverless Function (CommonJS, tanpa npm) proxy AI. **Claude utama** (`ANTHROPIC_API_KEY`, `CLAUDE_MODEL` opsional default `claude-sonnet-5-5`; Messages API via `fetch` karena proyek tanpa npm, `anthropic-version: 2026-10-21`, `output_config.effort: 'low'`, prompt caching system + data, Absen dari foto pakai `output_config.format` json_schema `ABSEN_SCHEMA`) → kalau key kosong / error / timeout 25 dtk (foto 35) / refusal → otomatis **Gemini cadangan** (respons berisi `note`). Pilihan Nick 27 Okt 2026: Claude utama + Gemini cadangan, Sonnet 5.5. **Sejak v55 mode Auto: Gemini untuk pertanyaan tanpa data pribadi (dicek Claude Haiku 5.5 kalau berisi angka/data, env opsional `CLAUDE_CHECK_MODEL`), Claude Sonnet untuk pertanyaan yang butuh data pribadi.** Env var Gemini: `GEMINI_API_KEY`, `AI_PIN` (opsional — kosong = tanpa kode akses; Nick memilih tanpa kode, 27 Okt 2026), `GEMINI_MODEL` (opsional, default `gemini-3.5-flash`; cadangan otomatis `gemini-flash-latest` → `gemini-3.8-flash` → `gemini-flash-lite-latest` kalau sibuk/dipensiunkan/timeout 20 dtk; `gemini-2.5-flash` sudah tidak tersedia untuk user baru). Diagnosa: POST `/api/ai` `{"action":"models"}` → daftar model untuk key itu. **JANGAN** taruh API key di `index.html`/repo. System prompt ada di server (`SYSTEM_PROMPT`), rate limit 60/menit per IP (v62)
 - Pindah tab pakai `smoothSwap()` (View Transitions + `skipTransition()` pengaman 450ms) — jangan hapus pengamannya
@@ -309,6 +310,10 @@ Edit index.html locally (+ file lain kalau perlu)
 - Accordion Absensi Coach: tabel tetap dirender saat tertutup (pakai `hidden`), supaya patch realtime per-dot jalan. State buka: `_CABS_OPEN`, Visi: `_VISI_EXPANDED`
 - Toggle region Coach ada di header (`#cRegSeg` → `coachSetRegion()`), bukan per tab
 - KPI + banner visi CGL (`#dTop`) hanya tampil di tab Absensi; KPI Coach (`#cTop`) hanya di Overview
+
+### Label tanggal & tahun (v77)
+- Label `dates`: `"2 Mei 26"` (pakai tahun). Label lama Jan–Apr 2026 **tanpa tahun** (`"3 Jan"` … `"25 Apr"`) = 2026 (`LEGACY_LABEL_YEAR`) — data sengaja tidak diubah
+- Baca tahun pakai `parseLabelToYear()` / `parseDateLabel()` / `labelYM()` (bulan+tahun). **JANGAN** pakai tahun sekarang (`new Date().getFullYear()`) untuk label, dan **jangan** banding bulan saja (`parseLabelToMonth() === bulan`) — mulai 2027 bulan yang sama muncul 2x
 
 ### Absensi offline (v37)
 - SEMUA simpan absensi lewat `saveAttendance(memberId, dateId, status)` — jangan panggil `supa.from('attendance')` langsung dari UI
@@ -397,6 +402,7 @@ Edit index.html locally (+ file lain kalau perlu)
 | v29 | **Distribusi Wilayah** — filter kecamatan + kelurahan di Coach/TL Overview |
 | v30 | Wilayah filter hardening (escape + reset state + count consistency) |
 | v31 | **27 bug fixes** — attendance stats inflate, data corruption (sekolah/kelas split), XSS (PDF export), error handling (21 Supabase ops), TEEN 25 color map, reconnect race guard, undo sync, milestone prereq, visi TOCTOU fix |
+| v77 | **Audit & persiapan 2027**: (1) label tanggal tanpa tahun dibaca 2026 (`parseLabelToYear`, `labelYM`) — dulu mulai Jan 2027 "3 Jan" terbaca 2027 → tombol Generate Sabtu menawarkan Mei 2027, filter bulan HP & navigasi ‹ › campur tahun / tidak bisa mundur ke Des 2026, "CGL belum input" & data AI salah tanggal, urutan chart TL; (2) Pelayanan: bulan diurutkan kronologis + otomatis buka bulan berjalan (dulu bulan pertama yang pernah dibuat); (3) `.vercelignore` — dokumen & Apps Script tidak lagi bisa dibuka publik; dokumen lama dipindah ke `docs/` |
 | v76 | **Tanggal otomatis dimatikan** (permintaan Nick 19 Nov 2026) — `autoGenerateDates()` tidak dipanggil lagi di `loadCoachData` (fungsi masih ada). Tanggal baru hanya lewat tombol manual "Generate Sabtu". Desember 2026 sudah sempat dibuat otomatis oleh v75 (kunci `__AUTO_DATES__` jaktim1/jaktim2:2026-12 tetap di `cg_vision`) |
 | v75 | **Tanggal ibadah otomatis** (`autoGenerateDates`, dipanggil sekali di akhir `loadCoachData` — Coach/TL saja): per region, kalau tanggal terakhir ≤10 hari lagi → Sabtu bulan berikutnya ditambah (maks 3 bulan beruntun). **Kunci anti-dobel**: insert `cg_vision` `cg='__AUTO_DATES__'`, `region='jaktim1:2026-12'` (unik cg+region) — error 23505 = sudah dibuat HP lain → lewati; insert tanggal gagal → kunci dihapus lagi. Inti insert dipisah ke `insertSabtuRegion(reg, year, month)` (dipakai juga tombol manual "Generate Sabtu"). `handleVisionChange` mengabaikan baris `__AUTO_DATES__` |
 | v74 | **Edit info CG dari aplikasi**: tombol "Ubah" (`#hEdit`, `.cginfo-edit`) di header dashboard CG → modal `cgInfoModal` (`openCGInfoEdit`/`saveCGInfo`) untuk `cg_info.leader`, `hari_jam`, `lokasi`. Hanya kolom yang berubah disimpan; baca ulang DB dulu — kalau kolom itu sudah diubah orang lain sejak form dibuka, simpan dibatalkan & form dimuat ulang; baris belum ada → insert. Update `CUR_CG_INFO` + `ALL_CG_INFO` + header (`applyCGInfoUI`; jadwal/lokasi kosong → disembunyikan, tombol "Isi jadwal & lokasi"). Fix: export PDF Coach kini `esc()` nama CG/CGL/jadwal/lokasi. `APP_GUIDE` AI ditambah cara ubah info CG |
@@ -455,16 +461,16 @@ Detail changelog per version ada di git log (`git log --oneline`).
 - 21 member: teks "· Kelas X" (bug input gabungan pra-v31) dihapus dari kolom `sekolah`; kelas diisi/dinaikkan ke angka tertinggi (aturan dari Nick)
 - 6 member: kolom `kelurahan` berisi "Kelurahan, Kecamatan" dipisah ke kolomnya (Jonathan → Cakung Timur/Cakung, Glenn → Cipinang Muara/Jatinegara)
 - Masih perlu diisi CGL: alamat jalan di kolom kelurahan (Aiko TEEN 25, Carissa TEEN 17), tgl lahir tanpa tahun (Aiko, Justin & Grace TEEN 17)
-Detail v31 ada di `V31_CHANGELOG.md`.
+Detail v31 ada di `docs/V31_CHANGELOG.md`.
 
 ---
 
 ## Related Files
-- `HANDOFF.md` — comprehensive handoff untuk Claude Code baru (28 section, semua konteks)
-- `V31_CHANGELOG.md` — detail 27 bug fixes di v31 (Oktober 2026)
-- `CURRENT_DESIGN.md` — referensi desain **lama (v31)**, sebelum redesign v32
+- `docs/` — dokumen lama (usang sebagian, v31): `START_HERE.md`, `MASTER_HANDOFF.md`, `HANDOFF.md`, `PROMPT_CLAUDE_CODE.md`, `AUTO_ACCESS_SETUP.md`, `SQL_COOKBOOK.md`
+- `docs/V31_CHANGELOG.md` — detail 27 bug fixes di v31 (Oktober 2026)
+- `docs/CURRENT_DESIGN.md` — referensi desain **lama (v31)**, sebelum redesign v32
 - Paket redesign v32: `C:\Penyimpanan utama\Downloads\aog-redesign-handoff.zip` (spec, migration map, QA checklist, prototype) — sengaja **tidak** disalin ke repo karena Vercel mem-publish root
-- `KELAPA_GADING_SETUP.md` — blueprint untuk cabang Kelapa Gading (belum di-deploy)
+- `docs/KELAPA_GADING_SETUP.md` — blueprint untuk cabang Kelapa Gading (belum di-deploy)
 - `google-apps-script.gs` — Apps Script Google Sheets sync
 - `service-worker.js` — PWA SW network-first
 - `manifest.json` — PWA manifest
