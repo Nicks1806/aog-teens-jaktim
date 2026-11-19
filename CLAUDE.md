@@ -1,6 +1,6 @@
 # AOG Teens Jaktim — CG Dashboard (Absensi + Management)
 
-**Current version:** v81 · **Last updated:** 19 November 2026
+**Current version:** v82 · **Last updated:** 19 November 2026
 
 ## Project Overview
 Single-file web app untuk tracking attendance, pelayanan, milestone, events, visi, dan distribusi wilayah CG untuk AOG Teens Jakarta Timur. Dipakai oleh ~54 member, 9 CG Leaders, 2 Coach, dan 1 Team Leader secara bersamaan saat ibadah hari Minggu.
@@ -114,7 +114,7 @@ Header: Rekap CG + Visi Coach (read-only) di kanan. Stats cards: Hadir, Izin, Sa
 - **Line chart SVG accurate** (v25) — denominator hanya count member yang sudah aktif per tanggal (auto-detect via `memberJoinIdx`)
 - **TL chart merge duplicate dates** (v26) — 1 kolom per tanggal (gabungan jaktim1 + jaktim2)
 - Mobile month filter (≤600px)
-- **Desktop: default 3 bulan terakhir** (v80, `absViewDates`; bulan ini + 2 sebelumnya) + tombol "Tampilkan semua (N tanggal)" / "3 bulan terakhir" (`_ABS_SHOW_ALL`, `toggleAbsShowAll`) di tab Absensi CGL & Coach/TL. Persentase per anak, per CG, dan total tetap dihitung dari SEMUA tanggal (statDates/cgDates), hanya kolom yang dipersingkat
+- **Desktop: pilihan rentang tanggal** (v82, `absRangeHTML` / `absViewDates`, state `_ABS_RANGE` {mode,from,to}): 3 bulan terakhir (default) / 6 bulan terakhir / Tahun berjalan / Semua / Pilih bulan… (dari–sampai, `setAbsRange`, `setAbsRangeEnd`, terbalik = ditukar otomatis) di tab Absensi CGL & Coach/TL; halaman aktif dicek lewat `#pageD`/`#pageC` display (bukan class active tab, karena tab tersembunyi tetap ber-class active). Persentase per anak, per CG, dan total tetap dihitung dari SEMUA tanggal (statDates/cgDates), hanya kolom yang dipersingkat
 - **Posisi geser tabel dijaga** (v80): `.tblwrap[data-sk]` (`d:CG` / `c:CG`) + `absSaveScroll`/`absRestoreScroll` di sekitar `innerHTML` render; belum digeser / di ujung kanan → tetap di tanggal terbaru. Dulu tiap realtime absensi CGL lain → tabel Coach digambar ulang → scroll balik ke kiri
 - Sticky name column
 - Export **Absensi CSV** (UTF-8 BOM) + **Absensi PDF** (print window)
@@ -282,8 +282,8 @@ Edit index.html locally (+ file lain kalau perlu)
 ```
 
 **Version bump pattern setiap push code:**
-1. `index.html` — cari `App version">v81` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
-2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v81'` → naikkan sama
+1. `index.html` — cari `App version">v82` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
+2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v82'` → naikkan sama
 
 ---
 
@@ -404,6 +404,7 @@ Edit index.html locally (+ file lain kalau perlu)
 | v29 | **Distribusi Wilayah** — filter kecamatan + kelurahan di Coach/TL Overview |
 | v30 | Wilayah filter hardening (escape + reset state + count consistency) |
 | v31 | **27 bug fixes** — attendance stats inflate, data corruption (sekolah/kelas split), XSS (PDF export), error handling (21 Supabase ops), TEEN 25 color map, reconnect race guard, undo sync, milestone prereq, visi TOCTOU fix |
+| v82 | **Pilihan rentang tanggal absensi** (desktop): dropdown 3 bulan / 6 bulan / tahun ini / semua / pilih bulan dari–sampai, menggantikan tombol Tampilkan semua. Persentase tetap dari semua tanggal |
 | v81 | **Ketikan tidak hilang saat realtime**: `rtSafe(tabElId, fn)` + `rtEditingIn` — gambar ulang tab dari realtime (absensi/member/pelayanan/event/visi) & polling Coach ditunda selama user mengetik di tab itu (input/textarea/select fokus, atau kotak `[data-draft]` masih berisi — form event Coach), jalan 800 ms setelah keluar kotak. **Pemicu render ulang baru dari realtime WAJIB lewat `rtSafe`** |
 | v80 | **Absensi 3 bulan terakhir + scroll tidak balik ke awal**: tabel desktop default 3 bulan terakhir + tombol Tampilkan semua; posisi geser tabel dijaga saat digambar ulang (realtime/polling) & dibuka di tanggal terbaru |
 | v79 | **Tombol "Absen dari foto" dihapus** (permintaan Nick) dari tab Absensi Coach/TL & CGL + baris panduan di `APP_GUIDE` (`api/ai.js`). Kode `openAbsenFoto`/modal `aiAbsenModal` tetap ada karena dipakai alur isi absensi lewat chat (v48). Kirim foto di chat Tanya AI tetap ada |
