@@ -1,6 +1,6 @@
 # AOG Teens Jaktim — CG Dashboard (Absensi + Management)
 
-**Current version:** v80 · **Last updated:** 19 November 2026
+**Current version:** v81 · **Last updated:** 19 November 2026
 
 ## Project Overview
 Single-file web app untuk tracking attendance, pelayanan, milestone, events, visi, dan distribusi wilayah CG untuk AOG Teens Jakarta Timur. Dipakai oleh ~54 member, 9 CG Leaders, 2 Coach, dan 1 Team Leader secara bersamaan saat ibadah hari Minggu.
@@ -282,8 +282,8 @@ Edit index.html locally (+ file lain kalau perlu)
 ```
 
 **Version bump pattern setiap push code:**
-1. `index.html` — cari `App version">v80` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
-2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v80'` → naikkan sama
+1. `index.html` — cari `App version">v81` → naikkan (ada **2** tempat: sidebar CGL + sidebar Coach)
+2. `service-worker.js` — cari `CACHE_NAME = 'aog-absensi-v81'` → naikkan sama
 
 ---
 
@@ -404,6 +404,7 @@ Edit index.html locally (+ file lain kalau perlu)
 | v29 | **Distribusi Wilayah** — filter kecamatan + kelurahan di Coach/TL Overview |
 | v30 | Wilayah filter hardening (escape + reset state + count consistency) |
 | v31 | **27 bug fixes** — attendance stats inflate, data corruption (sekolah/kelas split), XSS (PDF export), error handling (21 Supabase ops), TEEN 25 color map, reconnect race guard, undo sync, milestone prereq, visi TOCTOU fix |
+| v81 | **Ketikan tidak hilang saat realtime**: `rtSafe(tabElId, fn)` + `rtEditingIn` — gambar ulang tab dari realtime (absensi/member/pelayanan/event/visi) & polling Coach ditunda selama user mengetik di tab itu (input/textarea/select fokus, atau kotak `[data-draft]` masih berisi — form event Coach), jalan 800 ms setelah keluar kotak. **Pemicu render ulang baru dari realtime WAJIB lewat `rtSafe`** |
 | v80 | **Absensi 3 bulan terakhir + scroll tidak balik ke awal**: tabel desktop default 3 bulan terakhir + tombol Tampilkan semua; posisi geser tabel dijaga saat digambar ulang (realtime/polling) & dibuka di tanggal terbaru |
 | v79 | **Tombol "Absen dari foto" dihapus** (permintaan Nick) dari tab Absensi Coach/TL & CGL + baris panduan di `APP_GUIDE` (`api/ai.js`). Kode `openAbsenFoto`/modal `aiAbsenModal` tetap ada karena dipakai alur isi absensi lewat chat (v48). Kirim foto di chat Tanya AI tetap ada |
 | v78 | **Logo tema tahun**: modal "Tema tahun ini" (klik blok tema di sidebar Coach/TL) bisa upload logo (`themePickLogo` → canvas, PNG/WebP tetap transparan) & hapus logo; logo menggantikan teks THE YEAR OF di landing (`#ltLogo`) dan sidebar (`.st-logo`). Teks "AOG Teens Jaktim 2026" (`#ltTag`) bisa diedit, kosong = tahun otomatis |
