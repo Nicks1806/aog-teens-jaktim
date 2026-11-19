@@ -503,6 +503,29 @@ table.att .tlabel{font-size:12px;color:var(--muted);font-weight:600}
 .pel-add-wrap{position:relative;display:inline-block}
 .asg-add{min-height:32px;padding:0 12px;border:1px dashed;border-radius:20px;background:transparent;font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:4px;cursor:pointer}
 .asg-add:hover{background:#fff}
+.absrange{position:relative}
+.absrange-btn small{color:var(--muted);font-weight:500;font-size:12px}
+.absrange-btn[aria-expanded="true"]{border-color:#c9bffb;background:#faf8ff}
+.absrange-pop{position:absolute;top:calc(100% + 6px);right:0;z-index:60;width:296px;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 24px 60px rgba(108,92,231,.22);padding:6px;text-align:left}
+.absrange-pop[hidden]{display:none}
+.absrange-pop.left{right:auto;left:0}
+.absrange-opt{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:0;background:none;padding:9px 12px;border-radius:10px;cursor:pointer;font:inherit;color:var(--ink)}
+.absrange-opt:hover,.absrange-opt:focus-visible{background:#f6f4ff}
+.absrange-opt.on{background:#f1eeff}
+.absrange-opt .tx{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0}
+.absrange-opt b{font-size:13px;font-weight:600}
+.absrange-opt small{font-size:12px;color:var(--muted)}
+.absrange-opt .ck{color:var(--accent);display:flex}
+.absrange-sep{height:1px;background:var(--line);margin:6px 4px}
+.absrange-months{padding:2px 8px 8px}
+.absrange-hint{font-size:12px;color:var(--muted);margin:4px 2px 2px}
+.absrange-hint b{color:var(--ink);font-weight:600}
+.absrange-yr{font-size:11px;font-weight:600;letter-spacing:.6px;color:var(--muted);margin:10px 2px 6px}
+.absrange-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.absrange-m{min-height:34px;border:1px solid var(--line);border-radius:9px;background:#fff;font:inherit;font-size:12.5px;cursor:pointer;color:var(--ink)}
+.absrange-m:hover{border-color:#c9bffb}
+.absrange-m.in{background:#f1eeff;border-color:#ddd6fe;color:#4B35C9}
+.absrange-m.end{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
 .pel-dd-panel{position:absolute;top:calc(100% + 6px);left:0;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 24px 60px rgba(108,92,231,.22);min-width:240px;max-height:300px;overflow-y:auto;z-index:50;padding:6px}
 @media (max-width:880px){.pel{grid-template-columns:1fr}.wkadd{margin-left:0}}
 /* Milestone */
@@ -1445,7 +1468,7 @@ html.vt .tab-content.active{animation:none}
     <button type="button" class="backcoach" id="dBackCoach" onclick="goBack()" style="display:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Kembali ke Coach</button>
     <nav class="navlist" aria-label="Tab CG"><button type="button" class="nav app-tab on" data-tab="absensi" aria-current="page" onclick="sTab('absensi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M9 15l2 2 4-4"/></svg><span>Absensi</span></button><button type="button" class="nav app-tab" data-tab="detail" onclick="sTab('detail',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c1.9.7 3.1 2.4 3.5 5.2"/></svg><span>Detail CG</span></button><button type="button" class="nav app-tab" data-tab="visi" onclick="sTab('visi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span>Visi CG</span></button><button type="button" class="nav app-tab" data-tab="pelayanan" onclick="sTab('pelayanan',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"/></svg><span>Pelayanan</span></button><button type="button" class="nav app-tab" data-tab="milestone" onclick="sTab('milestone',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4h11l-2 4 2 4H5"/></svg><span>Milestone</span></button><button type="button" class="nav app-tab" data-tab="events" onclick="sTab('events',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4z"/><path d="M14 7v10"/></svg><span>Events</span></button><button type="button" class="nav app-tab ai-nav" data-tab="ai" onclick="sTab('ai',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg><span>Tanya AI</span></button></nav>
     <div class="sidetheme"><small>The year of</small><b>Unity</b><span>&amp; Open Heavens</span></div>
-    <div class="profile"><span class="ava" id="dAva" aria-hidden="true">A</span><div style="flex:1;min-width:0"><b id="nN"></b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v82</span></span></span></div><button type="button" class="exit" onclick="goBack()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
+    <div class="profile"><span class="ava" id="dAva" aria-hidden="true">A</span><div style="flex:1;min-width:0"><b id="nN"></b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v83</span></span></span></div><button type="button" class="exit" onclick="goBack()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
   </aside>
   <div class="main">
     <header class="mtop">
@@ -1489,7 +1512,7 @@ html.vt .tab-content.active{animation:none}
     <div class="rolesw" role="group" aria-label="Peran"><button type="button" id="roleCoachBtn" class="on" aria-pressed="true" onclick="switchRole('coach')">Coach</button><button type="button" id="roleTLBtn" aria-pressed="false" onclick="switchRole('tl')">TL</button></div>
     <nav class="navlist" id="coachTabs" aria-label="Tab Coach"><button type="button" class="nav app-tab on" data-tab="c-overview" aria-current="page" onclick="sCoachTab('c-overview',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"/></svg><span>Overview</span></button><button type="button" class="nav app-tab" data-tab="c-absensi" onclick="sCoachTab('c-absensi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M9 15l2 2 4-4"/></svg><span>Absensi</span></button><button type="button" class="nav app-tab" data-tab="c-milestone" onclick="sCoachTab('c-milestone',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4h11l-2 4 2 4H5"/></svg><span>Milestone</span></button><button type="button" class="nav app-tab" data-tab="c-visi" onclick="sCoachTab('c-visi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span>Visi</span></button><button type="button" class="nav app-tab" data-tab="c-events" onclick="sCoachTab('c-events',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4z"/><path d="M14 7v10"/></svg><span>Events</span></button><button type="button" class="nav app-tab ai-nav" data-tab="c-ai" onclick="sCoachTab('c-ai',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg><span>Tanya AI</span></button><button type="button" class="nav app-tab usage-nav" data-tab="c-usage" hidden onclick="sCoachTab('c-usage',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V11M10 20V5M16 20v-8M22 20H2"/></svg><span>Pemakaian AI</span></button></nav>
     <button type="button" class="sidetheme editable" onclick="openThemeEdit()" aria-label="Edit tema tahun ini" title="Klik untuk edit tema"><small>The year of</small><b>Unity</b><span>&amp; Open Heavens</span><i class="st-edit" aria-hidden="true">Edit</i></button>
-    <div class="profile"><span class="ava" id="cAva" aria-hidden="true">C</span><div style="flex:1;min-width:0"><b id="cWho">Coach</b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v82</span></span></span></div><button type="button" class="exit" onclick="goBackCoach()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
+    <div class="profile"><span class="ava" id="cAva" aria-hidden="true">C</span><div style="flex:1;min-width:0"><b id="cWho">Coach</b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v83</span></span></span></div><button type="button" class="exit" onclick="goBackCoach()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
   </aside>
   <div class="main">
     <header class="mtop">
@@ -3097,8 +3120,8 @@ let _ABS_RANGE = { mode: '3m', from: 0, to: 0 };
 const ABS_MONTH_ID = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Ags','Sep','Okt','Nov','Des'];
 function absYMLabel(ym) { return ABS_MONTH_ID[ym % 12] + ' ' + Math.floor(ym / 12); }
 function absMonthsOf(dates) { return [...new Set(dates.map(d => labelYM(d.label)).filter(Boolean))].sort((a, b) => a - b); }
-function absViewDates(dates) {
-  const r = _ABS_RANGE, now = new Date(), nowYM = now.getFullYear() * 12 + now.getMonth();
+function absViewDates(dates, range) {
+  const r = range || _ABS_RANGE, now = new Date(), nowYM = now.getFullYear() * 12 + now.getMonth();
   if (r.mode === 'all') return dates;
   const inR = (lo, hi) => dates.filter(d => { const ym = labelYM(d.label); return ym && ym >= lo && ym <= hi; });
   if (r.mode === 'custom') { const v = inR(Math.min(r.from, r.to), Math.max(r.from, r.to)); return v; }
@@ -3111,42 +3134,98 @@ function absViewDates(dates) {
   }
   return v.length ? v : dates;
 }
-// Pilihan rentang (dropdown) + kalau "Pilih bulan…": dari bulan … sampai bulan …
+// Menu rentang (tombol + menu melayang, bukan <select> bawaan browser). "Pilih bulan": klik bulan awal lalu bulan akhir.
+let _ABS_MENU_OPEN = false, _ABS_PICKING = false;
+function absSpanText(view) {
+  const ms = absMonthsOf(view);
+  if (!ms.length) return 'Tidak ada tanggal';
+  const a = ms[0], b = ms[ms.length - 1];
+  const txt = a === b ? absYMLabel(a) : (Math.floor(a / 12) === Math.floor(b / 12) ? ABS_MONTH_ID[a % 12] : absYMLabel(a)) + ' – ' + absYMLabel(b);
+  return txt + ' · ' + view.length + ' tanggal';
+}
 function absRangeHTML(dates) {
   const months = absMonthsOf(dates);
   if (months.length <= 1) return '';
-  const r = _ABS_RANGE;
-  const opt = (v, t) => '<option value="' + v + '"' + (r.mode === v ? ' selected' : '') + '>' + t + '</option>';
-  let h = '<label class="sr" for="absRangeSel">Rentang tanggal</label><select class="select sm" id="absRangeSel" onchange="setAbsRange(this.value)">' +
-    opt('3m', '3 bulan terakhir') + opt('6m', '6 bulan terakhir') + opt('year', 'Tahun ' + new Date().getFullYear()) +
-    opt('all', 'Semua (' + dates.length + ' tanggal)') + opt('custom', 'Pilih bulan…') + '</select>';
+  const r = _ABS_RANGE, yr = new Date().getFullYear();
+  const NAMES = { '3m': '3 bulan terakhir', '6m': '6 bulan terakhir', year: 'Tahun ' + yr, all: 'Semua tanggal', custom: 'Pilih bulan' };
+  const cur = absViewDates(dates);
+  let h = '<div class="absrange">' +
+    '<button type="button" class="btn sm absrange-btn" aria-haspopup="true" aria-expanded="' + _ABS_MENU_OPEN + '" onclick="toggleAbsRangeMenu(event)">' +
+    icon('cal', 16) + '<span>' + NAMES[r.mode] + '</span><small>' + esc(absSpanText(cur).split(' · ')[0]) + '</small>' + icon('chev', 14) + '</button>' +
+    '<div class="absrange-pop" role="menu" aria-label="Rentang tanggal"' + (_ABS_MENU_OPEN ? '' : ' hidden') + '>';
+  ['3m', '6m', 'year', 'all', 'custom'].forEach(m => {
+    const on = r.mode === m;
+    const sub = m === 'custom' ? (on ? absSpanText(cur) : 'Klik bulan awal lalu bulan akhir') : absSpanText(absViewDates(dates, { mode: m }));
+    h += '<button type="button" role="menuitemradio" aria-checked="' + on + '" class="absrange-opt' + (on ? ' on' : '') + '" onclick="setAbsRange(\'' + m + '\')">' +
+      '<span class="tx"><b>' + NAMES[m] + '</b><small>' + esc(sub) + '</small></span>' + (on ? '<span class="ck">' + icon('check', 16) + '</span>' : '') + '</button>';
+  });
   if (r.mode === 'custom') {
-    const mopts = sel => months.map(ym => '<option value="' + ym + '"' + (ym === sel ? ' selected' : '') + '>' + absYMLabel(ym) + '</option>').join('');
-    h += '<label class="sr" for="absFrom">Dari bulan</label><select class="select sm" id="absFrom" onchange="setAbsRangeEnd(\'from\', this.value)">' + mopts(r.from) + '</select>' +
-      '<span class="sub" style="margin:0;align-self:center">s/d</span>' +
-      '<label class="sr" for="absTo">Sampai bulan</label><select class="select sm" id="absTo" onchange="setAbsRangeEnd(\'to\', this.value)">' + mopts(r.to) + '</select>';
+    const lo = Math.min(r.from, r.to), hi = Math.max(r.from, r.to);
+    h += '<div class="absrange-sep"></div><div class="absrange-months"><div class="absrange-hint">' +
+      (_ABS_PICKING ? 'Sekarang klik bulan <b>akhir</b>' : 'Klik bulan <b>awal</b>, lalu bulan <b>akhir</b>') + '</div>';
+    [...new Set(months.map(ym => Math.floor(ym / 12)))].forEach(y => {
+      h += '<div class="absrange-yr">' + y + '</div><div class="absrange-grid">';
+      months.filter(ym => Math.floor(ym / 12) === y).forEach(ym => {
+        const cls = (ym === lo || ym === hi) ? ' end' : (ym > lo && ym < hi ? ' in' : '');
+        h += '<button type="button" class="absrange-m' + cls + '" onclick="absPickMonth(' + ym + ')">' + ABS_MONTH_ID[ym % 12] + '</button>';
+      });
+      h += '</div>';
+    });
+    h += '</div>';
   }
-  return h;
+  return h + '</div></div>';
 }
 function absRerender() {
   for (const k in _ABS_SCROLL) delete _ABS_SCROLL[k]; // ganti rentang → mulai lagi dari tanggal terbaru
   if (document.getElementById('pageD')?.style.display === 'block' && document.getElementById('tab-absensi')?.classList.contains('active')) renderAbsensi();
   if (document.getElementById('pageC')?.style.display === 'block' && document.getElementById('tab-c-absensi')?.classList.contains('active')) renderCoachAbsensi();
+  if (_ABS_MENU_OPEN) absPlaceMenu();
 }
+// Menu jangan keluar layar: kalau tidak muat ke kiri, rata kiri tombol
+function absPlaceMenu() {
+  document.querySelectorAll('.absrange-pop:not([hidden])').forEach(pop => {
+    pop.classList.remove('left');
+    if (pop.getBoundingClientRect().left < 8) pop.classList.add('left');
+  });
+}
+function toggleAbsRangeMenu(ev) {
+  if (ev) ev.stopPropagation();
+  _ABS_MENU_OPEN = !_ABS_MENU_OPEN;
+  document.querySelectorAll('.absrange-pop').forEach(p => { p.hidden = !_ABS_MENU_OPEN; });
+  document.querySelectorAll('.absrange-btn').forEach(b => b.setAttribute('aria-expanded', String(_ABS_MENU_OPEN)));
+  if (_ABS_MENU_OPEN) absPlaceMenu();
+}
+function closeAbsRangeMenu() {
+  if (!_ABS_MENU_OPEN) return;
+  _ABS_MENU_OPEN = false; _ABS_PICKING = false;
+  document.querySelectorAll('.absrange-pop').forEach(p => { p.hidden = true; });
+  document.querySelectorAll('.absrange-btn').forEach(b => b.setAttribute('aria-expanded', 'false'));
+}
+document.addEventListener('click', e => { if (_ABS_MENU_OPEN && e.target.isConnected && !e.target.closest('.absrange')) closeAbsRangeMenu(); }); // isConnected: tombol di menu yang baru digambar ulang jangan dianggap klik di luar
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAbsRangeMenu(); });
 function setAbsRange(mode) {
-  if (mode === 'custom' && _ABS_RANGE.mode !== 'custom') {
-    // Mulai dari rentang yang sedang tampil
-    const src = document.getElementById('pageD')?.style.display === 'block' ? DATES : ALL_DATES; // halaman yang sedang tampil
-    const cur = absMonthsOf(absViewDates(src)), all = absMonthsOf(src);
-    _ABS_RANGE.from = cur[0] || all[0] || 0;
-    _ABS_RANGE.to = cur[cur.length - 1] || all[all.length - 1] || 0;
+  if (mode === 'custom') {
+    if (_ABS_RANGE.mode !== 'custom') {
+      // Mulai dari rentang yang sedang tampil
+      const src = document.getElementById('pageD')?.style.display === 'block' ? DATES : ALL_DATES; // halaman yang sedang tampil
+      const cur = absMonthsOf(absViewDates(src)), all = absMonthsOf(src);
+      _ABS_RANGE.from = cur[0] || all[0] || 0;
+      _ABS_RANGE.to = cur[cur.length - 1] || all[all.length - 1] || 0;
+    }
+    _ABS_RANGE.mode = 'custom'; _ABS_PICKING = false; _ABS_MENU_OPEN = true; // tetap terbuka untuk pilih bulan
+  } else {
+    _ABS_RANGE.mode = mode; _ABS_PICKING = false; _ABS_MENU_OPEN = false;
   }
-  _ABS_RANGE.mode = mode;
   absRerender();
 }
-function setAbsRangeEnd(which, val) {
-  _ABS_RANGE[which] = parseInt(val, 10) || 0;
-  if (_ABS_RANGE.from > _ABS_RANGE.to) { const t = _ABS_RANGE.from; _ABS_RANGE.from = _ABS_RANGE.to; _ABS_RANGE.to = t; } // dibalik otomatis
+function absPickMonth(ym) {
+  if (!_ABS_PICKING) { _ABS_RANGE.from = _ABS_RANGE.to = ym; _ABS_PICKING = true; }
+  else {
+    _ABS_RANGE.to = ym;
+    if (_ABS_RANGE.from > _ABS_RANGE.to) { const t = _ABS_RANGE.from; _ABS_RANGE.from = _ABS_RANGE.to; _ABS_RANGE.to = t; } // dibalik otomatis
+    _ABS_PICKING = false; _ABS_MENU_OPEN = false;
+  }
+  _ABS_RANGE.mode = 'custom';
   absRerender();
 }
 // Posisi geser tabel disimpan sebelum tabel digambar ulang (realtime/polling) lalu dikembalikan.
