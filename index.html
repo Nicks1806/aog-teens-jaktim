@@ -39,6 +39,11 @@ h1,h2,h3{font-family:var(--display)}
 /* Landing */
 .landing{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:20px;background:radial-gradient(ellipse at top,#faf5ff,#f8f8f5 60%)}
 .landing-title{font-family:'Instrument Serif',serif;font-size:32px;margin-bottom:2px}
+.lt-logo{display:block;max-width:min(340px,80vw);max-height:180px;object-fit:contain;margin:0 auto 28px}
+.lt-logo[hidden],.sidetheme .st-logo[hidden]{display:none}
+.sidetheme .st-logo{display:block;max-width:100%;max-height:72px;object-fit:contain;align-self:flex-start}
+.theme-logo-prev{display:flex;align-items:center;justify-content:center;min-height:72px;padding:10px;border:1px dashed var(--line);border-radius:12px;background:#faf9f6;color:var(--muted);font-size:13px;text-align:center}
+.theme-logo-prev img{max-width:100%;max-height:120px;object-fit:contain}
 .landing-sub{font-size:11px;color:var(--g3);letter-spacing:2px;text-transform:uppercase;margin-bottom:36px}
 .region-toggle{display:flex;background:rgba(232,232,232,.6);backdrop-filter:blur(10px);border-radius:24px;padding:3px;margin-bottom:28px;box-shadow:inset 0 1px 2px rgba(0,0,0,.04)}
 .region-btn{padding:10px 32px;border-radius:22px;border:none;font-size:14px;font-weight:700;cursor:pointer;transition:all .3s cubic-bezier(.4,0,.2,1);background:transparent;color:var(--g3);letter-spacing:.5px}
@@ -1319,6 +1324,17 @@ html.vt .tab-content.active{animation:none}
       <label class="field"><span class="flabel">Baris atas</span><input class="input" id="themeKicker" maxlength="40" placeholder="The year of"></label>
       <label class="field"><span class="flabel">Judul</span><input class="input" id="themeTitle" maxlength="30" placeholder="Unity"></label>
       <label class="field"><span class="flabel">Baris bawah</span><input class="input" id="themeSub" maxlength="40" placeholder="&amp; Open Heavens"></label>
+      <div class="field"><span class="flabel">Logo (opsional)</span>
+        <div class="theme-logo-prev" id="themeLogoPrev">Belum ada logo</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button type="button" class="btn sm" onclick="document.getElementById('themeLogoFile').click()">Pilih gambar</button>
+          <button type="button" class="btn sm ghost" id="themeLogoDel" onclick="themeClearLogo()" hidden>Hapus logo</button>
+          <input type="file" id="themeLogoFile" accept="image/png,image/jpeg,image/webp" hidden onchange="themePickLogo(this)">
+        </div>
+        <small class="sub">Kalau diisi, logo tampil menggantikan 3 baris teks di atas (halaman depan &amp; sidebar). Paling bagus PNG latar transparan.</small>
+      </div>
+      <label class="field"><span class="flabel">Teks di bawah "Absensi Dashboard"</span><input class="input" id="themeTag" maxlength="50" placeholder="AOG Teens Jaktim (tahun otomatis)">
+        <small class="sub">Kosongkan = otomatis "AOG Teens Jaktim" + tahun berjalan</small></label>
     </div>
     <div class="mfoot">
       <button type="button" class="btn" onclick="closeModal('themeModal')">Batal</button>
@@ -1403,11 +1419,12 @@ html.vt .tab-content.active{animation:none}
 
 <!-- LANDING -->
 <div class="landing" id="pageL">
+  <img id="ltLogo" class="lt-logo" alt="" hidden>
   <div style="font-size:13px;letter-spacing:3px;color:var(--g3);text-transform:uppercase;margin-bottom:6px;font-weight:600" id="ltKicker">THE YEAR OF</div>
   <div style="font-family:'Inter',sans-serif;font-weight:900;font-size:44px;letter-spacing:-2px;line-height:1" id="ltTitle">UNITY</div>
   <div style="font-family:'Inter',sans-serif;font-weight:800;font-size:22px;margin-bottom:28px;letter-spacing:-.5px" id="ltSub">& OPEN HEAVENS</div>
   <div class="landing-title" style="font-size:44px;line-height:1.1">Absensi Dashboard</div>
-  <div class="landing-sub" style="font-size:13px;letter-spacing:1.5px">AOG Teens Jaktim 2026</div>
+  <div class="landing-sub" style="font-size:13px;letter-spacing:1.5px" id="ltTag">AOG Teens Jaktim 2026</div>
   <div class="region-toggle"><button class="region-btn active" onclick="selReg('jaktim1',this)">JAKTIM 1</button><button class="region-btn" onclick="selReg('jaktim2',this)">JAKTIM 2</button></div>
   <div class="cgl-selector" id="cgDD" style="position:relative">
     <button type="button" id="cgDDBtn" onclick="toggleCGDropdown(event)" style="width:100%;padding:16px 18px;background:#fff;border:2px solid #e4dcff;border-radius:14px;display:flex;align-items:center;gap:12px;cursor:pointer;font-family:Inter,sans-serif;font-size:13px;color:var(--g1);box-shadow:0 4px 14px rgba(108,92,231,.06);transition:all .2s" onmouseover="this.style.borderColor='#c4b5fd';this.style.boxShadow='0 6px 20px rgba(108,92,231,.12)'" onmouseout="this.style.borderColor='#e4dcff';this.style.boxShadow='0 4px 14px rgba(108,92,231,.06)'">
@@ -1428,7 +1445,7 @@ html.vt .tab-content.active{animation:none}
     <button type="button" class="backcoach" id="dBackCoach" onclick="goBack()" style="display:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Kembali ke Coach</button>
     <nav class="navlist" aria-label="Tab CG"><button type="button" class="nav app-tab on" data-tab="absensi" aria-current="page" onclick="sTab('absensi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M9 15l2 2 4-4"/></svg><span>Absensi</span></button><button type="button" class="nav app-tab" data-tab="detail" onclick="sTab('detail',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c1.9.7 3.1 2.4 3.5 5.2"/></svg><span>Detail CG</span></button><button type="button" class="nav app-tab" data-tab="visi" onclick="sTab('visi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span>Visi CG</span></button><button type="button" class="nav app-tab" data-tab="pelayanan" onclick="sTab('pelayanan',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"/></svg><span>Pelayanan</span></button><button type="button" class="nav app-tab" data-tab="milestone" onclick="sTab('milestone',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4h11l-2 4 2 4H5"/></svg><span>Milestone</span></button><button type="button" class="nav app-tab" data-tab="events" onclick="sTab('events',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4z"/><path d="M14 7v10"/></svg><span>Events</span></button><button type="button" class="nav app-tab ai-nav" data-tab="ai" onclick="sTab('ai',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg><span>Tanya AI</span></button></nav>
     <div class="sidetheme"><small>The year of</small><b>Unity</b><span>&amp; Open Heavens</span></div>
-    <div class="profile"><span class="ava" id="dAva" aria-hidden="true">A</span><div style="flex:1;min-width:0"><b id="nN"></b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v77</span></span></span></div><button type="button" class="exit" onclick="goBack()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
+    <div class="profile"><span class="ava" id="dAva" aria-hidden="true">A</span><div style="flex:1;min-width:0"><b id="nN"></b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v78</span></span></span></div><button type="button" class="exit" onclick="goBack()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
   </aside>
   <div class="main">
     <header class="mtop">
@@ -1472,7 +1489,7 @@ html.vt .tab-content.active{animation:none}
     <div class="rolesw" role="group" aria-label="Peran"><button type="button" id="roleCoachBtn" class="on" aria-pressed="true" onclick="switchRole('coach')">Coach</button><button type="button" id="roleTLBtn" aria-pressed="false" onclick="switchRole('tl')">TL</button></div>
     <nav class="navlist" id="coachTabs" aria-label="Tab Coach"><button type="button" class="nav app-tab on" data-tab="c-overview" aria-current="page" onclick="sCoachTab('c-overview',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"/></svg><span>Overview</span></button><button type="button" class="nav app-tab" data-tab="c-absensi" onclick="sCoachTab('c-absensi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M9 15l2 2 4-4"/></svg><span>Absensi</span></button><button type="button" class="nav app-tab" data-tab="c-milestone" onclick="sCoachTab('c-milestone',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4h11l-2 4 2 4H5"/></svg><span>Milestone</span></button><button type="button" class="nav app-tab" data-tab="c-visi" onclick="sCoachTab('c-visi',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span>Visi</span></button><button type="button" class="nav app-tab" data-tab="c-events" onclick="sCoachTab('c-events',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4z"/><path d="M14 7v10"/></svg><span>Events</span></button><button type="button" class="nav app-tab ai-nav" data-tab="c-ai" onclick="sCoachTab('c-ai',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg><span>Tanya AI</span></button><button type="button" class="nav app-tab usage-nav" data-tab="c-usage" hidden onclick="sCoachTab('c-usage',this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V11M10 20V5M16 20v-8M22 20H2"/></svg><span>Pemakaian AI</span></button></nav>
     <button type="button" class="sidetheme editable" onclick="openThemeEdit()" aria-label="Edit tema tahun ini" title="Klik untuk edit tema"><small>The year of</small><b>Unity</b><span>&amp; Open Heavens</span><i class="st-edit" aria-hidden="true">Edit</i></button>
-    <div class="profile"><span class="ava" id="cAva" aria-hidden="true">C</span><div style="flex:1;min-width:0"><b id="cWho">Coach</b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v77</span></span></span></div><button type="button" class="exit" onclick="goBackCoach()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
+    <div class="profile"><span class="ava" id="cAva" aria-hidden="true">C</span><div style="flex:1;min-width:0"><b id="cWho">Coach</b><span class="live"><i class="live-dot"></i><span class="live-label">Live</span><span>· <span class="appver" title="App version">v78</span></span></span></div><button type="button" class="exit" onclick="goBackCoach()" aria-label="Keluar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button></div>
   </aside>
   <div class="main">
     <header class="mtop">
@@ -2057,8 +2074,10 @@ async function saveVisionField(cg, region, field, value) {
   }
 }
 
-// Tema tahun (sidebar + landing) — disimpan di cg_vision dengan cg='__THEME__', region='all', visi = JSON {kicker,title,sub}
-const THEME_DEFAULT = { kicker: 'The year of', title: 'Unity', sub: '& Open Heavens' };
+// Tema tahun (sidebar + landing) — disimpan di cg_vision dengan cg='__THEME__', region='all', visi = JSON {kicker,title,sub,logo,tag}
+// logo = data URL gambar (opsional, diperkecil saat upload) → menggantikan 3 baris teks; tag = teks di bawah "Absensi Dashboard" (kosong = otomatis + tahun berjalan)
+const THEME_DEFAULT = { kicker: 'The year of', title: 'Unity', sub: '& Open Heavens', logo: '', tag: '' };
+function themeTagText(t) { return String((t && t.tag) || '').trim() || ('AOG Teens Jaktim ' + new Date().getFullYear()); }
 let CUR_THEME = { ...THEME_DEFAULT };
 try { const t = JSON.parse(localStorage.getItem('aog_theme') || 'null'); if (t && t.title) CUR_THEME = { ...THEME_DEFAULT, ...t }; } catch(e) {}
 function applyTheme(t) {
@@ -2067,11 +2086,21 @@ function applyTheme(t) {
   set('ltKicker', CUR_THEME.kicker.toUpperCase());
   set('ltTitle', CUR_THEME.title.toUpperCase());
   set('ltSub', CUR_THEME.sub.toUpperCase());
+  set('ltTag', themeTagText(CUR_THEME));
+  const logo = /^data:image\/(png|jpeg|webp);base64,/.test(CUR_THEME.logo || '') ? CUR_THEME.logo : '';
+  const altText = [CUR_THEME.kicker, CUR_THEME.title, CUR_THEME.sub].filter(Boolean).join(' ');
+  const lg = document.getElementById('ltLogo');
+  if (lg) { if (logo) { lg.src = logo; lg.alt = altText; } else lg.removeAttribute('src'); lg.hidden = !logo; }
+  ['ltKicker', 'ltTitle', 'ltSub'].forEach(id => { const el = document.getElementById(id); if (el) el.hidden = !!logo; });
   document.querySelectorAll('.sidetheme').forEach(el => {
     const k = el.querySelector('small'), b = el.querySelector('b'), sp = el.querySelector('span');
     if (k) k.textContent = CUR_THEME.kicker;
     if (b) b.textContent = CUR_THEME.title;
     if (sp) sp.textContent = CUR_THEME.sub;
+    let im = el.querySelector('.st-logo');
+    if (!im && logo) { im = document.createElement('img'); im.className = 'st-logo'; im.alt = ''; el.insertBefore(im, el.firstChild); }
+    if (im) { if (logo) { im.src = logo; im.alt = altText; } im.hidden = !logo; }
+    [k, b, sp].forEach(x => { if (x) x.hidden = !!logo; });
   });
   try { localStorage.setItem('aog_theme', JSON.stringify(CUR_THEME)); } catch(e) {}
 }
@@ -2137,13 +2166,49 @@ function openThemeEdit() {
   document.getElementById('themeKicker').value = CUR_THEME.kicker;
   document.getElementById('themeTitle').value = CUR_THEME.title;
   document.getElementById('themeSub').value = CUR_THEME.sub;
+  document.getElementById('themeTag').value = CUR_THEME.tag || '';
+  _THEME_LOGO = CUR_THEME.logo || '';
+  themeLogoPreview();
   openModal('themeModal');
+}
+let _THEME_LOGO = '';
+function themeLogoPreview() {
+  const box = document.getElementById('themeLogoPrev');
+  box.innerHTML = _THEME_LOGO ? '<img src="' + esc(_THEME_LOGO) + '" alt="Pratinjau logo">' : 'Belum ada logo';
+  document.getElementById('themeLogoDel').hidden = !_THEME_LOGO;
+}
+function themeClearLogo() { _THEME_LOGO = ''; themeLogoPreview(); }
+// Gambar diperkecil (maks 800x400) supaya ringan dimuat semua HP; PNG/WebP tetap transparan
+function themePickLogo(input) {
+  const file = input.files && input.files[0];
+  input.value = '';
+  if (!file) return;
+  if (!/^image\/(png|jpeg|webp)$/.test(file.type)) { toast('❌ Pilih gambar PNG, JPG, atau WebP'); return; }
+  if (file.size > 10 * 1024 * 1024) { toast('❌ Gambar terlalu besar (maks 10 MB)'); return; }
+  const url = URL.createObjectURL(file);
+  const img = new Image();
+  img.onload = () => {
+    URL.revokeObjectURL(url);
+    const r = Math.min(1, 800 / img.width, 400 / img.height);
+    const c = document.createElement('canvas');
+    c.width = Math.max(1, Math.round(img.width * r)); c.height = Math.max(1, Math.round(img.height * r));
+    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+    let out = file.type === 'image/jpeg' ? c.toDataURL('image/jpeg', 0.9) : c.toDataURL('image/png');
+    if (out.length > 450000) out = c.toDataURL('image/webp', 0.9);
+    if (!/^data:image\/webp/.test(out) && out.length > 450000) out = c.toDataURL('image/jpeg', 0.85);
+    if (out.length > 450000) { toast('❌ Logo terlalu besar setelah diperkecil — coba gambar yang lebih sederhana'); return; }
+    _THEME_LOGO = out; themeLogoPreview();
+  };
+  img.onerror = () => { URL.revokeObjectURL(url); toast('❌ Gambar tidak bisa dibaca'); };
+  img.src = url;
 }
 async function saveTheme() {
   const t = {
     kicker: document.getElementById('themeKicker').value.trim(),
     title: document.getElementById('themeTitle').value.trim(),
-    sub: document.getElementById('themeSub').value.trim()
+    sub: document.getElementById('themeSub').value.trim(),
+    tag: document.getElementById('themeTag').value.trim(),
+    logo: _THEME_LOGO || ''
   };
   if (!t.title) { toast('❌ Judul tema harus diisi'); return; }
   const btn = document.getElementById('themeSaveBtn');
