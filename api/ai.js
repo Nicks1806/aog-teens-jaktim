@@ -62,7 +62,6 @@ const APP_GUIDE = [
   '- Saran lagu PAW tampil sebagai daftar dengan tombol "Lirik" (membuka video lirik di YouTube) dan "Spotify" per lagu; lirik tidak ditulis di aplikasi karena hak cipta.',
   '- Ulang tahun: kartu "Ulang tahun terdekat" (30 hari) di Overview Coach/TL dan tab Detail CG, tombol "Ucapan WA" membuat ucapan dengan AI.',
   '- Isi absensi lewat chat / suara (Coach/TL & CGL): di Tanya AI ketik atau tekan mikrofon lalu ucapkan, mis. "TEEN 01 Sabtu ini: Andi, Budi hadir, Citra izin" → AI menyiapkan kartu absensi → "Cek & simpan" → cek/koreksi → Simpan. CGL hanya bisa untuk CG-nya.',
-  '- Absen dari foto (Coach/TL & CGL): tab Absensi → tombol "Absen dari foto" → pilih CG + tanggal ibadah → foto daftar hadir → "Baca dengan AI" → cek & koreksi H/I/S/A per anak → "Simpan". Tidak ada yang tersimpan sebelum Simpan. Tombol "Sisanya → Alpa" untuk anak yang tidak ada di foto.',
   '- Tanggal ibadah bulan baru: Coach/TL tab Absensi → tombol "Generate Sabtu [Bulan Tahun]" (menambah semua hari Sabtu bulan berikutnya, aman dari duplikat).',
   '- Pengingat CGL: Coach tab Absensi → bagian "CGL belum input absensi" → "Ingatkan" per CG atau "Ingatkan semua" (notifikasi ke HP CGL yang sudah mengaktifkan notifikasi).',
   '- Tambah anak baru: dashboard CG → tab Detail CG → "Tambah member".',
